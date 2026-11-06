@@ -3440,7 +3440,7 @@
 
         el.tPosition.textContent = 'İlaç Kutusu Aranıyor';
         el.tDistance.textContent = '20 cm Mesafede Tutun';
-        announceGuidance('İlaç kutusunu kameranın 20 santimetre önüne tutun. Barkodu, miligram dozajı ve Son Kullanma Tarihi (SKT) sıfır hatayla kontrol edilecektir.', {
+        announceGuidance('İlaç kutusunu kameranın 20 santimetre önüne tutun. Barkodu, miligram dozajı ve Son Kullanma Tarihi (SKT) okunup kontrol edilecektir.', {
             bannerState: 'normal',
             minIntervalMs: 4000
         });
@@ -10388,7 +10388,7 @@
             'light_meter': '7. Bölüm: Lamba Açık mı Kapalı mı ve Pencere Bulucu açıldı. Işığın olduğu tarafa döndükçe ses incelir.',
             'explorer': '8. Bölüm: Etrafımda Ne Var ve Evrak Okuyucu açıldı. Odanızdaki eşyaları söyler, çift dokunursanız elinizdeki kağıdı okur. Yürürken güvenliğiniz için mutlaka beyaz bastonunuzu kullanmaya devam edin.',
             'medicine_skt': '9. Bölüm: İlaç Kutusu ve Son Kullanma Tarihi Kontrolü açıldı. İlacın adını, kaç miligram olduğunu ve tarihinin geçip geçmediğini kontrol etmek için kutuyu kameraya tutun.',
-            'signature_pen': '10. Bölüm: İmza Atarken Kalem Yönlendirici açıldı. Maksimum güvenlik kilidi aktif: Önce evrakta ne yazdığını doğrulamak için ekrana çift dokunun veya Boşluk tuşuna basın; evrak okunduktan sonra kaleminizi imza alanına yönlendireceğim.',
+            'signature_pen': '10. Bölüm: İmza Atarken Kalem Yönlendirici açıldı. Güvenliğiniz için önce evrakta ne yazdığını doğrulamak üzere ekrana çift dokunun veya Boşluk tuşuna basın; evrak okunduktan sonra kaleminizi imza alanına yönlendireceğim.',
             'liquid_level': '11. Bölüm: Masadaki Bardak, Kupa ve Şişe Bulucu açıldı. Masadaki bardağı veya şişeyi elinizi çarpmadan bulmak için kamerayı masaya tutun. Güvenliğiniz için kaynar çay veya sıcak su doldururken kameraya güvenmeyin.',
             'door_elevator_lcd': '12. Bölüm: Kapı Numarası, Asansör Tuşu ve Makine Ekranı Okuyucu açıldı. Kapı numarasını, asansör tuşlarını veya çamaşır makinesi ekranını okutmak için Boşluk tuşuna basın.',
             'food_freshness': '13. Bölüm: Paketli Gıda İçindekiler, Alerjen ve Son Tüketim Tarihi Okuyucu açıldı. Market paketinin içindekiler ve tarih kısmını kameraya gösterip Boşluk tuşuna basın.',
