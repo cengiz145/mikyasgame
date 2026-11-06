@@ -11465,6 +11465,7 @@
 
     // 12. Bölüm: Canlı Sesli Derece Ayarlama (Kombi, Klima, Çamaşır Makinesi, Fırın) Düğmeleri
     const btnDegreeLiveToggle = document.getElementById('btn-degree-live-toggle');
+    const btnDegreeSpeakGuide = document.getElementById('btn-degree-speak-guide');
     const btnDegreeReadNow = document.getElementById('btn-degree-read-now');
     const btnDegreeVoiceTarget = document.getElementById('btn-degree-voice-target');
     const btnDegreeClearTarget = document.getElementById('btn-degree-clear-target');
@@ -11472,7 +11473,19 @@
     const btnDegreeSetTarget = document.getElementById('btn-degree-set-target');
     const degreePresetBtns = document.querySelectorAll('.degree-preset-btn');
 
+    function speakApplianceDegreeTactileGuide() {
+        const guideSpeech = 'Derece Okuma ve Elle Ayarlama Yol Göstericisi kullanım betimlemesi: '
+            + 'Öncelikle içiniz rahat olsun; bu uygulama kombi, klima veya makinenize kesinlikle hiçbir elektronik sinyal ya da komut göndermez, eşyalarınıza müdahale etmez; yalnızca kamerayla ekranı okur. '
+            + '1. Adım: Telefonu kaldırmadan önce iki elinizle cihazın ön yüzeyine dokunun; parmak uçlarınızla düz ve pürüzsüz cam ekran penceresini ve hemen yanındaki veya altındaki artırma, azaltma tuşlarını ya da çevrilen düğmeyi hissederek yerlerini belirleyin. '
+            + '2. Adım: Bir elinizle telefonun arka kamerasını az önce dokunduğunuz pürüzsüz ekran penceresine hafifçe değdirin, ardından elinizi ekrandan yaklaşık bir karış, yani 15 ile 20 santimetre kendinize doğru geri çekin. Uygulama ekranın ışığını algılayıp sağa veya sola kaydırmanız için size sesli yön tarif edecektir. '
+            + '3. Adım: İsterseniz hazır derece düğmelerinden birine dokunun, isterseniz Ulaşmak İstediğim Dereceyi Sesle Söyle düğmesine basıp örneğin kırk beş derece deyin. '
+            + '4. Adım: Telefonu tutan elinizi sabit tutarken, boştaki diğer elinizi kameranın önünden geçirmeden, aşağıdan veya yandan uzatarak cihazın düğmesinin üzerine koyun. Eliniz ekranın önünü kapatırsa uygulama sizi hemen uyarır. '
+            + '5. Adım: Kendi parmağınızla düğmeye bir kez basın ve bir iki saniye bekleyin. Uygulama değişen sayıyı anında okuyacak ve istediğiniz sayıya geldiğinizde üçlü onay sinyaliyle düğmeden elinizi çekebileceğinizi söyleyecektir.';
+        announceGuidance(guideSpeech, { force: true, bannerState: 'centered' });
+    }
+
     if (btnDegreeLiveToggle) btnDegreeLiveToggle.addEventListener('click', toggleApplianceDegreeLiveTracking);
+    if (btnDegreeSpeakGuide) btnDegreeSpeakGuide.addEventListener('click', speakApplianceDegreeTactileGuide);
     if (btnDegreeReadNow) btnDegreeReadNow.addEventListener('click', () => readApplianceDegreeNow(false));
     if (btnDegreeVoiceTarget) btnDegreeVoiceTarget.addEventListener('click', () => startVoiceItemMemoryCapture('degree_target'));
     if (btnDegreeClearTarget) btnDegreeClearTarget.addEventListener('click', () => clearTargetApplianceDegree(false));
