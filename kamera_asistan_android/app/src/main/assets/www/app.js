@@ -757,6 +757,10 @@
             setTimeout(() => this.playPannedTone(659.25, 0, 0.09, 'triangle', 0.14), 65);
         }
 
+        playLockedChime() {
+            this.playLockChord();
+        }
+
         playShutterSound() {
             this.init();
             this.playPannedTone(880, 0, 0.06, 'triangle', 0.25);
@@ -1274,6 +1278,7 @@
             anCtx.drawImage(el.video, 0, 0, anW, anH);
 
             const metrics = analyzeFrameMathematics(anCtx, anW, anH);
+            state.lastMetrics = metrics;
             updateTelemetryUI(metrics);
 
             let qrDetection = null;
@@ -3969,6 +3974,7 @@
         el.btnDownloadPhoto.hidden = false;
 
         const metrics = analyzeFrameMathematics(ctx, capCanvas.width, capCanvas.height);
+        state.lastMetrics = metrics;
         let preds = [];
         if (!state.cocoModel && typeof window.cocoSsd !== 'undefined') {
             try {
@@ -4182,11 +4188,9 @@
                     return;
                 }
 
-                // ÖZEL MOD 23: ERİŞİLEBİLİR YEMEK YAPMA REHBERİ (SADECE KAMERANIN GERÇEKTEN GÖRDÜKLERİ VE YÜZDELERİ)
+                // ÖZEL MOD 23: ADIM ADIM SESLİ YEMEK TARİFLERİ REHBERİ (SADECE SESLİ TARİF ADIMINI OKUR)
                 if (state.mode === 'cooking_guide') {
-                    const cookCheck = analyzeStoveFlameAndFoodBrowning(capCanvas, metrics, verifiedCombinedText, preds);
-                    showDetectedResult('👩‍🍳👁️ Kameranın Gördüğü Gerçek Nesne, Renk ve Yazı Raporu', cookCheck.fullText);
-                    announceGuidance(cookCheck.speechText, { force: true, bannerState: 'centered' });
+                    stepCookingInstruction(0);
                     return;
                 }
 
@@ -6132,7 +6136,7 @@
     }
 
     function matchMelodyBySemitoneContour(midiNotes) {
-        if (!Array.isArray(midiNotes) || midiNotes.length < 7) return null;
+        if (!Array.isArray(midiNotes) || midiNotes.length < 9) return null;
         const userIntervals = [];
         for (let i = 1; i < midiNotes.length; i++) {
             const diff = Math.max(-9, Math.min(9, midiNotes[i] - midiNotes[i - 1]));
@@ -6163,7 +6167,7 @@
             }
         }
 
-        if (bestSong && bestScore >= 0.74) {
+        if (bestSong && bestScore >= 0.84) {
             return {
                 song: bestSong,
                 confidencePct: Math.min(98, Math.round(bestScore * 100))
@@ -6830,6 +6834,19 @@
             fetchJsonWithTimeout(itunesUrl, 4500)
         ]);
 
+        const queryNormTokens = normalizeTurkishPhonetic(primaryQuery).split(/\s+/).filter(w => w.length >= 3);
+        const isOnlineCandidateRelevant = (titleStr, artistStr, lyricsStr) => {
+            if (queryNormTokens.length === 0) return false;
+            const combinedNorm = normalizeTurkishPhonetic(`${titleStr || ''} ${artistStr || ''} ${lyricsStr || ''}`);
+            let matchedCount = 0;
+            for (const tok of queryNormTokens) {
+                if (combinedNorm.includes(tok)) matchedCount++;
+            }
+            if (matchedCount > 0) return true;
+            const titleArtistSim = computeTrigramSimilarity(primaryQuery, `${titleStr || ''} ${artistStr || ''}`);
+            return titleArtistSim >= 0.38;
+        };
+
         const lrcList = lrcRes.status === 'fulfilled' ? lrcRes.value : null;
         if (Array.isArray(lrcList) && lrcList.length > 0) {
             lrcList.slice(0, 4).forEach((item, idx) => {
@@ -6841,6 +6858,9 @@
                     lyrics: item.plainLyrics || item.syncedLyrics || '',
                     previewUrl: ''
                 };
+                if (!isOnlineCandidateRelevant(cand.title, cand.artist, cand.lyrics)) {
+                    return;
+                }
                 if (idx === 0 && !foundTrack) {
                     foundTrack = cand;
                 } else if (idx === 0 && foundTrack && cand.lyrics.length > (foundTrack.lyrics || '').length) {
@@ -6870,6 +6890,9 @@
             itData.results.forEach((hit, idx) => {
                 const releaseYear = hit.releaseDate ? hit.releaseDate.slice(0, 4) : '';
                 const albumStr = `${hit.collectionName || 'Tekli'}${releaseYear ? ' (' + releaseYear + ')' : ''}`;
+                if (!foundTrack && !isOnlineCandidateRelevant(hit.trackName, hit.artistName, '')) {
+                    return;
+                }
                 if (idx === 0) {
                     if (!foundTrack) {
                         foundTrack = {
@@ -7218,8 +7241,8 @@
                 break;
             }
         }
-        if (!target && typeof TURKEY_81_CITIES !== 'undefined') {
-            for (const c of TURKEY_81_CITIES) {
+        if (!target && typeof TURKEY_81_PROVINCES !== 'undefined') {
+            for (const c of TURKEY_81_PROVINCES) {
                 if (c[0].toLocaleLowerCase('tr-TR').includes(qLower)) {
                     target = { name: `${c[0]} Merkez`, lat: c[1], lon: c[2] };
                     break;
@@ -7290,7 +7313,7 @@
 
         if (distM <= 70 && !state.busStopAlert60Fired) {
             state.busStopAlert60Fired = true;
-            radar.playLockedChime();
+            radar.playLockChord();
             if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 400]);
             announceGuidance(`DİKKAT! İneceğiniz ${state.busTargetStop.name} durağına geldiniz! Sadece ${distM} metre kaldı, şimdi inme düğmesine basın!`, {
                 force: true,
@@ -7735,7 +7758,7 @@
         const outlierRatio = outlierPixels / Math.max(1, count);
         return {
             r: avgR, g: avgG, b: avgB,
-            colorInfo: classifyTurkishColorName(avgR, avgG, avgB),
+            colorInfo: classifyColorCIELAB(avgR, avgG, avgB),
             stdDev,
             outlierRatio
         };
@@ -8603,7 +8626,7 @@
         const stepObj = rec.steps[state.currentCookingStepIndex] || rec.steps[0];
         const titleEl = document.getElementById('cooking-recipe-title');
         const stepEl = document.getElementById('cooking-step-text');
-        const timerBtn = document.getElementById('btn-cooking-timer');
+        const badgeEl = document.getElementById('cooking-status-badge');
 
         if (titleEl) {
             titleEl.textContent = `${rec.title} — ${rec.ingredients}`;
@@ -8611,9 +8634,8 @@
         if (stepEl && stepObj) {
             stepEl.textContent = `(${state.currentCookingStepIndex + 1}/${rec.steps.length}) ${stepObj.text}`;
         }
-        if (timerBtn && stepObj && !state.cookingTimerInterval) {
-            const mins = stepObj.timerMinutes || 3;
-            timerBtn.textContent = `⏱️ Bu Adımın Pişme Süresini Başlat (${mins} Dakika Konuşan Saat)`;
+        if (badgeEl) {
+            badgeEl.textContent = `Adım ${state.currentCookingStepIndex + 1} / ${rec.steps.length}`;
         }
     }
 
@@ -8626,7 +8648,7 @@
         updateCookingGuideUI();
         if (speakNow) {
             const rec = BLIND_ACCESSIBLE_RECIPES[idx];
-            announceGuidance(`Seçilen yemek: ${rec.title}. Gerekli malzemeler: ${rec.ingredients} Şimdi 1. adıma başlamak için Bu Adımı Oku düğmesine basabilirsiniz.`, {
+            announceGuidance(`Seçilen yemek tarifi: ${rec.title}. Gerekli malzemeler: ${rec.ingredients} 1. adımdan dinlemeye başlamak için Bu Adımı Oku veya Sonraki Adım düğmesine basabilirsiniz.`, {
                 force: true,
                 bannerState: 'centered'
             });
@@ -8645,240 +8667,24 @@
     function stepCookingInstruction(delta) {
         const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
         if (!rec) return;
-        const isStoveRecipe = rec.category === 'ocakli';
         if (delta < 0 && state.currentCookingStepIndex <= 0) {
             announceGuidance(`İlk adımdasınız. ${rec.steps[0].text}`, { force: true });
             return;
         }
         if (delta > 0 && state.currentCookingStepIndex >= rec.steps.length - 1) {
-            if (isStoveRecipe) {
-                startStoveOffReminderWatch();
-                announceGuidance(`Tebrikler, ${rec.title} tarifinin son adımındasınız! Yemeğiniz hazır. Güvenliğiniz için lütfen şimdi ocağın ve fırının düğmesini tamamen kapatın ve Ocağı Kapattım düğmesine dokunun!`, {
-                    force: true,
-                    bannerState: 'centered'
-                });
-            } else {
-                announceGuidance(`Tebrikler, ${rec.title} tarifinin son adımındasınız! Bu yemekte hiç ocak veya ateş kullanmadığımız için yanma ve taşma riski sıfırdır. Ellerinize sağlık, afiyet olsun!`, {
-                    force: true,
-                    bannerState: 'centered'
-                });
-            }
+            announceGuidance(`Tebrikler, ${rec.title} tarifinin tüm adımları tamamlandı! Ellerinize sağlık, afiyet olsun.`, {
+                force: true,
+                bannerState: 'centered'
+            });
             return;
         }
         state.currentCookingStepIndex = Math.max(0, Math.min(rec.steps.length - 1, state.currentCookingStepIndex + delta));
         updateCookingGuideUI();
         const stepObj = rec.steps[state.currentCookingStepIndex];
-        const safetyHint = isStoveRecipe
-            ? (stepObj.timerMinutes >= 10
-                ? ' Taşmayı önlemek için tencerenin ağzına yatay bir tahta kaşık koyup kapağı hafif aralık bırakmayı ve kaynayınca ocağı en kısığa almayı unutmayın.'
-                : (stepObj.timerMinutes > 0
-                    ? ' Dibinin tutmaması ve yanmaması için ocağı orta-kısık ateşte tutun ve her 40 saniyede bir tahta kaşıkla karıştırın.'
-                    : ''))
-            : '';
-        const timerHint = stepObj.timerMinutes > 0
-            ? (isStoveRecipe
-                ? ` Bu adımın pişme süresi ${stepObj.timerMinutes} dakikadır; Konuşan Tencere Saatini Başlat düğmesine basarak yanma ve taşma hatırlatmalı sayacı başlatabilirsiniz.`
-                : ` Bu adımın dinlenme veya karıştırma süresi ${stepObj.timerMinutes} dakikadır; Konuşan Saati Başlat düğmesine basarak sesli sayacı başlatabilirsiniz.`)
-            : '';
-        announceGuidance(`${stepObj.text}${safetyHint}${timerHint}`, {
+        announceGuidance(`${rec.title}, ${state.currentCookingStepIndex + 1}. adım (toplam ${rec.steps.length} adım): ${stepObj.text}`, {
             force: true,
             bannerState: 'centered'
         });
-    }
-
-    function formatMinutesSecondsTurkish(totalSec) {
-        const m = Math.floor(totalSec / 60);
-        const s = totalSec % 60;
-        if (m > 0 && s > 0) return `${m} dakika ${s} saniye`;
-        if (m > 0) return `${m} dakika`;
-        return `${s} saniye`;
-    }
-
-    function startStoveOffReminderWatch() {
-        state.stoveConfirmedOff = false;
-        if (state.stoveOffReminderTimer) clearInterval(state.stoveOffReminderTimer);
-        state.stoveOffReminderTimer = setInterval(() => {
-            if (state.stoveConfirmedOff) {
-                clearInterval(state.stoveOffReminderTimer);
-                state.stoveOffReminderTimer = null;
-                return;
-            }
-            radar.playDangerAlarm();
-            if (navigator.vibrate) navigator.vibrate([220, 80, 220]);
-            announceGuidance('Güvenlik hatırlatması: Yemeğinizin pişme süresi tamamlandı. Ocağın veya fırının açık kalmaması için lütfen düğmesini kapalı konuma getirin ve ekrandaki Ocağı Kapattım düğmesine basın.', {
-                force: true,
-                bannerState: 'warning'
-            });
-        }, 45000);
-    }
-
-    function confirmStoveTurnedOffSafety() {
-        state.stoveConfirmedOff = true;
-        if (state.stoveOffReminderTimer) {
-            clearInterval(state.stoveOffReminderTimer);
-            state.stoveOffReminderTimer = null;
-        }
-        if (state.boilBurnGuardActive) {
-            toggleBoilOverAndBurnGuard();
-        }
-        const badgeEl = document.getElementById('cooking-status-badge');
-        const donenessEl = document.getElementById('cooking-doneness-display');
-        if (badgeEl) badgeEl.textContent = '✅ Ocak Kapalı & Güvenli';
-        if (donenessEl) donenessEl.textContent = 'Ocak kapatıldı (Güvenli)';
-        radar.playQrSuccessSound();
-        announceGuidance('Harikasınız! Ocağın ve fırının kapatıldığı onaylandı, açık unutma alarmı durduruldu. Ellerinize sağlık, afiyet ve şifa olsun!', {
-            force: true,
-            bannerState: 'centered'
-        });
-    }
-
-    async function toggleBoilOverAndBurnGuard() {
-        const btn = document.getElementById('btn-cooking-boil-guard');
-        const donenessEl = document.getElementById('cooking-doneness-display');
-
-        if (state.boilBurnGuardActive) {
-            state.boilBurnGuardActive = false;
-            if (state.boilBurnAudioTimer) {
-                clearInterval(state.boilBurnAudioTimer);
-                state.boilBurnAudioTimer = null;
-            }
-            if (btn) {
-                btn.classList.remove('active-toggle');
-                btn.setAttribute('aria-pressed', 'false');
-                btn.textContent = '👁️ Kamera Görsel Gözlemcisi: Kapalı';
-            }
-            announceGuidance('Kamera görsel gözlemcisi kapatıldı.', { force: true });
-            return;
-        }
-
-        state.boilBurnGuardActive = true;
-        if (!state.isRunning) {
-            await startCamera();
-        }
-        if (btn) {
-            btn.classList.add('active-toggle');
-            btn.setAttribute('aria-pressed', 'true');
-            btn.textContent = '👁️ Kamera Görsel Gözlemcisi: AÇIK';
-        }
-        if (donenessEl) {
-            donenessEl.textContent = '👁️ Kamera Görüntüsü İzleniyor';
-        }
-
-        announceGuidance('Kamera Görsel Gözlemcisi açıldı! Hiçbir varsayım yapmadan sadece kamerada gerçekten görünen eşyaları ve renkleri anlaşılır bir dille bildirir.', {
-            force: true,
-            bannerState: 'centered'
-        });
-    }
-
-    function toggleCookingStepTimer() {
-        const timerEl = document.getElementById('cooking-timer-display');
-        const timerBtn = document.getElementById('btn-cooking-timer');
-        const badgeEl = document.getElementById('cooking-status-badge');
-
-        if (state.cookingTimerInterval) {
-            clearInterval(state.cookingTimerInterval);
-            state.cookingTimerInterval = null;
-            state.cookingTimerRemainingSec = 0;
-            if (timerEl) timerEl.textContent = 'Sayaç durduruldu';
-            if (badgeEl) badgeEl.textContent = 'Mutfak Şefiniz Hazır';
-            updateCookingGuideUI();
-            announceGuidance('Konuşan tencere ve fırın saati durduruldu.', { force: true });
-            return;
-        }
-
-        const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
-        const isStoveRecipe = rec && rec.category === 'ocakli';
-        const stepObj = rec ? rec.steps[state.currentCookingStepIndex] : null;
-        const minutes = (stepObj && stepObj.timerMinutes > 0) ? stepObj.timerMinutes : 3;
-        state.cookingTimerRemainingSec = minutes * 60;
-        state.cookingTotalStepSec = state.cookingTimerRemainingSec;
-        state.stoveConfirmedOff = false;
-
-        if (timerBtn) {
-            timerBtn.textContent = '⏹️ Konuşan Mutfak Saatini Durdur';
-        }
-        if (badgeEl) {
-            badgeEl.textContent = isStoveRecipe ? `⏱️ Pişiyor: ${minutes} dk` : `⏱️ Hazırlanıyor: ${minutes} dk`;
-        }
-        if (timerEl) {
-            timerEl.textContent = `Kalan Süre: ${formatMinutesSecondsTurkish(state.cookingTimerRemainingSec)}`;
-        }
-        if (isStoveRecipe) {
-            announceGuidance(`${minutes} dakikalık yanma ve taşma korumalı tencere saati başlatıldı! Pişme sırasında dibinin tutmaması için ne zaman karıştıracağınızı ve ocağı kısacağınızı size adım adım hatırlatacağım.`, {
-                force: true,
-                bannerState: 'centered'
-            });
-        } else {
-            announceGuidance(`${minutes} dakikalık ocaksız hazırlama ve dinlendirme saati başlatıldı! Süre dolduğunda size sesli haber vereceğim.`, {
-                force: true,
-                bannerState: 'centered'
-            });
-        }
-
-        state.cookingTimerInterval = setInterval(() => {
-            state.cookingTimerRemainingSec--;
-            const elapsedSec = state.cookingTotalStepSec - state.cookingTimerRemainingSec;
-
-            if (timerEl) {
-                timerEl.textContent = `Kalan Süre: ${formatMinutesSecondsTurkish(Math.max(0, state.cookingTimerRemainingSec))}`;
-            }
-
-            if (state.cookingTimerRemainingSec <= 0) {
-                clearInterval(state.cookingTimerInterval);
-                state.cookingTimerInterval = null;
-                radar.playLockedChime();
-                if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 400]);
-                updateCookingGuideUI();
-                if (isStoveRecipe) {
-                    if (timerEl) timerEl.textContent = 'SÜRE DOLDU! Ocağı kontrol edin!';
-                    if (badgeEl) badgeEl.textContent = '✅ Pişme Süresi Doldu!';
-                    startStoveOffReminderWatch();
-                    announceGuidance('DİKKAT SÜRE DOLDU! Yemeğinizin yanmaması için lütfen şimdi ocağı kapatın veya kısın! Eğer pişirme bittiyse Ocağı Kapattım düğmesine dokunun.', {
-                        force: true,
-                        bannerState: 'centered'
-                    });
-                } else {
-                    if (timerEl) timerEl.textContent = 'SÜRE DOLDU! Bir sonraki adıma geçebilirsiniz.';
-                    if (badgeEl) badgeEl.textContent = '✅ Süre Tamamlandı!';
-                    announceGuidance('Süre tamamlandı! Ocaksız tarifinizin bu adımı hazır, şimdi Sonraki Adım düğmesine basabilirsiniz.', {
-                        force: true,
-                        bannerState: 'centered'
-                    });
-                }
-                return;
-            }
-
-            // YANMA VE TAŞMA ÖNLEYİCİ OTOMATİK ARA HATIRLATICILAR (Sadece Ocaklı Yemeklerde):
-            if (isStoveRecipe) {
-                // 1) Kısa kavurma adımlarında (<= 7 dk) her 45 saniyede bir "Dibinin tutmaması için karıştır" uyarısı
-                if (minutes <= 7 && elapsedSec > 0 && elapsedSec % 45 === 0 && state.cookingTimerRemainingSec > 20) {
-                    announceGuidance(`Yanma önleyici hatırlatma: Dibinin tutmaması için şimdi tahta kaşıkla tencereyi kenarlardan ortaya doğru bir kez karıştırın. Kalan süre ${formatMinutesSecondsTurkish(state.cookingTimerRemainingSec)}.`, {
-                        force: true,
-                        bannerState: 'normal'
-                    });
-                    return;
-                }
-
-                // 2) Uzun kaynama adımlarında (>= 8 dk) 90. saniyede "Taşmaması için altını en kısığa al ve tahta kaşık koy" uyarısı
-                if (minutes >= 8 && elapsedSec === 90) {
-                    announceGuidance('Taşma önleyici hatırlatma: Tencere kaynamaya başladıysa taşmaması için ocağın düğmesini şimdi en kısık konuma çevirin ve tencerenin ağzına yatay bir tahta kaşık koyup kapağı hafif aralık bırakın.', {
-                        force: true,
-                        bannerState: 'warning'
-                    });
-                    return;
-                }
-            }
-
-            if (state.cookingTimerRemainingSec === 30) {
-                announceGuidance(isStoveRecipe ? 'Pişme süresinin bitmesine son 30 saniye kaldı, ocağın başına geçebilirsiniz.' : 'Sürenin bitmesine son 30 saniye kaldı.', { force: true });
-            } else if (state.cookingTimerRemainingSec <= 5 && state.cookingTimerRemainingSec > 0) {
-                announceGuidance(String(state.cookingTimerRemainingSec), { force: true });
-            } else if (state.cookingTimerRemainingSec % 60 === 0) {
-                const remMin = Math.round(state.cookingTimerRemainingSec / 60);
-                const stirNote = (isStoveRecipe && remMin % 3 === 0) ? ' Suyunu ve ateşin kısık olduğunu kontrol edin.' : '';
-                announceGuidance(`Mutfak saati bilgisi: Sürenin tamamlanmasına ${remMin} dakika kaldı.${stirNote}`, { force: true });
-            }
-        }, 1000);
     }
 
     function findRecipeByIngredientsOrName(queryText) {
@@ -8913,111 +8719,22 @@
                 filterCookingRecipesByCategory(rec.category, false);
             }
             selectCookingRecipe(bestIdx, false);
-            const catLabel = rec.category === 'ocaksiz' ? 'Ocaksız Yapılabilecek Türk Yemekleri kategorisinden' : 'Ocak Kullanılan Türk Yemekleri kategorisinden';
-            announceGuidance(`Söylediğiniz malzemelere en uygun yemek ${catLabel} bulundu: ${rec.title}! Gerekli malzemeler: ${rec.ingredients} Şimdi 1. adımdan başlıyoruz: ${rec.steps[0].text}`, {
+            announceGuidance(`Söylediğiniz malzemelere en uygun tarif bulundu: ${rec.title}. Gerekli malzemeler: ${rec.ingredients} Şimdi 1. adım: ${rec.steps[0].text}`, {
                 force: true,
                 bannerState: 'centered'
             });
         } else {
-            announceGuidance(`"${queryText}" için tam eşleşen bir tarif bulunamadı, ancak 14 ocaksız ve 13 ocaklı olmak üzere toplam 27 erişilebilir Türk yemeğinden dilediğinizi seçebilirsiniz.`, {
+            announceGuidance(`"${queryText}" için tam eşleşen bir tarif bulunamadı, listedeki 27 yemek tarifinden dilediğinizi seçebilirsiniz.`, {
                 force: true,
                 bannerState: 'warning'
             });
         }
     }
 
-    function speakBlindCookingSafetyTips() {
-        const tips = 'Yanma ve Taşmayı Önleyen 6 Altın Mutfak Kuralı: ' +
-            '1 (Tahta Kaşık Köprüsüyle Sıfır Taşma): Çorba, makarna veya bakliyat kaynatırken tencerenin ağzına yatay olarak bir tahta kaşık koyun ve kapağı onun üzerine hafif aralık bırakın; yükselen köpük tahta kaşığa değdiği anda sönüp geri iner, yemek asla taşmaz! ' +
-            '2 (Üstten 4 Parmak Boşluk Kuralı): Tencereye veya cezveye su koyarken işaret parmağınızın ikinci boğumuyla tencerenin üst kenarını kontrol edin; en üstten en az 3-4 parmak boşluk bırakın. ' +
-            '3 (Soğuk Tava & Orta-Kısık Ateş Kuralı): Soğanı, salçayı ve şehriyeyi asla harlı ateşte kavurmayın; malzemeyi soğuk tavaya koyup ocağı orta-kısık ateşe ayarlayın, böylece ne yağ sıçrar ne de dibi yanar. ' +
-            '4 (Tencere Sapı ve Merkez Kilidi): Ocağı yakmadan önce tencerenin ızgaranın tam ortasında oturduğunu iki elinizle kontrol edin ve sapını mutlaka tezgahın içine doğru çevirin ki eliniz çarpmasın. ' +
-            '5 (Kamera Görsel Gözlemcisi): Kamera gözlemcisi uydurma yorum yapmaz; sadece gerçekten gördüğü eşyaları ve renkleri sade bir dille söyler. ' +
-            '6 (Ocağı Kapattım Güvenlik Onayı): Yemek bittiğinde siz Ocağı Kapattım düğmesine basana kadar uygulama ocağı açık unutmamanız için size sesli hatırlatma yapar.';
-        showDetectedResult('🛡️ Yanma ve Taşma Önleyici 6 Altın Mutfak Kuralı', tips);
-        announceGuidance(tips, { force: true, bannerState: 'centered' });
-    }
-
-    function analyzeStoveFlameAndFoodBrowning(capCanvas, metrics, cleanText = '', verifiedPreds = []) {
-        const ctx = capCanvas.getContext('2d');
-        const w = capCanvas.width;
-        const h = capCanvas.height;
-
-        const centerCol = (metrics && metrics.centerColor) ? metrics.centerColor.name : sampleRegionTurkishColor(ctx, w * 0.35, h * 0.35, w * 0.3, h * 0.3);
-        const topCol = sampleRegionTurkishColor(ctx, w * 0.25, h * 0.08, w * 0.5, h * 0.22);
-        const bottomCol = sampleRegionTurkishColor(ctx, w * 0.25, h * 0.70, w * 0.5, h * 0.22);
-
-        let lightState = 'Normal aydınlıkta';
-        if (metrics && metrics.avgBrightness < 45) lightState = 'Karanlık / çok loş ışıkta';
-        else if (metrics && metrics.avgBrightness < 85) lightState = 'Loş ışıkta';
-        else if (metrics && metrics.avgBrightness > 200) lightState = 'Parlak ışıkta';
-
-        const highConfObjs = verifyPredictionsInAiBrain(verifiedPreds || [], w, h, false);
-
-        const objMsg = highConfObjs.length > 0
-            ? 'Görünen eşyalar: ' + highConfObjs.map(p => TR_LABELS[p.class] || p.class).join(', ') + '.'
-            : 'Kamerada belirgin bir eşya görünmüyor.';
-
-        const colorAndToneMsg = `${lightState}; merkezdeki renk ${centerCol}, üst bölge rengi ${topCol}, alt bölge rengi ${bottomCol}.`;
-
-        const statusEl = document.getElementById('cooking-doneness-display');
-        if (statusEl) {
-            const firstObj = highConfObjs.length > 0
-                ? (TR_LABELS[highConfObjs[0].class] || highConfObjs[0].class)
-                : 'Eşya Yok';
-            statusEl.textContent = `Görünen: ${firstObj} | Merkez Rengi: ${centerCol} | Işık: ${lightState}`;
-        }
-
-        const speech = `${objMsg} ${colorAndToneMsg} ${cleanText ? 'Okunan yazı: ' + cleanText.replace(/\s+/g, ' ') : ''}`.trim();
-        return {
-            speechText: speech,
-            fullText: `${objMsg}\n${colorAndToneMsg}\n\nOkunan Yazı:\n${cleanText || 'Okunabilir yazı yok.'}`,
-            isBurntRisk: false
-        };
-    }
-
-    function handleCookingGuideLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
-        const col = metrics.centerColor ? metrics.centerColor.name : 'Bilinmiyor';
-        el.tPosition.textContent = `Kamera Merkez Rengi: ${col}`;
-        el.tDistance.textContent = state.cookingTimerInterval
-            ? `Sayaç: ${formatMinutesSecondsTurkish(state.cookingTimerRemainingSec)}`
-            : (state.boilBurnGuardActive ? 'Görsel Gözlemci Açık' : 'Aşçı Rehberi Hazır');
-
-        const highConfPreds = Array.isArray(predictions) ? predictions : [];
-        let lightWord = 'Aydınlık';
-        if (metrics && metrics.avgBrightness < 45) lightWord = 'Karanlık';
-        else if (metrics && metrics.avgBrightness < 85) lightWord = 'Loş';
-
-        const statusEl = document.getElementById('cooking-doneness-display');
-        if (statusEl) {
-            const objSummary = highConfPreds.length > 0
-                ? highConfPreds.slice(0, 2).map(p => TR_LABELS[p.class] || p.class).join(', ')
-                : 'Eşya yok';
-            statusEl.textContent = `Görünen: ${objSummary} | Merkez Rengi: ${col} | Ortam: ${lightWord}`;
-        }
-
-        const now = performance.now();
-        if (state.boilBurnGuardActive && (now - state.lastBoilBurnAlertAt > 12000)) {
-            state.lastBoilBurnAlertAt = now;
-            const objSpeech = highConfPreds.length > 0
-                ? 'Kamerada ' + highConfPreds.slice(0, 3).map(p => TR_LABELS[p.class] || p.class).join(', ') + ' görünüyor.'
-                : 'Kamerada belirgin bir eşya görünmüyor.';
-            announceGuidance(`${objSpeech} Merkezdeki yüzeyin rengi ${col}.`, {
-                force: false,
-                bannerState: 'normal'
-            });
-        }
-    }
-
-    function checkStoveFlameAndFoodDoneness() {
-        if (!state.isRunning) {
-            announceGuidance('Kamerada görünen eşyaları ve renkleri dinlemek için önce üstteki Kamerayı Başlat düğmesine basın.', {
-                force: true,
-                bannerState: 'warning'
-            });
-            return;
-        }
-        captureAndDescribePhoto(false);
+    function handleCookingGuideLiveMode() {
+        const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
+        el.tPosition.textContent = rec ? rec.title : 'Sesli Tarif Rehberi';
+        el.tDistance.textContent = rec ? `Adım ${state.currentCookingStepIndex + 1}/${rec.steps.length}` : 'Hazır';
     }
 
     function syncModePanelsVisibility(activeMode) {
@@ -9107,7 +8824,7 @@
             'sock_outfit_check': '20. Bölüm: Çorap Eşleştirici, Kıyafet Kombin Uyumu ve Leke Kontrolü açıldı. İki çorabı yan yana kameraya tutup Boşluk tuşuna basın; birbirinin eşi olup olmadığını ve leke durumunu söyleyeceğim.',
             'where_am_i': '21. Bölüm: Tam Olarak Neredeyim? Sokak, Bina, Tabela ve WhatsApp Konum Tarif Edici açıldı. Bulunduğunuz cadde ve sokağı hemen öğreniliyor.',
             'step_calorie_guide': `22. Bölüm: Sesli Adım Sayacı ve Sağlıklı Besin Rehberi açıldı. Bugün ${state.dailySteps || 0} adım attınız. Telefon cebinizde yürürken adımlarınızı sayarım; ayrıca yediğiniz yemeği söyleyip veya paketi kameraya gösterip besin değerini öğrenebilirsiniz.`,
-            'cooking_guide': '23. Bölüm: Erişilebilir Yemek Yapma Rehberi ve Konuşan Aşçı açıldı. Tüm yemek tariflerimiz kokuya, cızırtı sesine, tam bardak ölçüsüne ve dakikaya göre hazırlanmıştır. İstediğiniz yemeği seçin veya evdeki malzemeleri söyleyin, adım adım birlikte pişirelim.'
+            'cooking_guide': '23. Bölüm: Adım Adım Sesli Yemek Tarifleri Rehberi açıldı. İstediğiniz yemeği listeden seçin veya evdeki malzemeleri söyleyin; malzemeleri ve hazırlanışını adım adım sesli olarak tarif edeceğim.'
         }[newMode];
 
         if (modeAnnouncement) {
@@ -9542,13 +9259,6 @@
     if (btnCookingPrev) btnCookingPrev.addEventListener('click', () => stepCookingInstruction(-1));
     if (btnCookingCurrent) btnCookingCurrent.addEventListener('click', () => stepCookingInstruction(0));
     if (btnCookingNext) btnCookingNext.addEventListener('click', () => stepCookingInstruction(1));
-    if (btnCookingTimer) btnCookingTimer.addEventListener('click', toggleCookingStepTimer);
-    const btnCookingBoilGuard = document.getElementById('btn-cooking-boil-guard');
-    const btnCookingStoveOff = document.getElementById('btn-cooking-stove-off');
-    if (btnCookingBoilGuard) btnCookingBoilGuard.addEventListener('click', toggleBoilOverAndBurnGuard);
-    if (btnCookingStoveOff) btnCookingStoveOff.addEventListener('click', confirmStoveTurnedOffSafety);
-    if (btnCookingCheckDoneness) btnCookingCheckDoneness.addEventListener('click', checkStoveFlameAndFoodDoneness);
-    if (btnCookingSafetyTips) btnCookingSafetyTips.addEventListener('click', speakBlindCookingSafetyTips);
 
     el.touchZone.addEventListener('click', () => {
         const now = performance.now();

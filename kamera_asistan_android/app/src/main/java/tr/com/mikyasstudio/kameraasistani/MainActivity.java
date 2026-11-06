@@ -317,16 +317,10 @@ public class MainActivity extends AppCompatActivity {
             webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'Space', key: ' '}));", null);
             return true;
         }
-        // Ses Kısma Tuşu: Tek basışta Sesli Komut (F), Çift basışta 8 Mod Arası Geçiş (M)
+        // Ses Kısma Tuşu: Tek veya çift basışta Son Söyleneni Tekrar Oku (T Kısayolu - Galeri/Flaş tetiklemez)
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            long now = System.currentTimeMillis();
-            if (now - lastVolumeDownTime < 420) {
-                webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'KeyM', key: 'm'}));", null);
-                lastVolumeDownTime = 0;
-            } else {
-                webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'KeyF', key: 'f'}));", null);
-                lastVolumeDownTime = now;
-            }
+            webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'KeyT', key: 't'}));", null);
+            lastVolumeDownTime = System.currentTimeMillis();
             return true;
         }
         return super.onKeyDown(keyCode, event);
