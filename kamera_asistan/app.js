@@ -9392,12 +9392,12 @@
 
     function startVoiceItemMemoryCapture(modeType = 'save') {
         const promptMap = {
-            'smart_intent': 'Şimdi ne yapmak istediğinizi söyleyin. Örneğin: Klimayı 24 dereceye ayarla, Kombiyi 45 derece yap, Elimde kaç lira var, Bu ilacın tarihi geçmiş mi veya Mercimek çorbası tarifi.',
+            'smart_intent': 'Şimdi ne yapmak istediğinizi söyleyin. Örneğin: Kombi veya klima ekranında kaç derece yazıyor, Elimde kaç lira var, Bu ilacın tarihi geçmiş mi, Kadıköy durağına alarm kur veya Mercimek çorbası tarifi.',
             'save': 'Şimdi eşyanızı nereye koyduğunuzu söyleyin, örneğin: Yedek anahtarı vestiyerin üst çekmecesine koydum.',
             'bus_dest': 'Şimdi ineceğiniz durağın veya semtin adını söyleyin, örneğin: Kadıköy İskele veya Kızılay.',
             'calorie': 'Şimdi yediğiniz veya merak ettiğiniz yemeğin adını söyleyin, örneğin: Mercimek çorbası veya 1 bardak süt.',
             'cooking': 'Evde hangi malzemeler var veya hangi yemeği yapmak istiyorsunuz? Şimdi söyleyin.',
-            'degree_target': 'Cihazı kaç dereceye ayarlamak istiyorsunuz? Şimdi söyleyin. Örneğin: 24 derece, 45 derece veya 180 derece.',
+            'degree_target': 'Kendi elinizle ayarlarken ekranda kaç derece görünce size haber vermemi istersiniz? Şimdi söyleyin. Örneğin: 24 derece, 40 derece veya 180 derece.',
             'ask': 'Şimdi aradığınız eşyanın adını söyleyin, örneğin: Yedek anahtar nerede?'
         };
         const promptMsg = promptMap[modeType] || promptMap['ask'];
