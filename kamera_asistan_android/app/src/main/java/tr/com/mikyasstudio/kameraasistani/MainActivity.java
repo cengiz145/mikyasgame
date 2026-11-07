@@ -54,7 +54,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private static final int REQ_FILE_CHOOSER = 1002;
     private static final int REQ_VOICE_SONG = 1003;
     private static final int REQ_VOICE_GENERIC = 1004;
-    private static final String LIVE_APP_URL = "https://cengiz145.github.io/mikyasgame/kamera_asistan/";
+    private static final String LIVE_APP_URL = "https://mikyasstudio.com.tr/kamera_asistan/";
+    private static final String BACKUP_APP_URL = "https://cengiz145.github.io/mikyasgame/kamera_asistan/";
     private static final String LOCAL_FALLBACK_URL = "file:///android_asset/www/index.html";
     public static volatile boolean isAppInForeground = false;
     private WebView webView;
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     }
                     return false;
                 }
-                if (("https".equals(scheme) || "http".equals(scheme)) && host.contains("cengiz145.github.io")) {
+                if (("https".equals(scheme) || "http".equals(scheme)) && (host.contains("mikyasstudio.com.tr") || host.contains("cengiz145.github.io"))) {
                     if (urlStr.endsWith(".apk") || !uri.getPath().contains("kamera_asistan")) {
                         return true;
                     }
@@ -134,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     Uri uri = request.getUrl();
                     String host = uri.getHost() != null ? uri.getHost().toLowerCase(Locale.ROOT) : "";
                     String path = uri.getPath() != null ? uri.getPath() : "";
-                    if (host.contains("cengiz145.github.io") && path.contains("/kamera_asistan")) {
+                    if ((host.contains("mikyasstudio.com.tr") || host.contains("cengiz145.github.io")) && path.contains("/kamera_asistan")) {
                         String assetFile = "www/index.html";
                         String mimeType = "text/html";
                         if (path.endsWith("/app.js") || path.endsWith("app.js")) {
