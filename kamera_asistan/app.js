@@ -2989,7 +2989,7 @@
                         const tNow = performance.now();
 
                         // 0. YARI KAPALI / KATLANMIŞ PARA UYARISI:
-                        // Kağıt para olduğu anlaşıldı ("TÜRK LİRASI" / "MERKEZ BANKASI" okundu) ama rakamı parmak kapattıysa veya kadraj dışındaysa:
+                        // Kağıt para olduğu anlaşıldı ("TÜRK LİRASI" yazısı okundu) ama rakamı parmak kapattıysa veya kadraj dışındaysa:
                         if (noteInfo.partialOnly) {
                             if (el.moneyLiveSeen) {
                                 el.moneyLiveSeen.textContent = '⚠️ Paranın Rakamı Kapalı / Kadraj Dışı';
@@ -4602,14 +4602,14 @@
     /**
      * Kağıt parayı düz (0°), baş aşağı ters (180°), sağa dik (90°) veya sola dik (270°)
      * nasıl tutulursa tutulsun tanıyan 360° çok yönlü OCR tarayıcı.
-     * Eğer paranın üzerinde "TÜRK LİRASI" / "MERKEZ BANKASI" okunuyor ama rakam parmak altında
+     * Eğer paranın üzerinde "TÜRK LİRASI" okunuyor ama rakam parmak altında
      * veya kadraj dışında kaldıysa { partialOnly: true } döndürerek kullanıcıyı sesli uyarır.
      */
     async function recognizeBanknoteMultiOrientation(sourceCanvas, centerColorName = '') {
         if (typeof window.Tesseract === 'undefined') return null;
 
         let sawBanknoteWordsWithoutNumber = false;
-        const hasBanknoteWords = (txt) => /L[İI]RASI\b|T[ÜU]RK\s*L[İI]RA|MERKEZ\s*BANK|CUMHUR[İI]YET\s*MERKEZ/i.test(txt || '');
+        const hasBanknoteWords = (txt) => /L[İI]RASI\b|T[ÜU]RK\s*L[İI]RA|CUMHUR[İI]YET\s*MERKEZ/i.test(txt || '');
 
         // 1. Düz (0°) kontrol et (Sadece gerçek OCR doğrulamasından geçen temiz metinleri kullan)
         const res0 = await window.Tesseract.recognize(sourceCanvas, 'tur+eng');
@@ -4649,7 +4649,7 @@
     }
 
     /**
-     * T.C. Merkez Bankası E9 Emisyon Kağıt Paralarını Sıfır-Hata İle Tanıyan Üçlü Doğrulama Motoru:
+     * T.C. E9 Emisyon Kağıt Paralarını Sıfır-Hata İle Tanıyan Üçlü Doğrulama Motoru:
      * 1) Rakam ve Yazı ("200", "İKİ YÜZ", "100", "YÜZ", "50", "ELLİ", "20", "YİRMİ", "10", "ON", "5", "BEŞ")
      * 2) Baş Aşağı (Ters) Tutulan Rakam Kalıpları ("002"->200, "001"->100, "05"->50, "02"->20, "01"->10 + Renk Kilidi)
      * 3) Arka Yüz İpuçları ve Renk Çapraz Doğrulaması (Kullanıcıya söylenmez, sadece arka planda doğrulama içindir)
@@ -4666,7 +4666,7 @@
         const isPurple = /MOR|EFLATUN/.test(colorUpper);
         const isOrangeYellow = /TURUNCU|SARI|HARDAL/.test(colorUpper);
 
-        const hasExplicitMoneyWord = /L[İI]RASI\b|T[ÜU]RK\s*L[İI]RA|MERKEZ\s*BANK|CUMHUR[İI]YET\s*MERKEZ|İKİ\s*YÜZ|IKI\s*YUZ|\bYÜZ\s*(?:TÜRK|LİRA)|\bELLİ\s*(?:TÜRK|LİRA)|\bYİRMİ\s*(?:TÜRK|LİRA)|\bON\s*(?:TÜRK|LİRA)|\bBEŞ\s*(?:TÜRK|LİRA)/.test(clean);
+        const hasExplicitMoneyWord = /L[İI]RASI\b|T[ÜU]RK\s*L[İI]RA|CUMHUR[İI]YET\s*MERKEZ|İKİ\s*YÜZ|IKI\s*YUZ|\bYÜZ\s*(?:TÜRK|LİRA)|\bELLİ\s*(?:TÜRK|LİRA)|\bYİRMİ\s*(?:TÜRK|LİRA)|\bON\s*(?:TÜRK|LİRA)|\bBEŞ\s*(?:TÜRK|LİRA)/.test(clean);
 
         // Arka yüz portre isimlerinden kesin kupür tespiti (Kullanıcıya asla söylenmez, sadece iç doğrulama!)
         const hasYunusEmre = /YUNUS\s*EMRE|SEVVELİM|SEVELIM/.test(clean);
@@ -5830,7 +5830,7 @@
                 // ÖZEL MOD 5 (PARA SAYMA VE TÜM GENEL MODLAR): KAĞIT PARA ALGILANDIĞINDA SADECE 5. MODDA TOPLAMA EKLE, DİĞER MODLARDA SADECE SÖYLE
                 const centerColName = metrics.centerColor ? metrics.centerColor.name : '';
                 let banknoteDetails = detectTurkishBanknoteDetailsFromText(cleanText, centerColName);
-                const hasBanknoteWordsInText = /L[İI]RASI\b|T[ÜU]RK\s*L[İI]RA|MERKEZ\s*BANK|CUMHUR[İI]YET\s*MERKEZ/i.test(cleanText || '');
+                const hasBanknoteWordsInText = /L[İI]RASI\b|T[ÜU]RK\s*L[İI]RA|CUMHUR[İI]YET\s*MERKEZ/i.test(cleanText || '');
                 if (!banknoteDetails && (state.mode === 'color_cloth' || hasBanknoteWordsInText)) {
                     const rotatedCheck = await recognizeBanknoteMultiOrientation(capCanvas, centerColName);
                     if (rotatedCheck && rotatedCheck.partialOnly) {
@@ -5939,6 +5939,13 @@
                     }
                 } else {
                     const universalInsights = buildUniversalSmartInsights(cleanText, primaryPassVerifiedText, secondaryRawVerifiedText);
+                    if (/Paylaşılan|Ekran/i.test(sourceLabel)) {
+                        const screenRescue = analyzeUnlabelledScreenAndUiRegions(capCanvas, cleanText, collectedLines);
+                        if (screenRescue && screenRescue.speechText) {
+                            universalInsights.speechNotes.push(screenRescue.speechText);
+                            universalInsights.reportLines.push(screenRescue.fullText);
+                        }
+                    }
                     if (Array.isArray(preds) && preds.some(p => p.class === 'bus') && cleanText) {
                         const busAuto = processBusRouteOcrResult(cleanText, preds);
                         if (busAuto && busAuto.speechText && busAuto.speechText.startsWith('Yaklaşan otobüs')) {
@@ -9371,7 +9378,7 @@
             { label: 'Fatura / Vezneler / Ödeme İşlemi', regex: /FATURA|VEZNE|TAHS[İI]LAT/i },
             { label: 'Yeşil Giriş / Onay Bölgesi', regex: /\bONAY(?:LA)?\b|\bG[İI]R[İI]Ş\b|\bTAMAM\b|\bDEVAM\b|\bEVET\b/i },
             { label: 'Kırmızı İptal / Geri Bölgesi', regex: /\b[İI]PTAL\b|\bGER[İI]\b|\bÇIKIŞ\b|\bHAYIR\b/i },
-            { label: 'Temassız / Kart Okutma Alanı', regex: /TEMASSIZ|KARTI\s*OKUT|YAKLAŞTIR/i }
+            { label: 'Temassız Okutma Alanı', regex: /TEMASSIZ|YAKLAŞTIR/i }
         ];
 
         const regionHits = [];
@@ -9412,7 +9419,7 @@
         // Dokunmatik Tuş Takımı (1-9 Rakam Dizilimi) Kontrolü
         const digitTokens = text.match(/\b[0-9]\b/g) || [];
         const uniqueDigits = [...new Set(digitTokens)];
-        const hasTouchKeypad = uniqueDigits.length >= 4 || /TUŞLAYIN|NUMARA\s*GİR|TC\s*KİMLİK/i.test(text);
+        const hasTouchKeypad = uniqueDigits.length >= 4 || /TUŞLAYIN|NUMARA\s*GİR|SIRA\s*NO/i.test(text);
 
         // Kullanıcının parmağı ekranda görünüyorsa parmak konumunu da söyle
         let fingerHint = '';
@@ -9815,7 +9822,7 @@
         }
 
         // 4. POS Tutarı, Dokunmatik Kiosk / Sıra Alma Rehberi ve IBAN Kopyalama Senaryosu
-        if (/(?:\biban\b|pos\s*cihaz|pos\s*ekran|kredi\s*kart|ödeme\s*tutar|fiş\s*tutar|kiosk|sıra\s*alma|dokunmatik\s*ekran|hastane\s*sıra)/u.test(q)) {
+        if (/(?:\biban\b|pos\s*cihaz|pos\s*ekran|ödeme\s*tutar|fiş\s*tutar|kiosk|sıra\s*alma|dokunmatik\s*ekran|hastane\s*sıra)/u.test(q)) {
             if (/kopyala/u.test(q) && state.lastDetectedIban) {
                 setMode('pos_iban_reader', { silentAnnouncement: true });
                 copyDetectedIbanToClipboard();
