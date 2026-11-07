@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Erişilebilir Kamera Uygulaması</string>
-    <string name="accessibility_service_label">Erişilebilir Kamera: Sesli Ekran Ortalama Asistanı</string>
-    <string name="accessibility_service_description">Görme engelli kullanıcılar için sesli hizalama ve yönlendirme aracıdır. Ses Açma tuşuna çift basıldığında ekran parlaklık merkezini hesaplayarak telefonu doğru yöne tutmanız için Türkçe sesli rehberlik sağlar.</string>
 </resources>
