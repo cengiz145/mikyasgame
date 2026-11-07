@@ -7,11 +7,11 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId "tr.com.mikyasstudio.seslikameraasistani"
+        applicationId "tr.com.mikyasstudio.erisilebilirkamera"
         minSdk 24
         targetSdk 36
-        versionCode 57
-        versionName "50.4.0"
+        versionCode 58
+        versionName "51.0.0"
     }
 
     signingConfigs {

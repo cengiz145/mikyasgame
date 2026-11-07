@@ -1,7 +1,7 @@
 {
   "name": "Erişilebilir Kamera Uygulaması",
   "short_name": "Erişilebilir Kamera",
-  "description": "Görme engelliler için Sesli Kamera, Sınav ve Belge Okuyucu, Sesli Kıble ve Namaz Vakti Rehberi, Cihazlara Sinyal Göndermeden Yalnızca Kamerayla Ekran Okuyup Yol Gösteren Derece ve Elle Ayarlama Rehberi, Dokunmatik Kiosk ve Sıra Alma Rehberi, Görsel Kavanoz/Poşet Hafızası, Kıyafet Leke/Ters-Düz ve Seri Renkli Çamaşır Ayıklama, Görsel QR Menü ve Market Birim Fiyat Hesaplayıcı, Ayna/Tıraş ve Görüntülü Görüşme Kadraj Asistanı, Saat Yönlü Düşen Eşya Radarı, Evden Çıkış Işık/Pencere Taraması, Madeni ve Kağıt Para Sayacı, Müzik Tanıma ve 22 Günlük Yaşam Asistanı.",
+  "description": "Görme engelliler için Sesli Kamera, Sınav ve Belge Okuyucu, Sesli Kıble ve Namaz Vakti Rehberi, Cihazlara Sinyal Göndermeden Yalnızca Kamerayla Ekran Okuyup Yol Gösteren Derece ve Elle Ayarlama Rehberi, POS ve Dokunmatik Kiosk/Sıra Alma Rehberi, Görsel Kavanoz/Poşet Hafızası, Kıyafet Leke/Ters-Düz ve Seri Renkli Çamaşır Ayıklama, Görsel QR Menü ve Market Birim Fiyat Hesaplayıcı, Ayna/Tıraş ve Görüntülü Görüşme Kadraj Asistanı, Saat Yönlü Düşen Eşya Radarı, Evden Çıkış Işık/Pencere Taraması, Madeni ve Kağıt Para Sayacı, Müzik Tanıma ve 22 Günlük Yaşam Asistanı.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#090d16",
