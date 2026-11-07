@@ -1,11 +1,21 @@
 {
-  "name": "Erişilebilir Kamera Uygulaması",
-  "short_name": "Erişilebilir Kamera",
+  "name": "Voice Lens",
+  "short_name": "Voice Lens",
   "description": "Görme engelliler için Sesli Kamera, Sınav ve Belge Okuyucu, Sesli Kıble ve Namaz Vakti Rehberi, Cihazlara Sinyal Göndermeden Yalnızca Kamerayla Ekran Okuyup Yol Gösteren Derece ve Elle Ayarlama Rehberi, POS ve Dokunmatik Kiosk/Sıra Alma Rehberi, Görsel Kavanoz/Poşet Hafızası, Kıyafet Leke/Ters-Düz ve Seri Renkli Çamaşır Ayıklama, Görsel QR Menü ve Market Birim Fiyat Hesaplayıcı, Ayna/Tıraş ve Görüntülü Görüşme Kadraj Asistanı, Saat Yönlü Düşen Eşya Radarı, Evden Çıkış Işık/Pencere Taraması, Madeni ve Kağıt Para Sayacı, Müzik Tanıma ve 22 Günlük Yaşam Asistanı.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#090d16",
   "theme_color": "#0f172a",
-  "lang": "tr"
+  "orientation": "portrait",
+  "lang": "tr",
+  "categories": ["accessibility", "utilities", "productivity"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%23090d16'/%3E%3Ccircle cx='96' cy='96' r='54' fill='none' stroke='%23facc15' stroke-width='12'/%3E%3Ccircle cx='96' cy='96' r='22' fill='%2338bdf8'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
 

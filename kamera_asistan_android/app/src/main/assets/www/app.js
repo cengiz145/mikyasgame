@@ -497,9 +497,9 @@
             .replace(/[Ⓓⓓ]/g, ' D) ')
             .replace(/[Ⓔⓔ]/g, ' E) ')
             .replace(/(^|\s)@\)\s*/gm, '$1A) ')
-            // Parantez içi boşluklu "( A )" veya "A )" şıklarını ve satır içi "A. ... B. ... C. ..." şıklarını standartlaştır
-            .replace(/(^|\s)\(\s*([A-Ea-e])\s*\)\s*(?=\S)/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `)
-            .replace(/(^|\s)\(?([A-Ea-e])\s*\)\s*(?=\S)/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `);
+            // Parantez içi boşluklu "( A )", "[A]" veya "A )" şıklarını ve satır içi "A. ... B. ... C. ..." şıklarını standartlaştır
+            .replace(/(^|\s)[\(\[]\s*([A-Ea-e])\s*[\)\]]\s*(?=\S)/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `)
+            .replace(/(^|\s)[\(\[]?([A-Ea-e])\s*[\)\]]\s*(?=\S)/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `);
 
         if (/(?:^|\s)[A-Ea-e][\.\-]\s+\S[\s\S]*?(?:^|\s)[B-Eb-e][\.\-]\s+\S[\s\S]*?(?:^|\s)[C-Ec-e][\.\-]\s+\S/i.test(text)) {
             text = text.replace(/(^|\s)([A-Ea-e])[\.\-]\s+(?=\S)/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `);
@@ -588,12 +588,28 @@
             }
 
             if (qObj.options.A || qObj.options.B || qObj.options.C) {
+                const allLetters = ['A', 'B', 'C', 'D', 'E'];
+                let lastPresentIdx = -1;
+                for (let li = allLetters.length - 1; li >= 0; li--) {
+                    if (qObj.options[allLetters[li]]) {
+                        lastPresentIdx = li;
+                        break;
+                    }
+                }
+                const missingOptions = [];
+                for (let li = 0; li < lastPresentIdx; li++) {
+                    if (!qObj.options[allLetters[li]]) {
+                        missingOptions.push(allLetters[li]);
+                    }
+                }
+                qObj.missingOptions = missingOptions;
                 parsedQuestions.push(qObj);
             }
         });
 
         return parsedQuestions;
     }
+    window.parseExamQuestionsAndOptions = parseExamQuestionsAndOptions;
 
     function updateExamRemoteUI() {
         const total = state.examQuestions.length;
@@ -618,8 +634,11 @@
         const q = state.examQuestions[state.currentExamIndex];
         if (!q) return;
         const optCount = ['A', 'B', 'C', 'D', 'E'].filter(k => Boolean(q.options[k])).length;
+        const missingNote = (Array.isArray(q.missingOptions) && q.missingOptions.length > 0)
+            ? ` Not: ${q.missingOptions.join(', ')} şıkkı kağıtta net okunamadı; kamerayı hafif hizalayıp tekrar okutabilirsiniz.`
+            : '';
         const msg = optCount > 0
-            ? `Soru ${q.number}: ${q.stem || 'Soru metni okunamadı.'}. Toplam ${optCount} şık ayrıştırıldı. Şıkları tek tek dinlemek için A, B, C, D, E düğmelerine dokunun.`
+            ? `Soru ${q.number}: ${q.stem || 'Soru metni okunamadı.'}. Toplam ${optCount} şık ayrıştırıldı.${missingNote} Şıkları tek tek dinlemek için A, B, C, D, E düğmelerine dokunun.`
             : `${q.stem || 'Soru metni okunamadı.'}`;
         announceGuidance(msg, { force: true, bannerState: 'centered' });
     }
@@ -647,6 +666,9 @@
                 parts.push(`${letter} şıkkı: ${q.options[letter]}.`);
             }
         });
+        if (Array.isArray(q.missingOptions) && q.missingOptions.length > 0) {
+            parts.push(`Not: ${q.missingOptions.join(', ')} şıkkı kağıtta net okunamadı.`);
+        }
         announceGuidance(parts.join(' '), { force: true, bannerState: 'centered' });
     }
 
@@ -1045,12 +1067,35 @@
                 utter.rate = state.speechRate || 1.0;
                 const trVoice = Array.isArray(voices) ? voices.find(v => v.lang && v.lang.toLowerCase().startsWith('tr')) : null;
                 if (trVoice) utter.voice = trVoice;
-                utter.onend = () => { state.isCurrentlySpeaking = false; };
-                utter.onerror = () => { state.isCurrentlySpeaking = false; };
+                utter.onend = () => {
+                    state.isCurrentlySpeaking = false;
+                    if (state.speechWatchdogTimer) {
+                        clearTimeout(state.speechWatchdogTimer);
+                        state.speechWatchdogTimer = null;
+                    }
+                };
+                utter.onerror = () => {
+                    state.isCurrentlySpeaking = false;
+                    if (state.speechWatchdogTimer) {
+                        clearTimeout(state.speechWatchdogTimer);
+                        state.speechWatchdogTimer = null;
+                    }
+                };
                 state.isCurrentlySpeaking = true;
                 window.speechSynthesis.speak(utter);
                 spokeViaTts = true;
             } catch (_) {}
+        }
+
+        if (state.isCurrentlySpeaking) {
+            if (state.speechWatchdogTimer) {
+                clearTimeout(state.speechWatchdogTimer);
+            }
+            const watchdogMs = Math.max(5000, Math.min(24000, String(text || '').length * 105));
+            state.speechWatchdogTimer = setTimeout(() => {
+                state.isCurrentlySpeaking = false;
+                state.speechWatchdogTimer = null;
+            }, watchdogMs);
         }
 
         // 3. Çift Ses (TalkBack / NVDA Yankısı) Önleyici: Sadece sesli motor (TTS) konuşmadıysa aria-live="assertive" tetiklenir
@@ -2171,8 +2216,19 @@
 
         const sorted = [...counts.values()].sort((a, b) => b.valueKurus - a.valueKurus);
         const parts = sorted.map(g => `${g.count} adet ${g.label}`);
+        let paperCount = 0;
+        let coinCount = 0;
+        sorted.forEach(g => {
+            if (g.valueKurus >= 500 && !/Madeni/i.test(g.label)) {
+                paperCount += g.count;
+            } else {
+                coinCount += g.count;
+            }
+        });
         return {
             totalCount: totalItems,
+            paperCount,
+            coinCount,
             shortText: `${totalItems} adet (${parts.join(', ')})`,
             spokenBreakdown: parts.join(', ')
         };
@@ -2282,10 +2338,14 @@
 
         const totalFormatted = formatTurkishKurusTotal(state.moneyTotalKurus);
         const breakdown = computeMoneyBreakdownSummary();
-        const reportText = `💰 Toplam Tutar: ${totalFormatted}\nToplam Adet: ${breakdown.totalCount} adet para\nDetaylı Döküm: ${breakdown.spokenBreakdown}`;
+        const typeNoteParts = [];
+        if (breakdown.paperCount > 0) typeNoteParts.push(`${breakdown.paperCount} adet kağıt para`);
+        if (breakdown.coinCount > 0) typeNoteParts.push(`${breakdown.coinCount} adet madeni para`);
+        const typeSummary = typeNoteParts.length > 0 ? ` (${typeNoteParts.join(' ve ')})` : '';
+        const reportText = `💰 Toplam Tutar: ${totalFormatted}\nToplam Adet: ${breakdown.totalCount} adet para${typeSummary}\nDetaylı Döküm: ${breakdown.spokenBreakdown}`;
         showDetectedResult(`💰 Para Sayacı Raporu — Toplam: ${totalFormatted}`, reportText);
 
-        announceGuidance(`Sayılan toplam tutar ${totalFormatted}. Toplam ${breakdown.totalCount} adet paranın dökümü: ${breakdown.spokenBreakdown}.`, {
+        announceGuidance(`Sayılan toplam tutar ${totalFormatted}. Toplam ${breakdown.totalCount} adet paranın${typeSummary} dökümü: ${breakdown.spokenBreakdown}.`, {
             force: true,
             bannerState: 'centered'
         });
@@ -2376,8 +2436,16 @@
     function addCurrentlyVisibleMoneyManually() {
         if (state.moneyLiveCandidate && state.moneyLiveCandidate.kurus > 0) {
             const cand = state.moneyLiveCandidate;
+            const now = performance.now();
+            if (cand.signature && cand.signature === state.moneyLastCommittedSignature && (now - (state.moneyLastCommittedAt || 0) < 2500)) {
+                announceGuidance('Bu para az önce toplama eklendi. Aynı paranın iki kez sayılmaması için lütfen kameraya yeni bir para gösterin.', {
+                    force: true,
+                    bannerState: 'warning'
+                });
+                return;
+            }
             state.moneyLastCommittedSignature = cand.signature;
-            state.moneyLastCommittedAt = performance.now();
+            state.moneyLastCommittedAt = now;
             state.moneyEmptyFramesSinceCommit = 0;
             addMoneyToRunningTotal(cand.kurus, cand.label, cand.items, 'manual_live');
             return;
@@ -2392,6 +2460,7 @@
             });
         }
     }
+    window.addCurrentlyVisibleMoneyManually = addCurrentlyVisibleMoneyManually;
 
     function drawCoinCircleOverlay(ctx, coin, scaleX, scaleY) {
         if (!ctx) return;
@@ -3085,10 +3154,15 @@
                 fullPhrase: 'Saat 12 yönünde, ayağınızın yaklaşık 35 santimetre ilerisinde'
             };
         }
-        const [bx, by, bw, bh] = bbox;
-        const cx = (bx + bw * 0.5) / Math.max(1, anW);
-        const cy = (by + bh * 0.5) / Math.max(1, anH);
-        const areaRatio = (bw * bh) / Math.max(1, anW * anH);
+        const safeW = (typeof anW === 'number' && isFinite(anW) && anW > 0) ? anW : 320;
+        const safeH = (typeof anH === 'number' && isFinite(anH) && anH > 0) ? anH : 240;
+        const bx = (typeof bbox[0] === 'number' && isFinite(bbox[0])) ? Math.max(0, bbox[0]) : safeW * 0.4;
+        const by = (typeof bbox[1] === 'number' && isFinite(bbox[1])) ? Math.max(0, bbox[1]) : safeH * 0.4;
+        const bw = (typeof bbox[2] === 'number' && isFinite(bbox[2]) && bbox[2] > 0) ? bbox[2] : safeW * 0.2;
+        const bh = (typeof bbox[3] === 'number' && isFinite(bbox[3]) && bbox[3] > 0) ? bbox[3] : safeH * 0.2;
+        const cx = Math.max(0, Math.min(1, (bx + bw * 0.5) / safeW));
+        const cy = Math.max(0, Math.min(1, (by + bh * 0.5) / safeH));
+        const areaRatio = Math.max(0, Math.min(1, (bw * bh) / (safeW * safeH)));
 
         let clockHour = 12;
         if (cx < 0.22) clockHour = 10;
@@ -3282,7 +3356,14 @@
             }
 
             if (activeScreens.length > 0) {
-                findings.push('AÇIK EKRAN UYARISI: Odada açık kalmış bir televizyon veya bilgisayar ekranı algılandı.');
+                const screenDirs = [...new Set(activeScreens.map(sc => {
+                    if (!sc.bbox || sc.bbox.length < 4) return 'tam karşınızda';
+                    const scx = (sc.bbox[0] + sc.bbox[2] * 0.5) / Math.max(1, w);
+                    if (scx < 0.36) return 'sol tarafta';
+                    if (scx > 0.64) return 'sağ tarafta';
+                    return 'tam karşınızda';
+                }))];
+                findings.push(`AÇIK EKRAN UYARISI: Odada (${screenDirs.join(', ')}) açık kalmış bir televizyon veya bilgisayar ekranı algılandı.`);
             }
             if (ajarInfo.hasAjarGap) {
                 findings.push(`ARALIK KAPI / PENCERE / PERDE UYARISI: ${ajarInfo.directionWord.charAt(0).toUpperCase() + ajarInfo.directionWord.slice(1)} dikey bir ışık sızıntısı şeridi algılandı; kapı, balkon kapısı veya perde tam kapanmamış (aralık kalmış) olabilir.`);
@@ -3526,14 +3607,23 @@
         const dosageMatches = text.match(/\b\d+(?:[.,]\d+)?\s*(?:mg\s*\/\s*\d+\s*ml|mg|mcg|ml|gr|g|iu|ünite|tablet|film\s*tablet|kapsül|draje|ampul|flakon|şurup|damla|sprey)\b/gi) || [];
         const uniqueDosages = [...new Set(dosageMatches.map(d => d.replace(/\s+/g, ' ').trim()))];
 
-        // Eczane Kullanım Etiketi Kalıpları (Sabah 1, Akşam 1, Tok karnına, Günde 2 defa)
-        const usageMatches = text.match(/(?:sabah|öğle|akşam|gece)\s*\d+|günde\s*\d+\s*(?:defa|kez)|\d+\s*x\s*\d+|(?:aç|tok)\s*karn[ıi]na|yemek(?:lerden)?\s*(?:önce|sonra)/gi) || [];
+        // Eczane Kullanım Etiketi ve Saklama Koşulu Kalıpları (Sabah 1, Akşam 1, Tok karnına, 12 saatte bir, Buzdolabında saklayınız)
+        const usageMatches = text.match(/(?:sabah|[öoÖO][ğgĞG]le|ak[şsŞS]am|gece)\s*\d+|g[üuÜU]nde\s*\d+\s*(?:defa|kez)|\d+\s*saatte\s*b[iİıI]r|yatmadan\s*[öoÖO]nce|\d+\s*x\s*\d+|(?:a[çcÇC]|tok)\s*karn[ıiIİ]na|a[çcÇC]\s*veya\s*tok|yemek(?:lerden)?\s*(?:[öoÖO]nce|sonra)|[çcÇC][iİıI][ğgĞG]nemeden|bol\s*su\s*[iİıI]le|buzdolab[ıiIİ]nda(?:\s*\(?\s*2\s*-\s*8\s*°?\s*c\s*\)?)?\s*saklay[ıiIİ]n[ıiIİ]z|25\s*°?\s*c\s*alt[ıiIİ]ndak[iİıI]\s*oda\s*s[ıiIİ]cakl[ıiIİ][ğgĞG][ıiIİ]nda/gi) || [];
         const uniqueUsage = [...new Set(usageMatches.map(u => u.replace(/\s+/g, ' ').trim()))];
+        const storageWarnings = uniqueUsage.filter(u => /buzdolab|oda\s*s[ıiIİ]cakl|saklay/i.test(u));
 
         // Sıkı Son Kullanma Tarihi (SKT / EXP / TETT) Doğrulaması
         const now = new Date();
         const curYear = now.getFullYear();
         const curMonth = now.getMonth() + 1;
+        const monthNameMap = {
+            'OCAK': 1, 'JAN': 1, 'ŞUBAT': 2, 'SUBAT': 2, 'FEB': 2,
+            'MART': 3, 'MAR': 3, 'NİSAN': 4, 'NISAN': 4, 'APR': 4,
+            'MAYIS': 5, 'MAY': 5, 'HAZİRAN': 6, 'HAZIRAN': 6, 'JUN': 6,
+            'TEMMUZ': 7, 'JUL': 7, 'AĞUSTOS': 8, 'AGUSTOS': 8, 'AUG': 8,
+            'EYLÜL': 9, 'EYLUL': 9, 'SEP': 9, 'EKİM': 10, 'EKIM': 10, 'OCT': 10,
+            'KASIM': 11, 'NOV': 11, 'ARALIK': 12, 'DEC': 12
+        };
 
         const extractExpiryFromSingleText = (srcText) => {
             let eMonth = null;
@@ -3543,6 +3633,21 @@
                 .replace(/(^|[\s:.\-/])[Oo](?=[0-9])/g, '$10')
                 .replace(/([0-9])[Oo](?=[0-9])/g, '$10');
             const cleaned = ocrZeroFixed.replace(/(?:[ÜU]\.?\s*R\.?\s*T\.?|[ÜU]\.?R\.?T\.?|[ÜU]\.?\s*T\.?|[ÜU]RET[İI]M(?:\s*TAR[İI]H[İI])?|[İI]MAL(?:\s*TAR[İI]H[İI])?|MFG|M\.?F\.?G\.?|PRD|P\.?\s*D\.?|PROD(?:UCTION)?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi, ' ');
+            // 0. Türkçe ve İngilizce Ay İsimli Son Kullanma Tarihleri (Örn: "SKT: MAYIS 2028", "KASIM 2027", "EKİM 27")
+            const monthNameRx = /\b(OCAK|JAN|ŞUBAT|SUBAT|FEB|MART|MAR|NİSAN|NISAN|APR|MAYIS|MAY|HAZİRAN|HAZIRAN|JUN|TEMMUZ|JUL|AĞUSTOS|AGUSTOS|AUG|EYLÜL|EYLUL|SEP|EKİM|EKIM|OCT|KASIM|NOV|ARALIK|DEC)[\s./\-]+(20[2-3]\d|2[4-9]|3[0-8])\b/gi;
+            let mnm;
+            while ((mnm = monthNameRx.exec(cleaned)) !== null) {
+                const rawM = mnm[1].toLocaleUpperCase('tr-TR');
+                const mo = monthNameMap[rawM] || monthNameMap[mnm[1].toUpperCase()];
+                let yr = parseInt(mnm[2], 10);
+                if (yr < 100) yr += 2000;
+                if (mo >= 1 && mo <= 12 && yr >= 2020 && yr <= 2038) {
+                    if (eYear === null || (yr * 12 + mo) > (eYear * 12 + eMonth)) {
+                        eMonth = mo;
+                        eYear = yr;
+                    }
+                }
+            }
             const labeledRx = /(?:S\.?K\.?T\.?|SON\s*KULLAN(?:MA|IM)|SON\s*T[ÜU]KET[İI]M|EXP(?:IRY)?|T\.?E\.?T\.?T\.?|B\.?\s*B\.?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi;
             let m;
             while ((m = labeledRx.exec(cleaned)) !== null) {
@@ -3559,11 +3664,12 @@
                 }
             }
             if (eYear === null) {
-                const genericRx = /\b(?:(\d{1,2})[./\-])?(0[1-9]|1[0-2])[./\-](20[2-3]\d)\b/g;
+                const genericRx = /\b(?:(0?[1-9]|[12]\d|3[01])[./\-])?(0[1-9]|1[0-2])[./\-](20[2-3]\d|2[4-9]|3[0-8])\b/g;
                 let gm;
                 while ((gm = genericRx.exec(cleaned)) !== null) {
                     const mo = parseInt(gm[2], 10);
-                    const yr = parseInt(gm[3], 10);
+                    let yr = parseInt(gm[3], 10);
+                    if (yr < 100) yr += 2000;
                     if (mo >= 1 && mo <= 12 && yr >= 2020 && yr <= 2038) {
                         if (eYear === null || (yr * 12 + mo) > (eYear * 12 + eMonth)) {
                             eMonth = mo;
@@ -3626,9 +3732,11 @@
             sktSpeech,
             dosages: uniqueDosages,
             usageInstructions: uniqueUsage,
+            storageWarnings,
             barcodes: validBarcodes
         };
     }
+    window.parseMedicineAndExpiryZeroError = parseMedicineAndExpiryZeroError;
 
     function handleMedicineSktLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, qrDetection, predictions) {
         const barcodeBox = (qrDetection && qrDetection.bbox) ? qrDetection.bbox : detectBarcodeStripeRegion(metrics, anW, anH);
@@ -3831,12 +3939,16 @@
 
             el.tPosition.textContent = `Kalem Ucu: (${Math.round(penTip.x)}, ${Math.round(penTip.y)})`;
             el.tDistance.textContent = `Hedefe: ${cmd}`;
-            announceGuidance(`İmza kutusuna ulaşmak için kaleminizi ${cmd} kaydırın.`, {
-                bannerState: 'normal',
+            const approachMsg = state.signatureDocVerified
+                ? `İmza kutusuna ulaşmak için kaleminizi ${cmd} kaydırın.`
+                : `Önce evrakı okutmak için ekrana çift dokunun; imza kutusuna ulaşmak için kaleminizi ${cmd} kaydırın.`;
+            announceGuidance(approachMsg, {
+                bannerState: state.signatureDocVerified ? 'normal' : 'warning',
                 minIntervalMs: 2100
             });
         }
     }
+    window.handleSignaturePenLiveMode = handleSignaturePenLiveMode;
 
     /**
      * Mod 11: Akustik Sıvı Seviyesi & Bardak Doldurma Radarı (Menisküs Gradyanı + 5 Kare Medyan Filtresi)
@@ -3871,10 +3983,19 @@
         );
 
         const align = computeAlignmentInstruction(cupPred.bbox, anW, anH, trLabel);
+        const topLum = 0.299 * topSample.r + 0.587 * topSample.g + 0.114 * topSample.b;
+        const botLum = 0.299 * botSample.r + 0.587 * botSample.g + 0.114 * botSample.b;
+        const colorContrast = Math.hypot(topSample.r - botSample.r, topSample.g - botSample.g, topSample.b - botSample.b);
+        let fillHint = '';
+        if (colorContrast < 16 && topSample.colorName === botSample.colorName && botSample.colorName !== 'Beyaz') {
+            fillHint = ' Dikkat: Bardak üst kenarına kadar aynı koyulukta (yüzde 80 üzeri dolu) görünüyor; taşmaması için ağız kısmında en az 1 parmak boşluk bırakın.';
+        } else if (colorContrast >= 24 && Math.abs(topLum - botLum) >= 18) {
+            fillHint = ' Bardağın alt yarısı dolu, üst kısmı boş görünüyor.';
+        }
         el.tPosition.textContent = `${trLabel} (${align.posLabel})`;
         el.tDistance.textContent = `Üst: ${topSample.colorName} | Alt: ${botSample.colorName}`;
 
-        announceGuidance(`${trLabel} algılandı (${align.posLabel}). Üst kısmın rengi ${topSample.colorName}, alt kısmın rengi ${botSample.colorName}.`, {
+        announceGuidance(`${trLabel} algılandı (${align.posLabel}). Üst kısmın rengi ${topSample.colorName}, alt kısmın rengi ${botSample.colorName}.${fillHint}`, {
             bannerState: align.isCentered ? 'centered' : 'normal',
             minIntervalMs: 3400
         });
@@ -3982,11 +4103,12 @@
         }
 
         let spinSpeed = '';
-        const explicitSpinMatch = raw.match(/\b(400|600|800|1000|1200|1400|1600)\s*(?:dev[iı]r|rpm)?\b/i);
+        const explicitSpinMatch = raw.match(/\b(400|500|600|700|800|900|1000|1100|1200|1300|1400|1500|1600)\s*(?:dev[iı]r|rpm)?\b/i);
         if (explicitSpinMatch) {
             spinSpeed = `${explicitSpinMatch[1]} devir`;
         }
 
+        const isWasherContext = /\b(?:PAMUKLU|SENTET[İI]K|SIKMA|DEV[İI]R|DURULAMA|YIKAMA|NAR[İI]N|YÜNLÜ|PERDE)\b/i.test(raw);
         let detectedDegree = null;
 
         // 1. Açıkça derece sembolü (°C, °, derece, sıcaklık) içeren ifadeler
@@ -3995,7 +4117,8 @@
             raw.match(/\b(\d{2,3})\s*[°oO0]?\s*C\b/);
         if (explicitDegMatch) {
             const val = parseFloat(explicitDegMatch[1].replace(',', '.'));
-            if (val >= 14 && val <= 260) {
+            const maxAllowedExplicit = isWasherContext ? 95 : 260;
+            if (val >= 14 && val <= maxAllowedExplicit) {
                 detectedDegree = val;
             }
         }
@@ -4011,11 +4134,11 @@
             const tokens = cleanedForNums.match(/\b\d{2,3}(?:[.,]5)?\b/g) || [];
             for (const tok of tokens) {
                 const val = parseFloat(tok.replace(',', '.'));
-                if (val === 400 || val === 600 || val === 800 || val === 1000 || val === 1200 || val === 1400 || val === 1600) {
+                if ([400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600].includes(val)) {
                     continue;
                 }
                 const isAcKombiWasherRange = (val >= 15 && val <= 95);
-                const isOvenRange = (val >= 100 && val <= 260 && val % 5 === 0);
+                const isOvenRange = !isWasherContext && (val >= 100 && val <= 260 && val % 5 === 0);
                 if (isAcKombiWasherRange || isOvenRange) {
                     detectedDegree = val;
                     break;
@@ -4031,6 +4154,7 @@
             isDoorContext
         };
     }
+    window.extractApplianceDegreeAndTelemetry = extractApplianceDegreeAndTelemetry;
 
     function processApplianceDegreeAndBuildGuidance(cleanText, isLiveTick = false) {
         const telemetry = extractApplianceDegreeAndTelemetry(cleanText);
@@ -4241,11 +4365,41 @@
             { rx: /(?:^|[^\p{L}\p{N}])on\s*sekiz(?=$|[^\p{L}\p{N}])/u, val: 18 },
             { rx: /(?:^|[^\p{L}\p{N}])on\s*altı(?=$|[^\p{L}\p{N}])/u, val: 16 }
         ];
+        // 1. Dinamik Türkçe Bileşik Sayı Çözümleyici ("otuz yedi", "kırk üç", "altmış sekiz", "yüz altmış beş", "yirmi dört buçuk" vb.)
+        const tensMap = { 'on': 10, 'yirmi': 20, 'otuz': 30, 'kırk': 40, 'elli': 50, 'altmış': 60, 'yetmiş': 70, 'seksen': 80, 'doksan': 90 };
+        const onesMap = { 'bir': 1, 'iki': 2, 'üç': 3, 'dört': 4, 'beş': 5, 'altı': 6, 'yedi': 7, 'sekiz': 8, 'dokuz': 9 };
+        const tokens = clean.split(/\s+/);
+        let dynTotal = 0;
+        let hasDynHit = false;
+        for (let i = 0; i < tokens.length; i++) {
+            const w = tokens[i].replace(/[^\p{L}]/gu, '');
+            if (w === 'iki' && tokens[i + 1] && tokens[i + 1].replace(/[^\p{L}]/gu, '') === 'yüz') {
+                dynTotal += 200;
+                hasDynHit = true;
+                i++;
+            } else if (w === 'yüz') {
+                dynTotal += 100;
+                hasDynHit = true;
+            } else if (tensMap[w]) {
+                dynTotal += tensMap[w];
+                hasDynHit = true;
+            } else if (onesMap[w] && hasDynHit) {
+                dynTotal += onesMap[w];
+            } else if (w === 'buçuk' && hasDynHit) {
+                dynTotal += 0.5;
+            } else if (hasDynHit && w !== 'derece' && w !== 'dereceye') {
+                break;
+            }
+        }
+        if (hasDynHit && dynTotal >= 14 && dynTotal <= 260) {
+            return dynTotal;
+        }
         for (const item of wordNums) {
             if (item.rx.test(clean)) return item.val;
         }
         return null;
     }
+    window.parseSpokenDegreeFromText = parseSpokenDegreeFromText;
 
     function toggleApplianceDegreeLiveTracking() {
         state.degreeLiveTrackingActive = !state.degreeLiveTrackingActive;
@@ -4510,19 +4664,38 @@
             { name: 'Domuz Katkısı / Alkol / Karmin (E120) Uyarısı', regex: /(?:^|[^\p{L}])(?:DOMUZ|LARD|ALKOL|ETANOL|KARMİN|KARMIN|E120)(?=$|[^\p{L}])/iu }
         ];
 
+        // "ESER MİKTARDA / İZ MİKTARDA ... İÇEREBİLİR / BULUNABİLİR" (Çapraz Bulaşma) cümlelerini ana içerikten ayır
+        const traceClauses = [];
+        const traceRegex = /(?:ESER|İZ)\s*M[İI]KTARDA[^.;!\n]*|[^.;!\n]*?(?:ESER|İZ)\s*M[İI]KTARDA\s*(?:[İI]ÇEREB[İI]L[İI]R|BULUNAB[İI]L[İI]R)/gi;
+        const mainIngredientsText = cleanedForAllergens.replace(traceRegex, (match) => {
+            traceClauses.push(match);
+            return ' ';
+        });
+        const joinedTraceText = traceClauses.join(' ');
+        const traceAllergens = [];
+
         allergenRules.forEach(rule => {
-            if (rule.regex.test(cleanedForAllergens)) {
+            if (rule.regex.test(mainIngredientsText)) {
                 detectedAllergens.push(rule.name);
+            } else if (joinedTraceText && rule.regex.test(joinedTraceText)) {
+                traceAllergens.push(rule.name);
             }
         });
+
+        const traceWarning = traceAllergens.length > 0
+            ? `Çapraz Bulaşma Notu: Bu üründe eser (iz) miktarda ${traceAllergens.join(', ')} bulunabilir.`
+            : '';
 
         const sktInfo = parseMedicineAndExpiryZeroError(text);
         return {
             allergens: detectedAllergens,
+            traceAllergens,
+            traceWarning,
             freeFromNotes,
             sktInfo
         };
     }
+    window.parseFoodAllergensAndIngredients = parseFoodAllergensAndIngredients;
 
     function handleFoodFreshnessLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
         const roiBox = [anW * 0.25, anH * 0.25, anW * 0.50, anH * 0.50];
@@ -4889,7 +5062,17 @@
             ? 'Saç ve Üst Kadraj: Başınızın üst kısmında sağ ve sol taraf arasında belirgin ton/dağınıklık farkı veya kadraj kesilmesi var; saçınızı elinizle düzeltip başınızı biraz ortalayabilirsiniz.'
             : 'Saç ve Üst Kadraj: Başınızın üst kısmı kadrajın içinde tam görünüyor ve saç hizanız dengeli.';
 
-        // Arka Plan Düzeni (Görüntülü Görüşme Öncesi Kontrol)
+        // Arka Plan Düzeni, Telefon Eğikliği ve Ortam Aydınlatması (Görüntülü Görüşme Öncesi Kontrol)
+        const avgLum = (metrics && typeof metrics.avgBrightness === 'number') ? metrics.avgBrightness : 120;
+        const isTooDark = avgLum < 45;
+        const lightingWarning = isTooDark
+            ? 'Aydınlatma Uyarısı: Ortam görüntülü görüşme ve tıraş kontrolü için çok karanlık; lütfen oda ışığını açın veya yüzünüzü ışığa dönün.'
+            : '';
+        const rollAngle = (state.hasOrientationSensor && typeof state.tiltRoll === 'number') ? state.tiltRoll : 0;
+        const isPhoneTilted = Math.abs(rollAngle) > 15;
+        const tiltWarning = isPhoneTilted
+            ? `Telefon Eğiklik Uyarısı: Telefonu yaklaşık ${Math.abs(Math.round(rollAngle))} derece ${rollAngle > 0 ? 'sağa' : 'sola'} eğik tutuyorsunuz; görüntülü görüşmede karşı tarafa düz görünmek için telefonu dik konuma getirin.`
+            : '';
         const topBg = measureRegionColorAndPattern(imgData, w, h, w * 0.12, h * 0.03, w * 0.76, h * 0.18);
         let bgDesc = `Arka planınız ${topBg.colorName} tonlarında (${topBg.pattern}) ve sade görünüyor.`;
         if (bgObjects.length > 0) {
@@ -4897,16 +5080,20 @@
             bgDesc = `Görüntülü Görüşme Arka Planı: Arkanızda ${bgNames} görünüyor (${topBg.colorName} arka plan).`;
         }
 
-        const speechText = `Ayna ve Görüntülü Görüşme Asistanı: ${frameGuidance} ${shaveSymmetryNote} ${hairNote} ${bgDesc}`;
+        const speechText = `Ayna ve Görüntülü Görüşme Asistanı: ${lightingWarning ? lightingWarning + ' ' : ''}${tiltWarning ? tiltWarning + ' ' : ''}${frameGuidance} ${shaveSymmetryNote} ${hairNote} ${bgDesc}`;
         return {
             isCentered,
+            isTooDark,
+            lightingWarning,
+            isPhoneTilted,
+            tiltWarning,
             jawLumDiff,
             frameGuidance,
             shaveSymmetryNote,
             hairNote,
             bgDesc,
             speechText,
-            fullText: `🪞 Ayna Karşısında Kişisel Bakım ve Görüntülü Görüşme Raporu:\n• Kadraj Durumu: ${frameGuidance}\n• ${shaveSymmetryNote}\n• ${hairNote}\n• ${bgDesc}`
+            fullText: `🪞 Ayna Karşısında Kişisel Bakım ve Görüntülü Görüşme Raporu:${lightingWarning ? '\n• ' + lightingWarning : ''}\n• Kadraj Durumu: ${frameGuidance}\n• ${shaveSymmetryNote}\n• ${hairNote}\n• ${bgDesc}`
         };
     }
     window.analyzePersonalGroomingAndVideoCallReadiness = analyzePersonalGroomingAndVideoCallReadiness;
@@ -4956,36 +5143,41 @@
             return parseFloat(s.replace(',', '.'));
         };
 
+        const multiPackWeightMatch = text.match(/\b(\d{1,2})\s*[xX*]\s*(\d{1,4}(?:[.,]\d{1,2})?)\s*(kg|kilo|kilogram|gr|gram|g|lt|litre|l|ml)\b/i);
         const weightMatch = text.match(/\b(\d{1,4}(?:[.,]\d{1,2})?)\s*(kg|kilo|kilogram|gr|gram|g|lt|litre|l|ml)\b/i);
+        const piecePackMatch = text.match(/\b(\d{1,3})\s*(?:['’]?\s*l[ıiuü]\s*(?:paket|kutu)?|adet)\b/i);
         const priceMatches = [...text.matchAll(/(?:(\d{1,4}(?:[.,]\d{1,2})?)\s*(?:TL|₺|LİRA|LIRA)|(?:TL|₺)\s*(\d{1,4}(?:[.,]\d{1,2})?))/gi)];
 
-        if (weightMatch && priceMatches.length > 0) {
-            const rawQty = parseTrFloat(weightMatch[1]);
-            const unitRaw = weightMatch[2].toLowerCase();
+        if ((multiPackWeightMatch || weightMatch) && priceMatches.length > 0) {
+            const packMult = multiPackWeightMatch ? parseInt(multiPackWeightMatch[1], 10) : 1;
+            const singleQty = multiPackWeightMatch ? parseTrFloat(multiPackWeightMatch[2]) : parseTrFloat(weightMatch[1]);
+            const rawQty = packMult * singleQty;
+            const unitRaw = (multiPackWeightMatch ? multiPackWeightMatch[3] : weightMatch[2]).toLowerCase();
             const rawPriceStr = priceMatches[0][1] || priceMatches[0][2];
             const pkgPrice = parseTrFloat(rawPriceStr);
+            const multiPackLabel = packMult > 1 ? ` (${packMult} x ${singleQty} ${unitRaw} çoklu paket)` : '';
 
             if (rawQty > 0 && pkgPrice > 0 && pkgPrice < 50000) {
                 if (unitRaw === 'gr' || unitRaw === 'gram' || unitRaw === 'g') {
-                    if (rawQty >= 20 && rawQty <= 5000) {
+                    if (rawQty >= 20 && rawQty <= 15000) {
                         const perKg = (pkgPrice * 1000) / rawQty;
                         const perKgFormatted = perKg.toFixed(2).replace('.', ',');
-                        unitPriceNotes.push(`Market Birim Fiyat Hesabı: ${rawQty} gram paket fiyatı ${pkgPrice} TL; bu ürünün 1 kilogram (kilosu) gerçek birim fiyatı ${perKgFormatted} Türk Lirasıdır.`);
+                        unitPriceNotes.push(`Market Birim Fiyat Hesabı: Toplam ${rawQty} gram${multiPackLabel} paket fiyatı ${pkgPrice} TL; bu ürünün 1 kilogram (kilosu) gerçek birim fiyatı ${perKgFormatted} Türk Lirasıdır.`);
                     }
                 } else if (unitRaw === 'ml') {
-                    if (rawQty >= 30 && rawQty <= 5000) {
+                    if (rawQty >= 30 && rawQty <= 15000) {
                         const perLiter = (pkgPrice * 1000) / rawQty;
                         const perLiterFormatted = perLiter.toFixed(2).replace('.', ',');
-                        unitPriceNotes.push(`Market Birim Fiyat Hesabı: ${rawQty} mililitre ürün fiyatı ${pkgPrice} TL; bu ürünün 1 litre gerçek birim fiyatı ${perLiterFormatted} Türk Lirasıdır.`);
+                        unitPriceNotes.push(`Market Birim Fiyat Hesabı: Toplam ${rawQty} mililitre${multiPackLabel} ürün fiyatı ${pkgPrice} TL; bu ürünün 1 litre gerçek birim fiyatı ${perLiterFormatted} Türk Lirasıdır.`);
                     }
                 } else if (unitRaw === 'kg' || unitRaw === 'kilo' || unitRaw === 'kilogram') {
                     const perKg = pkgPrice / rawQty;
                     const perKgFormatted = perKg.toFixed(2).replace('.', ',');
-                    unitPriceNotes.push(`Market Birim Fiyat Hesabı: ${rawQty} kilogram ürün fiyatı ${pkgPrice} TL (Kilosu: ${perKgFormatted} TL).`);
+                    unitPriceNotes.push(`Market Birim Fiyat Hesabı: Toplam ${rawQty} kilogram${multiPackLabel} ürün fiyatı ${pkgPrice} TL (Kilosu: ${perKgFormatted} TL).`);
                 } else if (unitRaw === 'lt' || unitRaw === 'litre' || unitRaw === 'l') {
                     const perLiter = pkgPrice / rawQty;
                     const perLiterFormatted = perLiter.toFixed(2).replace('.', ',');
-                    unitPriceNotes.push(`Market Birim Fiyat Hesabı: ${rawQty} litre ürün fiyatı ${pkgPrice} TL (Litresi: ${perLiterFormatted} TL).`);
+                    unitPriceNotes.push(`Market Birim Fiyat Hesabı: Toplam ${rawQty} litre${multiPackLabel} ürün fiyatı ${pkgPrice} TL (Litresi: ${perLiterFormatted} TL).`);
                 }
 
                 // Eğer hem "2 Al 1 Öde" / "3 Al 2 Öde" hem de paket fiyatı varsa tanesinin kaça geldiğini de söyle!
@@ -4997,6 +5189,14 @@
                     const effectiveUnit = ((pkgPrice * payM) / buyN).toFixed(2).replace('.', ',');
                     campaignNotes.push(`${buyN} Al ${payM} Öde kampanyasıyla tanesi ${pkgPrice} TL yerine ${effectiveUnit} TL'ye geliyor.`);
                 }
+            }
+        } else if (piecePackMatch && priceMatches.length > 0) {
+            const pieceCount = parseInt(piecePackMatch[1], 10);
+            const rawPriceStr = priceMatches[0][1] || priceMatches[0][2];
+            const pkgPrice = parseTrFloat(rawPriceStr);
+            if (pieceCount >= 2 && pieceCount <= 200 && pkgPrice > 0 && pkgPrice < 50000) {
+                const perPieceFormatted = (pkgPrice / pieceCount).toFixed(2).replace('.', ',');
+                unitPriceNotes.push(`Market Birim Fiyat Hesabı: ${pieceCount} adetlik paket fiyatı ${pkgPrice} TL (Tanesi: ${perPieceFormatted} TL).`);
             }
         }
 
@@ -5053,9 +5253,14 @@
                 const cy = (ln.bbox && typeof ln.bbox.y0 === 'number' && typeof ln.bbox.y1 === 'number')
                     ? ((ln.bbox.y0 + ln.bbox.y1) * 0.5) / Math.max(1, h)
                     : 0.5;
-                if (cy < 0.30) topTexts.push(raw);
-                else if (cy > 0.72) botTexts.push(raw);
-                else midTexts.push(raw);
+                const cx = (ln.bbox && typeof ln.bbox.x0 === 'number' && typeof ln.bbox.x1 === 'number')
+                    ? ((ln.bbox.x0 + ln.bbox.x1) * 0.5) / Math.max(1, w)
+                    : 0.5;
+                const horizTag = cx < 0.34 ? ' (Sol)' : (cx > 0.66 ? ' (Sağ)' : ' (Orta)');
+                const labeled = `${raw}${horizTag}`;
+                if (cy < 0.30) topTexts.push(labeled);
+                else if (cy > 0.72) botTexts.push(labeled);
+                else midTexts.push(labeled);
             }
         }
 
@@ -5405,6 +5610,11 @@
             speechNotes.push(useStr);
             reportLines.push(useStr);
         }
+        if (med.storageWarnings && med.storageWarnings.length > 0) {
+            const storStr = `Saklama Koşulu: ${med.storageWarnings.join(', ')}.`;
+            speechNotes.push(storStr);
+            reportLines.push(storStr);
+        }
 
         // 2. Gıda Alerjeni ve Güvenli İbare Kontrolü
         const pkg = parseFoodAllergensAndIngredients(text);
@@ -5456,6 +5666,13 @@
             reportLines.push(menuAndPrice.reportSummary);
         }
 
+        // 7. Doğrulanmış EAN-13 / EAN-8 / İTS Karekod Barkod Bilgisi
+        if (med.barcodes && med.barcodes.length > 0) {
+            const bcLine = `Doğrulanmış Barkod: ${med.barcodes.join(', ')}.`;
+            speechNotes.push(bcLine);
+            reportLines.push(bcLine);
+        }
+
         return {
             speechNotes,
             reportLines,
@@ -5494,12 +5711,16 @@
         populatePhotoExplorerMap(capCanvas, metrics, preds, [], initialStory);
 
         const hasOcrEngine = typeof window.Tesseract !== 'undefined';
+        const isTextFocusedMode = ['exam_reader', 'medicine_skt', 'pos_iban_reader', 'food_freshness', 'signature_pen', 'door_elevator_lcd', 'bus_stop_tracker', 'tv_subtitle_score'].includes(state.mode);
+        const offlineOcrHint = (!hasOcrEngine && isTextFocusedMode)
+            ? ' Not: Yazı okuma motoru şu an çevrimdışı önbellekte bulunmadığı için sahne, renk ve nesne analizi yapıldı; yazıların okunması için interneti bir kez açmanız yeterlidir.'
+            : '';
         showDetectedResult(
             `${sourceLabel} — Detaylı Türkçe Betimleme`,
-            hasOcrEngine ? (initialStory + '\n\n(Fotoğrafın üzerindeki yazılar kontrol ediliyor...)') : initialStory
+            hasOcrEngine ? (initialStory + '\n\n(Fotoğrafın üzerindeki yazılar kontrol ediliyor...)') : (initialStory + (offlineOcrHint ? `\n\n${offlineOcrHint.trim()}` : ''))
         );
         announceGuidance(
-            hasOcrEngine ? `${sourceLabel} inceleniyor, sahne ve yazılar okunuyor...` : initialStory,
+            hasOcrEngine ? `${sourceLabel} inceleniyor, sahne ve yazılar okunuyor...` : (initialStory + offlineOcrHint),
             {
                 force: true,
                 bannerState: 'centered'
@@ -5656,12 +5877,14 @@
                         : '';
                     const hasFullIngredientsHeader = /(?:İÇİNDEKİLER|ICINDEKILER|İÇİNDEKİ|ALERJEN|ALLERGEN|İÇERİR|ICERIR)/i.test(cleanText) && cleanText.length >= 25;
                     const allergenMsg = pkg.allergens.length > 0
-                        ? `DİKKAT ALERJİ UYARISI: Pakette ${pkg.allergens.join(', ')} bulundu!`
-                        : (hasFullIngredientsHeader
-                            ? 'Okunan içindekiler listesinde bilinen bir alerji maddesine rastlanmadı; ancak ciddi alerjiniz varsa tüketmeden önce bir yakınınıza da teyit ettirin.'
-                            : (unitAndMenu.speechSummary
-                                ? 'Raf etiketi veya menü fiyat analizi tamamlandı.'
-                                : 'DİKKAT: Paketin İçindekiler listesi bu açıdan tam okunamadı! Alerjiniz varsa bu ürüne güvenmeyin; lütfen paketin arka yüzündeki İçindekiler bölümünü yakından okutun.'));
+                        ? `DİKKAT ALERJİ UYARISI: Pakette ${pkg.allergens.join(', ')} bulundu!${pkg.traceWarning ? ' ' + pkg.traceWarning : ''}`
+                        : (pkg.traceWarning
+                            ? `Ana içerikte doğrudan alerjen okunmadı ancak DİKKAT: ${pkg.traceWarning}`
+                            : (hasFullIngredientsHeader
+                                ? 'Okunan içindekiler listesinde bilinen bir alerji maddesine rastlanmadı; ancak ciddi alerjiniz varsa tüketmeden önce bir yakınınıza da teyit ettirin.'
+                                : (unitAndMenu.speechSummary
+                                    ? 'Raf etiketi veya menü fiyat analizi tamamlandı.'
+                                    : 'DİKKAT: Paketin İçindekiler listesi bu açıdan tam okunamadı! Alerjiniz varsa bu ürüne güvenmeyin; lütfen paketin arka yüzündeki İçindekiler bölümünü yakından okutun.')));
                     const unitPriceSpeech = unitAndMenu.speechSummary ? ` ${unitAndMenu.speechSummary}` : '';
                     const unitPriceReport = unitAndMenu.reportSummary ? `\n${unitAndMenu.reportSummary}` : '';
                     const foodReport = `${surfaceMsg}\n${freeFromMsg}\n${allergenMsg}${unitPriceReport}\n${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}\n\nPakette veya Etikette Okunan Yazı:\n${cleanText || 'Paket yazısı algılanmadı.'}`.trim();
@@ -5746,10 +5969,15 @@
                     const degMatches = cleanText.match(/\b\d{1,4}(?:[.,]\d)?\s*(?:°\s*C|derece|bar|devir|dk|dakika|kat|daire|no)\b/gi) || [];
                     const errMatches = cleanText.match(/\b(?:E|F|ERR|HATA)\s*[-:]?\s*\d{1,3}\b/gi) || [];
                     const numTokens = cleanText.match(/\b\d{1,4}\b/g) || [];
+                    const elevatorTokens = cleanText.match(/\b(?:-1|-2|B1|B2|Z|G|ZEM[İI]N|G[İI]R[İI]Ş|ALARM|AC[İI]L|ÇAN)\b/gi) || [];
+                    const hasAlarmBell = /\b(?:ALARM|AC[İI]L|ÇAN|🔔)\b/i.test(cleanText);
+                    const elevatorHint = elevatorTokens.length > 0
+                        ? `Asansör Kat Paneli Tuşları: ${[...new Set(elevatorTokens.map(t => t.toUpperCase()))].join(', ')}.${hasAlarmBell ? ' DİKKAT: Panelde Acil Durum / Alarm Çanı tuşu algılandı; yanlışlıkla alarmı çaldırmamak için kat tuşlarına dokunurken dikkatli olun.' : ''} `
+                        : '';
                     const errLine = errMatches.length > 0 ? `Algılanan Arıza Kodu: ${[...new Set(errMatches)].join(', ')}. ` : '';
                     const summaryNums = degMatches.length > 0
-                        ? `${errLine}Birimli Değerler: ${degMatches.join(', ')}.`
-                        : (numTokens.length > 0 ? `${errLine}Okunan Numara / Tuşlar: ${[...new Set(numTokens)].slice(0, 8).join(', ')}.` : (errLine || ''));
+                        ? `${elevatorHint}${errLine}Birimli Değerler: ${degMatches.join(', ')}.`
+                        : (numTokens.length > 0 ? `${elevatorHint}${errLine}Okunan Numara / Tuşlar: ${[...new Set(numTokens)].slice(0, 8).join(', ')}.` : (`${elevatorHint}${errLine}`.trim()));
                     const boilerSafetyNote = 'Güvenlik uyarısı: Kombi su basıncı veya gaz vanası gibi kritik müdahalelerde kameradaki rakama tek başına güvenmeyin; mutlaka gören bir yakınınıza veya yetkili servise kontrol ettirin.';
                     const coachReportSection = (degCoach && degCoach.detectedDegree !== null) ? `${degCoach.reportText}\n\n` : '';
                     const panelReport = `${coachReportSection}${brandLine}\n${summaryNums}\n\n⚠️ ${boilerSafetyNote}\n\nEkran veya Kapı Yazısı:\n${cleanText || 'Rakam veya yazı okunamadı.'}`.trim();
@@ -6020,6 +6248,13 @@
                 loadImageDataUrlAndAnalyze(e.target.result, 'Galeriden Seçilen Fotoğraf');
             }
         };
+        reader.onerror = () => {
+            state.isProcessingOcr = false;
+            announceGuidance('Seçilen görsel dosyası okunamadı veya bozuk. Lütfen başka bir fotoğraf seçin.', {
+                force: true,
+                bannerState: 'warning'
+            });
+        };
         reader.readAsDataURL(file);
     }
 
@@ -6040,8 +6275,16 @@
             capCanvas.getContext('2d').drawImage(img, 0, 0, w, h);
             await analyzePhotoCanvasAndDescribe(capCanvas, label);
         };
+        img.onerror = () => {
+            state.isProcessingOcr = false;
+            announceGuidance('Seçilen görsel dosyası okunamadı veya bozuk. Lütfen başka bir fotoğraf seçin.', {
+                force: true,
+                bannerState: 'warning'
+            });
+        };
         img.src = dataUrl;
     }
+    window.loadImageDataUrlAndAnalyze = loadImageDataUrlAndAnalyze;
 
     // =========================================================================
     // AKILLI ÇOK KARELİ (MULTI-KEYFRAME) ZAMAN SIRALI VİDEO BETİMLEME MİMARİSİ
@@ -6811,6 +7054,19 @@
         }
     };
 
+    window.receiveSharedTextFromAndroid = function (sharedText) {
+        const clean = String(sharedText || '').trim();
+        if (!clean) return;
+        const universal = buildUniversalSmartInsights(clean, clean, clean);
+        const smartNotes = (universal && Array.isArray(universal.speechNotes) && universal.speechNotes.length > 0)
+            ? universal.speechNotes.join(' ') + ' '
+            : '';
+        const spokenSummary = `Paylaşılan Metin Analizi: ${smartNotes}Tam metin: ${clean.replace(/\s+/g, ' ')}`;
+        state.lastStoryText = spokenSummary;
+        showDetectedResult('Paylaşılan Metin / Mesaj Analizi', `${smartNotes ? smartNotes + '\n\n' : ''}Paylaşılan Tam Metin:\n${clean}`);
+        announceGuidance(spokenSummary, { force: true, bannerState: 'centered' });
+    };
+
     function showDetectedResult(title, content) {
         el.resultPanel.hidden = false;
         el.resultTitle.textContent = title;
@@ -7038,6 +7294,15 @@
                 degBtn.classList.remove('active-toggle');
                 degBtn.setAttribute('aria-pressed', 'false');
                 degBtn.textContent = '▶️ Canlı Derece Takibini Başlat (Tuşa Bastıkça Söyler)';
+            }
+        }
+        if (state.laundrySortLiveActive) {
+            state.laundrySortLiveActive = false;
+            const lBtn = document.getElementById('btn-laundry-sort-toggle');
+            if (lBtn) {
+                lBtn.classList.remove('active-toggle');
+                lBtn.setAttribute('aria-pressed', 'false');
+                lBtn.textContent = '🧺 Canlı Renkli / Beyaz Çamaşır Ayıklamayı Başlat';
             }
         }
         if (state.videoStream) {
@@ -8899,6 +9164,14 @@
     function toggleContinuousAutoSongRadar() {
         radar.init();
         state.songAutoRadarEnabled = !state.songAutoRadarEnabled;
+        if (state.songAutoRadarEnabled && state.songTunerActive) {
+            state.songTunerActive = false;
+            if (el.btnSongTuner) {
+                el.btnSongTuner.classList.remove('active-toggle');
+                el.btnSongTuner.setAttribute('aria-pressed', 'false');
+                el.btnSongTuner.textContent = '🎸 Sesli Enstrüman Akort & Makam: Kapalı';
+            }
+        }
         if (el.btnSongAutoRadar) {
             el.btnSongAutoRadar.classList.toggle('active-toggle', state.songAutoRadarEnabled);
             el.btnSongAutoRadar.setAttribute('aria-pressed', String(state.songAutoRadarEnabled));
@@ -8930,6 +9203,18 @@
     function toggleInstrumentTunerAndMakam() {
         radar.init();
         state.songTunerActive = !state.songTunerActive;
+        if (state.songTunerActive && state.songAutoRadarEnabled) {
+            state.songAutoRadarEnabled = false;
+            if (state.songAutoRadarInterval) {
+                clearInterval(state.songAutoRadarInterval);
+                state.songAutoRadarInterval = null;
+            }
+            if (el.btnSongAutoRadar) {
+                el.btnSongAutoRadar.classList.remove('active-toggle');
+                el.btnSongAutoRadar.setAttribute('aria-pressed', 'false');
+                el.btnSongAutoRadar.textContent = '📡 Otomatik Şarkı Takibi: Kapalı';
+            }
+        }
         if (el.btnSongTuner) {
             el.btnSongTuner.classList.toggle('active-toggle', state.songTunerActive);
             el.btnSongTuner.setAttribute('aria-pressed', String(state.songTunerActive));
@@ -9155,7 +9440,7 @@
         const cleanedForBus = upper
             .replace(/\b(?:PERON|SAAT|KAPI|HAT\s*BOYU)\s*[:.]?\s*\d{1,4}\b/g, ' ')
             .replace(/\b\d{1,4}\s*(?:TL|KR|KURUŞ|MG|ML|GR|KG|CM|MM|DK|SN|GB|MB|HZ|W|V|DERECE|KKAL|KCAL)\b/g, ' ');
-        const alphaNumRouteMatches = (cleanedForBus.match(/\b(?:\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3})\b/g) || [])
+        const alphaNumRouteMatches = (cleanedForBus.match(/\b(?:[A-ZÇĞİÖŞÜ]{1,2}-\d{1,3}[A-ZÇĞİÖŞÜ]?|\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3})\b/g) || [])
             .filter(tok => !/^(?:\d+(?:TL|KR|MG|ML|GR|KG|CM|MM|DK|SN|GB|MB|HZ)|3D|4K|2D)$/i.test(tok));
         const pureNumMatches = cleanedForBus.match(/\b[1-9]\d{0,3}\b/g) || [];
         const routeMatches = alphaNumRouteMatches.length > 0 ? alphaNumRouteMatches : pureNumMatches;
@@ -9183,6 +9468,7 @@
             fullText: fallbackSpeech
         };
     }
+    window.processBusRouteOcrResult = processBusRouteOcrResult;
 
     async function setBusDestinationStopAlarm(queryStr) {
         const q = String(queryStr || '').trim();
@@ -9265,12 +9551,19 @@
             return;
         }
         if (!state.userLat || !state.userLon) {
+            state.busGpsWaitCount = (state.busGpsWaitCount || 0) + 1;
             autoAcquireLocationAndWatch();
             if (speakImmediately) {
                 announceGuidance(`${state.busTargetStop.name} durağı için alarm kuruldu, GPS konumunuz alınıyor.`, { force: true });
+            } else if (state.busGpsWaitCount === 3) {
+                announceGuidance(`Uyarı: ${state.busTargetStop.name} durağı takibi için GPS sinyali henüz alınamadı. Lütfen telefonunuzun konum servisinin açık olduğundan emin olun veya pencere kenarına yaklaşın.`, {
+                    force: true,
+                    bannerState: 'warning'
+                });
             }
             return;
         }
+        state.busGpsWaitCount = 0;
         const distM = computeDistanceMetersHaversine(state.userLat, state.userLon, state.busTargetStop.lat, state.busTargetStop.lon);
         const remEl = document.getElementById('bus-remaining-distance');
         const distFormatted = distM >= 1000 ? `${(distM / 1000).toFixed(1)} kilometre (${distM} metre)` : `${distM} metre`;
@@ -9366,8 +9659,10 @@
         if (!cleaned.startsWith('TR') || cleaned.length !== 26) return null;
         const body = cleaned.slice(2)
             .replace(/O/g, '0')
-            .replace(/I/g, '1')
+            .replace(/[IL]/g, '1')
+            .replace(/Z/g, '2')
             .replace(/S/g, '5')
+            .replace(/G/g, '6')
             .replace(/B/g, '8');
         if (!/^\d{24}$/.test(body)) return null;
         const fullIban = 'TR' + body;
@@ -9383,6 +9678,7 @@
             isValidChecksum: remainder === 1
         };
     }
+    window.validateTurkishIbanMod97 = validateTurkishIbanMod97;
 
     /**
      * Mod 16: Düz Cam Dokunmatik POS, Hastane Sıra Alma ve Kurum Kiosk Ekranı Bölge & Parmak Yönlendiricisi
@@ -9506,17 +9802,56 @@
         announceGuidance(defaultTouchGuide, { force: true, bannerState: 'centered' });
     }
 
+    function formatPosAmountForSpeech(rawAmountStr) {
+        const s = String(rawAmountStr || '');
+        const numMatch = s.match(/(\d{1,3}(?:[.\s]\d{3})+(?:,\d{2})?|\d{1,6}(?:[.,]\d{2})?)/);
+        if (!numMatch) return '';
+        let numToken = numMatch[1].replace(/\s+/g, '');
+        let liraStr = '';
+        let kurusStr = '';
+        if (numToken.includes('.') && numToken.includes(',')) {
+            const parts = numToken.replace(/\./g, '').split(',');
+            liraStr = parts[0];
+            kurusStr = parts[1] || '';
+        } else if (numToken.includes(',')) {
+            const parts = numToken.split(',');
+            liraStr = parts[0];
+            kurusStr = parts[1] || '';
+        } else if (/^\d{1,3}(?:\.\d{3})+$/.test(numToken)) {
+            liraStr = numToken.replace(/\./g, '');
+        } else if (numToken.includes('.')) {
+            const parts = numToken.split('.');
+            liraStr = parts[0];
+            kurusStr = parts[1] || '';
+        } else {
+            liraStr = numToken;
+        }
+        const liraVal = parseInt(liraStr, 10);
+        const kurusVal = kurusStr ? parseInt(kurusStr.padEnd(2, '0').slice(0, 2), 10) : 0;
+        if (isNaN(liraVal)) return '';
+        if (kurusVal > 0) {
+            return `${liraVal} Lira ${kurusVal} Kuruş`;
+        }
+        return `${liraVal} Türk Lirası`;
+    }
+    window.formatPosAmountForSpeech = formatPosAmountForSpeech;
+
     function processPosAmountAndIbanText(cleanText, pass1Text = '', pass2Text = '', collectedLines = [], capCanvas = null, metrics = null) {
         const text = String(cleanText || '');
         const compactNoSpaces = text.toUpperCase().replace(/[\s\-.,]/g, '');
-        const ibanRegex = /TR[0-9OISB]{24}/g;
+        const ibanRegex = /TR[0-9OILSZBG]{24}/g;
         const rawIbans = compactNoSpaces.match(ibanRegex) || [];
         let foundIbanObj = null;
+        const validIbans = [];
         for (const cand of rawIbans) {
             const checked = validateTurkishIbanMod97(cand);
             if (checked) {
-                foundIbanObj = checked;
-                if (checked.isValidChecksum) break;
+                if (!foundIbanObj || (!foundIbanObj.isValidChecksum && checked.isValidChecksum)) {
+                    foundIbanObj = checked;
+                }
+                if (checked.isValidChecksum && !validIbans.some(v => v.iban === checked.iban)) {
+                    validIbans.push(checked);
+                }
             }
         }
 
@@ -9562,15 +9897,20 @@
         } else if (cleanAmounts.length > 0) {
             state.lastDetectedPosAmount = cleanAmounts[0];
             if (posEl) posEl.textContent = cleanAmounts.join(' / ');
-            speechParts.push(`Ekranda okunan ödeme tutarı: ${cleanAmounts[0]}. Güvenliğiniz için kart işlemini onaylamadan önce bildirimdeki tutarı da kontrol edin.`);
+            const spokenMoney = formatPosAmountForSpeech(cleanAmounts[0]);
+            const spokenClarification = spokenMoney ? ` (${spokenMoney})` : '';
+            speechParts.push(`Ekranda okunan ödeme tutarı: ${cleanAmounts[0]}${spokenClarification}. Güvenliğiniz için kart işlemini onaylamadan önce bildirimdeki tutarı da kontrol edin.`);
         }
 
         if (foundIbanObj) {
             if (foundIbanObj.isValidChecksum) {
                 state.lastDetectedIban = foundIbanObj.formatted;
-                if (ibanEl) ibanEl.textContent = `${foundIbanObj.formatted} (Mod-97 Doğrulandı)`;
+                const multiNote = validIbans.length > 1
+                    ? ` (Belgede toplam ${validIbans.length} adet doğrulanmış IBAN bulundu, ilki panoya kopyalandı; diğerleri: ${validIbans.slice(1).map(x => x.formatted).join(' / ')})`
+                    : '';
+                if (ibanEl) ibanEl.textContent = `${foundIbanObj.formatted} (Mod-97 Doğrulandı)${validIbans.length > 1 ? ` [+${validIbans.length - 1} IBAN]` : ''}`;
                 copyTextUniversal(foundIbanObj.iban, 'IBAN');
-                speechParts.push(`Doğrulanmış 26 haneli IBAN numarası bulundu ve telefonunuzun panosuna kopyalandı: ${foundIbanObj.formatted}. Para göndermeden önce alıcı adını mutlaka kontrol edin.`);
+                speechParts.push(`Doğrulanmış 26 haneli IBAN numarası bulundu ve telefonunuzun panosuna kopyalandı: ${foundIbanObj.formatted}.${multiNote} Para göndermeden önce alıcı adını mutlaka kontrol edin.`);
             } else {
                 if (ibanEl) ibanEl.textContent = '⚠️ IBAN Rakamı Net Değil (Kopyalanmadı)';
                 speechParts.push('DİKKAT: TR ile başlayan bir IBAN algılandı ancak rakamlardan biri net okunamadığı için yanlış hesaba para gitmemesi adına panoya kopyalanmadı! Lütfen kamerayı yaklaştırıp tekrar okutun.');
@@ -9595,6 +9935,7 @@
             fullText: `${speechParts.join('\n')}\n\nOkunan Tam Metin:\n${text}`
         };
     }
+    window.processPosAmountAndIbanText = processPosAmountAndIbanText;
 
     async function copyDetectedIbanToClipboard() {
         if (!state.lastDetectedIban) {
@@ -9666,6 +10007,24 @@
             return;
         }
         state.deletedItemMemoryBackup = null;
+        const normKey = clean.toLocaleLowerCase('tr-TR').replace(/\s+/g, ' ');
+        const existingIdx = state.itemMemories.findIndex(m => String(m.text || '').toLocaleLowerCase('tr-TR').replace(/\s+/g, ' ') === normKey);
+        if (existingIdx >= 0) {
+            const existing = state.itemMemories.splice(existingIdx, 1)[0];
+            existing.text = clean;
+            if (colorTag) existing.colorTag = colorTag;
+            if (Array.isArray(visualSignature)) existing.visualSignature = visualSignature;
+            existing.dateStr = new Date().toLocaleDateString('tr-TR');
+            state.itemMemories.unshift(existing);
+            saveItemMemoriesToStorage();
+            const inp = document.getElementById('memory-note-input');
+            if (inp) inp.value = '';
+            announceGuidance(`Mevcut eşya kaydınız güncellendi: "${clean}".`, {
+                force: true,
+                bannerState: 'centered'
+            });
+            return;
+        }
         const entry = {
             id: Date.now(),
             text: clean,
@@ -9683,6 +10042,7 @@
             bannerState: 'centered'
         });
     }
+    window.saveItemMemoryEntry = saveItemMemoryEntry;
 
     function buildTurkishStemVariants(word) {
         const clean = String(word || '').toLocaleLowerCase('tr-TR').replace(/[^a-zçğıöşü0-9]/gu, '');
@@ -9718,10 +10078,18 @@
         const stopRegex = /(?:^|\s)(?:nerede|nereye|neredeydi|koydum|koymuştum|bıraktım|acaba|benim|hangi|olan)(?=$|\s)/gu;
         const words = q.replace(stopRegex, ' ').trim().split(/\s+/).filter(w => w.length >= 2);
         const queryStems = words.flatMap(buildTurkishStemVariants);
-        const matches = state.itemMemories.filter(item => {
+        let matches = state.itemMemories.filter(item => {
             const hay = item.text.toLocaleLowerCase('tr-TR');
             return hay.includes(q) || queryStems.some(stem => hay.includes(stem));
         });
+
+        // Bulanık (Fuzzy Trigram) Yedek Arama: Ses tanıma ufak bir harf hatası yaptıysa en yakın eşya kaydını bul
+        if (matches.length === 0 && words.length > 0 && state.itemMemories.length > 0) {
+            matches = state.itemMemories.filter(item => {
+                const hayWords = String(item.text || '').toLocaleLowerCase('tr-TR').split(/\s+/).filter(w => w.length >= 3);
+                return words.some(qw => hayWords.some(hw => computeTrigramSimilarity(qw, hw) >= 0.44));
+            });
+        }
 
         if (matches.length > 0) {
             const best = matches.slice(0, 3).map(m => m.text).join('. Ayrıca: ');
@@ -9773,6 +10141,29 @@
             const activeStatus = getActiveModeSpokenStatus();
             announceGuidance(activeStatus, { force: true, bannerState: 'centered' });
             return 'active_mode_status';
+        }
+
+        // 0A. Aktif Takip / Alarm / Spiker Durdurma ("alarmı kapat", "durak alarmını kapat", "takibi durdur", "spikeri durdur")
+        if (/(?:alarmı\s*kapat|alarmı\s*iptal|durak\s*alarmını\s*kapat|takibi\s*durdur|spikeri\s*durdur|spikeri\s*kapat)/u.test(q)) {
+            if (state.busTargetStop || state.busStopWatchTimer) {
+                cancelBusStopAlarm();
+                return 'bus_alarm_cancelled';
+            }
+            if (state.tvAutoReaderActive) {
+                toggleTvAutoSubtitleSpeaker();
+                return 'tv_auto_stopped';
+            }
+            if (state.degreeLiveTrackingActive) {
+                toggleApplianceDegreeLiveTracking();
+                return 'degree_live_stopped';
+            }
+            if (state.laundrySortLiveActive) {
+                toggleLaundrySortingLiveMode();
+                return 'laundry_live_stopped';
+            }
+            stopAllSpeechImmediately();
+            announceGuidance('Aktif sesli takip ve alarmlar durduruldu.', { force: true });
+            return 'all_trackers_stopped';
         }
 
         // 0B. Doğrudan Bölüm Numarasıyla Seçim ("1. bölüm", "14. bölümü aç", "bölüm 22", "5. mod")
@@ -9837,9 +10228,26 @@
             return 'where_am_i';
         }
 
-        // 3. Kıble Pusulası ve Namaz Vakitleri Senaryosu
+        // 3. Kıble Pusulası, 81 İl Seçimi ve Namaz Vakitleri Senaryosu
         if (/(?:kıble|namaz|ezan|imsak|iftar|sahur|öğle\s*vakti|ikindi|akşam\s*ezanı|yatsı|kabe)/u.test(q)) {
             setMode('qibla_compass', { silentAnnouncement: true });
+            if (typeof TURKEY_81_PROVINCES !== 'undefined') {
+                for (const prov of TURKEY_81_PROVINCES) {
+                    const pNameLower = prov[0].toLocaleLowerCase('tr-TR');
+                    const pRegex = new RegExp(`(?:^|[^\\p{L}])${pNameLower}(?=$|[^\\p{L}]|da|de|ta|te|dan|den|için)`, 'u');
+                    if (pRegex.test(q)) {
+                        state.userLat = prov[1];
+                        state.userLon = prov[2];
+                        state.locationSource = 'voice_city';
+                        if (el.qiblaCitySelect) {
+                            const optVal = `${prov[1]},${prov[2]},${prov[0]}`;
+                            el.qiblaCitySelect.value = optVal;
+                        }
+                        updateQiblaTargetDisplay(`${prov[0]} (Sesli İl Seçimi)`);
+                        break;
+                    }
+                }
+            }
             if (/(?:vakit|vakti|saat|ezan|imsak|iftar|sahur|kaçta|ne\s*kadar)/u.test(q)) {
                 speakPrayerTimesAndSolarValidation();
                 return 'qibla_prayer_times';
@@ -9864,7 +10272,16 @@
             return 'pos_iban_reader';
         }
 
-        // 5. Canlı Para Sayma, Cüzdan ve Kumbara Senaryosu
+        // 5. Canlı Para Sayma, Cüzdan, Son Parayı Geri Alma ve Kumbara Sıfırlama Senaryosu
+        if (/(?:son\s*parayı\s*geri\s*al|parayı\s*geri\s*al|cüzdanı\s*sıfırla|kumbarayı\s*sıfırla|para\s*sayacını\s*sıfırla)/u.test(q)) {
+            setMode('color_cloth', { silentAnnouncement: true });
+            if (/geri\s*al/u.test(q)) {
+                undoLastAddedMoney();
+                return 'money_undo';
+            }
+            resetMoneyCounter();
+            return 'money_reset';
+        }
         if (/(?:kaç\s*lira|ne\s*kadar\s*param|para\s*say|cüzdan|kumbara|kağıt\s*para|bozuk\s*para|demir\s*para|madeni\s*para|toplam\s*tutar|kıyafet\s*rengi|kaç\s*param\s*var)/u.test(q)) {
             if (/(?:ne\s*kadar\s*param|kaç\s*param|toplam\s*kaç|toplam\s*tutar|cüzdanımda)/u.test(q)) {
                 setMode('color_cloth', { silentAnnouncement: true });
@@ -9888,6 +10305,17 @@
                 speakAllSavedItemMemories();
                 return 'item_memory';
             }
+            if (/\b(?:koydum|bıraktım|sakladım|astım|olarak\s*kaydet)\b/u.test(q) && !/(?:nereye\s*koydum|neredeydi|\bnerede\b|bulamıyorum)/u.test(q)) {
+                setMode('item_memory', { silentAnnouncement: true });
+                const autoSig = (el.analysisCanvas && state.lastMetrics)
+                    ? computeVisualObjectFingerprint(el.analysisCanvas, state.lastMetrics)
+                    : null;
+                const autoCol = (state.lastMetrics && state.lastMetrics.centerColor)
+                    ? state.lastMetrics.centerColor.name
+                    : '';
+                saveItemMemoryEntry(raw, autoCol, autoSig);
+                return 'item_memory_save';
+            }
             if (/(?:bu\s*kavanoz|elimdeki\s*kavanoz|bu\s*poşet|bu\s*poşette|içinde\s*ne\s*var|kavanozu\s*tanı|eşyamı\s*tanı)/u.test(q)) {
                 setMode('item_memory', { silentAnnouncement: true });
                 recognizeVisibleJarFromMemory();
@@ -9898,16 +10326,16 @@
                 searchItemMemoryByQuery(raw);
                 return 'item_memory_search';
             }
-            if (/\b(?:koydum|bıraktım|sakladım|astım|olarak\s*kaydet)\b/u.test(q)) {
-                setMode('item_memory', { silentAnnouncement: true });
-                saveItemMemoryEntry(raw);
-                return 'item_memory_save';
-            }
             setMode('item_memory');
             return 'item_memory';
         }
 
-        // 8. Adım Sayacı ve Yemek Kalori Hesaplama Senaryosu
+        // 8. Adım Sayacı, Adım Sıfırlama ve Yemek Kalori Hesaplama Senaryosu
+        if (/(?:adımlarımı\s*sıfırla|adım\s*sayacını\s*sıfırla|kalori\s*sayacını\s*sıfırla)/u.test(q)) {
+            setMode('step_calorie_guide', { silentAnnouncement: true });
+            resetDailyStepAndCalorieCounter();
+            return 'step_calorie_reset';
+        }
         if (/(?:kaç\s*adım|adım\s*say|ne\s*kadar\s*yürüdüm|kalori|kaç\s*kalori|besin\s*değeri)/u.test(q)) {
             setMode('step_calorie_guide', { silentAnnouncement: true });
             if (/(?:kalori|besin)/u.test(q)) {
@@ -9921,7 +10349,35 @@
             return 'step_calorie_guide';
         }
 
-        // 9. Sesli Yemek Tarifleri ve Evdeki Malzemeyle Tarif Bulma Senaryosu
+        // 9. Sesli Yemek Tarifleri, Eller Doluyken Sesli Adım İlerletme ve Evdeki Malzemeyle Tarif Bulma Senaryosu
+        if (/(?:kaç\s*dakika\s*kaldı|süreye\s*ne\s*kadar\s*kaldı|yemeğin\s*süresi|kalan\s*süre)/u.test(q)) {
+            setMode('cooking_guide', { silentAnnouncement: true });
+            if (state.cookingTimerInterval && state.cookingTimerRemainingSec > 0) {
+                const rm = Math.floor(state.cookingTimerRemainingSec / 60);
+                const rs = state.cookingTimerRemainingSec % 60;
+                announceGuidance(`Mutfak zamanlayıcısında kalan süre: ${rm > 0 ? rm + ' dakika ' : ''}${rs} saniye.`, { force: true, bannerState: 'centered' });
+            } else {
+                announceGuidance('Şu an çalışan aktif bir mutfak zamanlayıcısı yok. Süreyi başlatmak için Adım Süresini Başlat düğmesine basabilirsiniz.', { force: true, bannerState: 'warning' });
+            }
+            return 'cooking_timer_status';
+        }
+        if (/(?:sonraki\s*adım|diğer\s*adım|bir\s*sonraki\s*adım|önceki\s*adım|adımı\s*tekrar|malzemeleri\s*oku|malzeme\s*listesi)/u.test(q)) {
+            setMode('cooking_guide', { silentAnnouncement: true });
+            if (/(?:malzemeleri\s*oku|malzeme\s*listesi)/u.test(q)) {
+                speakCookingIngredients();
+                return 'cooking_ingredients';
+            }
+            if (/önceki\s*adım/u.test(q)) {
+                stepCookingInstruction(-1);
+                return 'cooking_prev_step';
+            }
+            if (/adımı\s*tekrar/u.test(q)) {
+                stepCookingInstruction(0);
+                return 'cooking_repeat_step';
+            }
+            stepCookingInstruction(1);
+            return 'cooking_next_step';
+        }
         if (/(?:yemek\s*tarif|ne\s*pişir|nasıl\s*yapılır|tarifi\b|ocaksız|evde\s+.*?\s+var|çorba\s*tarif|pilav\s*tarif|menemen|mercimek)/u.test(q)) {
             if (/ocaksız/u.test(q)) {
                 setMode('cooking_guide', { silentAnnouncement: true });
@@ -9977,7 +10433,39 @@
             return 'song_finder';
         }
 
-        // 13. Sınav ve Test Okuyucu Senaryosu
+        // 13. Sınav ve Test Okuyucu & Sesli Şık / Soru Kumandası Senaryosu
+        const optVoiceMatch = q.match(/\b([abcde])\s*(?:şıkkını|şıkkı|seçeneğini|seçeneği)\s*(?:oku|söyle)?\b/u);
+        if (optVoiceMatch) {
+            const letter = optVoiceMatch[1].toUpperCase();
+            setMode('exam_reader', { silentAnnouncement: true });
+            speakSingleOption(letter);
+            return 'exam_option_' + letter;
+        }
+        if (/(?:tüm\s*şıkları\s*oku|bütün\s*şıkları\s*oku|soruyu\s*ve\s*şıkları\s*oku|sonraki\s*soru|diğer\s*soru|önceki\s*soru)/u.test(q)) {
+            setMode('exam_reader', { silentAnnouncement: true });
+            if (/(?:sonraki\s*soru|diğer\s*soru)/u.test(q)) {
+                if (state.currentExamIndex + 1 < state.examQuestions.length) {
+                    state.currentExamIndex++;
+                    updateExamRemoteUI();
+                    speakCurrentQuestionStem();
+                } else {
+                    announceGuidance('Bu sayfadaki son sorudasınız.', { force: true });
+                }
+                return 'exam_next_question';
+            }
+            if (/önceki\s*soru/u.test(q)) {
+                if (state.currentExamIndex > 0) {
+                    state.currentExamIndex--;
+                    updateExamRemoteUI();
+                    speakCurrentQuestionStem();
+                } else {
+                    announceGuidance('İlk sorudasınız.', { force: true });
+                }
+                return 'exam_prev_question';
+            }
+            speakEntireQuestionAndOptions();
+            return 'exam_all_options';
+        }
         if (/(?:sınav|test\s*soru|şık\s*oku|soruyu\s*oku)/u.test(q)) {
             if (/soruyu\s*oku/u.test(q)) {
                 setMode('exam_reader', { silentAnnouncement: true });
@@ -10006,6 +10494,35 @@
         if (/(?:yere\s*düşen|düşen\s*eşya|düşen\s*anahtar|anahtar\s*düştü|para\s*düştü|yüzüğüm\s*düştü|düşen\s*para|düşen\s*yüzük|modem\s*ışığı)/u.test(q)) { setMode('anomaly_led'); return 'anomaly_led'; }
         if (/(?:özçekim|selfie|vesikalık|tıraş|sakal|sakalım|görüntülü\s*görüşme|saçım\s*nasıl|saçım\s*düzgün|ayna\s*karşı)/u.test(q)) { setMode('portrait'); return 'portrait'; }
         if (/(?:karekod|qr\s*kod|whatsapp\s*web|qr\s*menü|restoran\s*menü|kafe\s*menü)/u.test(q)) { setMode('qr_screen'); return 'qr_screen'; }
+
+        // 15. Sesli Spesifik Eşya Hedefleme ("telefonumu bul", "çantamı bul", "kitabı bul", "koltuğu bul", "masayı bul")
+        const objTargetMap = [
+            { rx: /\b(?:telefon|telefonu|telefonumu|cep\s*telefonu)\s*(?:bul|ara|nerede)/u, val: 'cell phone', label: 'Cep Telefonu' },
+            { rx: /\b(?:çanta|çantayı|çantamı|sırt\s*çantası)\s*(?:bul|ara|nerede)/u, val: 'backpack', label: 'Çanta' },
+            { rx: /\b(?:kitap|kitabı|kitabımı|defteri)\s*(?:bul|ara|nerede)/u, val: 'book', label: 'Kitap' },
+            { rx: /\b(?:sandalye|sandalyeyi|koltuk|koltuğu)\s*(?:bul|ara|nerede)/u, val: 'chair', label: 'Sandalye / Koltuk' },
+            { rx: /\b(?:masa|masayı)\s*(?:bul|ara|nerede)/u, val: 'dining table', label: 'Masa' },
+            { rx: /\b(?:bilgisayar|bilgisayarı|laptop)\s*(?:bul|ara|nerede)/u, val: 'laptop', label: 'Bilgisayar' }
+        ];
+        for (const ot of objTargetMap) {
+            if (ot.rx.test(q)) {
+                state.targetFilter = ot.val;
+                if (el.targetSelect) el.targetSelect.value = ot.val;
+                setMode('explorer', { silentAnnouncement: true });
+                announceGuidance(`Radar hedefi ${ot.label} olarak ayarlandı. Kamerayı çevrenize tutun; ${ot.label} algılandığında saat yönü ve mesafesiyle bildireceğim.`, {
+                    force: true,
+                    bannerState: 'centered'
+                });
+                return 'explorer_target_' + ot.val.replace(/\s+/g, '_');
+            }
+        }
+
+        // 16. Sesli Kısayol ve Kullanım Yardımı ("kısayollar neler", "tuş kısayolları", "nasıl kullanılır")
+        if (/(?:kısayol|kısayollar|tuş\s*kombinasyon|nasıl\s*kullanılır|yardım\s*menüsü)/u.test(q)) {
+            const helpMsg = 'Temel kısayollar: Ekrana çift dokunma veya Boşluk tuşu kameradaki görüntüyü ve yazıları okur. J tuşu sesli komut alır. N tuşu sayılan toplam parayı söyler. V tuşu namaz vakitlerini ve Güneş doğrulamasını okur. T tuşu son açıklamayı tekrar eder. Y tuşu okuma hızını değiştirir. Telefonun Ses Açma ve Ses Kısma tuşlarına aynı anda basılı tuttuğunuzda herhangi bir uygulamadaki yazısız ekranlar sesli okunur.';
+            announceGuidance(helpMsg, { force: true, bannerState: 'centered' });
+            return 'voice_shortcuts_help';
+        }
 
         // Varsayılan: Etrafımda Ne Var & Evrak Okuyucu
         setMode('explorer');
@@ -10220,12 +10737,13 @@
             }
         }
 
-        if (!bestEntry || bestDist > 26) return null;
-        const confidencePct = Math.max(55, Math.min(99, Math.round(100 - bestDist * 1.6)));
+        if (!bestEntry || bestDist > 38) return null;
+        const confidencePct = Math.max(40, Math.min(99, Math.round(100 - bestDist * 1.6)));
         return {
             entry: bestEntry,
             distance: Number(bestDist.toFixed(2)),
-            confidencePct
+            confidencePct,
+            isNearCandidateOnly: bestDist > 26
         };
     }
     window.matchVisualObjectFingerprint = matchVisualObjectFingerprint;
@@ -10270,8 +10788,10 @@
         const ocrNote = cleanText ? `Üzerinde okunan yazı: ${cleanText.replace(/\s+/g, ' ')}.` : 'Üzerinde okunabilir bir etiket yazısı görünmüyor.';
 
         let jarNote = '';
-        if (visualMatch && visualMatch.entry) {
+        if (visualMatch && visualMatch.entry && !visualMatch.isNearCandidateOnly) {
             jarNote = `Kişisel Nesne Hafızası Eşleşmesi (Yüzde ${visualMatch.confidencePct} görsel uyum): Bu kavanoz veya poşet daha önce kaydettiğiniz "${visualMatch.entry.text}" kaydıyla eşleşiyor!`;
+        } else if (visualMatch && visualMatch.entry && visualMatch.isNearCandidateOnly) {
+            jarNote = `Tam eşleşme doğrulanamadı; ancak renk ve doku olarak en yakın kaydınız (Yüzde ${visualMatch.confidencePct} benzerlik): "${visualMatch.entry.text}". Lütfen kavanozu biraz daha yaklaştırıp tekrar deneyin veya kokusunu kontrol edin.`;
         } else if (jarMemories.length > 0) {
             jarNote = `Görünen yüzeyin rengi ${col}. Hafızanızda ${col} renkli kavanoz/poşet için "${jarMemories[0].text}" kaydı bulunuyor; ancak üzerinde yazı yoksa aynı renkteki kavanozları karıştırmamak için lütfen kokusunu veya dokusunu da kontrol edin.`;
         } else {
@@ -10280,6 +10800,7 @@
         const combined = `${jarNote} ${ocrNote}`.trim();
         return { speechText: combined, fullText: combined, visualMatch };
     }
+    window.matchOrDescribeJarAndMemoryItem = matchOrDescribeJarAndMemoryItem;
 
     // --- MOD 19: TELEVİZYON ALTYAZI OKUYUCU VE CANLI MAÇ SKORU SPİKERİ ---
     state.tvAutoReaderActive = false;
@@ -10331,19 +10852,22 @@
                 spokenScores.push(`${t1} ${s1}, ${t2} ${s2}`);
             }
         }
-        const minuteMatches = raw.match(/\b(?:\d{1,2}['’]\s*DK|\d{2}:\d{2})\b/gi) || [];
+        const minuteMatches = raw.match(/\b(?:\d{1,3}\s*\+\s*\d{1,2}\s*['’.]?(?:\s*DK)?|\d{1,3}['’]\s*(?:DK)?|(?:DK|DAKİKA)\s*[:.]?\s*\d{1,3}(?:\+\d{1,2})?|\d{2}:\d{2})\b/gi) || [];
         if (rawScores.length > 0 && minuteMatches.length > 0) {
-            rawScores.push(minuteMatches[0]);
+            rawScores.push(minuteMatches[0].trim());
         }
         const scoreStr = rawScores.length > 0 ? rawScores.slice(0, 3).join(' | ') : '';
         const spokenScoreSentence = spokenScores.length > 0
-            ? `Canlı Maç Skoru: ${spokenScores[0]}${minuteMatches.length > 0 ? ' (Süre: ' + minuteMatches[0] + ')' : ''}. `
+            ? `Canlı Maç Skoru: ${spokenScores[0]}${minuteMatches.length > 0 ? ' (Süre: ' + minuteMatches[0].trim() + ')' : ''}. `
             : '';
 
         if (scoreStr && scoreEl) {
             scoreEl.textContent = scoreStr;
         }
-        const cleanLines = raw.split(/\n+/).map(l => l.trim()).filter(l => l.length >= 3);
+        const watermarkNoiseRx = /^(?:HD|4K|TV|CANLI|LIVE|SPOR|TRT\s*\d?|ATV|KANAL\s*D|SHOW|STAR|NOW|TV8|HABER)$/i;
+        const cleanLines = raw.split(/\n+/)
+            .map(l => l.replace(/\b(?:CANLI\s*YAYIN|FULL\s*HD|ULTRA\s*HD)\b/gi, '').trim())
+            .filter(l => l.length >= 3 && !watermarkNoiseRx.test(l));
         const subtitleLine = cleanLines.slice(-2).join(' ');
         if (subtitleLine && subEl) {
             subEl.textContent = subtitleLine;
@@ -10357,6 +10881,7 @@
             subtitleLine
         };
     }
+    window.processTvSubtitleAndScoreText = processTvSubtitleAndScoreText;
 
     function toggleTvAutoSubtitleSpeaker() {
         state.tvAutoReaderActive = !state.tvAutoReaderActive;
@@ -10468,6 +10993,22 @@
     }
     window.classifyLaundrySortingCategory = classifyLaundrySortingCategory;
 
+    function getOutfitColorCombinationAdvice(colorName) {
+        const c = String(colorName || '').toLocaleLowerCase('tr-TR');
+        if (/lacivert/.test(c)) return 'Kombin Önerisi: Lacivert kıyafet; Beyaz, Bej, Gri, Açık Mavi veya Krem tonlarıyla çok şık uyum sağlar.';
+        if (/siyah/.test(c)) return 'Kombin Önerisi: Siyah kıyafet; Beyaz, Gri, Kırmızı, Bej veya Kot Mavisi parçalarla her ortamda uyumludur.';
+        if (/beyaz|krem|ekru/.test(c)) return 'Kombin Önerisi: Beyaz/Krem kıyafet; Lacivert, Siyah, Kot Mavisi, Haki veya Bordo tonlarıyla yüksek kontrastlı ve dengeli durur.';
+        if (/gri|füme|antrasit/.test(c)) return 'Kombin Önerisi: Gri/Antrasit kıyafet; Beyaz, Siyah, Lacivert, Bordo veya Pembe tonlarıyla uyumludur.';
+        if (/mavi|turkuaz/.test(c)) return 'Kombin Önerisi: Mavi tonları; Beyaz, Bej, Lacivert, Gri veya Kahverengi parçalarla rahatça kombinlenebilir.';
+        if (/kırmızı|bordo/.test(c)) return 'Kombin Önerisi: Kırmızı/Bordo kıyafet; Siyah, Beyaz, Lacivert, Gri veya Bej gibi sade renklerle dengelenmelidir.';
+        if (/yeşil|haki/.test(c)) return 'Kombin Önerisi: Yeşil/Haki kıyafet; Bej, Krem, Beyaz, Kahverengi veya Siyah parçalarla doğal uyum yakalar.';
+        if (/kahve|bej|vizon|taba/.test(c)) return 'Kombin Önerisi: Kahverengi/Bej tonları; Krem, Beyaz, Lacivert, Haki Yeşil veya Açık Mavi ile çok uyumludur.';
+        if (/sarı|hardal|turuncu/.test(c)) return 'Kombin Önerisi: Sarı/Turuncu canlı tonlar; Lacivert, Kot Mavisi, Beyaz, Gri veya Siyah alt/üst parçalarla dengelenebilir.';
+        if (/mor|eflatun|lila|pembe/.test(c)) return 'Kombin Önerisi: Mor/Pembe tonları; Beyaz, Gri, Lacivert, Bej veya Siyah parçalarla uyumludur.';
+        return `Kombin Önerisi: ${colorName || 'Bu'} tonundaki kıyafeti Beyaz, Siyah, Gri veya Bej gibi nötr parçalarla güvenle tamamlayabilirsiniz.`;
+    }
+    window.getOutfitColorCombinationAdvice = getOutfitColorCombinationAdvice;
+
     /**
      * Kıyafet Ters mi Düz mü Giyilmiş (İç Yıkama/Beden Etiketi veya Kabarık İç Dikiş İzi Dışarıda mı?) Denetçisi
      */
@@ -10477,6 +11018,7 @@
         const h = capCanvas.height;
         const centerSample = sampleRegionRgbAndContrast(ctx, w * 0.25, h * 0.25, w * 0.50, h * 0.50);
         const laundryInfo = classifyLaundrySortingCategory(centerSample.colorInfo, centerSample.r, centerSample.g, centerSample.b);
+        const combinationAdvice = getOutfitColorCombinationAdvice(centerSample.colorInfo.name);
 
         // 1. İç Yıkama / Beden Etiketi Yazısı Kontrolü (%100 Pamuk, Cotton, Polyester, 30°C, Made in, S/M/L/XL, Yıkama)
         const hasCareTagText = /(?:%\s*\d{1,3}|PAMUK|COTTON|POLYESTER|VİSKON|VISCOSE|ELASTAN|YIKAMA|WASH|MADE\s*IN|TÜRKİYE|TURKEY|\b(?:XS|XL|XXL|30\s*°?\s*C|40\s*°?\s*C)\b|BEDEN|SIZE)/i.test(cleanText || '');
@@ -10527,7 +11069,8 @@
             insideOutReason,
             insideOutSpeech,
             laundryCategory: laundryInfo.category,
-            laundrySpeech: `Çamaşır Ayıklama Grubu: ${laundryInfo.category} (${centerSample.colorInfo.name}). ${laundryInfo.warning}`
+            laundrySpeech: `Çamaşır Ayıklama Grubu: ${laundryInfo.category} (${centerSample.colorInfo.name}). ${laundryInfo.warning}`,
+            combinationAdvice
         };
     }
     window.analyzeGarmentInsideOutAndLaundryGroup = analyzeGarmentInsideOutAndLaundryGroup;
@@ -10570,7 +11113,7 @@
             }
             const now = performance.now();
             const isDifferentGroup = `${laundry.category}_${col}` !== state.lastLaundrySpokenCategory;
-            if (isDifferentGroup || (now - state.lastLaundrySpokenAt > 2600)) {
+            if (isDifferentGroup || (now - state.lastLaundrySpokenAt > 6500)) {
                 state.lastLaundrySpokenCategory = `${laundry.category}_${col}`;
                 state.lastLaundrySpokenAt = now;
                 announceGuidance(`${laundry.category}: ${col}.`, {
@@ -10664,7 +11207,7 @@
             : (centerSample.outlierRatio >= 0.08 && centerSample.stdDev >= 20);
         const refColorName = isTwoPieceComparison ? leftCore.colorInfo.name : centerSample.colorInfo.name;
         const stainDetail = hasStainOrSpot
-            ? `Merkez renk: ${refColorName}. Dikkat: Kumaş yüzeyinde ana renkten belirgin şekilde ayrılan bir renk farkı, desen veya çay/yemek lekesi izi algılandı; giymeden önce elinizle veya yakınınızla kontrol edebilirsiniz.`
+            ? `Merkez renk: ${refColorName}. Dikkat: Kumaş yüzeyinde ana renkten belirgin şekilde ayrılan bir renk farkı, desen, çay/yemek lekesi veya leke izi algılandı; giymeden önce elinizle veya yakınınızla kontrol edebilirsiniz.`
             : `Merkez renk: ${refColorName}, yüzey homojen ve lekesiz görünüyor.`;
         const stainShortBadge = hasStainOrSpot
             ? `${refColorName} (Farklı Leke/Desen İzi Var)`
@@ -10672,8 +11215,8 @@
 
         if (isSingleUniformSurface || state.sockSubMode === 'outfit' || state.sockSubMode === 'inside_out') {
             const singleMsg = (state.sockSubMode === 'outfit' || state.sockSubMode === 'inside_out')
-                ? `Kıyafet, Leke ve Ters/Düz Analizi: ${stainDetail} ${insideOutAndLaundry.insideOutSpeech} ${insideOutAndLaundry.laundrySpeech}`
-                : `Tek Parça Yüzey: Kamerada yan yana iki ayrı çorap ayırt edilemedi; tamamı ${centerSample.colorInfo.name} tek bir yüzey görünüyor. ${stainDetail} ${insideOutAndLaundry.insideOutSpeech} ${insideOutAndLaundry.laundrySpeech} İki çorabı karşılaştırmak için aralarında biraz boşluk bırakarak yan yana koyun.`;
+                ? `Kıyafet, Leke ve Ters/Düz Analizi: ${stainDetail} ${insideOutAndLaundry.insideOutSpeech} ${insideOutAndLaundry.laundrySpeech} ${insideOutAndLaundry.combinationAdvice}`
+                : `Tek Parça Yüzey: Kamerada yan yana iki ayrı çorap ayırt edilemedi; tamamı ${centerSample.colorInfo.name} tek bir yüzey görünüyor. ${stainDetail} ${insideOutAndLaundry.insideOutSpeech} ${insideOutAndLaundry.laundrySpeech} ${insideOutAndLaundry.combinationAdvice} İki çorabı karşılaştırmak için aralarında biraz boşluk bırakarak yan yana koyun.`;
             if (sockEl && state.sockSubMode !== 'outfit' && state.sockSubMode !== 'inside_out') sockEl.textContent = `TEK YÜZEY (${centerSample.colorInfo.name})`;
             if (stainEl) stainEl.textContent = stainShortBadge;
             const speech = `${singleMsg} ${cleanText ? 'Etiket yazısı: ' + cleanText.replace(/\s+/g, ' ') : ''}`.trim();
@@ -10690,7 +11233,7 @@
             ? `Çorap ve Kıyafet Eşleşmesi: Sol taraftaki parça (${leftHalf.colorInfo.name}) ile sağ taraftaki parça (${rightHalf.colorInfo.name}) aynı renkte ve birbiriyle eşleşiyor.`
             : `Farklı Renk: Sol taraftaki parça ${leftHalf.colorInfo.name}, sağ taraftaki parça ise ${rightHalf.colorInfo.name}; birbirinden farklı.`;
 
-        const stainMsg = `${stainDetail} ${insideOutAndLaundry.insideOutSpeech} ${insideOutAndLaundry.laundrySpeech}`;
+        const stainMsg = `${stainDetail} ${insideOutAndLaundry.insideOutSpeech} ${insideOutAndLaundry.laundrySpeech} ${insideOutAndLaundry.combinationAdvice}`;
 
         if (sockEl) sockEl.textContent = isPairMatch ? `EŞLEŞTİ (${leftHalf.colorInfo.name})` : `FARKLI (${leftHalf.colorInfo.name} / ${rightHalf.colorInfo.name})`;
         if (stainEl) stainEl.textContent = stainShortBadge;
@@ -10785,11 +11328,22 @@
             : 'Kamerayı çevre veya sokak tabelasına yöneltip Boşluk tuşuna basarak tabela bilgisini de ekleyebilirsiniz.';
         if (signEl) signEl.textContent = cleanSign.length >= 3 ? cleanSign : 'Henüz tabela okutulmadı';
 
-        const fullSpeech = `Şu an bulunduğunuz açık adres: ${addressDesc}. ${signDesc}`;
+        let headingNote = '';
+        if (typeof state.smoothedHeading === 'number' && !isNaN(state.smoothedHeading)) {
+            const dirs = ['Kuzey', 'Kuzeydoğu', 'Doğu', 'Güneydoğu', 'Güney', 'Güneybatı', 'Batı', 'Kuzeybatı'];
+            const idx = Math.round((((state.smoothedHeading % 360) + 360) % 360) / 45) % 8;
+            headingNote = ` Yüzünüz şu an ${dirs[idx]} (${Math.round(state.smoothedHeading)} derece) yönüne dönük.`;
+        }
+        const coordNote = (typeof state.userLat === 'number' && typeof state.userLon === 'number')
+            ? ` Acil durumlarda 112 Acil Çağrı Merkezine bildirebileceğiniz tam GPS koordinatınız: ${state.userLat.toFixed(4)}, ${state.userLon.toFixed(4)}.`
+            : '';
+
+        const fullSpeech = `Şu an bulunduğunuz açık adres: ${addressDesc}.${headingNote} ${signDesc}${coordNote}`;
         state.lastWhereAmISummary = fullSpeech;
         showDetectedResult('📍 Konum, Açık Adres ve Çevre Tabelası Raporu', fullSpeech);
         announceGuidance(fullSpeech, { force: true, bannerState: 'centered' });
     }
+    window.announceWhereAmIFullAddressAndSignboard = announceWhereAmIFullAddressAndSignboard;
 
     async function shareWhereAmIOnWhatsapp() {
         if (!state.lastWhereAmISummary) {
@@ -10961,7 +11515,7 @@
             return;
         }
         // "1 adet elma" içindeki "et" veya "1 su bardağı süt" içindeki "su" hecesinin yanlış eşleşmesini önlemek için tam kelime sınırı kontrolü:
-        const qClean = q.replace(/\b(?:\d+|bir|iki|üç|yarım|adet|tane|porsiyon|tabak|kase|bardak|su\s+bardağı|çay\s+bardağı|dilim|kaşık)\b/gu, ' ').replace(/\s+/g, ' ').trim() || q;
+        const qClean = q.replace(/\b(?:\d+|bir|iki|üç|yarım|çeyrek|duble|buçuk|adet|tane|porsiyon|tabak|kase|bardak|su\s+bardağı|çay\s+bardağı|dilim|kaşık)\b/gu, ' ').replace(/\s+/g, ' ').trim() || q;
         const extractPortionMultiplier = (fullQuery, matchedKey) => {
             if (!matchedKey) return 1;
             const escaped = matchedKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -10971,8 +11525,11 @@
             const targetClause = clauses.find(c => keyRegex.test(c)) || fullQuery;
             const idx = targetClause.search(new RegExp(escaped, 'iu'));
             const prefix = (idx >= 0 ? targetClause.slice(0, idx) : targetClause).toLocaleLowerCase('tr-TR');
+            if (/(?:^|[^\p{L}])(?:çeyrek|0[.,]25|1\/4)(?=$|[^\p{L}])/u.test(prefix)) return 0.25;
             if (/(?:^|[^\p{L}])(?:yarım|0[.,]5|1\/2)(?=$|[^\p{L}])/u.test(prefix)) return 0.5;
-            if (/(?:^|[^\p{L}])(?:bir\s+buçuk|1[.,]5)(?=$|[^\p{L}])/u.test(prefix)) return 1.5;
+            if (/(?:^|[^\p{L}])(?:iki\s+buçuk|2[.,]5)(?=$|[^\p{L}])/u.test(prefix)) return 2.5;
+            if (/(?:^|[^\p{L}])(?:bir\s+buçuk|1[.,]5|buçuk)(?=$|[^\p{L}])/u.test(prefix)) return 1.5;
+            if (/(?:^|[^\p{L}])(?:duble|çift\s+porsiyon)(?=$|[^\p{L}])/u.test(prefix)) return 2;
             const numWordMap = { 'bir': 1, 'iki': 2, 'üç': 3, 'dört': 4, 'beş': 5, 'altı': 6, 'yedi': 7, 'sekiz': 8, 'dokuz': 9, 'on': 10 };
             const wordMatch = prefix.match(/(?:^|[^\p{L}])(bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|on)(?=$|[^\p{L}])/u);
             if (wordMatch && numWordMap[wordMatch[1]]) return numWordMap[wordMatch[1]];
@@ -11024,6 +11581,7 @@
             state.dailyIntakeKcal += totalAddedKcal;
             saveStepCalorieToStorage();
             const formatItemLabel = (m) => {
+                if (m.portionMultiplier === 0.25) return `Çeyrek Porsiyon ${m.name.replace(/^1\s+\S+\s+/u, '')} (${m.totalKcal} kcal)`;
                 if (m.portionMultiplier === 0.5) return `Yarım Porsiyon ${m.name.replace(/^1\s+\S+\s+/u, '')} (${m.totalKcal} kcal)`;
                 if (m.portionMultiplier !== 1) return `${m.portionMultiplier}x ${m.name} (${m.totalKcal} kcal)`;
                 return `${m.name} (${m.totalKcal} kcal)`;
@@ -11031,10 +11589,14 @@
             const namesSummary = matchedItems.map(formatItemLabel).join(' + ');
             if (lastFoodEl) lastFoodEl.textContent = namesSummary;
             const benefitsSummary = matchedItems.map(m => m.benefit).join(' ');
+            const stepsEquivalent = totalAddedKcal > 0 ? Math.round(totalAddedKcal / 0.045) : 0;
+            const walkEquivNote = stepsEquivalent > 0 ? ` Bu enerjiyi yakmak yaklaşık ${stepsEquivalent} adım yürüyüşe karşılık gelir.` : '';
+            const hasHighGlycemic = matchedItems.some(m => /Tatlı|Simit|Pilav|Makarna|Ekmek/i.test(m.name));
+            const glycemicNote = hasHighGlycemic ? ' Diyabet ve kan şekeri dengesi için karbonhidratlı besinleri yoğurt, salata veya proteinle birlikte tüketmeniz önerilir.' : '';
             const speechIntro = matchedItems.length === 1
                 ? `${formatItemLabel(matchedItems[0]).replace(/\s*\(\d+\s*kcal\)/, '')} yaklaşık ${totalAddedKcal} kaloridir.`
                 : `Sorgulanan ${matchedItems.length} besin (${namesSummary}) toplam yaklaşık ${totalAddedKcal} kaloridir.`;
-            announceGuidance(`Besin değeri bilgisi: ${speechIntro} ${benefitsSummary} Günlük enerji toplamınız ${state.dailyIntakeKcal} kalori olarak güncellendi.`, {
+            announceGuidance(`Besin değeri bilgisi: ${speechIntro} ${benefitsSummary}${walkEquivNote}${glycemicNote} Günlük enerji toplamınız ${state.dailyIntakeKcal} kalori olarak güncellendi.`, {
                 force: true,
                 bannerState: 'centered'
             });
@@ -11790,7 +12352,8 @@
             return;
         }
         if (delta > 0 && state.currentCookingStepIndex >= rec.steps.length - 1) {
-            announceGuidance(`${rec.title} tarifinin tüm adımları tamamlanmıştır. Afiyet olsun.`, {
+            const finalStepText = rec.steps[rec.steps.length - 1] ? rec.steps[rec.steps.length - 1].text : '';
+            announceGuidance(`${rec.title} tarifinin tüm adımları tamamlanmıştır. Afiyet olsun. Son adım özeti: ${finalStepText}`, {
                 force: true,
                 bannerState: 'centered'
             });
@@ -11807,6 +12370,7 @@
             bannerState: 'centered'
         });
     }
+    window.stepCookingInstruction = stepCookingInstruction;
 
     function findRecipeByIngredientsOrName(queryText) {
         const q = String(queryText || '').trim().toLocaleLowerCase('tr-TR');
@@ -11831,8 +12395,15 @@
             let score = 0;
             if (titleHay.includes(q)) score += 8;
             words.forEach(w => {
-                if (titleHay.includes(w)) score += 4;
-                else if (ingHay.includes(w)) score += 2;
+                const stemVariants = (typeof buildTurkishStemVariants === 'function')
+                    ? buildTurkishStemVariants(w)
+                    : [w];
+                const strippedCustom = w.replace(/(?:lı|li|lu|lü|sız|siz|suz|süz|la|le|dan|den|tan|ten)$/u, '');
+                if (strippedCustom.length >= 3 && !stemVariants.includes(strippedCustom)) {
+                    stemVariants.push(strippedCustom);
+                }
+                if (stemVariants.some(st => st.length >= 3 && titleHay.includes(st))) score += 4;
+                else if (stemVariants.some(st => st.length >= 3 && ingHay.includes(st))) score += 2;
             });
             if (score > bestScore) {
                 bestScore = score;
@@ -12535,6 +13106,10 @@
     });
 
     el.btnSwitchCam.addEventListener('click', () => {
+        if (state.torchActive) {
+            tryEnableHardwareTorch(false);
+            state.torchActive = false;
+        }
         state.facingMode = state.facingMode === 'environment' ? 'user' : 'environment';
         const label = state.facingMode === 'user' ? 'Ön Selfie' : 'Arka';
         el.btnSwitchCam.textContent = `🔄 Kamera: ${label}`;
@@ -13182,6 +13757,18 @@
             el.resultPanel.hidden = true;
             stopAllSpeechImmediately();
             announceGuidance('Sonuç paneli kapatıldı.', { force: true });
+            return true;
+        }
+        if (state.laundrySortLiveActive) {
+            toggleLaundrySortingLiveMode();
+            return true;
+        }
+        if (state.tvAutoReaderActive) {
+            toggleTvAutoSubtitleSpeaker();
+            return true;
+        }
+        if (state.degreeLiveTrackingActive) {
+            toggleApplianceDegreeLiveTracking();
             return true;
         }
         if (state.songListening) {

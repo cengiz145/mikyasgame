@@ -65,6 +65,11 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
+        // Kamera Asistanı kendi ön planındayken ses tuşu çift basışlarını (Fotoğraf Çek / Son Söyleneni Tekrarla)
+        // MainActivity.onKeyDown'un yakalaması için doğrudan uygulamaya bırak:
+        if (MainActivity.isAppInForeground) {
+            return super.onKeyEvent(event);
+        }
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
             long now = System.currentTimeMillis();
             if (now - lastVolUpPress < 450) {
@@ -156,6 +161,7 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
         int h = bmp.getHeight();
         int step = 8;
         long topEdges = 0, midEdges = 0, botEdges = 0;
+        long topLeftCornerEdges = 0, topRightCornerEdges = 0, botRightFabEdges = 0;
         long botSatCount = 0, botSamples = 0;
 
         for (int y = step; y < h - step; y += step) {
@@ -164,16 +170,21 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
                 int pr = bmp.getPixel(x + step, y);
                 int pd = bmp.getPixel(x, y + step);
                 int lum = (((p >> 16) & 0xff) * 3 + ((p >> 8) & 0xff) * 6 + (p & 0xff)) / 10;
-                int lumR = (((pr >> 16) & 0xff) * 3 + ((pr >> 8) & 0xff) * 6 + (pr & 0xff)) / 10;
-                int lumD = (((pd >> 16) & 0xff) * 3 + ((pd >> 8) & 0xff) * 6 + (pd & 0xff)) / 10;
+                int lumR = (((pr >> 16) & 0xff) * 3 + (((pr >> 8) & 0xff) * 6) + (pr & 0xff)) / 10;
+                int lumD = (((pd >> 16) & 0xff) * 3 + (((pd >> 8) & 0xff) * 6) + (pd & 0xff)) / 10;
                 int grad = Math.abs(lum - lumR) + Math.abs(lum - lumD);
 
+                if (y < h * 0.14) {
+                    if (x < w * 0.22 && grad > 42) topLeftCornerEdges++;
+                    else if (x > w * 0.78 && grad > 42) topRightCornerEdges++;
+                }
                 if (y < h * 0.28) {
                     if (grad > 38) topEdges++;
                 } else if (y < h * 0.72) {
                     if (grad > 38) midEdges++;
                 } else {
                     if (grad > 38) botEdges++;
+                    if (x > w * 0.74 && y > h * 0.78 && grad > 42) botRightFabEdges++;
                     int r = (p >> 16) & 0xff;
                     int g = (p >> 8) & 0xff;
                     int b = p & 0xff;
@@ -186,6 +197,15 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
         }
 
         StringBuilder sb = new StringBuilder("Ekran düzeni özeti: ");
+        if (topLeftCornerEdges > 18 || topRightCornerEdges > 18) {
+            if (topLeftCornerEdges > 18 && topRightCornerEdges > 18) {
+                sb.append("Sol üst köşede geri veya menü ikonu, sağ üst köşede kapatma veya sepet ikonu yer alıyor. ");
+            } else if (topRightCornerEdges > 18) {
+                sb.append("Sağ üst köşede kapatma, arama veya sepet ikonu yer alıyor. ");
+            } else {
+                sb.append("Sol üst köşede geri veya menü ikonu yer alıyor. ");
+            }
+        }
         if (topEdges > 120) {
             sb.append("Ekranın üst kısmında başlık ve görsel afiş alanı yer alıyor. ");
         }
@@ -194,6 +214,8 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
         }
         if (botSamples > 0 && ((double) botSatCount / botSamples > 0.14 || botEdges > 110)) {
             sb.append("Ekranın alt kısmında belirgin renkli bir onay veya devam düğmesi tespit edildi. ");
+        } else if (botRightFabEdges > 20) {
+            sb.append("Sağ alt köşede yüzen hızlı işlem düğmesi tespit edildi. ");
         }
         sb.append("Ekran üzerindeki tüm metinleri ve etiketsiz butonları dinlemek için Kamera Asistanı uygulamasına geçebilirsiniz.");
         return sb.toString();
@@ -295,7 +317,14 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
     public void onAccessibilityEvent(AccessibilityEvent event) {}
 
     @Override
-    public void onInterrupt() {}
+    public void onInterrupt() {
+        liveScanActive = false;
+        scanSessionId++;
+        mainHandler.removeCallbacksAndMessages(null);
+        if (tts != null) {
+            tts.stop();
+        }
+    }
 
     @Override
     public void onDestroy() {
