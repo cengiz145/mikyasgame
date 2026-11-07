@@ -60,13 +60,14 @@ jobs:
         working-directory: kamera_asistan_android
         run: gradle assembleRelease --no-daemon
 
-      - name: Publish APK to kamera_asistan/MikyasKameraAsistani.apk
+      - name: Publish APK to kamera_asistan/VoiceLens.apk
         run: |
-          cp kamera_asistan_android/app/build/outputs/apk/release/app-release.apk kamera_asistan/MikyasKameraAsistani.apk
+          rm -f kamera_asistan/MikyasKameraAsistani.apk
+          cp kamera_asistan_android/app/build/outputs/apk/release/app-release.apk kamera_asistan/VoiceLens.apk
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f kamera_asistan/MikyasKameraAsistani.apk kamera_asistan_android/app/mikyas-release.jks
+          git add -A kamera_asistan/ kamera_asistan_android/app/mikyas-release.jks
           if ! git diff --staged --quiet; then
-            git commit -m "build(apk): Update Play Protect clean signed MikyasKameraAsistani.apk [skip ci]"
+            git commit -m "build(apk): Update Play Protect clean signed VoiceLens.apk [skip ci]"
             git push origin HEAD:main
           fi
