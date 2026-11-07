@@ -630,6 +630,13 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         loadAssistantApp();
+        if (webView != null) {
+            webView.postDelayed(() -> {
+                if (webView != null) {
+                    webView.evaluateJavascript("if (typeof window.retryCameraAfterAndroidPermission === 'function') { window.retryCameraAfterAndroidPermission(); }", null);
+                }
+            }, 600);
+        }
     }
 
     @Override

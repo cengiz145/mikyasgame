@@ -5335,6 +5335,12 @@
     async function captureAndDescribePhoto(isAutoTriggered = false) {
         if (!state.isRunning && !isAutoTriggered) {
             await startCamera();
+            if (state.isRunning && el.video && el.video.readyState < 2) {
+                for (let waitStep = 0; waitStep < 5; waitStep++) {
+                    await new Promise(r => setTimeout(r, 100));
+                    if (el.video.readyState >= 2) break;
+                }
+            }
         }
         if (!state.isRunning || el.video.readyState < 2) {
             announceGuidance('Kameradan çekmek için önce kamerayı başlatın veya üstteki "Galeriden Fotoğraf Seç" düğmesiyle telefonunuzdaki bir fotoğrafı betimletin.', {
@@ -6952,7 +6958,19 @@
         };
 
         try {
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            let stream;
+            try {
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+            } catch (_) {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        audio: false,
+                        video: { facingMode: state.facingMode }
+                    });
+                } catch (_2) {
+                    stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+                }
+            }
             state.videoStream = stream;
             el.video.srcObject = stream;
             await el.video.play();
@@ -6964,6 +6982,10 @@
             el.btnSwitchCam.disabled = false;
             el.btnToggleFlash.disabled = false;
             el.btnCaptureNow.disabled = false;
+
+            if (state.mode === 'anomaly_led' && state.flashMode === 'auto') {
+                tryEnableHardwareTorch(true);
+            }
 
             const camName = state.facingMode === 'user' ? 'Ön selfie kamerası' : 'Arka kamera';
             announceGuidance(`${camName} ve sesli radar başlatıldı. Aktif mod: ${getActiveModeTitle()}.`, {
@@ -6980,6 +7002,11 @@
             });
         }
     }
+    window.retryCameraAfterAndroidPermission = function () {
+        if (!state.isRunning) {
+            startCamera();
+        }
+    };
 
     function stopCamera() {
         state.isRunning = false;
@@ -12293,8 +12320,16 @@
         state.lastDetectedBarcode = '';
         state.sockSubMode = 'sock';
 
-        // Ön (Selfie) kamerada unutulma şikayetini önle: Özçekim (4) dışındaki belge/nesne modlarına geçildiğinde otomatik Arka Kameraya dön
-        if (newMode !== 'portrait' && state.facingMode === 'user') {
+        // Ön (Selfie) ve Arka Kamera otomatik geçişi: Özçekim/Tıraş/Görüntülü Görüşme (4) moduna girildiğinde otomatik Ön Kamera, diğer modlara geçildiğinde otomatik Arka Kamera açılır
+        if (newMode === 'portrait' && state.facingMode !== 'user') {
+            state.facingMode = 'user';
+            if (el.btnSwitchCam) {
+                el.btnSwitchCam.textContent = '🔄 Kamera: Ön Selfie';
+            }
+            if (state.isRunning) {
+                startCamera();
+            }
+        } else if (newMode !== 'portrait' && state.facingMode === 'user') {
             state.facingMode = 'environment';
             if (el.btnSwitchCam) {
                 el.btnSwitchCam.textContent = '🔄 Kamera: Arka';
@@ -12356,6 +12391,10 @@
         }
         const nonCameraModes = new Set(['qibla_compass', 'song_finder', 'step_calorie_guide', 'cooking_guide']);
         if (nonCameraModes.has(newMode) && state.flashMode === 'auto') {
+            tryEnableHardwareTorch(false);
+        } else if (newMode === 'anomaly_led' && state.isRunning && state.flashMode === 'auto') {
+            tryEnableHardwareTorch(true);
+        } else if (prevMode === 'anomaly_led' && newMode !== 'anomaly_led' && state.flashMode === 'auto') {
             tryEnableHardwareTorch(false);
         }
 
@@ -13165,7 +13204,7 @@
         }
         const onboardingBackdrop = document.getElementById('mode-onboarding-backdrop');
         if (onboardingBackdrop && !onboardingBackdrop.hidden) {
-            announceGuidance('Bölümü kullanmaya başlamak için lütfen bilgilendirme penceresindeki Okudum ve Anladım düğmesine basın.', { force: true });
+            acceptActiveModeOnboarding();
             return true;
         }
         return false;
