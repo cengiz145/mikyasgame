@@ -287,11 +287,51 @@ button:disabled {
     background: #fde047;
 }
 
-/* Mod Kartları */
+/* Mod Kartları ve Açılır Kategori Klasörleri */
 .mode-section h2, .guidance-panel h2, .help-section h2 {
     font-size: 1.15rem;
     margin-bottom: 12px;
     color: var(--accent-primary);
+}
+
+.category-accordion-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.category-folder {
+    background: rgba(19, 28, 46, 0.72);
+    border: 2px solid var(--border-color);
+    border-radius: 14px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.category-folder.open-folder {
+    border-color: var(--accent-success);
+    background: rgba(15, 23, 42, 0.96);
+}
+
+.category-folder > .category-tab {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.08rem;
+}
+
+.category-panel {
+    padding-top: 6px;
+    border-top: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.category-panel .exam-remote-section {
+    grid-column: 1 / -1;
+    margin-top: 4px;
 }
 
 .mode-grid {

@@ -7023,13 +7023,17 @@
                 state.examQuestions = allExamQuestions;
                 state.currentExamIndex = 0;
                 updateExamRemoteUI();
-                if (el.examRemotePanel) el.examRemotePanel.hidden = false;
+                state.mode = 'exam_reader';
+                state.modePanelOpen = true;
+                filterModesByLifeCategory('is_egitim', { forceOpen: true, silent: true });
             } else if (pdfPageVirtualQuestions.length > 1) {
                 // Çok sayfalı normal PDF'lerde de Önceki / Sonraki kumandasını ve Sol/Sağ ok tuşlarını sayfa çevirici olarak aktif et!
                 state.examQuestions = pdfPageVirtualQuestions;
                 state.currentExamIndex = Math.max(0, savedBookmarkPage - 1);
                 updateExamRemoteUI();
-                if (el.examRemotePanel) el.examRemotePanel.hidden = false;
+                state.mode = 'exam_reader';
+                state.modePanelOpen = true;
+                filterModesByLifeCategory('is_egitim', { forceOpen: true, silent: true });
             }
 
             try {
@@ -10345,16 +10349,58 @@
     }
     window.activateSmartUsageScenarioPreset = activateSmartUsageScenarioPreset;
 
-    function filterModesByLifeCategory(catId) {
+    state.openCategory = null;
+    state.modePanelOpen = false;
+
+    function filterModesByLifeCategory(catId, options = {}) {
         if (!el.categoryTabs || !el.modeButtons) return;
+        const forceOpen = Boolean(options && options.forceOpen);
+        const silent = Boolean(options && options.silent);
+
+        // Açık olan kategoriye tekrar dokunulursa kategoriyi ve içindeki tüm alt butonları kapat
+        if (!forceOpen && state.openCategory === catId) {
+            state.openCategory = null;
+            state.modePanelOpen = false;
+            el.categoryTabs.forEach(tab => {
+                tab.classList.remove('active-toggle');
+                tab.setAttribute('aria-expanded', 'false');
+                tab.setAttribute('aria-pressed', 'false');
+                const folder = tab.closest('.category-folder');
+                if (folder) folder.classList.remove('open-folder');
+            });
+            document.querySelectorAll('[data-category-panel]').forEach(panel => {
+                panel.hidden = true;
+            });
+            el.modeButtons.forEach(btn => {
+                btn.hidden = true;
+                btn.style.display = 'none';
+            });
+            syncModePanelsVisibility(state.mode);
+            if (!silent) {
+                const closedLabel = LIFE_CATEGORY_LABELS[catId] || 'Kategori';
+                announceGuidance(`${closedLabel} kapatıldı.`, { force: true, bannerState: 'normal' });
+            }
+            return;
+        }
+
+        state.openCategory = catId;
         el.categoryTabs.forEach(tab => {
-            const isSel = tab.getAttribute('data-category') === catId;
+            const isSel = (catId === 'all' || tab.getAttribute('data-category') === catId);
             tab.classList.toggle('active-toggle', isSel);
+            tab.setAttribute('aria-expanded', isSel ? 'true' : 'false');
             tab.setAttribute('aria-pressed', isSel ? 'true' : 'false');
+            const folder = tab.closest('.category-folder');
+            if (folder) folder.classList.toggle('open-folder', isSel);
         });
+
+        document.querySelectorAll('[data-category-panel]').forEach(panel => {
+            const pCat = panel.getAttribute('data-category-panel');
+            const showPanel = (catId === 'all' || pCat === catId);
+            panel.hidden = !showPanel;
+        });
+
         let visibleCount = 0;
-        let firstVisibleMode = null;
-        let activeModeIsVisible = false;
+        let activeModeInThisCategory = false;
         el.modeButtons.forEach(btn => {
             const btnCat = btn.getAttribute('data-category') || 'all';
             const btnMode = btn.getAttribute('data-mode');
@@ -10363,23 +10409,24 @@
             btn.style.display = show ? '' : 'none';
             if (show) {
                 visibleCount++;
-                if (!firstVisibleMode) {
-                    firstVisibleMode = btnMode;
-                }
                 if (btnMode === state.mode) {
-                    activeModeIsVisible = true;
+                    activeModeInThisCategory = true;
                 }
             }
         });
-        const label = LIFE_CATEGORY_LABELS[catId] || 'Seçili Kategori';
-        if (!activeModeIsVisible && firstVisibleMode) {
-            setMode(firstVisibleMode);
-            return;
+
+        if (!activeModeInThisCategory) {
+            state.modePanelOpen = false;
         }
-        announceGuidance(`${label} açıldı. Bu bölümde ${visibleCount} özellik listeleniyor.`, {
-            force: true,
-            bannerState: 'normal'
-        });
+        syncModePanelsVisibility(state.mode);
+
+        if (!silent) {
+            const label = LIFE_CATEGORY_LABELS[catId] || 'Seçili Kategori';
+            announceGuidance(`${label} açıldı. İçindeki ${visibleCount} bölümü dinlemek için sağa kaydırın.`, {
+                force: true,
+                bannerState: 'normal'
+            });
+        }
     }
     window.filterModesByLifeCategory = filterModesByLifeCategory;
 
@@ -13709,50 +13756,78 @@
     }
 
     function syncModePanelsVisibility(activeMode) {
+        const allowSubPanel = Boolean(state.modePanelOpen && state.openCategory);
+        const modePanelMap = {
+            'exam_reader': el.examRemotePanel,
+            'color_cloth': el.moneyCounterPanel,
+            'qibla_compass': el.qiblaCompassPanel,
+            'song_finder': el.songFinderPanel,
+            'bus_stop_tracker': el.busStopPanel,
+            'pos_iban_reader': el.posIbanPanel,
+            'item_memory': el.itemMemoryPanel,
+            'tv_subtitle_score': el.tvSubtitlePanel,
+            'sock_outfit_check': el.sockOutfitPanel,
+            'where_am_i': el.whereAmIPanel,
+            'step_calorie_guide': el.stepCaloriePanel,
+            'cooking_guide': el.cookingGuidePanel,
+            'door_elevator_lcd': el.applianceDegreePanel
+        };
+
+        // Aktif bölümün kontrol panelini doğrudan kendi kategorisinin içindeki ilgili bölüm butonunun hemen altına yerleştir
+        if (allowSubPanel && modePanelMap[activeMode] && el.modeButtons) {
+            const activeBtn = Array.from(el.modeButtons).find(b => b.getAttribute('data-mode') === activeMode);
+            const activePanel = modePanelMap[activeMode];
+            if (activeBtn && activePanel && activeBtn.parentElement && activePanel.previousElementSibling !== activeBtn) {
+                try {
+                    activeBtn.insertAdjacentElement('afterend', activePanel);
+                } catch (_) {}
+            }
+        }
+
         if (el.examRemotePanel) {
-            el.examRemotePanel.hidden = (activeMode !== 'exam_reader');
+            el.examRemotePanel.hidden = !(allowSubPanel && activeMode === 'exam_reader');
         }
         if (el.moneyCounterPanel) {
-            el.moneyCounterPanel.hidden = (activeMode !== 'color_cloth');
+            el.moneyCounterPanel.hidden = !(allowSubPanel && activeMode === 'color_cloth');
         }
         if (el.qiblaCompassPanel) {
-            el.qiblaCompassPanel.hidden = (activeMode !== 'qibla_compass');
+            el.qiblaCompassPanel.hidden = !(allowSubPanel && activeMode === 'qibla_compass');
         }
         if (el.songFinderPanel) {
-            el.songFinderPanel.hidden = (activeMode !== 'song_finder');
+            el.songFinderPanel.hidden = !(allowSubPanel && activeMode === 'song_finder');
         }
         if (el.busStopPanel) {
-            el.busStopPanel.hidden = (activeMode !== 'bus_stop_tracker');
+            el.busStopPanel.hidden = !(allowSubPanel && activeMode === 'bus_stop_tracker');
         }
         if (el.posIbanPanel) {
-            el.posIbanPanel.hidden = (activeMode !== 'pos_iban_reader');
+            el.posIbanPanel.hidden = !(allowSubPanel && activeMode === 'pos_iban_reader');
         }
         if (el.itemMemoryPanel) {
-            el.itemMemoryPanel.hidden = (activeMode !== 'item_memory');
+            el.itemMemoryPanel.hidden = !(allowSubPanel && activeMode === 'item_memory');
         }
         if (el.tvSubtitlePanel) {
-            el.tvSubtitlePanel.hidden = (activeMode !== 'tv_subtitle_score');
+            el.tvSubtitlePanel.hidden = !(allowSubPanel && activeMode === 'tv_subtitle_score');
         }
         if (el.sockOutfitPanel) {
-            el.sockOutfitPanel.hidden = (activeMode !== 'sock_outfit_check');
+            el.sockOutfitPanel.hidden = !(allowSubPanel && activeMode === 'sock_outfit_check');
         }
         if (el.whereAmIPanel) {
-            el.whereAmIPanel.hidden = (activeMode !== 'where_am_i');
+            el.whereAmIPanel.hidden = !(allowSubPanel && activeMode === 'where_am_i');
         }
         if (el.stepCaloriePanel) {
-            el.stepCaloriePanel.hidden = (activeMode !== 'step_calorie_guide');
+            el.stepCaloriePanel.hidden = !(allowSubPanel && activeMode === 'step_calorie_guide');
         }
         if (el.cookingGuidePanel) {
-            el.cookingGuidePanel.hidden = (activeMode !== 'cooking_guide');
+            el.cookingGuidePanel.hidden = !(allowSubPanel && activeMode === 'cooking_guide');
         }
         if (el.applianceDegreePanel) {
-            el.applianceDegreePanel.hidden = (activeMode !== 'door_elevator_lcd');
+            el.applianceDegreePanel.hidden = !(allowSubPanel && activeMode === 'door_elevator_lcd');
         }
         if (el.targetFilterSection) {
             el.targetFilterSection.hidden = (activeMode === 'qibla_compass' || activeMode === 'song_finder' || activeMode === 'item_memory' || activeMode === 'step_calorie_guide' || activeMode === 'cooking_guide');
         }
         if (el.btnWhatsappHold) {
-            el.btnWhatsappHold.hidden = (activeMode !== 'qr_screen');
+            el.btnWhatsappHold.hidden = !(allowSubPanel && activeMode === 'qr_screen');
         }
     }
 
@@ -14248,6 +14323,19 @@
             tryEnableHardwareTorch(false);
         }
 
+        state.modePanelOpen = true;
+        let matchedCat = null;
+        el.modeButtons.forEach(btn => {
+            const isMatch = btn.getAttribute('data-mode') === newMode;
+            if (isMatch) {
+                matchedCat = btn.getAttribute('data-category');
+            }
+            btn.classList.toggle('active', isMatch);
+            btn.setAttribute('aria-checked', isMatch ? 'true' : 'false');
+        });
+        if (matchedCat && state.openCategory !== matchedCat) {
+            filterModesByLifeCategory(matchedCat, { forceOpen: true, silent: true });
+        }
         syncModePanelsVisibility(newMode);
         if (newMode === 'qibla_compass') {
             state.qiblaActive = true;
@@ -14259,25 +14347,6 @@
                 autoAcquireLocationAndWatch();
             }
         }
-
-        el.modeButtons.forEach(btn => {
-            const isMatch = btn.getAttribute('data-mode') === newMode;
-            if (isMatch && btn.hidden) {
-                el.modeButtons.forEach(b => {
-                    b.hidden = false;
-                    b.style.display = '';
-                });
-                if (el.categoryTabs) {
-                    el.categoryTabs.forEach(tab => {
-                        const isAll = tab.getAttribute('data-category') === 'all';
-                        tab.classList.toggle('active-toggle', isAll);
-                        tab.setAttribute('aria-pressed', isAll ? 'true' : 'false');
-                    });
-                }
-            }
-            btn.classList.toggle('active', isMatch);
-            btn.setAttribute('aria-checked', isMatch ? 'true' : 'false');
-        });
 
         const modeAnnouncement = {
             'exam_reader': '1. Bölüm: Sınav Sorusu ve Şık Okuyucu açıldı. Telefonu sınav kağıdına tutun; soru kökünü ve A, B, C, D, E şıklarını birbirinden ayırarak tek tek okuyacağım.',
@@ -15160,6 +15229,10 @@
         const onboardingBackdrop = document.getElementById('mode-onboarding-backdrop');
         if (onboardingBackdrop && !onboardingBackdrop.hidden) {
             acceptActiveModeOnboarding();
+            return true;
+        }
+        if (state.openCategory) {
+            filterModesByLifeCategory(state.openCategory);
             return true;
         }
         return false;
