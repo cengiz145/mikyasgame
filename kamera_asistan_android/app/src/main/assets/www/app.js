@@ -1971,6 +1971,23 @@
                         } catch (_) {}
                     }
 
+                    // 3. Aşama: Gölgeli, buruşuk veya soluk karekodlar için Bradley-Roth Adaptif Eşikleme (her 4 karede bir)
+                    if (!code && (state.mode === 'qr_screen' || state.mode === 'medicine_skt' || state.mode === 'pos_iban_reader') && (state.frameCounter % 4 === 0)) {
+                        try {
+                            const binQr = applyBradleyRothShadowRemoval(el.analysisCanvas, 0.86);
+                            if (binQr && binQr.binaryData) {
+                                code = window.jsQR(binQr.binaryData, binQr.width, binQr.height, {
+                                    inversionAttempts: 'attemptBoth'
+                                });
+                                if (code) {
+                                    offsetX = 0;
+                                    offsetY = 0;
+                                    scaleBack = 1;
+                                }
+                            }
+                        } catch (_) {}
+                    }
+
                     if (code && code.location) {
                         const xs = [
                             offsetX + code.location.topLeftCorner.x * scaleBack,
@@ -1995,6 +2012,10 @@
                         }
                     }
                 }
+            }
+
+            if (state.mode === 'qr_screen') {
+                stepCameraHardwareZoomForQrIfNeeded(Boolean(qrDetection && qrDetection.data));
             }
 
                     // Herhangi bir moddayken QR kod veya İlaç GS1 Karekod görülürse mod değiştirmeye gerek kalmadan anında oku!
@@ -6881,6 +6902,16 @@
         try {
             const pdfLib = window.pdfjsLib;
             if (!pdfLib || typeof pdfLib.getDocument !== 'function') {
+                if (window.AndroidSongBridge && typeof window.AndroidSongBridge.renderLastSelectedPdfOffline === 'function') {
+                    const startedOffline = window.AndroidSongBridge.renderLastSelectedPdfOffline();
+                    if (startedOffline) {
+                        announceGuidance('Çevrimdışı Android yerleşik PDF motoru devreye girdi; sayfalar yüksek çözünürlüklü OCR ile okunuyor...', {
+                            force: true,
+                            bannerState: 'centered'
+                        });
+                        return;
+                    }
+                }
                 announceGuidance('PDF okuma motoru yükleniyor, lütfen internet bağlantınızı kontrol edip birkaç saniye sonra tekrar deneyin.', {
                     force: true,
                     bannerState: 'warning'
@@ -6899,6 +6930,7 @@
             const allExamQuestions = [];
             const pdfPageVirtualQuestions = [];
             const embeddedQrCodes = [];
+            state.activePdfPages = [];
             let fullRawTextForInsights = '';
 
             // Kaldığı sayfayı hatırlama (PDF Yer İmi Hafızası)
@@ -6965,6 +6997,7 @@
                     fullRawTextForInsights += (fullRawTextForInsights ? '\n\n' : '') + pageText;
                     const tag = usedOcrOnScannedPage ? ' (Taranmış Resim Sayfası - OCR ile Çözüldü)' : '';
                     pageReports.push(`--- Sayfa ${pNum}/${totalPages}${tag} ---\n${pageText}`);
+                    state.activePdfPages.push({ pageNum: pNum, totalPages, text: pageText });
 
                     pdfPageVirtualQuestions.push({
                         number: pNum,
@@ -8079,6 +8112,41 @@
             if (Object.keys(adv).length > 0) {
                 await track.applyConstraints({ advanced: [adv] });
             }
+        } catch (_) {}
+    }
+
+    function stepCameraHardwareZoomForQrIfNeeded(foundQrNow) {
+        if (!state.stream || typeof state.stream.getVideoTracks !== 'function') return;
+        const now = performance.now();
+        if (foundQrNow) {
+            state.lastQrSeenOrZoomResetAt = now;
+            if (state.currentQrAutoZoom && state.currentQrAutoZoom > 1.05) {
+                state.currentQrAutoZoom = 1.0;
+                const track = state.stream.getVideoTracks()[0];
+                if (track && typeof track.applyConstraints === 'function') {
+                    track.applyConstraints({ advanced: [{ zoom: 1.0 }] }).catch(() => {});
+                }
+            }
+            return;
+        }
+        if (!state.lastQrSeenOrZoomResetAt) {
+            state.lastQrSeenOrZoomResetAt = now;
+            return;
+        }
+        if (now - state.lastQrSeenOrZoomResetAt < 3500) return;
+        state.lastQrSeenOrZoomResetAt = now;
+        try {
+            const track = state.stream.getVideoTracks()[0];
+            if (!track || typeof track.getCapabilities !== 'function' || typeof track.applyConstraints !== 'function') return;
+            const caps = track.getCapabilities() || {};
+            if (!caps.zoom || typeof caps.zoom.max !== 'number' || caps.zoom.max <= 1.1) return;
+            const minZ = Math.max(1.0, caps.zoom.min || 1.0);
+            const maxZ = Math.min(2.5, caps.zoom.max);
+            const levels = [minZ, Math.min(maxZ, 1.6), Math.min(maxZ, 2.2)];
+            state.qrZoomStepIdx = ((state.qrZoomStepIdx || 0) + 1) % levels.length;
+            const targetZoom = levels[state.qrZoomStepIdx];
+            state.currentQrAutoZoom = targetZoom;
+            track.applyConstraints({ advanced: [{ zoom: targetZoom }] }).catch(() => {});
         } catch (_) {}
     }
 
@@ -11219,7 +11287,14 @@
                 return 'hardware_torch_off';
             }
             if (/(?:ön\s*kameraya|arka\s*kameraya|kamerayı\s*çevir)/u.test(q)) {
-                if (el.btnSwitchCamera) el.btnSwitchCamera.click();
+                state.facingMode = /ön\s*kameraya/u.test(q)
+                    ? 'user'
+                    : (/arka\s*kameraya/u.test(q) ? 'environment' : (state.facingMode === 'user' ? 'environment' : 'user'));
+                if (el.btnSwitchCam) {
+                    el.btnSwitchCam.textContent = state.facingMode === 'user' ? '🤳 Ön Kamera' : '📷 Arka Kamera';
+                }
+                announceGuidance(state.facingMode === 'user' ? 'Ön kameraya geçildi.' : 'Arka kameraya geçildi.', { force: true });
+                if (state.isRunning) startCamera();
                 return 'camera_switched';
             }
             if (/kamerayı\s*başlat/u.test(q)) {
@@ -11229,6 +11304,70 @@
             if (/(?:kamerayı\s*durdur|kamerayı\s*kapat)/u.test(q)) {
                 if (state.isRunning) stopCamera();
                 return 'camera_stopped';
+            }
+        }
+
+        // 00C-PDF. PDF ve Belge Sesli Komutları ("pdf seç", "5. sayfaya git", "sonraki sayfa", "pdf'de [kelime] ara")
+        if (/(?:pdf\s*seç|pdf\s*aç|belge\s*seç|dosya\s*seç|galeriden\s*seç|fotoğraf\s*seç)/u.test(q)) {
+            if (el.photoFileInput) el.photoFileInput.click();
+            announceGuidance('Fotoğraf, video veya PDF belgesi seçme ekranı açılıyor.', { force: true });
+            return 'open_file_picker';
+        }
+        const pdfPageJumpMatch = q.match(/(?:sayfa\s*(\d{1,3})|(\d{1,3})\s*\.?\s*sayfaya\s*git|(\d{1,3})\s*\.?\s*sayfayı\s*oku)/u);
+        if (pdfPageJumpMatch && Array.isArray(state.examQuestions) && state.examQuestions.length > 0) {
+            const targetPage = parseInt(pdfPageJumpMatch[1] || pdfPageJumpMatch[2] || pdfPageJumpMatch[3], 10);
+            if (targetPage >= 1 && targetPage <= state.examQuestions.length) {
+                state.currentExamIndex = targetPage - 1;
+                updateExamRemoteUI();
+                readCurrentExamQuestionAloud();
+                return 'pdf_page_jumped';
+            }
+        }
+        if (/(?:sonraki\s*sayfa|diğer\s*sayfa|sayfayı\s*çevir|ileri\s*sayfa)/u.test(q) && Array.isArray(state.examQuestions) && state.examQuestions.length > 0) {
+            if (state.currentExamIndex < state.examQuestions.length - 1) {
+                state.currentExamIndex++;
+                updateExamRemoteUI();
+            }
+            readCurrentExamQuestionAloud();
+            return 'pdf_next_page';
+        }
+        if (/(?:önceki\s*sayfa|geri\s*sayfa|bir\s*önceki\s*sayfa)/u.test(q) && Array.isArray(state.examQuestions) && state.examQuestions.length > 0) {
+            if (state.currentExamIndex > 0) {
+                state.currentExamIndex--;
+                updateExamRemoteUI();
+            }
+            readCurrentExamQuestionAloud();
+            return 'pdf_prev_page';
+        }
+        const pdfSearchMatch = q.match(/(?:pdf'?de|pdf\s*içinde|belgede|metinde)\s+(.+?)\s+(?:ara|bul|geçiyor\s*mu)/u);
+        if (pdfSearchMatch && pdfSearchMatch[1]) {
+            const term = pdfSearchMatch[1].trim().toLocaleLowerCase('tr-TR');
+            if (term.length >= 2) {
+                if (Array.isArray(state.activePdfPages) && state.activePdfPages.length > 0) {
+                    const hits = [];
+                    state.activePdfPages.forEach(p => {
+                        const low = String(p.text || '').toLocaleLowerCase('tr-TR');
+                        if (low.includes(term)) {
+                            const sentences = String(p.text || '').split(/(?<=[.!?])\s+|\n+/u);
+                            const matchedSent = sentences.find(s => s.toLocaleLowerCase('tr-TR').includes(term)) || p.text.slice(0, 160);
+                            hits.push(`Sayfa ${p.pageNum}: ${matchedSent.trim()}`);
+                        }
+                    });
+                    const msg = hits.length > 0
+                        ? `"${term}" ifadesi PDF belgesinde ${hits.length} sayfada bulundu. ${hits.slice(0, 3).join(' | ')}`
+                        : `"${term}" ifadesi okunan PDF sayfalarında bulunamadı.`;
+                    showDetectedResult(`🔍 PDF İçi Arama: "${term}"`, hits.length > 0 ? hits.join('\n\n') : msg);
+                    announceGuidance(msg, { force: true, bannerState: hits.length > 0 ? 'centered' : 'warning' });
+                    return 'pdf_keyword_searched';
+                } else if (state.lastStoryText) {
+                    const low = String(state.lastStoryText).toLocaleLowerCase('tr-TR');
+                    const found = low.includes(term);
+                    const msg = found
+                        ? `Evet, "${term}" ifadesi son okunan metinde geçiyor.`
+                        : `Hayır, "${term}" ifadesi son okunan metinde bulunamadı.`;
+                    announceGuidance(msg, { force: true });
+                    return 'text_keyword_searched';
+                }
             }
         }
 

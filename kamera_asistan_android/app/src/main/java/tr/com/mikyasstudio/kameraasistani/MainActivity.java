@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public static volatile boolean isAppInForeground = false;
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
+    private Uri lastSelectedChooserUri = null;
     private String pendingSharedImageDataUrl = null;
     private String pendingSharedMultiImagesJsCall = null;
     private String pendingSharedVideoJsCall = null;
@@ -219,8 +220,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType("*/*");
                     intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
-                    startActivityForResult(Intent.createChooser(intent, "Betimlenecek Fotoğrafı veya Videoyu Seçin"), REQ_FILE_CHOOSER);
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "application/pdf"});
+                    startActivityForResult(Intent.createChooser(intent, "Betimlenecek Fotoğrafı, Videoyu veya PDF Belgesini Seçin"), REQ_FILE_CHOOSER);
                     return true;
                 } catch (Exception e) {
                     MainActivity.this.filePathCallback = null;
@@ -435,6 +436,13 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             } catch (Exception ignored) {}
             return false;
         }
+
+        @JavascriptInterface
+        public boolean renderLastSelectedPdfOffline() {
+            if (lastSelectedChooserUri == null) return false;
+            renderPdfUriAndSendToWebView(lastSelectedChooserUri);
+            return true;
+        }
     }
 
     @Override
@@ -516,46 +524,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 }
             }).start();
         } else if ("application/pdf".equals(type)) {
-            final Uri pdfUri = mediaUri;
-            new Thread(() -> {
-                try (ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(pdfUri, "r")) {
-                    if (pfd == null) return;
-                    try (PdfRenderer renderer = new PdfRenderer(pfd)) {
-                        int pageCount = Math.min(6, renderer.getPageCount());
-                        if (pageCount <= 0) return;
-                        StringBuilder jsArr = new StringBuilder("[");
-                        boolean firstPage = true;
-                        for (int i = 0; i < pageCount; i++) {
-                            try (PdfRenderer.Page page = renderer.openPage(i)) {
-                                int pw = Math.max(1, page.getWidth());
-                                int ph = Math.max(1, page.getHeight());
-                                float scale = Math.min(2.2f, 1440f / Math.max(pw, ph));
-                                if (scale < 1.3f) scale = 1.6f;
-                                int bw = Math.max(320, Math.round(pw * scale));
-                                int bh = Math.max(320, Math.round(ph * scale));
-                                Bitmap bmp = Bitmap.createBitmap(bw, bh, Bitmap.Config.ARGB_8888);
-                                bmp.eraseColor(Color.WHITE);
-                                page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                bmp.compress(Bitmap.CompressFormat.JPEG, 88, baos);
-                                bmp.recycle();
-                                String b64 = Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
-                                if (!firstPage) jsArr.append(",");
-                                jsArr.append("'data:image/jpeg;base64,").append(b64).append("'");
-                                firstPage = false;
-                            }
-                        }
-                        jsArr.append("]");
-                        if (!firstPage) {
-                            final String builtPdfJs = "if (typeof window.receiveSharedMultiplePhotosFromAndroid === 'function') { window.receiveSharedMultiplePhotosFromAndroid(" + jsArr.toString() + "); }";
-                            runOnUiThread(() -> {
-                                pendingSharedMultiImagesJsCall = builtPdfJs;
-                                deliverPendingSharedImageToWebView();
-                            });
-                        }
-                    }
-                } catch (Exception ignored) {}
-            }).start();
+            renderPdfUriAndSendToWebView(mediaUri);
         } else if (type.startsWith("video/")) {
             final Uri videoUri = mediaUri;
             new Thread(() -> {
@@ -613,6 +582,49 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 }
             }).start();
         }
+    }
+
+    private void renderPdfUriAndSendToWebView(final Uri pdfUri) {
+        if (pdfUri == null) return;
+        new Thread(() -> {
+            try (ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(pdfUri, "r")) {
+                if (pfd == null) return;
+                try (PdfRenderer renderer = new PdfRenderer(pfd)) {
+                    int pageCount = Math.min(8, renderer.getPageCount());
+                    if (pageCount <= 0) return;
+                    StringBuilder jsArr = new StringBuilder("[");
+                    boolean firstPage = true;
+                    for (int i = 0; i < pageCount; i++) {
+                        try (PdfRenderer.Page page = renderer.openPage(i)) {
+                            int pw = Math.max(1, page.getWidth());
+                            int ph = Math.max(1, page.getHeight());
+                            float scale = Math.min(2.2f, 1440f / Math.max(pw, ph));
+                            if (scale < 1.3f) scale = 1.6f;
+                            int bw = Math.max(320, Math.round(pw * scale));
+                            int bh = Math.max(320, Math.round(ph * scale));
+                            Bitmap bmp = Bitmap.createBitmap(bw, bh, Bitmap.Config.ARGB_8888);
+                            bmp.eraseColor(Color.WHITE);
+                            page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            bmp.compress(Bitmap.CompressFormat.JPEG, 88, baos);
+                            bmp.recycle();
+                            String b64 = Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
+                            if (!firstPage) jsArr.append(",");
+                            jsArr.append("'data:image/jpeg;base64,").append(b64).append("'");
+                            firstPage = false;
+                        }
+                    }
+                    jsArr.append("]");
+                    if (!firstPage) {
+                        final String builtPdfJs = "if (typeof window.receiveSharedMultiplePhotosFromAndroid === 'function') { window.receiveSharedMultiplePhotosFromAndroid(" + jsArr.toString() + "); }";
+                        runOnUiThread(() -> {
+                            pendingSharedMultiImagesJsCall = builtPdfJs;
+                            deliverPendingSharedImageToWebView();
+                        });
+                    }
+                }
+            } catch (Exception ignored) {}
+        }).start();
     }
 
     private String decodeUriToBase64DataUrl(Uri imageUri, int maxDim) {
@@ -782,6 +794,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     results = new Uri[]{data.getData()};
                 }
             }
+            lastSelectedChooserUri = (results != null && results.length > 0) ? results[0] : null;
             filePathCallback.onReceiveValue(results);
             filePathCallback = null;
         } else if (requestCode == REQ_VOICE_SONG) {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'voicelens-ocr-ai-cache-v51-5';
+const CACHE_NAME = 'voicelens-ocr-ai-cache-v51-7';
 const CORE_ASSETS = [
     './',
     './index.html',
