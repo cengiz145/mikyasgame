@@ -7,6 +7,7 @@ on:
       - 'kamera_asistan/index.html'
       - 'kamera_asistan/app.js'
       - 'kamera_asistan/style.css'
+      - 'kamera_asistan/sw.js'
       - 'kamera_asistan_android/**'
       - '.github/workflows/build-kamera-apk.yml'
   workflow_dispatch:
@@ -54,6 +55,7 @@ jobs:
           cp kamera_asistan/index.html kamera_asistan_android/app/src/main/assets/www/
           cp kamera_asistan/style.css kamera_asistan_android/app/src/main/assets/www/
           cp kamera_asistan/app.js kamera_asistan_android/app/src/main/assets/www/
+          cp kamera_asistan/sw.js kamera_asistan_android/app/src/main/assets/www/
           cp kamera_asistan/manifest.json kamera_asistan_android/app/src/main/assets/www/
 
       - name: Build Signed Release APK
