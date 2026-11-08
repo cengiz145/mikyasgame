@@ -10793,12 +10793,7 @@
             const mins = parseInt(customCookTimerMatch[1], 10);
             if (mins > 0 && mins <= 240) {
                 setMode('cooking_guide', { silentAnnouncement: true });
-                if (state.cookingTimerInterval) {
-                    clearInterval(state.cookingTimerInterval);
-                    state.cookingTimerInterval = null;
-                }
-                state.cookingTimerRemainingSec = mins * 60;
-                announceGuidance(`${mins} dakikalık mutfak zamanlayıcısı başlatıldı. Süre bittiğinde sesli alarm vereceğim.`, { force: true, bannerState: 'centered' });
+                toggleCookingStepTimer(mins);
                 return 'cooking_custom_timer';
             }
         }
@@ -10806,7 +10801,8 @@
         if (cookStepJumpMatch) {
             const targetStep = parseInt(cookStepJumpMatch[1] || cookStepJumpMatch[2], 10);
             setMode('cooking_guide', { silentAnnouncement: true });
-            if (state.currentCookingRecipe && Array.isArray(state.currentCookingRecipe.steps) && targetStep >= 1 && targetStep <= state.currentCookingRecipe.steps.length) {
+            const activeRec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
+            if (activeRec && Array.isArray(activeRec.steps) && targetStep >= 1 && targetStep <= activeRec.steps.length) {
                 state.currentCookingStepIndex = targetStep - 1;
                 stepCookingInstruction(0);
                 return 'cooking_jump_step';
@@ -12759,15 +12755,22 @@
         }
     }
 
-    function toggleCookingStepTimer() {
-        if (state.cookingTimerInterval) {
+    function toggleCookingStepTimer(customMinutes = null) {
+        const hasCustomMin = typeof customMinutes === 'number' && customMinutes > 0;
+        if (state.cookingTimerInterval && !hasCustomMin) {
             stopCookingStepTimer(true);
             return;
+        }
+        if (state.cookingTimerInterval) {
+            clearInterval(state.cookingTimerInterval);
+            state.cookingTimerInterval = null;
         }
         const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
         if (!rec) return;
         const stepObj = rec.steps[state.currentCookingStepIndex] || rec.steps[0];
-        const minutes = (stepObj && stepObj.timerMinutes && stepObj.timerMinutes > 0) ? stepObj.timerMinutes : 5;
+        const minutes = hasCustomMin
+            ? customMinutes
+            : ((stepObj && stepObj.timerMinutes && stepObj.timerMinutes > 0) ? stepObj.timerMinutes : 5);
         state.cookingTotalStepSec = Math.round(minutes * 60);
         state.cookingTimerRemainingSec = state.cookingTotalStepSec;
 
@@ -14232,14 +14235,19 @@
         loadStepCalorieFromStorage();
         populateCookingRecipesSelect();
         populate81ProvincesSelect();
+        let initialRequestedMode = null;
         try {
             const urlParams = new URLSearchParams(window.location.search || '');
             const requestedMode = urlParams.get('mode');
             if (requestedMode && MODE_DESCRIPTIONS[requestedMode]) {
-                state.mode = requestedMode;
+                initialRequestedMode = requestedMode;
             }
         } catch (_) {}
-        syncModePanelsVisibility(state.mode);
+        if (initialRequestedMode) {
+            setMode(initialRequestedMode, { silentAnnouncement: true });
+        } else {
+            syncModePanelsVisibility(state.mode);
+        }
         updateExamRemoteUI();
         if (!hasAcceptedModeOnboarding(state.mode)) {
             openModeOnboardingModal(state.mode, false);

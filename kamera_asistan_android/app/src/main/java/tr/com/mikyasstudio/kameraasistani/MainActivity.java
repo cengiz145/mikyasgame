@@ -47,9 +47,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     private static final int REQ_PERMS = 1001;
@@ -163,42 +161,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 } catch (Exception ignored) {
                     return true;
                 }
-            }
-
-            @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                if (request != null && request.getUrl() != null) {
-                    Uri uri = request.getUrl();
-                    String host = uri.getHost() != null ? uri.getHost().toLowerCase(Locale.ROOT) : "";
-                    String path = uri.getPath() != null ? uri.getPath() : "";
-                    if ((host.contains("mikyasstudio.com.tr") || host.contains("cengiz145.github.io")) && path.contains("/kamera_asistan")) {
-                        String assetFile = "www/index.html";
-                        String mimeType = "text/html";
-                        if (path.endsWith("/app.js") || path.endsWith("app.js")) {
-                            assetFile = "www/app.js";
-                            mimeType = "application/javascript";
-                        } else if (path.endsWith("/style.css") || path.endsWith("style.css")) {
-                            assetFile = "www/style.css";
-                            mimeType = "text/css";
-                        } else if (path.endsWith("/manifest.json") || path.endsWith("manifest.json")) {
-                            assetFile = "www/manifest.json";
-                            mimeType = "application/json";
-                        } else if (path.endsWith("/") || path.endsWith("/kamera_asistan") || path.endsWith("/index.html")) {
-                            assetFile = "www/index.html";
-                            mimeType = "text/html";
-                        } else {
-                            return super.shouldInterceptRequest(view, request);
-                        }
-                        try {
-                            InputStream is = getAssets().open(assetFile);
-                            Map<String, String> headers = new HashMap<>();
-                            headers.put("Access-Control-Allow-Origin", "*");
-                            headers.put("Cache-Control", "no-store");
-                            return new WebResourceResponse(mimeType, "UTF-8", 200, "OK", headers, is);
-                        } catch (Exception ignored) {}
-                    }
-                }
-                return super.shouldInterceptRequest(view, request);
             }
 
             @Override
@@ -913,11 +875,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                         if ("true".equals(value)) {
                             return;
                         }
-                        if (webView.canGoBack()) {
-                            webView.goBack();
-                        } else {
-                            MainActivity.super.onBackPressed();
-                        }
+                        MainActivity.super.onBackPressed();
                     }
             );
         } else {

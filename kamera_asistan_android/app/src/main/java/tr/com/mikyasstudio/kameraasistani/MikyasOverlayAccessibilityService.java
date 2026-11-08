@@ -220,7 +220,7 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
         } else if (botRightFabEdges > 20) {
             sb.append("Sağ alt köşede yüzen hızlı işlem düğmesi tespit edildi. ");
         }
-        sb.append("Ekran üzerindeki tüm metinleri ve etiketsiz butonları dinlemek için Kamera Asistanı uygulamasına geçebilirsiniz.");
+        sb.append("Ekran üzerindeki tüm metinleri ve etiketsiz butonları dinlemek için Voice Lens uygulamasına geçebilirsiniz.");
         return sb.toString();
     }
 
