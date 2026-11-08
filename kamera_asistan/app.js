@@ -1997,7 +1997,7 @@
                 }
             }
 
-            // Herhangi bir moddayken QR kod veya İlaç GS1 Karekod görülürse mod değiştirmeye gerek kalmadan anında oku!
+                    // Herhangi bir moddayken QR kod veya İlaç GS1 Karekod görülürse mod değiştirmeye gerek kalmadan anında oku!
             if (qrDetection && qrDetection.data && state.mode !== 'qr_screen') {
                 const nowQr = performance.now();
                 if (qrDetection.data !== state.lastQrCode || nowQr - (state.lastQrAt || 0) > 6500) {
@@ -2010,8 +2010,10 @@
                         showDetectedResult('💊 Karekod / Barkod Otomatik Okundu', `${medCheck.sktSpeech}\nBarkod: ${gs1.gtin}`);
                         announceGuidance(`Karekod okundu! ${medCheck.sktSpeech}`, { force: true, bannerState: medCheck.sktStatus === 'EXPIRED' ? 'warning' : 'centered' });
                     } else {
-                        showDetectedResult('📱 QR Kod / Barkod Otomatik Okundu', qrDetection.data);
-                        announceGuidance(`Kamerada QR kod veya barkod okundu: ${qrDetection.data}`, { force: true, bannerState: 'centered' });
+                        const qrInfo = classifyAndDescribeQrPayload(qrDetection.data);
+                        showDetectedResult(qrInfo.title, qrDetection.data);
+                        copyTextUniversal(qrDetection.data.trim(), qrInfo.title);
+                        announceGuidance(qrInfo.speech, { force: true, bannerState: 'centered' });
                     }
                 }
             }
@@ -2393,16 +2395,37 @@
                 speech: `Kartvizit karekodu okundu: ${personName}${phoneStr}. Bilgiler panoya kopyalandı.`
             };
         }
+        // TR Karekod / FAST / IBAN Ödeme Karekodu Çözümleyici
+        const ibanInQr = clean.replace(/\s+/g, '').match(/TR\d{24}/i);
+        if (ibanInQr) {
+            const formattedIban = ibanInQr[0].toUpperCase().replace(/(.{4})/g, '$1 ').trim();
+            state.lastDetectedIban = formattedIban;
+            return {
+                type: 'iban_qr',
+                title: '🏦 TR Karekod / FAST IBAN Ödeme Kodu',
+                speech: `TR Karekod ödeme bilgisi okundu ve IBAN numarası panoya kopyalandı: ${formattedIban}.`
+            };
+        }
         if (/^https?:\/\//i.test(clean) && !/whatsapp/i.test(clean)) {
             let domain = '';
+            const isInsecureHttp = /^http:\/\//i.test(clean);
             try {
                 domain = new URL(clean).hostname.replace(/^www\./i, '');
             } catch (_) {}
             const domainNote = domain ? ` (${domain} alan adı)` : '';
+            const isOfficialGov = /(?:turkiye\.gov\.tr|gib\.gov\.tr|enabiz\.gov\.tr|mhrs\.gov\.tr|ebilet\.tcddtasimacilik\.gov\.tr)$/i.test(domain);
+            const secWarn = isInsecureHttp ? ' Dikkat: Bu bağlantı şifresiz (HTTP) bir adrestir; kişisel bilgi girerken dikkatli olun.' : '';
+            if (isOfficialGov) {
+                return {
+                    type: 'official_url',
+                    title: `🏛️ Resmi Kurum / e-Devlet / e-Fatura Karekodu${domainNote}`,
+                    speech: `Resmi kurum doğrulama karekodu okundu${domainNote}, bağlantı panoya kopyalandı. Bağlantıyı Aç düğmesiyle resmi belgeyi görüntüleyebilirsiniz.`
+                };
+            }
             return {
                 type: 'url',
                 title: `🍽️🔗 QR Kod / Menü Bağlantısı Okundu${domainNote}`,
-                speech: `QR kod tam hizalandı ve okundu${domainNote}, bağlantı panoya kopyalandı: ${clean}. Eğer bu bir restoran veya kafe menüsüyse, açılan görsel menüyü sesli yemek ve fiyat listesine dönüştürmek için ekrana çift dokunabilir veya Ses Kısma tuşuna çift basarak Ekran Kurtarıcısını kullanabilirsiniz.`
+                speech: `QR kod tam hizalandı ve okundu${domainNote}, bağlantı panoya kopyalandı: ${clean}.${secWarn} Eğer bu bir restoran veya kafe menüsüyse, açılan görsel menüyü sesli yemek ve fiyat listesine dönüştürmek için ekrana çift dokunabilir veya Ses Kısma tuşuna çift basarak Ekran Kurtarıcısını kullanabilirsiniz.`
             };
         }
         if (/whatsapp/i.test(clean) || /^[0-9]@/.test(clean)) {
@@ -2419,6 +2442,59 @@
         };
     }
     window.classifyAndDescribeQrPayload = classifyAndDescribeQrPayload;
+
+    /**
+     * 3-Kademeli Süper QR ve Barkod Tarayıcı (Fotoğraf, Ekran Görüntüsü ve PDF Sayfaları İçin):
+     * 1) Tam Kare (BarcodeDetector + jsQR)
+     * 2) 2x Merkez Yakınlaştırma (Küçük veya uzak QR kodlar için)
+     * 3) Bradley-Roth Gölge ve Parlama Silicili Siyah-Beyaz Keskinleştirme (Buruşuk fiş ve parlak kutular için)
+     */
+    async function scanStaticCanvasForQrMaster(sourceCanvas) {
+        if (!sourceCanvas || !sourceCanvas.width || !sourceCanvas.height) return null;
+        const w = sourceCanvas.width;
+        const h = sourceCanvas.height;
+
+        if (state.barcodeDetector) {
+            try {
+                const bcs = await state.barcodeDetector.detect(sourceCanvas);
+                if (bcs && bcs.length > 0 && bcs[0].rawValue) {
+                    return bcs[0].rawValue.trim();
+                }
+            } catch (_) {}
+        }
+
+        if (typeof window.jsQR !== 'function') return null;
+
+        try {
+            const ctx = sourceCanvas.getContext('2d');
+            const fullData = ctx.getImageData(0, 0, w, h);
+            const c1 = window.jsQR(fullData.data, w, h, { inversionAttempts: 'attemptBoth' });
+            if (c1 && c1.data) return c1.data.trim();
+
+            // 2. Kademe: Merkez %55 2x Zoom
+            const cropW = Math.floor(w * 0.55);
+            const cropH = Math.floor(h * 0.55);
+            const cx0 = Math.floor((w - cropW) * 0.5);
+            const cy0 = Math.floor((h - cropH) * 0.5);
+            const zCanvas = document.createElement('canvas');
+            zCanvas.width = w;
+            zCanvas.height = h;
+            const zCtx = zCanvas.getContext('2d');
+            zCtx.drawImage(sourceCanvas, cx0, cy0, cropW, cropH, 0, 0, w, h);
+            const zData = zCtx.getImageData(0, 0, w, h);
+            const c2 = window.jsQR(zData.data, w, h, { inversionAttempts: 'attemptBoth' });
+            if (c2 && c2.data) return c2.data.trim();
+
+            // 3. Kademe: Bradley-Roth Gölge/Parlama Silicili Siyah-Beyaz Keskinleştirme
+            const binObj = applyBradleyRothShadowRemoval(sourceCanvas, 0.86);
+            if (binObj && binObj.binaryData) {
+                const c3 = window.jsQR(binObj.binaryData, binObj.width, binObj.height, { inversionAttempts: 'attemptBoth' });
+                if (c3 && c3.data) return c3.data.trim();
+            }
+        } catch (_) {}
+
+        return null;
+    }
 
     function handleQrAndScreenMode(anW, anH, scaleX, scaleY, ovCtx, metrics, qrDetection, predictions) {
         if (qrDetection) {
@@ -6157,11 +6233,19 @@
             reportLines.push(menuAndPrice.reportSummary);
         }
 
-        // 7. Doğrulanmış EAN-13 / EAN-8 / İTS Karekod Barkod Bilgisi
+        // 7. Doğrulanmış EAN-13 / EAN-8 / İTS Karekod ve Gömülü QR Kod Bilgisi
         if (med.barcodes && med.barcodes.length > 0) {
             const bcLine = `Doğrulanmış Barkod: ${med.barcodes.join(', ')}.`;
             speechNotes.push(bcLine);
             reportLines.push(bcLine);
+        }
+        if (state.lastDetectedBarcode && !parseGs1MedicineDataMatrix(state.lastDetectedBarcode)) {
+            const qrSmart = classifyAndDescribeQrPayload(state.lastDetectedBarcode);
+            if (qrSmart && qrSmart.speech) {
+                speechNotes.unshift(qrSmart.speech);
+                reportLines.unshift(`${qrSmart.title}: ${state.lastDetectedBarcode}`);
+                copyTextUniversal(state.lastDetectedBarcode, qrSmart.title);
+            }
         }
 
         // 8. Kartvizit, Reçete, Kargo ve Evrak Üzerindeki Telefon Numaraları ve E-Posta Adresleri
@@ -6198,6 +6282,13 @@
 
         const metrics = analyzeFrameMathematics(ctx, capCanvas.width, capCanvas.height);
         state.lastMetrics = metrics;
+
+        // Fotoğrafın veya WhatsApp ekran görüntüsünün içinde QR kod / Barkod varsa anında çöz!
+        const detectedPhotoQr = await scanStaticCanvasForQrMaster(capCanvas);
+        if (detectedPhotoQr) {
+            state.lastDetectedBarcode = detectedPhotoQr;
+        }
+
         let preds = [];
         if (!state.cocoModel && typeof window.cocoSsd !== 'undefined') {
             try {
@@ -6803,10 +6894,22 @@
             const arrayBuf = await file.arrayBuffer();
             const pdfDoc = await pdfLib.getDocument({ data: arrayBuf }).promise;
             const totalPages = pdfDoc.numPages || 1;
-            const maxPagesToRead = Math.min(8, totalPages);
+            const maxPagesToRead = Math.min(15, totalPages);
             const pageReports = [];
             const allExamQuestions = [];
+            const pdfPageVirtualQuestions = [];
+            const embeddedQrCodes = [];
             let fullRawTextForInsights = '';
+
+            // Kaldığı sayfayı hatırlama (PDF Yer İmi Hafızası)
+            const pdfKey = `${file.name || 'belge.pdf'}_${totalPages}`;
+            let savedBookmarkPage = 1;
+            try {
+                const bmMap = JSON.parse(localStorage.getItem('mikyas_pdf_bookmarks_v1') || '{}');
+                if (bmMap[pdfKey] && bmMap[pdfKey] >= 1 && bmMap[pdfKey] <= maxPagesToRead) {
+                    savedBookmarkPage = bmMap[pdfKey];
+                }
+            } catch (_) {}
 
             for (let pNum = 1; pNum <= maxPagesToRead; pNum++) {
                 const page = await pdfDoc.getPage(pNum);
@@ -6825,11 +6928,9 @@
                     }
                 } catch (_) {}
 
-                // 2. Eğer sayfa TARANMIŞ RESİM PDF ise (dijital metin 20 karakterden azsa),
-                //    sayfayı yüksek çözünürlüklü tuvale çiz ve 6-katmanlı OCR motorumuzdan geçir!
-                if (pageText.length < 20 && typeof window.Tesseract !== 'undefined') {
-                    usedOcrOnScannedPage = true;
-                    const viewport = page.getViewport({ scale: 1.85 });
+                // İlk sayfada gömülü QR kod (e-Fatura, e-Devlet, Bilet) kontrolü veya taranmış resim sayfası için tuval oluştur
+                if (pageText.length < 20 || pNum === 1) {
+                    const viewport = page.getViewport({ scale: pageText.length < 20 ? 1.85 : 1.35 });
                     const canvas = document.createElement('canvas');
                     canvas.width = Math.max(320, Math.round(viewport.width));
                     canvas.height = Math.max(320, Math.round(viewport.height));
@@ -6838,21 +6939,38 @@
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     await page.render({ canvasContext: ctx, viewport }).promise;
 
-                    const binObj = applyBradleyRothShadowRemoval(canvas);
-                    const splitInfo = splitExamColumnsIfTwoColumn(binObj);
-                    const ocrParts = [];
-                    for (let cIdx = 0; cIdx < splitInfo.canvases.length; cIdx++) {
-                        const ocrRes = await runFastOcrRecognize(splitInfo.canvases[cIdx], { rawPass: false });
-                        const verified = extractVerifiedRealTextFromOcrResult(ocrRes, '\n').trim();
-                        if (verified) ocrParts.push(verified);
+                    const pageQr = await scanStaticCanvasForQrMaster(canvas);
+                    if (pageQr && !embeddedQrCodes.includes(pageQr)) {
+                        embeddedQrCodes.push(pageQr);
+                        state.lastDetectedBarcode = pageQr;
                     }
-                    pageText = ocrParts.join('\n\n').trim();
+
+                    // 2. Eğer sayfa TARANMIŞ RESİM PDF ise (dijital metin 20 karakterden azsa),
+                    //    6-katmanlı OCR motorumuzdan geçir!
+                    if (pageText.length < 20 && typeof window.Tesseract !== 'undefined') {
+                        usedOcrOnScannedPage = true;
+                        const binObj = applyBradleyRothShadowRemoval(canvas);
+                        const splitInfo = splitExamColumnsIfTwoColumn(binObj);
+                        const ocrParts = [];
+                        for (let cIdx = 0; cIdx < splitInfo.canvases.length; cIdx++) {
+                            const ocrRes = await runFastOcrRecognize(splitInfo.canvases[cIdx], { rawPass: false });
+                            const verified = extractVerifiedRealTextFromOcrResult(ocrRes, '\n').trim();
+                            if (verified) ocrParts.push(verified);
+                        }
+                        pageText = ocrParts.join('\n\n').trim();
+                    }
                 }
 
                 if (pageText) {
                     fullRawTextForInsights += (fullRawTextForInsights ? '\n\n' : '') + pageText;
                     const tag = usedOcrOnScannedPage ? ' (Taranmış Resim Sayfası - OCR ile Çözüldü)' : '';
                     pageReports.push(`--- Sayfa ${pNum}/${totalPages}${tag} ---\n${pageText}`);
+
+                    pdfPageVirtualQuestions.push({
+                        number: pNum,
+                        stem: `PDF Sayfa ${pNum}/${totalPages}${tag}: ${pageText}`,
+                        options: { A: '', B: '', C: '', D: '', E: '' }
+                    });
 
                     const parsedQs = parseExamQuestionsAndOptions(pageText);
                     if (Array.isArray(parsedQs) && parsedQs.length > 0 && parsedQs.some(q => q.options && (q.options.A || q.options.B || q.options.C))) {
@@ -6873,14 +6991,32 @@
                 state.currentExamIndex = 0;
                 updateExamRemoteUI();
                 if (el.examRemotePanel) el.examRemotePanel.hidden = false;
+            } else if (pdfPageVirtualQuestions.length > 1) {
+                // Çok sayfalı normal PDF'lerde de Önceki / Sonraki kumandasını ve Sol/Sağ ok tuşlarını sayfa çevirici olarak aktif et!
+                state.examQuestions = pdfPageVirtualQuestions;
+                state.currentExamIndex = Math.max(0, savedBookmarkPage - 1);
+                updateExamRemoteUI();
+                if (el.examRemotePanel) el.examRemotePanel.hidden = false;
             }
 
+            try {
+                const bmMap = JSON.parse(localStorage.getItem('mikyas_pdf_bookmarks_v1') || '{}');
+                bmMap[pdfKey] = (state.currentExamIndex || 0) + 1;
+                localStorage.setItem('mikyas_pdf_bookmarks_v1', JSON.stringify(bmMap));
+            } catch (_) {}
+
             const insights = buildUniversalSmartInsights(fullRawTextForInsights, fullRawTextForInsights, '');
+            const qrNoteSpeech = embeddedQrCodes.length > 0
+                ? ` PDF sayfasında gömülü karekod bulundu ve çözüldü: ${classifyAndDescribeQrPayload(embeddedQrCodes[0]).speech}`
+                : '';
             const insightReport = insights.reportLines.length > 0
-                ? `\n\n--- Akıllı Belge Denetçisi Bulguları ---\n${insights.reportLines.join('\n')}`
+                ? `\n\n--- Akıllı Belge Denetçisi ve Karekod Bulguları ---\n${insights.reportLines.join('\n')}`
                 : '';
             const insightSpeech = insights.speechNotes.length > 0
                 ? ` ${insights.speechNotes.join(' ')}`
+                : '';
+            const bookmarkSpeech = savedBookmarkPage > 1
+                ? ` Bu PDF belgesinde en son ${savedBookmarkPage}. sayfada kalmıştınız. `
                 : '';
 
             const finalReport = pageReports.join('\n\n') + insightReport;
@@ -6888,8 +7024,8 @@
             showDetectedResult(`📄 PDF Belgesi Okuma Raporu (${maxPagesToRead}/${totalPages} Sayfa${allExamQuestions.length > 0 ? `, ${allExamQuestions.length} Sınav Sorusu` : ''})`, finalReport);
 
             const spokenSummary = fullRawTextForInsights
-                ? `PDF belgesi (${maxPagesToRead} sayfa) başarıyla okundu.${allExamQuestions.length > 0 ? ` Belgede toplam ${allExamQuestions.length} adet çoktan seçmeli sınav sorusu ayrıştırıldı.` : ''}${insightSpeech} İçerik okunuyor: ${fullRawTextForInsights.replace(/\s+/g, ' ').slice(0, 1400)}`
-                : 'Seçilen PDF belgesinde okunabilir bir yazı bulunamadı.';
+                ? `PDF belgesi (${maxPagesToRead} sayfa) başarıyla okundu.${bookmarkSpeech}${allExamQuestions.length > 0 ? ` Belgede toplam ${allExamQuestions.length} adet çoktan seçmeli sınav sorusu ayrıştırıldı.` : (pdfPageVirtualQuestions.length > 1 ? ' Sayfalar arasında Önceki ve Sonraki düğmeleriyle veya yön tuşlarıyla gezinebilirsiniz.' : '')}${qrNoteSpeech}${insightSpeech} İçerik okunuyor: ${fullRawTextForInsights.replace(/\s+/g, ' ').slice(0, 1400)}`
+                : (embeddedQrCodes.length > 0 ? `PDF içinde yazı yok ancak gömülü karekod okundu: ${classifyAndDescribeQrPayload(embeddedQrCodes[0]).speech}` : 'Seçilen PDF belgesinde okunabilir bir yazı bulunamadı.');
             announceGuidance(spokenSummary, {
                 force: true,
                 bannerState: insights.hasExpiredAlarm ? 'warning' : 'centered'
