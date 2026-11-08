@@ -11,11 +11,12 @@
     <meta name="apple-mobile-web-app-title" content="Voice Lens">
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
-    <!-- Cihaz İçi Gerçek Zamanlı Yapay Zeka ve QR Kütüphaneleri -->
+    <!-- Cihaz İçi Gerçek Zamanlı Yapay Zeka, PDF ve QR Kütüphaneleri -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js" defer></script>
 </head>
 <body>
     <a href="#main-controls" class="skip-link">Ana Kontrollere Atla</a>
@@ -62,8 +63,8 @@
             <button id="btn-capture-now" class="action-btn" disabled aria-label="Şimdi Fotoğraf Çek, Detaylı Betimle ve Sesli Oku (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
                 📸 Şimdi Çek &amp; Betimle (Boşluk)
             </button>
-            <button id="btn-upload-photo" class="primary-btn" type="button" style="background: linear-gradient(135deg, #0ea5e9, #2563eb);" aria-label="Telefon Galerisinden veya WhatsApp'tan Gelen Bir Fotoğrafı ya da Videoyu Seçip Sahne Sahne Detaylı Betimlet ve Okut (Kısayol: M)">
-                🖼️🎬 Fotoğraf veya Video Seç &amp; Betimle (M)
+            <button id="btn-upload-photo" class="primary-btn" type="button" style="background: linear-gradient(135deg, #0ea5e9, #2563eb);" aria-label="Telefon Galerisinden veya WhatsApp'tan Gelen Bir Fotoğrafı, Videoyu ya da PDF Belgesini Seçip Sayfa Sayfa Detaylı Betimlet ve Okut (Kısayol: M)">
+                🖼️🎬📄 Fotoğraf, Video veya PDF Seç &amp; Oku (M)
             </button>
             <button id="btn-smart-voice-intent" class="secondary-btn" type="button" aria-label="22 Bölüm Arasından İstediğinizi Sesle Söyleyerek Açın (Kısayol: J)">
                 🎙️ Sesle Bölüm Seç (J)
@@ -80,7 +81,7 @@
             <button id="btn-open-mode-info" class="secondary-btn" type="button" aria-label="Aktif Bölümün Kullanım Talimatlarını, Eller ve Telefon Tutuş Betimlemesini ve Güvenlik Uyarılarını Aç">
                 ℹ️ Bölüm Talimatları ve Uyarılar
             </button>
-            <input type="file" id="photo-file-input" accept="image/*,video/*" multiple hidden aria-hidden="true">
+            <input type="file" id="photo-file-input" accept="image/*,video/*,application/pdf,.pdf" multiple hidden aria-hidden="true">
         </section>
 
         <!-- 22 BÖLÜM İÇİN İLK KULLANIM BİLGİLENDİRME, TALİMATLAR VE GÜVENLİK UYARILARI PENCERESİ -->

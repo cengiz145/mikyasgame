@@ -1,4 +1,4 @@
-const CACHE_NAME = 'voicelens-ocr-ai-cache-v51-4';
+const CACHE_NAME = 'voicelens-ocr-ai-cache-v51-5';
 const CORE_ASSETS = [
     './',
     './index.html',
@@ -8,7 +8,8 @@ const CORE_ASSETS = [
     'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js',
     'https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js',
     'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js',
-    'https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js'
+    'https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js',
+    'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js'
 ];
 
 self.addEventListener('install', (event) => {
@@ -77,3 +78,4 @@ self.addEventListener('fetch', (event) => {
             .catch(() => caches.match(req))
     );
 });
+

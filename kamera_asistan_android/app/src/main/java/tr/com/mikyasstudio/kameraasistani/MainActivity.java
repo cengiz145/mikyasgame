@@ -10,7 +10,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.pdf.PdfRenderer;
 import android.media.AudioManager;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
@@ -18,6 +20,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
@@ -511,6 +514,47 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                         deliverPendingSharedImageToWebView();
                     });
                 }
+            }).start();
+        } else if ("application/pdf".equals(type)) {
+            final Uri pdfUri = mediaUri;
+            new Thread(() -> {
+                try (ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(pdfUri, "r")) {
+                    if (pfd == null) return;
+                    try (PdfRenderer renderer = new PdfRenderer(pfd)) {
+                        int pageCount = Math.min(6, renderer.getPageCount());
+                        if (pageCount <= 0) return;
+                        StringBuilder jsArr = new StringBuilder("[");
+                        boolean firstPage = true;
+                        for (int i = 0; i < pageCount; i++) {
+                            try (PdfRenderer.Page page = renderer.openPage(i)) {
+                                int pw = Math.max(1, page.getWidth());
+                                int ph = Math.max(1, page.getHeight());
+                                float scale = Math.min(2.2f, 1440f / Math.max(pw, ph));
+                                if (scale < 1.3f) scale = 1.6f;
+                                int bw = Math.max(320, Math.round(pw * scale));
+                                int bh = Math.max(320, Math.round(ph * scale));
+                                Bitmap bmp = Bitmap.createBitmap(bw, bh, Bitmap.Config.ARGB_8888);
+                                bmp.eraseColor(Color.WHITE);
+                                page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                bmp.compress(Bitmap.CompressFormat.JPEG, 88, baos);
+                                bmp.recycle();
+                                String b64 = Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
+                                if (!firstPage) jsArr.append(",");
+                                jsArr.append("'data:image/jpeg;base64,").append(b64).append("'");
+                                firstPage = false;
+                            }
+                        }
+                        jsArr.append("]");
+                        if (!firstPage) {
+                            final String builtPdfJs = "if (typeof window.receiveSharedMultiplePhotosFromAndroid === 'function') { window.receiveSharedMultiplePhotosFromAndroid(" + jsArr.toString() + "); }";
+                            runOnUiThread(() -> {
+                                pendingSharedMultiImagesJsCall = builtPdfJs;
+                                deliverPendingSharedImageToWebView();
+                            });
+                        }
+                    }
+                } catch (Exception ignored) {}
             }).start();
         } else if (type.startsWith("video/")) {
             final Uri videoUri = mediaUri;

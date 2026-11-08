@@ -1937,21 +1937,52 @@
                     } catch (_) {}
                 }
                 if (!qrDetection && typeof window.jsQR === 'function') {
-                    const code = window.jsQR(metrics.imageData.data, anW, anH, {
+                    let code = window.jsQR(metrics.imageData.data, anW, anH, {
                         inversionAttempts: 'attemptBoth'
                     });
+                    let offsetX = 0;
+                    let offsetY = 0;
+                    let scaleBack = 1;
+
+                    // ÇOK ÖLÇEKLİ (2X MERKEZ YAKINLAŞTIRMALI) QR USTASI:
+                    // Fatura, ilaç kutusu veya bilgisayar ekranındaki küçük/uzak QR kodlarını 2 kat uzaktan yakala!
+                    if (!code && (state.mode === 'qr_screen' || state.mode === 'medicine_skt' || state.mode === 'pos_iban_reader' || (state.frameCounter % 2 === 0))) {
+                        try {
+                            const cropW = Math.floor(anW * 0.56);
+                            const cropH = Math.floor(anH * 0.56);
+                            const cx0 = Math.floor((anW - cropW) * 0.5);
+                            const cy0 = Math.floor((anH - cropH) * 0.5);
+                            if (!state.qrZoomCanvas) {
+                                state.qrZoomCanvas = document.createElement('canvas');
+                            }
+                            state.qrZoomCanvas.width = anW;
+                            state.qrZoomCanvas.height = anH;
+                            const zCtx = state.qrZoomCanvas.getContext('2d');
+                            zCtx.drawImage(el.analysisCanvas, cx0, cy0, cropW, cropH, 0, 0, anW, anH);
+                            const zData = zCtx.getImageData(0, 0, anW, anH);
+                            code = window.jsQR(zData.data, anW, anH, {
+                                inversionAttempts: 'attemptBoth'
+                            });
+                            if (code) {
+                                offsetX = cx0;
+                                offsetY = cy0;
+                                scaleBack = cropW / anW;
+                            }
+                        } catch (_) {}
+                    }
+
                     if (code && code.location) {
                         const xs = [
-                            code.location.topLeftCorner.x,
-                            code.location.topRightCorner.x,
-                            code.location.bottomLeftCorner.x,
-                            code.location.bottomRightCorner.x
+                            offsetX + code.location.topLeftCorner.x * scaleBack,
+                            offsetX + code.location.topRightCorner.x * scaleBack,
+                            offsetX + code.location.bottomLeftCorner.x * scaleBack,
+                            offsetX + code.location.bottomRightCorner.x * scaleBack
                         ];
                         const ys = [
-                            code.location.topLeftCorner.y,
-                            code.location.topRightCorner.y,
-                            code.location.bottomLeftCorner.y,
-                            code.location.bottomRightCorner.y
+                            offsetY + code.location.topLeftCorner.y * scaleBack,
+                            offsetY + code.location.topRightCorner.y * scaleBack,
+                            offsetY + code.location.bottomLeftCorner.y * scaleBack,
+                            offsetY + code.location.bottomRightCorner.y * scaleBack
                         ];
                         const minX = Math.min(...xs), maxX = Math.max(...xs);
                         const minY = Math.min(...ys), maxY = Math.max(...ys);
@@ -6736,9 +6767,148 @@
         return /\.(mp4|mov|webm|mkv|3gp|avi|m4v)$/.test(name);
     }
 
+    function isPdfFile(file) {
+        if (!file) return false;
+        const mime = String(file.type || '').toLowerCase();
+        if (mime === 'application/pdf') return true;
+        const name = String(file.name || '').toLowerCase();
+        return /\.pdf$/i.test(name);
+    }
+
+    /**
+     * Hem Dijital Metin Katmanlı Hem Taranmış (Resim) PDF Belgelerini Okuyan Akıllı PDF Motoru:
+     * - Ekran okuyucuların "Boş sayfa" dediği taranmış resim PDF'leri bile otomatik algılar,
+     *   sayfayı yüksek çözünürlüklü tuvale çizip 6-Katmanlı OCR + Sınav Sorusu Ayrıştırıcıdan geçirir.
+     */
+    async function handlePdfFileSelect(file) {
+        if (!file) return;
+        announceGuidance('Seçtiğiniz PDF belgesi açılıyor; hem dijital metin katmanı hem de taranmış resim sayfaları sayfa sayfa okunuyor, lütfen bekleyin...', {
+            force: true,
+            bannerState: 'centered'
+        });
+
+        try {
+            const pdfLib = window.pdfjsLib;
+            if (!pdfLib || typeof pdfLib.getDocument !== 'function') {
+                announceGuidance('PDF okuma motoru yükleniyor, lütfen internet bağlantınızı kontrol edip birkaç saniye sonra tekrar deneyin.', {
+                    force: true,
+                    bannerState: 'warning'
+                });
+                return;
+            }
+            if (pdfLib.GlobalWorkerOptions && !pdfLib.GlobalWorkerOptions.workerSrc) {
+                pdfLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+            }
+
+            const arrayBuf = await file.arrayBuffer();
+            const pdfDoc = await pdfLib.getDocument({ data: arrayBuf }).promise;
+            const totalPages = pdfDoc.numPages || 1;
+            const maxPagesToRead = Math.min(8, totalPages);
+            const pageReports = [];
+            const allExamQuestions = [];
+            let fullRawTextForInsights = '';
+
+            for (let pNum = 1; pNum <= maxPagesToRead; pNum++) {
+                const page = await pdfDoc.getPage(pNum);
+                let pageText = '';
+                let usedOcrOnScannedPage = false;
+
+                // 1. Önce dijital metin katmanını (varsa 20ms içinde) çıkar
+                try {
+                    const textContent = await page.getTextContent();
+                    if (textContent && Array.isArray(textContent.items)) {
+                        pageText = textContent.items
+                            .map(item => String(item.str || ''))
+                            .join(' ')
+                            .replace(/\s+/g, ' ')
+                            .trim();
+                    }
+                } catch (_) {}
+
+                // 2. Eğer sayfa TARANMIŞ RESİM PDF ise (dijital metin 20 karakterden azsa),
+                //    sayfayı yüksek çözünürlüklü tuvale çiz ve 6-katmanlı OCR motorumuzdan geçir!
+                if (pageText.length < 20 && typeof window.Tesseract !== 'undefined') {
+                    usedOcrOnScannedPage = true;
+                    const viewport = page.getViewport({ scale: 1.85 });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.max(320, Math.round(viewport.width));
+                    canvas.height = Math.max(320, Math.round(viewport.height));
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    await page.render({ canvasContext: ctx, viewport }).promise;
+
+                    const binObj = applyBradleyRothShadowRemoval(canvas);
+                    const splitInfo = splitExamColumnsIfTwoColumn(binObj);
+                    const ocrParts = [];
+                    for (let cIdx = 0; cIdx < splitInfo.canvases.length; cIdx++) {
+                        const ocrRes = await runFastOcrRecognize(splitInfo.canvases[cIdx], { rawPass: false });
+                        const verified = extractVerifiedRealTextFromOcrResult(ocrRes, '\n').trim();
+                        if (verified) ocrParts.push(verified);
+                    }
+                    pageText = ocrParts.join('\n\n').trim();
+                }
+
+                if (pageText) {
+                    fullRawTextForInsights += (fullRawTextForInsights ? '\n\n' : '') + pageText;
+                    const tag = usedOcrOnScannedPage ? ' (Taranmış Resim Sayfası - OCR ile Çözüldü)' : '';
+                    pageReports.push(`--- Sayfa ${pNum}/${totalPages}${tag} ---\n${pageText}`);
+
+                    const parsedQs = parseExamQuestionsAndOptions(pageText);
+                    if (Array.isArray(parsedQs) && parsedQs.length > 0 && parsedQs.some(q => q.options && (q.options.A || q.options.B || q.options.C))) {
+                        parsedQs.forEach(q => {
+                            allExamQuestions.push({
+                                ...q,
+                                number: allExamQuestions.length + 1
+                            });
+                        });
+                    }
+                } else {
+                    pageReports.push(`--- Sayfa ${pNum}/${totalPages} ---\n(Bu sayfada okunabilir metin bulunamadı.)`);
+                }
+            }
+
+            if (allExamQuestions.length > 0) {
+                state.examQuestions = allExamQuestions;
+                state.currentExamIndex = 0;
+                updateExamRemoteUI();
+                if (el.examRemotePanel) el.examRemotePanel.hidden = false;
+            }
+
+            const insights = buildUniversalSmartInsights(fullRawTextForInsights, fullRawTextForInsights, '');
+            const insightReport = insights.reportLines.length > 0
+                ? `\n\n--- Akıllı Belge Denetçisi Bulguları ---\n${insights.reportLines.join('\n')}`
+                : '';
+            const insightSpeech = insights.speechNotes.length > 0
+                ? ` ${insights.speechNotes.join(' ')}`
+                : '';
+
+            const finalReport = pageReports.join('\n\n') + insightReport;
+            state.lastStoryText = fullRawTextForInsights || finalReport;
+            showDetectedResult(`📄 PDF Belgesi Okuma Raporu (${maxPagesToRead}/${totalPages} Sayfa${allExamQuestions.length > 0 ? `, ${allExamQuestions.length} Sınav Sorusu` : ''})`, finalReport);
+
+            const spokenSummary = fullRawTextForInsights
+                ? `PDF belgesi (${maxPagesToRead} sayfa) başarıyla okundu.${allExamQuestions.length > 0 ? ` Belgede toplam ${allExamQuestions.length} adet çoktan seçmeli sınav sorusu ayrıştırıldı.` : ''}${insightSpeech} İçerik okunuyor: ${fullRawTextForInsights.replace(/\s+/g, ' ').slice(0, 1400)}`
+                : 'Seçilen PDF belgesinde okunabilir bir yazı bulunamadı.';
+            announceGuidance(spokenSummary, {
+                force: true,
+                bannerState: insights.hasExpiredAlarm ? 'warning' : 'centered'
+            });
+        } catch (_) {
+            announceGuidance('Seçilen PDF dosyası açılamadı veya şifreli. Lütfen başka bir PDF veya fotoğraf seçin.', {
+                force: true,
+                bannerState: 'warning'
+            });
+        }
+    }
+
     function handleGalleryFileSelect(file) {
         if (!file) return;
         radar.init();
+        if (isPdfFile(file)) {
+            handlePdfFileSelect(file);
+            return;
+        }
         if (isVideoFile(file)) {
             handleGalleryVideoSelect(file);
             return;
@@ -13982,12 +14152,12 @@
         el.photoFileInput.addEventListener('change', async () => {
             const files = el.photoFileInput.files;
             if (!files || files.length === 0) return;
-            if (files.length === 1) {
+            if (files.length === 1 || isPdfFile(files[0])) {
                 handleGalleryFileSelect(files[0]);
             } else {
                 const dataUrls = [];
                 for (let i = 0; i < Math.min(6, files.length); i++) {
-                    if (isVideoFile(files[i])) continue;
+                    if (isVideoFile(files[i]) || isPdfFile(files[i])) continue;
                     const url = await new Promise((res) => {
                         const r = new FileReader();
                         r.onload = (e) => res(e.target && e.target.result ? e.target.result : null);
