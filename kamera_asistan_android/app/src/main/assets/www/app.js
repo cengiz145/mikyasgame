@@ -13773,13 +13773,14 @@
             'door_elevator_lcd': el.applianceDegreePanel
         };
 
-        // Aktif bölümün kontrol panelini doğrudan kendi kategorisinin içindeki ilgili bölüm butonunun hemen altına yerleştir
+        // Aktif bölümün kontrol panelini doğrudan kendi kategori kutusunun içinde, bölüm butonlarının hemen altına düzenli olarak yerleştir
         if (allowSubPanel && modePanelMap[activeMode] && el.modeButtons) {
             const activeBtn = Array.from(el.modeButtons).find(b => b.getAttribute('data-mode') === activeMode);
             const activePanel = modePanelMap[activeMode];
-            if (activeBtn && activePanel && activeBtn.parentElement && activePanel.previousElementSibling !== activeBtn) {
+            const catFolder = activeBtn ? activeBtn.closest('.category-folder') : null;
+            if (catFolder && activePanel && activePanel.parentElement !== catFolder) {
                 try {
-                    activeBtn.insertAdjacentElement('afterend', activePanel);
+                    catFolder.appendChild(activePanel);
                 } catch (_) {}
             }
         }
