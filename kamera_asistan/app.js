@@ -8330,9 +8330,6 @@
         }
         el.btnStart.textContent = '📷 Kamerayı ve Sesli Rehberi Başlat';
         el.btnStart.setAttribute('aria-pressed', 'false');
-        el.btnSwitchCam.disabled = true;
-        el.btnToggleFlash.disabled = true;
-        el.btnCaptureNow.disabled = true;
         announceGuidance('Kamera ve sesli rehber durduruldu.', { force: true });
     }
 
@@ -13774,9 +13771,9 @@
         };
 
         // Aktif bölümün kontrol panelini doğrudan kendi kategori kutusunun içinde, bölüm butonlarının hemen altına düzenli olarak yerleştir
-        if (allowSubPanel && modePanelMap[activeMode] && el.modeButtons) {
+        if (allowSubPanel && el.modeButtons) {
             const activeBtn = Array.from(el.modeButtons).find(b => b.getAttribute('data-mode') === activeMode);
-            const activePanel = modePanelMap[activeMode];
+            const activePanel = modePanelMap[activeMode] || ((activeMode === 'explorer' || activeMode === 'qr_screen') ? el.targetFilterSection : null);
             const catFolder = activeBtn ? activeBtn.closest('.category-folder') : null;
             if (catFolder && activePanel && activePanel.parentElement !== catFolder) {
                 try {
@@ -13825,7 +13822,7 @@
             el.applianceDegreePanel.hidden = !(allowSubPanel && activeMode === 'door_elevator_lcd');
         }
         if (el.targetFilterSection) {
-            el.targetFilterSection.hidden = (activeMode === 'qibla_compass' || activeMode === 'song_finder' || activeMode === 'item_memory' || activeMode === 'step_calorie_guide' || activeMode === 'cooking_guide');
+            el.targetFilterSection.hidden = !(allowSubPanel && (activeMode === 'explorer' || activeMode === 'qr_screen'));
         }
         if (el.btnWhatsappHold) {
             el.btnWhatsappHold.hidden = !(allowSubPanel && activeMode === 'qr_screen');
@@ -14382,6 +14379,19 @@
 
         if (!silentAnnouncement && !hasAcceptedModeOnboarding(newMode)) {
             openModeOnboardingModal(newMode, false);
+        } else if (!silentAnnouncement && state.modePanelOpen && state.openCategory) {
+            // TalkBack kullanıcısı bir bölüme çift dokunduğunda odağı doğrudan açılan bölümün kumandasına taşı (aradaki diğer bölüm butonlarını tekrar gezmek zorunda kalmasın)
+            const activeCatFolder = document.querySelector(`[data-category-folder="${state.openCategory}"]`);
+            const visibleSubPanel = activeCatFolder
+                ? Array.from(activeCatFolder.querySelectorAll('.exam-remote-section, .filter-bar')).find(s => !s.hidden)
+                : null;
+            if (visibleSubPanel) {
+                const focusTarget = visibleSubPanel.querySelector('h2, button, select, input') || visibleSubPanel;
+                if (focusTarget) {
+                    if (focusTarget.tagName === 'H2') focusTarget.setAttribute('tabindex', '-1');
+                    try { focusTarget.focus(); } catch (_) {}
+                }
+            }
         }
 
         if (newMode === 'where_am_i' && !silentAnnouncement) {
@@ -14462,7 +14472,11 @@
         state.facingMode = state.facingMode === 'environment' ? 'user' : 'environment';
         const label = state.facingMode === 'user' ? 'Ön Selfie' : 'Arka';
         el.btnSwitchCam.textContent = `🔄 Kamera: ${label}`;
-        if (state.isRunning) startCamera();
+        if (state.isRunning) {
+            startCamera();
+        } else {
+            announceGuidance(`Kamera yönü ${label} olarak ayarlandı.`, { force: true });
+        }
     });
 
     el.btnToggleFlash.addEventListener('click', async () => {
@@ -14491,7 +14505,16 @@
         announceGuidance(`Otomatik fotoğraf çekimi ${state.autoCaptureEnabled ? 'açıldı' : 'kapatıldı'}.`, { force: true });
     });
 
-    el.btnCaptureNow.addEventListener('click', () => captureAndDescribePhoto(false));
+    el.btnCaptureNow.addEventListener('click', async () => {
+        if (!state.isRunning) {
+            await startCamera();
+            setTimeout(() => {
+                if (state.isRunning) captureAndDescribePhoto(false);
+            }, 750);
+            return;
+        }
+        captureAndDescribePhoto(false);
+    });
     if (el.btnUploadPhoto && el.photoFileInput) {
         el.btnUploadPhoto.addEventListener('click', () => el.photoFileInput.click());
         el.photoFileInput.addEventListener('change', async () => {
@@ -15167,13 +15190,13 @@
         } catch (_) {}
         if (initialRequestedMode) {
             setMode(initialRequestedMode, { silentAnnouncement: true });
+            if (!hasAcceptedModeOnboarding(initialRequestedMode)) {
+                openModeOnboardingModal(initialRequestedMode, false);
+            }
         } else {
             syncModePanelsVisibility(state.mode);
         }
         updateExamRemoteUI();
-        if (!hasAcceptedModeOnboarding(state.mode)) {
-            openModeOnboardingModal(state.mode, false);
-        }
         setTimeout(initAiModel, 350);
     });
 

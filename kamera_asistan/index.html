@@ -48,10 +48,10 @@
             <button id="btn-start-camera" class="primary-btn pulse-btn" aria-pressed="false">
                 📷 Kamerayı ve Sesli Rehberi Başlat
             </button>
-            <button id="btn-switch-camera" class="secondary-btn" disabled aria-label="Ön ve Arka Kamera Arasında Geçiş Yap">
+            <button id="btn-switch-camera" class="secondary-btn" aria-label="Ön ve Arka Kamera Arasında Geçiş Yap">
                 🔄 Kamera: Arka
             </button>
-            <button id="btn-toggle-flash" class="secondary-btn" disabled aria-pressed="false" aria-label="Telefon Işığını (Feneri) Aç veya Kapat (Kısayol: F)">
+            <button id="btn-toggle-flash" class="secondary-btn" aria-pressed="false" aria-label="Telefon Işığını (Feneri) Aç veya Kapat (Kısayol: F)">
                 🔦 Işık / Fener: Otomatik
             </button>
             <button id="btn-toggle-radar" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Yön Bulduran Sesli Sinyali Aç veya Kapat (Kısayol: R)">
@@ -60,7 +60,7 @@
             <button id="btn-toggle-auto" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Tam Hizalandığında Otomatik Fotoğraf Çekimini Aç veya Kapat (Kısayol: O)">
                 ⚡ Otomatik Çekim: Açık
             </button>
-            <button id="btn-capture-now" class="action-btn" disabled aria-label="Şimdi Fotoğraf Çek, Detaylı Betimle ve Sesli Oku (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
+            <button id="btn-capture-now" class="action-btn" aria-label="Şimdi Fotoğraf Çek, Detaylı Betimle ve Sesli Oku (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
                 📸 Şimdi Çek &amp; Betimle (Boşluk)
             </button>
             <button id="btn-upload-photo" class="primary-btn" type="button" style="background: linear-gradient(135deg, #0ea5e9, #2563eb);" aria-label="Telefon Galerisinden veya WhatsApp'tan Gelen Bir Fotoğrafı, Videoyu ya da PDF Belgesini Seçip Sayfa Sayfa Detaylı Betimlet ve Okut (Kısayol: M)">
@@ -945,8 +945,8 @@
             </div>
         </section>
 
-        <!-- Özel Hedef Filtresi ve WhatsApp Sabitleyici Çubuğu -->
-        <section id="target-filter-section" aria-label="Aradığınız Eşyayı Seçin ve Yardımcı Araçlar" class="filter-bar">
+        <!-- Özel Hedef Filtresi ve WhatsApp Sabitleyici Çubuğu (Sadece İlgili Bölüm Açıldığında Kategori İçinde Görünür) -->
+        <section id="target-filter-section" hidden aria-label="Aradığınız Eşyayı Seçin ve Yardımcı Araçlar" class="filter-bar">
             <label for="target-object-select">🎯 Aradığınız Özel Eşya:</label>
             <select id="target-object-select" aria-label="Kameranın Özellikle Aramasını İstediğiniz Eşyayı Seçin">
                 <option value="auto">Otomatik (Seçtiğiniz Bölüme Göre Kendisi Bulur)</option>
@@ -1033,7 +1033,11 @@
         <!-- Kullanım Kılavuzu ve Detaylı Açıklama -->
         <section aria-labelledby="help-heading" class="help-section">
             <h2 id="help-heading">Uygulama Hakkında Detaylı Açıklama, Kullanım Kılavuzu ve Klavye Kısayolları</h2>
-            <ul class="help-list">
+            <details>
+                <summary style="cursor: pointer; font-weight: 700; color: #38bdf8; padding: 8px 0; font-size: 1.02rem;">
+                    📖 Detaylı Kullanım Kılavuzunu ve Klavye Kısayollarını Okumak İçin Dokunun (Aç / Kapat)
+                </summary>
+            <ul class="help-list" style="margin-top: 10px;">
                 <li><strong>Derece Okuma ve Elle Ayarlama Yol Göstericisi (Cihazlara Kesinlikle Sinyal Göndermez — Görme Engelliler İçin Adım Adım Betimleme):</strong> Kombi, klima, çamaşır/bulaşık makinesi veya fırın ekranlarındaki dereceyi ayarlamak istediğinizde uygulama cihazınıza <strong>asla elektronik sinyal, kızılötesi, Wi-Fi veya uzaktan kumanda komutu göndermez</strong>; ev eşyalarınıza hiçbir şekilde müdahale etmez ve cihazlarınıza zarar verme olasılığı yoktur. Uygulama yalnızca kamerayla ekranı okuyan bir göz görevi görür. Görme engelli bir kullanıcının adım adım yapacağı işlem şöyledir: <strong>(1) Dokunarak Keşif:</strong> Önce ellerinizle cihazın ön yüzeyine dokunarak pürüzsüz cam/plastik ekran penceresini ve yanındaki/altındaki artırma (+), azaltma (-) tuşlarını veya çevrilen yuvarlak düğmeyi parmak uçlarınızla hissedip yerini belirleyin. <strong>(2) Bir Karış Mesafe:</strong> Bir elinizle telefonun arka kamerasını pürüzsüz ekran penceresine hafifçe değdirip yaklaşık <strong>bir karış (15–20 santimetre)</strong> kendinize doğru düz bir şekilde geri çekin; uygulama ekranın ışığını algılayıp <em>"Biraz sola/sağa kaydırın"</em> veya <em>"Tam ortalandı"</em> diyerek telefonunuzu hizalamanızı sağlar. <strong>(3) Diğer Eli Konumlandırma:</strong> Telefonu tutan elinizi sabit tutarken, boştaki diğer elinizi kamera merceğinin önünden geçirmeden (aşağıdan veya yandan uzatarak) cihazın düğmesinin üzerine koyun; eğer eliniz ekranın önünü kapatırsa uygulama <em>"Eliniz ekranı kapatıyor, parmağınızı hafifçe kenara çekin"</em> diyerek uyarır. <strong>(4) Tek Tek Basıp Dinleme:</strong> Kendi parmağınızla düğmeye her bastığınızda 1–2 saniye bekleyin; uygulama değişen sayıyı anında okur (<em>"Şu an 42 derece, 45 dereceye ulaşmak için 3 derece daha artırın"</em>) ve istediğiniz sayıya ulaştığınızda üçlü onay sinyali ve titreşimle <em>"Tamamlandı! Ekranda 45 derece yazıyor, düğmeden elinizi çekebilirsiniz"</em> diyerek işlemi güvenle bitirmenizi sağlar.</li>
                 <li><strong>Sınav Kağıdı ve Belge Okuma:</strong> Cihazı belgenin üzerinde paralel tutun. Yüzeydeki gölge farklılıkları otomatik olarak dengelenir ve çok sütunlu sayfalar sırasıyla ayrıştırılır. Okuma sonrasında <code>A, B, C, D, E</code> düğmeleriyle seçenekleri tek tek dinleyebilirsiniz.</li>
                 <li><strong>Kıble ve Namaz Vakitleri:</strong> Cihazı yere paralel tutarak kendi etrafınızda yavaşça dönün. Çevrede manyetik sapma tespit edilirse sistem sesli uyarı verir ve Güneş konumu üzerinden doğrulama sağlar.</li>
@@ -1042,6 +1046,7 @@
                 <li><strong>Sesli Yönlendirme Sinyalleri ve Titreşim:</strong> Uygulama, kulaklık gerektirmeden doğrudan cihaz hoparlörü ve titreşim geri bildirimiyle çalışır. Sola yönlendirme için <strong>çift düşük frekanslı sinyal</strong>, sağa yönlendirme için <strong>tek yüksek frekanslı sinyal</strong>, hizalama tamamlandığında ise <strong>üçlü onay sinyali ve titreşim</strong> üretilir.</li>
                 <li><strong>Klavye Kısayolları:</strong> <code>1</code>–<code>9</code> ve <code>0, U, I, G, H, N, Z/+, M</code> (ilgili modları etkinleştirir), <code>Boşluk</code> (Fotoğraf çeker ve okur), <code>K</code> (Kıble rehberini başlatır), <code>V</code> (Namaz vakitlerini seslendirir), <code>S, A, B, C, D, E</code> ve <code>Sol/Sağ Ok</code> (Soruları ve seçenekleri okur), <code>B</code> (Otobüs durağını kaydeder), <code>W</code> (Bulunduğunuz adresi tekrarlar), <code>O</code> (Otomatik çekimi açıp kapatır), <code>R</code> (Sesli yön sinyalini açıp kapatır), <code>F</code> (El fenerini açıp kapatır), <code>T</code> (Son bildirimi tekrarlar).</li>
             </ul>
+            </details>
         </section>
     </main>
 
