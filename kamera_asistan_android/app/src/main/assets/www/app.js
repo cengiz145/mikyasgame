@@ -2859,9 +2859,10 @@
             announceGuidance('Kameradaki kağıt veya madeni para okunup toplama ekleniyor...', { force: true });
             captureAndDescribePhoto(false);
         } else {
-            announceGuidance('Şu an kamerada görünen bir para yok. Lütfen önce kamerayı başlatıp parayı gösterin veya aşağıdaki hızlı para ekleme düğmelerini kullanın.', {
+            startCamera();
+            announceGuidance('Kamera otomatik olarak başlatıldı. Şimdi parayı kameranın önüne tutun; otomatik olarak veya bu düğmeye bastığınızda toplama eklenecektir.', {
                 force: true,
-                bannerState: 'warning'
+                bannerState: 'centered'
             });
         }
     }
@@ -14099,6 +14100,36 @@
     if (el.btnSongHistory) {
         el.btnSongHistory.addEventListener('click', speakSavedSongHistory);
     }
+    if (el.btnSongYoutube) {
+        el.btnSongYoutube.addEventListener('click', (ev) => {
+            const href = el.btnSongYoutube.getAttribute('href') || '';
+            if (!href || href === '#') {
+                ev.preventDefault();
+                announceGuidance('Önce bir şarkı dinletin veya aratın; ardından YouTube üzerinde açabilirsiniz.', { force: true, bannerState: 'warning' });
+                return;
+            }
+            if (window.AndroidSongBridge && typeof window.AndroidSongBridge.openExternalUrl === 'function') {
+                ev.preventDefault();
+                announceGuidance('Bulunan şarkı YouTube üzerinde açılıyor.', { force: true });
+                openExternalUrlUniversal(href);
+            }
+        });
+    }
+    if (el.btnSongSpotify) {
+        el.btnSongSpotify.addEventListener('click', (ev) => {
+            const href = el.btnSongSpotify.getAttribute('href') || '';
+            if (!href || href === '#') {
+                ev.preventDefault();
+                announceGuidance('Önce bir şarkı dinletin veya aratın; ardından Spotify üzerinde açabilirsiniz.', { force: true, bannerState: 'warning' });
+                return;
+            }
+            if (window.AndroidSongBridge && typeof window.AndroidSongBridge.openExternalUrl === 'function') {
+                ev.preventDefault();
+                announceGuidance('Bulunan şarkı Spotify üzerinde açılıyor.', { force: true });
+                openExternalUrlUniversal(href);
+            }
+        });
+    }
     if (el.btnSongTextSearch && el.songSearchInput) {
         el.btnSongTextSearch.addEventListener('click', () => {
             searchSongByLyricsOrQuery(el.songSearchInput.value);
@@ -14429,15 +14460,36 @@
     });
 
     el.btnCopyResult.addEventListener('click', async () => {
-        const txt = el.resultText.textContent || '';
+        const txt = (el.resultText.textContent || '').trim();
         if (txt) {
-            await copyTextUniversal(txt, 'Kamera Asistanı Raporu');
+            await copyTextUniversal(txt, 'Voice Lens Raporu');
             announceGuidance('Rapor panoya kopyalandı.', { force: true });
+        } else {
+            announceGuidance('Henüz kopyalanacak bir okuma raporu yok.', { force: true, bannerState: 'warning' });
         }
     });
 
+    if (el.btnOpenLink) {
+        el.btnOpenLink.addEventListener('click', (ev) => {
+            const href = el.btnOpenLink.getAttribute('href') || '';
+            if (!href || href === '#') {
+                ev.preventDefault();
+                announceGuidance('Henüz açılacak bir bağlantı veya karekod adresi bulunamadı.', { force: true, bannerState: 'warning' });
+                return;
+            }
+            if (window.AndroidSongBridge && typeof window.AndroidSongBridge.openExternalUrl === 'function') {
+                ev.preventDefault();
+                announceGuidance('Bağlantı güvenli tarayıcıda açılıyor.', { force: true });
+                openExternalUrlUniversal(href);
+            }
+        });
+    }
+
     el.btnDownloadPhoto.addEventListener('click', () => {
-        if (!state.lastCapturedDataUrl) return;
+        if (!state.lastCapturedDataUrl) {
+            announceGuidance('Henüz kaydedilecek bir fotoğraf çekilmedi.', { force: true, bannerState: 'warning' });
+            return;
+        }
         if (window.AndroidSongBridge && typeof window.AndroidSongBridge.saveBase64PhotoToGallery === 'function') {
             const ok = window.AndroidSongBridge.saveBase64PhotoToGallery(state.lastCapturedDataUrl);
             if (ok) {
@@ -14447,7 +14499,7 @@
         }
         const a = document.createElement('a');
         a.href = state.lastCapturedDataUrl;
-        a.download = `mikyas-kamera-${Date.now()}.jpg`;
+        a.download = `voice-lens-${Date.now()}.jpg`;
         a.click();
         announceGuidance('Fotoğraf cihazınıza indirildi.', { force: true });
     });
