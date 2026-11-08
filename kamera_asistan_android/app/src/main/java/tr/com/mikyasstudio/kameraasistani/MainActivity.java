@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.AudioManager;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.WindowManager;
@@ -61,12 +63,39 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
     private String pendingSharedImageDataUrl = null;
+    private String pendingSharedMultiImagesJsCall = null;
     private String pendingSharedVideoJsCall = null;
     private String pendingSharedTextJsCall = null;
     private String pendingInitialSpeech = null;
     private String pendingVoicePurpose = "song";
     private TextToSpeech nativeTts;
     private boolean nativeTtsReady = false;
+    private boolean triedBackupServer = false;
+    private AudioManager audioManager;
+    private final AudioManager.OnAudioFocusChangeListener audioFocusListener = focusChange -> {
+        if (focusChange == AudioManager.AUDIOFOCUS_LOSS ||
+            focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
+            focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+            if (nativeTts != null) {
+                try { nativeTts.stop(); } catch (Exception ignored) {}
+            }
+            runOnUiThread(() -> {
+                if (webView != null) {
+                    try {
+                        webView.evaluateJavascript("if (typeof window.pauseAudioForIncomingCallOrFocusLoss === 'function') { window.pauseAudioForIncomingCallOrFocusLoss(); }", null);
+                    } catch (Exception ignored) {}
+                }
+            });
+        } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+            runOnUiThread(() -> {
+                if (webView != null) {
+                    try {
+                        webView.evaluateJavascript("if (typeof window.resumeAudioAfterCallOrFocusGain === 'function') { window.resumeAudioAfterCallOrFocusGain(); }", null);
+                    } catch (Exception ignored) {}
+                }
+            });
+        }
+    };
     private long lastVolumeUpTime = 0;
     private long lastVolumeDownTime = 0;
 
@@ -74,6 +103,13 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        try {
+            audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager != null) {
+                audioManager.requestAudioFocus(audioFocusListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            }
+        } catch (Exception ignored) {}
 
         nativeTts = new TextToSpeech(this, this);
         extractSharedImageIfPresent(getIntent());
@@ -174,14 +210,24 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 if (request != null && request.isForMainFrame()) {
-                    view.loadUrl(LOCAL_FALLBACK_URL);
+                    if (!triedBackupServer) {
+                        triedBackupServer = true;
+                        view.loadUrl(BACKUP_APP_URL + "?t=" + (System.currentTimeMillis() / 60000L));
+                    } else {
+                        view.loadUrl(LOCAL_FALLBACK_URL);
+                    }
                 }
             }
 
             @Override
             public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
                 if (request != null && request.isForMainFrame() && errorResponse != null && errorResponse.getStatusCode() >= 400) {
-                    view.loadUrl(LOCAL_FALLBACK_URL);
+                    if (!triedBackupServer) {
+                        triedBackupServer = true;
+                        view.loadUrl(BACKUP_APP_URL + "?t=" + (System.currentTimeMillis() / 60000L));
+                    } else {
+                        view.loadUrl(LOCAL_FALLBACK_URL);
+                    }
                 }
             }
         });
@@ -207,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType("*/*");
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                     intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
                     startActivityForResult(Intent.createChooser(intent, "Betimlenecek Fotoğrafı veya Videoyu Seçin"), REQ_FILE_CHOOSER);
                     return true;
@@ -236,6 +283,30 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         if (status == TextToSpeech.SUCCESS && nativeTts != null) {
             nativeTts.setLanguage(new Locale("tr", "TR"));
             nativeTts.setSpeechRate(1.1f);
+            nativeTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {}
+
+                @Override
+                public void onDone(String utteranceId) {
+                    notifyJsSpeechDone();
+                }
+
+                @Override
+                public void onError(String utteranceId) {
+                    notifyJsSpeechDone();
+                }
+
+                private void notifyJsSpeechDone() {
+                    runOnUiThread(() -> {
+                        if (webView != null) {
+                            try {
+                                webView.evaluateJavascript("if (typeof window.notifyNativeSpeechFinished === 'function') { window.notifyNativeSpeechFinished(); }", null);
+                            } catch (Exception ignored) {}
+                        }
+                    });
+                }
+            });
             nativeTtsReady = true;
             if (pendingInitialSpeech != null && !pendingInitialSpeech.trim().isEmpty()) {
                 final String initialMsg = pendingInitialSpeech;
@@ -426,87 +497,58 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
 
         Uri mediaUri = null;
+        final ArrayList<Uri> multiImageUris = new ArrayList<>();
         if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
             ArrayList<Uri> streamList = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
             if (streamList != null && !streamList.isEmpty()) {
                 mediaUri = streamList.get(0);
+                if (type.startsWith("image/") && streamList.size() > 1) {
+                    for (int i = 0; i < Math.min(6, streamList.size()); i++) {
+                        if (streamList.get(i) != null) {
+                            multiImageUris.add(streamList.get(i));
+                        }
+                    }
+                }
             }
         } else {
             mediaUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         }
         if (mediaUri == null) return;
 
+        if (type.startsWith("image/") && multiImageUris.size() > 1) {
+            new Thread(() -> {
+                StringBuilder jsArr = new StringBuilder("[");
+                boolean firstImg = true;
+                for (Uri u : multiImageUris) {
+                    String dUrl = decodeUriToBase64DataUrl(u, 1280);
+                    if (dUrl != null) {
+                        if (!firstImg) jsArr.append(",");
+                        jsArr.append("'").append(dUrl).append("'");
+                        firstImg = false;
+                    }
+                }
+                jsArr.append("]");
+                if (!firstImg) {
+                    final String builtMulti = "if (typeof window.receiveSharedMultiplePhotosFromAndroid === 'function') { window.receiveSharedMultiplePhotosFromAndroid(" + jsArr.toString() + "); }";
+                    runOnUiThread(() -> {
+                        pendingSharedMultiImagesJsCall = builtMulti;
+                        deliverPendingSharedImageToWebView();
+                    });
+                }
+            }).start();
+            return;
+        }
+
         if (type.startsWith("image/")) {
             final Uri imageUri = mediaUri;
             new Thread(() -> {
-                int rotationDegrees = 0;
-                try (InputStream exifStream = getContentResolver().openInputStream(imageUri)) {
-                    if (exifStream != null) {
-                        ExifInterface exif = new ExifInterface(exifStream);
-                        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                        if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationDegrees = 90;
-                        else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationDegrees = 180;
-                        else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationDegrees = 270;
-                    }
-                } catch (Exception ignored) {}
-
-                int sampleSize = 1;
-                int maxDim = 1280;
-                try (InputStream boundsStream = getContentResolver().openInputStream(imageUri)) {
-                    if (boundsStream != null) {
-                        BitmapFactory.Options boundsOpts = new BitmapFactory.Options();
-                        boundsOpts.inJustDecodeBounds = true;
-                        BitmapFactory.decodeStream(boundsStream, null, boundsOpts);
-                        int rawW = boundsOpts.outWidth;
-                        int rawH = boundsOpts.outHeight;
-                        while ((rawW / sampleSize) > maxDim * 2 || (rawH / sampleSize) > maxDim * 2) {
-                            sampleSize *= 2;
-                        }
-                    }
-                } catch (Exception ignored) {}
-
-                try (InputStream is = getContentResolver().openInputStream(imageUri)) {
-                    if (is != null) {
-                        BitmapFactory.Options decodeOpts = new BitmapFactory.Options();
-                        decodeOpts.inSampleSize = sampleSize;
-                        Bitmap rawBmp = BitmapFactory.decodeStream(is, null, decodeOpts);
-                        if (rawBmp != null) {
-                            if (rotationDegrees != 0) {
-                                Matrix matrix = new Matrix();
-                                matrix.postRotate(rotationDegrees);
-                                Bitmap rotatedBmp = Bitmap.createBitmap(rawBmp, 0, 0, rawBmp.getWidth(), rawBmp.getHeight(), matrix, true);
-                                if (rotatedBmp != rawBmp) {
-                                    rawBmp.recycle();
-                                    rawBmp = rotatedBmp;
-                                }
-                            }
-                            int w = rawBmp.getWidth();
-                            int h = rawBmp.getHeight();
-                            Bitmap targetBmp = rawBmp;
-                            if (w > maxDim || h > maxDim) {
-                                float scale = Math.min((float) maxDim / w, (float) maxDim / h);
-                                targetBmp = Bitmap.createScaledBitmap(
-                                    rawBmp,
-                                    Math.max(1, Math.round(w * scale)),
-                                    Math.max(1, Math.round(h * scale)),
-                                    true
-                                );
-                                if (targetBmp != rawBmp) {
-                                    rawBmp.recycle();
-                                }
-                            }
-                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                            targetBmp.compress(Bitmap.CompressFormat.JPEG, 88, bos);
-                            targetBmp.recycle();
-                            String base64 = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
-                            final String dataUrl = "data:image/jpeg;base64," + base64;
-                            runOnUiThread(() -> {
-                                pendingSharedImageDataUrl = dataUrl;
-                                deliverPendingSharedImageToWebView();
-                            });
-                        }
-                    }
-                } catch (Exception ignored) {}
+                final String dataUrl = decodeUriToBase64DataUrl(imageUri, 1280);
+                if (dataUrl != null) {
+                    runOnUiThread(() -> {
+                        pendingSharedImageDataUrl = dataUrl;
+                        deliverPendingSharedImageToWebView();
+                    });
+                }
             }).start();
         } else if (type.startsWith("video/")) {
             final Uri videoUri = mediaUri;
@@ -567,6 +609,74 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
     }
 
+    private String decodeUriToBase64DataUrl(Uri imageUri, int maxDim) {
+        if (imageUri == null) return null;
+        int rotationDegrees = 0;
+        try (InputStream exifStream = getContentResolver().openInputStream(imageUri)) {
+            if (exifStream != null) {
+                ExifInterface exif = new ExifInterface(exifStream);
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationDegrees = 90;
+                else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationDegrees = 180;
+                else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationDegrees = 270;
+            }
+        } catch (Exception ignored) {}
+
+        int sampleSize = 1;
+        try (InputStream boundsStream = getContentResolver().openInputStream(imageUri)) {
+            if (boundsStream != null) {
+                BitmapFactory.Options boundsOpts = new BitmapFactory.Options();
+                boundsOpts.inJustDecodeBounds = true;
+                BitmapFactory.decodeStream(boundsStream, null, boundsOpts);
+                int rawW = boundsOpts.outWidth;
+                int rawH = boundsOpts.outHeight;
+                while ((rawW / sampleSize) > maxDim * 2 || (rawH / sampleSize) > maxDim * 2) {
+                    sampleSize *= 2;
+                }
+            }
+        } catch (Exception ignored) {}
+
+        try (InputStream is = getContentResolver().openInputStream(imageUri)) {
+            if (is != null) {
+                BitmapFactory.Options decodeOpts = new BitmapFactory.Options();
+                decodeOpts.inSampleSize = sampleSize;
+                Bitmap rawBmp = BitmapFactory.decodeStream(is, null, decodeOpts);
+                if (rawBmp != null) {
+                    if (rotationDegrees != 0) {
+                        Matrix matrix = new Matrix();
+                        matrix.postRotate(rotationDegrees);
+                        Bitmap rotatedBmp = Bitmap.createBitmap(rawBmp, 0, 0, rawBmp.getWidth(), rawBmp.getHeight(), matrix, true);
+                        if (rotatedBmp != rawBmp) {
+                            rawBmp.recycle();
+                            rawBmp = rotatedBmp;
+                        }
+                    }
+                    int w = rawBmp.getWidth();
+                    int h = rawBmp.getHeight();
+                    Bitmap targetBmp = rawBmp;
+                    if (w > maxDim || h > maxDim) {
+                        float scale = Math.min((float) maxDim / w, (float) maxDim / h);
+                        targetBmp = Bitmap.createScaledBitmap(
+                            rawBmp,
+                            Math.max(1, Math.round(w * scale)),
+                            Math.max(1, Math.round(h * scale)),
+                            true
+                        );
+                        if (targetBmp != rawBmp) {
+                            rawBmp.recycle();
+                        }
+                    }
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    targetBmp.compress(Bitmap.CompressFormat.JPEG, 88, bos);
+                    targetBmp.recycle();
+                    String base64 = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
+                    return "data:image/jpeg;base64," + base64;
+                }
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
+
     private void deliverPendingSharedImageToWebView() {
         attemptDeliverSharedMedia(12);
     }
@@ -576,6 +686,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         super.onResume();
         isAppInForeground = true;
         deliverPendingAccessibilityRescueScreen();
+        if (webView != null) {
+            webView.postDelayed(() -> {
+                if (webView != null && isAppInForeground) {
+                    try {
+                        webView.evaluateJavascript("if (typeof window.resumeFromAndroidForeground === 'function') { window.resumeFromAndroidForeground(); }", null);
+                    } catch (Exception ignored) {}
+                }
+            }, 300);
+        }
     }
 
     private void deliverPendingAccessibilityRescueScreen() {
@@ -595,7 +714,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     private void attemptDeliverSharedMedia(final int retriesLeft) {
         if (webView == null || retriesLeft <= 0) return;
-        if (pendingSharedImageDataUrl == null && pendingSharedVideoJsCall == null && pendingSharedTextJsCall == null) return;
+        if (pendingSharedImageDataUrl == null && pendingSharedMultiImagesJsCall == null && pendingSharedVideoJsCall == null && pendingSharedTextJsCall == null) return;
 
         webView.postDelayed(() -> {
             if (webView == null) return;
@@ -603,6 +722,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 "(typeof window.receiveSharedPhotoFromAndroid === 'function' && typeof window.receiveSharedVideoFramesFromAndroid === 'function')",
                 value -> {
                     if ("true".equals(value)) {
+                        if (pendingSharedMultiImagesJsCall != null) {
+                            final String multiCall = pendingSharedMultiImagesJsCall;
+                            pendingSharedMultiImagesJsCall = null;
+                            webView.evaluateJavascript(multiCall, null);
+                        }
                         if (pendingSharedImageDataUrl != null) {
                             final String payload = pendingSharedImageDataUrl;
                             pendingSharedImageDataUrl = null;
@@ -634,16 +758,22 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             if (filePathCallback == null) return;
             Uri[] results = null;
             if (resultCode == Activity.RESULT_OK && data != null) {
-                String dataString = data.getDataString();
-                if (dataString != null) {
-                    results = new Uri[]{Uri.parse(dataString)};
+                if (data.getClipData() != null && data.getClipData().getItemCount() > 0) {
+                    int count = data.getClipData().getItemCount();
+                    ArrayList<Uri> uriList = new ArrayList<>();
+                    for (int i = 0; i < count; i++) {
+                        Uri clipUri = data.getClipData().getItemAt(i).getUri();
+                        if (clipUri != null) {
+                            uriList.add(clipUri);
+                        }
+                    }
+                    if (!uriList.isEmpty()) {
+                        results = uriList.toArray(new Uri[0]);
+                    }
+                } else if (data.getDataString() != null) {
+                    results = new Uri[]{Uri.parse(data.getDataString())};
                 } else if (data.getData() != null) {
                     results = new Uri[]{data.getData()};
-                } else if (data.getClipData() != null && data.getClipData().getItemCount() > 0) {
-                    Uri clipUri = data.getClipData().getItemAt(0).getUri();
-                    if (clipUri != null) {
-                        results = new Uri[]{clipUri};
-                    }
                 }
             }
             filePathCallback.onReceiveValue(results);
@@ -701,6 +831,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (event != null && event.getRepeatCount() > 0) {
+            return super.onKeyDown(keyCode, event);
+        }
         // Ses Açma Tuşu: Tek basışta telefonun sesini normal açar; hızlı çift basışta Fotoğraf / Sınav Kağıdı Çeker (Space Kısayolu)
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             long now = System.currentTimeMillis();
@@ -734,7 +867,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
         if (webView != null) {
             try {
-                webView.evaluateJavascript("if (typeof window.stopAllSpeechImmediately === 'function') { window.stopAllSpeechImmediately(); }", null);
+                webView.evaluateJavascript("if (typeof window.pauseBackgroundHardwareAndAudio === 'function') { window.pauseBackgroundHardwareAndAudio(); } else if (typeof window.stopAllSpeechImmediately === 'function') { window.stopAllSpeechImmediately(); }", null);
             } catch (Exception ignored) {}
         }
         super.onPause();
@@ -743,6 +876,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @Override
     protected void onDestroy() {
         isAppInForeground = false;
+        if (audioManager != null) {
+            try { audioManager.abandonAudioFocus(audioFocusListener); } catch (Exception ignored) {}
+        }
         if (nativeTts != null) {
             try {
                 nativeTts.stop();

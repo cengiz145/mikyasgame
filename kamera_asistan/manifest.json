@@ -16,6 +16,31 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "1. Sınav ve Belge Okuyucu",
+      "short_name": "Sınav Okuyucu",
+      "description": "Sınav kağıdı, test şıkları ve basılı belgeleri sesli okur",
+      "url": "./index.html?mode=exam_reader"
+    },
+    {
+      "name": "2. Sesli Kıble ve Namaz Vakti",
+      "short_name": "Kıble & Namaz",
+      "description": "Sesli Kıble pusulası ve 81 il namaz vakitleri",
+      "url": "./index.html?mode=qibla_compass"
+    },
+    {
+      "name": "5. Para Sayacı ve Kıyafet Rengi",
+      "short_name": "Para Sayacı",
+      "description": "Kağıt ve madeni paraları sayar, kıyafet rengini söyler",
+      "url": "./index.html?mode=color_cloth"
+    },
+    {
+      "name": "9. İlaç Kutusu ve SKT Kontrolü",
+      "short_name": "İlaç & SKT",
+      "description": "İlaç adını, dozajını ve son kullanma tarihini okur",
+      "url": "./index.html?mode=medicine_skt"
+    }
   ]
 }
-

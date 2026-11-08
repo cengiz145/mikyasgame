@@ -70,6 +70,9 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
         if (MainActivity.isAppInForeground) {
             return super.onKeyEvent(event);
         }
+        if (event.getRepeatCount() > 0) {
+            return super.onKeyEvent(event);
+        }
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
             long now = System.currentTimeMillis();
             if (now - lastVolUpPress < 450) {
