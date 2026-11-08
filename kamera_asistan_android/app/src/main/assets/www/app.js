@@ -354,20 +354,276 @@
     };
 
     // =========================================================================
-    // 1. SINAV KAĞIDI İÇİN BRADLEY-ROTH İNTEGRAL GÖLGE SİLİCİ VE ÇİFT SÜTUN AYIRICI
+    // 1. ULTRA-HIZLI KALICI OCR MOTORU, OTOMATİK AÇI DÜZELTİCİ (AUTO-DESKEW),
+    //    2X SÜPER-ÇÖZÜNÜRLÜK KESKİNLEŞTİRİCİ VE BRADLEY-ROTH GÖLGE SİLİCİ
     // =========================================================================
+    state.persistentOcrWorker = null;
+    state.persistentOcrWorkerPromise = null;
+    state.ocrWorkerQueue = Promise.resolve();
+    state.lastDetectedDeskewAngleDeg = 0;
+    state.lastDetectedDocOrientationNote = '';
+
     /**
-     * Telefonun sınav kağıdı üzerine düşen gölgesini 2B İntegral Görüntü
-     * (I(x,y) < μ_yerel * 0.87) formülüyle tamamen temizler.
+     * Kalıcı (Persistent Singleton) Tesseract.js Worker Motoru:
+     * Her okumada sıfırdan Worker + WASM + tur/eng dil paketi yüklemek yerine (600-900ms kayıp),
+     * uygulama açılışında tek bir kalıcı Worker hazırlar ve tüm okumaları 2-3 kat hızlı çalıştırır.
      */
-    function applyBradleyRothShadowRemoval(sourceCanvas, customRatio = 0.87) {
-        const w = sourceCanvas.width;
-        const h = sourceCanvas.height;
+    async function ensurePersistentOcrWorker() {
+        if (state.persistentOcrWorker) return state.persistentOcrWorker;
+        if (state.persistentOcrWorkerPromise) return state.persistentOcrWorkerPromise;
+        if (typeof window.Tesseract === 'undefined' || typeof window.Tesseract.createWorker !== 'function') {
+            return null;
+        }
+        state.persistentOcrWorkerPromise = (async () => {
+            try {
+                const worker = await window.Tesseract.createWorker('tur+eng');
+                state.persistentOcrWorker = worker;
+                return worker;
+            } catch (_) {
+                state.persistentOcrWorker = null;
+                return null;
+            } finally {
+                state.persistentOcrWorkerPromise = null;
+            }
+        })();
+        return state.persistentOcrWorkerPromise;
+    }
+
+    /**
+     * Küçük Puntolu Yazılar (İlaç SKT, Fiş, İçindekiler) İçin 2x Süper-Çözünürlük,
+     * Parlama (Specular Glare) Bastırma ve 3x3 Unsharp Mask Harf Keskinleştirici.
+     */
+    function enhanceCanvasForUltraOcr(sourceCanvas, options = {}) {
+        if (!sourceCanvas || !sourceCanvas.width || !sourceCanvas.height) return sourceCanvas;
+        const srcW = sourceCanvas.width;
+        const srcH = sourceCanvas.height;
+
+        // Küçük şerit veya düşük çözünürlüklü kareleri harf kenarları yapışmasın diye 1.75x - 2x büyüt
+        const minDim = Math.min(srcW, srcH);
+        const maxDim = Math.max(srcW, srcH);
+        let scale = 1;
+        if (options.forceUpscale !== false) {
+            if (minDim < 360 && maxDim < 1100) scale = 2.0;
+            else if (minDim < 620 && maxDim < 1350) scale = 1.65;
+        }
+
+        const w = Math.max(16, Math.round(srcW * scale));
+        const h = Math.max(16, Math.round(srcH * scale));
         const outCanvas = document.createElement('canvas');
         outCanvas.width = w;
         outCanvas.height = h;
         const ctx = outCanvas.getContext('2d');
-        ctx.drawImage(sourceCanvas, 0, 0);
+        ctx.imageSmoothingEnabled = true;
+        try { ctx.imageSmoothingQuality = 'high'; } catch (_) {}
+        ctx.drawImage(sourceCanvas, 0, 0, w, h);
+
+        if (options.skipPixelSharpen) return outCanvas;
+
+        try {
+            const imgData = ctx.getImageData(0, 0, w, h);
+            const data = imgData.data;
+            const lumArr = new Uint8Array(w * h);
+
+            let minLum = 255;
+            let maxLum = 0;
+            for (let i = 0, p = 0; i < lumArr.length; i++, p += 4) {
+                let lum = Math.round(0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2]);
+                // Parlak ilaç kutusu / kavanoz üzerindeki flaş/lamba parlamasını (glare > 238) yumuşat
+                if (lum > 238) {
+                    lum = 238 + Math.round((lum - 238) * 0.35);
+                }
+                lumArr[i] = lum;
+                if (lum < minLum) minLum = lum;
+                if (lum > maxLum) maxLum = lum;
+            }
+
+            const range = Math.max(24, maxLum - minLum);
+            // 3x3 Unsharp Mask (Harf Kenarı Keskinleştirme) + Kontrast Germe
+            for (let y = 1; y < h - 1; y++) {
+                const rowOffset = y * w;
+                for (let x = 1; x < w - 1; x++) {
+                    const idx = rowOffset + x;
+                    const center = lumArr[idx];
+                    const neighbors = (
+                        lumArr[idx - 1] +
+                        lumArr[idx + 1] +
+                        lumArr[idx - w] +
+                        lumArr[idx + w]
+                    ) * 0.25;
+                    const sharpened = center + (center - neighbors) * 0.85;
+                    const stretched = ((sharpened - minLum) * 255) / range;
+                    const val = Math.max(0, Math.min(255, Math.round(stretched)));
+                    const p = idx * 4;
+                    data[p] = val;
+                    data[p + 1] = val;
+                    data[p + 2] = val;
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+        } catch (_) {}
+
+        return outCanvas;
+    }
+
+    /**
+     * Otomatik Belge Eğikliği Düzeltici (Auto-Deskew -26° .. +26°):
+     * Görme engelli kullanıcı kağıdı, faturayı veya ilaç kutusunu masada eğik/çapraz tuttuğunda
+     * yatay satır izdüşüm varyansını (Horizontal Projection Profile Variance) maksimize eden açıyı
+     * milisaniyeler içinde bulur ve görüntüyü OCR öncesi otomatik düzeltir.
+     */
+    function autoDeskewDocumentCanvas(sourceCanvas) {
+        if (!sourceCanvas || sourceCanvas.width < 80 || sourceCanvas.height < 80) {
+            return { canvas: sourceCanvas, angleDeg: 0 };
+        }
+        const w = sourceCanvas.width;
+        const h = sourceCanvas.height;
+
+        try {
+            // Hızlı açı tahmini için görüntüyü ~180px genişliğe küçültüp kenar piksellerini çıkar
+            const sampleScale = Math.min(1, 180 / Math.max(w, h));
+            const sw = Math.max(48, Math.round(w * sampleScale));
+            const sh = Math.max(48, Math.round(h * sampleScale));
+            const tmp = document.createElement('canvas');
+            tmp.width = sw;
+            tmp.height = sh;
+            const tCtx = tmp.getContext('2d');
+            tCtx.drawImage(sourceCanvas, 0, 0, sw, sh);
+            const sData = tCtx.getImageData(0, 0, sw, sh).data;
+
+            const edgePointsX = [];
+            const edgePointsY = [];
+            const cx = sw * 0.5;
+            const cy = sh * 0.5;
+            const yMargin = Math.floor(sh * 0.08);
+            const xMargin = Math.floor(sw * 0.08);
+
+            for (let y = yMargin; y < sh - yMargin; y++) {
+                let prevLum = 0.299 * sData[(y * sw + xMargin) * 4] + 0.587 * sData[(y * sw + xMargin) * 4 + 1] + 0.114 * sData[(y * sw + xMargin) * 4 + 2];
+                for (let x = xMargin + 1; x < sw - xMargin; x++) {
+                    const p = (y * sw + x) * 4;
+                    const lum = 0.299 * sData[p] + 0.587 * sData[p + 1] + 0.114 * sData[p + 2];
+                    if (Math.abs(lum - prevLum) >= 34) {
+                        edgePointsX.push(x - cx);
+                        edgePointsY.push(y - cy);
+                    }
+                    prevLum = lum;
+                }
+            }
+
+            if (edgePointsX.length < 45) {
+                return { canvas: sourceCanvas, angleDeg: 0 };
+            }
+
+            const hist = new Int32Array(sh);
+            const scoreAngle = (deg) => {
+                hist.fill(0);
+                const rad = (deg * Math.PI) / 180;
+                const sinA = Math.sin(rad);
+                const cosA = Math.cos(rad);
+                for (let i = 0; i < edgePointsX.length; i++) {
+                    const ry = Math.round(-edgePointsX[i] * sinA + edgePointsY[i] * cosA + cy);
+                    if (ry >= 0 && ry < sh) hist[ry]++;
+                }
+                let varianceScore = 0;
+                for (let r = 1; r < sh; r++) {
+                    const diff = hist[r] - hist[r - 1];
+                    varianceScore += diff * diff;
+                }
+                return varianceScore;
+            };
+
+            const zeroScore = scoreAngle(0);
+            let bestAngle = 0;
+            let bestScore = zeroScore;
+
+            // 1. Kaba tarama: -24° .. +24° arası 4° adımlarla
+            for (let deg = -24; deg <= 24; deg += 4) {
+                if (deg === 0) continue;
+                const sc = scoreAngle(deg);
+                if (sc > bestScore) {
+                    bestScore = sc;
+                    bestAngle = deg;
+                }
+            }
+
+            // 2. İnce tarama: en iyi açının etrafında 1° adımlarla
+            const fineStart = Math.max(-26, bestAngle - 3);
+            const fineEnd = Math.min(26, bestAngle + 3);
+            for (let deg = fineStart; deg <= fineEnd; deg += 1) {
+                const sc = scoreAngle(deg);
+                if (sc > bestScore) {
+                    bestScore = sc;
+                    bestAngle = deg;
+                }
+            }
+
+            // Sadece belirgin eğiklik varsa (|açı| >= 2° ve satır netliği %14+ artıyorsa) döndür
+            if (Math.abs(bestAngle) < 2 || bestScore < zeroScore * 1.14) {
+                state.lastDetectedDeskewAngleDeg = 0;
+                return { canvas: sourceCanvas, angleDeg: 0 };
+            }
+
+            state.lastDetectedDeskewAngleDeg = bestAngle;
+            const outCanvas = document.createElement('canvas');
+            outCanvas.width = w;
+            outCanvas.height = h;
+            const outCtx = outCanvas.getContext('2d');
+            outCtx.fillStyle = '#ffffff';
+            outCtx.fillRect(0, 0, w, h);
+            outCtx.save();
+            outCtx.translate(w * 0.5, h * 0.5);
+            outCtx.rotate((-bestAngle * Math.PI) / 180);
+            outCtx.drawImage(sourceCanvas, -w * 0.5, -h * 0.5);
+            outCtx.restore();
+
+            return { canvas: outCanvas, angleDeg: bestAngle };
+        } catch (_) {
+            return { canvas: sourceCanvas, angleDeg: 0 };
+        }
+    }
+
+    /**
+     * Kuyruklu ve Ön-İşlemeli Ultra-Hızlı OCR Çağrıcı:
+     * Kalıcı Tesseract Worker varsa onu kullanır, yoksa standart window.Tesseract.recognize'a düşer.
+     */
+    async function runFastOcrRecognize(targetCanvas, options = {}) {
+        if (!targetCanvas || typeof window.Tesseract === 'undefined') return null;
+        const preparedCanvas = options.rawPass
+            ? enhanceCanvasForUltraOcr(targetCanvas, { forceUpscale: options.forceUpscale !== false, skipPixelSharpen: false })
+            : targetCanvas;
+
+        const executeRecognition = async () => {
+            const worker = await ensurePersistentOcrWorker();
+            if (worker && typeof worker.recognize === 'function') {
+                try {
+                    return await worker.recognize(preparedCanvas);
+                } catch (_) {
+                    state.persistentOcrWorker = null;
+                }
+            }
+            return await window.Tesseract.recognize(preparedCanvas, 'tur+eng');
+        };
+
+        const queuedTask = state.ocrWorkerQueue.then(executeRecognition, executeRecognition);
+        state.ocrWorkerQueue = queuedTask.catch(() => {});
+        return queuedTask;
+    }
+
+    /**
+     * Telefonun sınav kağıdı veya belge üzerine düşen gölgesini 2B İntegral Görüntü
+     * (I(x,y) < μ_yerel * 0.87) formülüyle tamamen temizler; öncesinde eğikliği (Auto-Deskew)
+     * düzeltir ve küçük puntoları keskinleştirir.
+     */
+    function applyBradleyRothShadowRemoval(sourceCanvas, customRatio = 0.87) {
+        const deskewed = autoDeskewDocumentCanvas(sourceCanvas);
+        const enhancedCanvas = enhanceCanvasForUltraOcr(deskewed.canvas, { forceUpscale: true });
+        const w = enhancedCanvas.width;
+        const h = enhancedCanvas.height;
+        const outCanvas = document.createElement('canvas');
+        outCanvas.width = w;
+        outCanvas.height = h;
+        const ctx = outCanvas.getContext('2d');
+        ctx.drawImage(enhancedCanvas, 0, 0);
 
         const imgData = ctx.getImageData(0, 0, w, h);
         const data = imgData.data;
@@ -414,7 +670,7 @@
         }
 
         ctx.putImageData(imgData, 0, 0);
-        return { cleanCanvas: outCanvas, binaryData: data, width: w, height: h };
+        return { cleanCanvas: outCanvas, binaryData: data, width: w, height: h, deskewAngleDeg: deskewed.angleDeg };
     }
 
     /**
@@ -1789,7 +2045,7 @@
         const targetCanvas = isDegreeLcdMode ? preprocess7SegmentAndPanelCanvas(rawTargetCanvas) : rawTargetCanvas;
 
         Promise.resolve()
-            .then(() => window.Tesseract.recognize(targetCanvas, 'tur+eng'))
+            .then(() => runFastOcrRecognize(targetCanvas, { rawPass: !isDegreeLcdMode }))
             .then((ocrRes) => {
                 if (!state.isRunning || state.isProcessingOcr) return;
                 const liveText = extractVerifiedRealTextFromOcrResult(ocrRes).trim();
@@ -4654,12 +4910,12 @@
             c.getContext('2d').drawImage(el.video, 0, 0);
 
             const preCanvas = preprocess7SegmentAndPanelCanvas(c);
-            const ocrRes = await window.Tesseract.recognize(preCanvas, 'tur+eng');
+            const ocrRes = await runFastOcrRecognize(preCanvas, { rawPass: false });
             let text = extractVerifiedRealTextFromOcrResult(ocrRes).trim();
 
             let parsed = processApplianceDegreeAndBuildGuidance(text, isAutoTick);
             if (parsed.detectedDegree === null) {
-                const rawRes = await window.Tesseract.recognize(c, 'tur+eng');
+                const rawRes = await runFastOcrRecognize(c, { rawPass: true });
                 const rawText = extractVerifiedRealTextFromOcrResult(rawRes).trim();
                 if (rawText) {
                     text = text ? `${text} ${rawText}` : rawText;
@@ -4982,7 +5238,7 @@
         const hasBanknoteWords = (txt) => /L[İI]RASI\b|T[ÜU]RK\s*L[İI]RA|MERKEZ\s*BANK|CUMHUR[İI]YET\s*MERKEZ/i.test(txt || '');
 
         // 1. Düz (0°) kontrol et (Sadece gerçek OCR doğrulamasından geçen temiz metinleri kullan)
-        const res0 = await window.Tesseract.recognize(sourceCanvas, 'tur+eng');
+        const res0 = await runFastOcrRecognize(sourceCanvas, { rawPass: true });
         const txt0 = extractVerifiedRealTextFromOcrResult(res0);
         const match0 = detectTurkishBanknoteDetailsFromText(txt0, centerColorName);
         if (match0) return match0;
@@ -4990,7 +5246,7 @@
 
         // 2. Baş Aşağı Ters (180°) çevrilmiş kağıt para kontrolü
         const canvas180 = createRotatedCanvas(sourceCanvas, 180);
-        const res180 = await window.Tesseract.recognize(canvas180, 'tur+eng');
+        const res180 = await runFastOcrRecognize(canvas180, { rawPass: true });
         const txt180 = extractVerifiedRealTextFromOcrResult(res180);
         const match180 = detectTurkishBanknoteDetailsFromText(txt180, centerColorName);
         if (match180) return match180;
@@ -4998,7 +5254,7 @@
 
         // 3. Sağa Dik / Yan (90°) tutulmuş kağıt para kontrolü
         const canvas90 = createRotatedCanvas(sourceCanvas, 90);
-        const res90 = await window.Tesseract.recognize(canvas90, 'tur+eng');
+        const res90 = await runFastOcrRecognize(canvas90, { rawPass: true });
         const txt90 = extractVerifiedRealTextFromOcrResult(res90);
         const match90 = detectTurkishBanknoteDetailsFromText(txt90, centerColorName);
         if (match90) return match90;
@@ -5006,7 +5262,7 @@
 
         // 4. Sola Dik / Yan (270°) tutulmuş kağıt para kontrolü
         const canvas270 = createRotatedCanvas(sourceCanvas, 270);
-        const res270 = await window.Tesseract.recognize(canvas270, 'tur+eng');
+        const res270 = await runFastOcrRecognize(canvas270, { rawPass: true });
         const txt270 = extractVerifiedRealTextFromOcrResult(res270);
         const match270 = detectTurkishBanknoteDetailsFromText(txt270, centerColorName);
         if (match270) return match270;
@@ -5786,6 +6042,12 @@
         const reportLines = [];
         let hasExpiredAlarm = false;
 
+        if (state.lastDetectedDocOrientationNote) {
+            speechNotes.push(state.lastDetectedDocOrientationNote);
+            reportLines.push(state.lastDetectedDocOrientationNote);
+            state.lastDetectedDocOrientationNote = '';
+        }
+
         // 1. İlaç / Gıda Son Kullanma Tarihi (SKT / TETT / EXP) ve Dozaj Kontrolü
         const med = parseMedicineAndExpiryZeroError(primaryPassVerifiedText || text, state.lastDetectedBarcode, secondaryRawVerifiedText);
         if (med.formattedDate !== 'Doğrulanamadı') {
@@ -5952,13 +6214,14 @@
                 let secondaryRawVerifiedText = '';
 
                 if (hasOcrEngine) {
+                    state.lastDetectedDocOrientationNote = '';
                     const binObj = applyBradleyRothShadowRemoval(capCanvas);
                     splitInfo = (state.mode === 'door_elevator_lcd')
                         ? { isTwoColumn: false, canvases: [capCanvas, preprocess7SegmentAndPanelCanvas(capCanvas)] }
                         : splitExamColumnsIfTwoColumn(binObj);
 
                     for (let i = 0; i < splitInfo.canvases.length; i++) {
-                        const ocrRes = await window.Tesseract.recognize(splitInfo.canvases[i], 'tur+eng');
+                        const ocrRes = await runFastOcrRecognize(splitInfo.canvases[i], { rawPass: false });
                         const partText = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text.trim() : '';
                         const partVerified = extractVerifiedRealTextFromOcrResult(ocrRes);
                         const partMultiline = extractVerifiedRealTextFromOcrResult(ocrRes, '\n');
@@ -5990,7 +6253,7 @@
 
                     if ((state.mode !== 'door_elevator_lcd' && (verifiedCombinedText.trim().length < 6 || isHighStakesSafetyMode)) ||
                         (state.mode === 'door_elevator_lcd' && verifiedCombinedText.trim().length < 2)) {
-                        const fallbackRes = await window.Tesseract.recognize(capCanvas, 'tur+eng');
+                        const fallbackRes = await runFastOcrRecognize(capCanvas, { rawPass: true });
                         const rawText = (fallbackRes && fallbackRes.data && fallbackRes.data.text) ? fallbackRes.data.text.trim() : '';
                         secondaryRawVerifiedText = extractVerifiedRealTextFromOcrResult(fallbackRes).trim();
                         const rawMultiline = extractVerifiedRealTextFromOcrResult(fallbackRes, '\n');
@@ -6003,6 +6266,34 @@
                             }
                         } else if (secondaryRawVerifiedText && secondaryRawVerifiedText !== primaryPassVerifiedText) {
                             verifiedCombinedText = `${primaryPassVerifiedText} — ${secondaryRawVerifiedText}`;
+                        }
+                    }
+
+                    // 4-YÖNLÜ (180° / 90° / 270°) AKILLI BELGE VE KUTU KURTARICI:
+                    // Görme engelli kullanıcı faturayı, ilaç kutusunu, mektubu veya sınav kağıdını ters ya da yan tuttuysa
+                    // "Okunamadı" demek yerine 180°, 90° ve 270° yönlerini otomatik deneyip düzelt!
+                    if (state.mode !== 'door_elevator_lcd' && state.mode !== 'color_cloth' && verifiedCombinedText.trim().length < 8) {
+                        const candidateAngles = [
+                            { deg: 180, label: 'baş aşağı (ters)' },
+                            { deg: 90, label: 'sağa yan' },
+                            { deg: 270, label: 'sola yan' }
+                        ];
+                        for (let aIdx = 0; aIdx < candidateAngles.length; aIdx++) {
+                            const cand = candidateAngles[aIdx];
+                            const rotCanvas = createRotatedCanvas(capCanvas, cand.deg);
+                            const rotRes = await runFastOcrRecognize(rotCanvas, { rawPass: true });
+                            const rotVerified = extractVerifiedRealTextFromOcrResult(rotRes).trim();
+                            if (rotVerified.length >= 8 && rotVerified.length > verifiedCombinedText.trim().length) {
+                                combinedText = (rotRes && rotRes.data && rotRes.data.text) ? rotRes.data.text.trim() : rotVerified;
+                                verifiedCombinedText = rotVerified;
+                                primaryPassVerifiedText = rotVerified;
+                                verifiedMultilineText = extractVerifiedRealTextFromOcrResult(rotRes, '\n');
+                                if (rotRes && rotRes.data && Array.isArray(rotRes.data.lines)) {
+                                    collectedLines = rotRes.data.lines;
+                                }
+                                state.lastDetectedDocOrientationNote = `Not: Kağıt veya kutu ${cand.label} tutulmuş ancak otomatik düzeltilerek okundu.`;
+                                break;
+                            }
                         }
                     }
                 }
@@ -6718,6 +7009,30 @@
     }
 
     /**
+     * Türkçe Optik Karakter Karışıklıklarını (0<->O, 1<->İ/I) Sayılara, Tarihlere,
+     * Barkodlara ve IBAN'a Zarar Vermeden Bağlamsal Olarak Onaran Akıllı Filtre.
+     */
+    function repairTurkishOcrConfusions(rawLine) {
+        if (!rawLine) return '';
+        let s = String(rawLine);
+        // TR + 24 rakam IBAN veya uzun barkod içeren kısımlara dokunma, sadece harflerin ortasındaki bariz OCR hatalarını düzelt:
+        s = s
+            .replace(/\bT0PLAM\b/gi, 'TOPLAM')
+            .replace(/\bF[1I]YAT\b/gi, 'FİYAT')
+            .replace(/\bM[1I]KTAR\b/gi, 'MİKTAR')
+            .replace(/\bS0N\s+KULLANMA\b/gi, 'SON KULLANMA')
+            .replace(/\bTETT\s*[:.;]/gi, 'TETT:')
+            .replace(/\bSKT\s*[:.;]/gi, 'SKT:')
+            .replace(/\b[İI1]Ç[1I]NDEK[1I]LER\b/gi, 'İÇİNDEKİLER')
+            .replace(/\bÜRET[1I]M\b/gi, 'ÜRETİM')
+            .replace(/\bTÜKET[1I]M\b/gi, 'TÜKETİM');
+
+        // Tamamen büyük Türkçe harflerden oluşan en az 4 harfli kelimelerin tam ortasına karışmış '0' -> 'O' onarımı (örn. "K0NTROL" -> "KONTROL", "B1LG1" -> "BİLGİ"):
+        s = s.replace(/(^|\s)([A-ZÇĞİÖŞÜ]{2,})0([A-ZÇĞİÖŞÜ]{2,})(?=\s|[.,;:!?]|$)/g, '$1$2O$3');
+        return s;
+    }
+
+    /**
      * Tesseract OCR çıktısından gelen gürültü/doku uydurmalarını (halüsinasyonları) eler;
      * kameranın gördüğü her türlü gerçek yazıyı, kısa kodu, kapı numarasını, markayı ve etiketi eksiksiz döndürür.
      */
@@ -6733,7 +7048,7 @@
                 : (typeof ocrRes.data.confidence === 'number' ? ocrRes.data.confidence : 75);
             if (conf < 38) continue;
 
-            const raw = String(ln.text || '').replace(/\s+/g, ' ').trim();
+            const raw = repairTurkishOcrConfusions(String(ln.text || '').replace(/\s+/g, ' ').trim());
             if (!raw) continue;
 
             // Kısa kapı/kat numaraları ("5", "12", "B1", "Z"), kısa markalar ("LG"), arıza kodları ("E4", "F2")
@@ -6757,7 +7072,7 @@
             if (overallConf >= 35) {
                 const rawLines = ocrRes.data.text.split(/\r?\n/);
                 for (let j = 0; j < rawLines.length; j++) {
-                    const rLine = rawLines[j].replace(/\s+/g, ' ').trim();
+                    const rLine = repairTurkishOcrConfusions(rawLines[j].replace(/\s+/g, ' ').trim());
                     if (!rLine) continue;
                     const anMatches = rLine.match(/[\p{L}\p{N}]/gu) || [];
                     if (anMatches.length >= 1 && (anMatches.length / rLine.length) >= 0.42) {
@@ -7156,7 +7471,7 @@
                         continue; // Karede hiç yazı çizgisi yoksa 4 saniyelik Tesseract OCR'ı boşuna çalıştırma!
                     }
                     await new Promise(r => setTimeout(r, 0));
-                    const ocrRes = await window.Tesseract.recognize(strokeCheck.ocrCanvas, 'tur+eng');
+                    const ocrRes = await runFastOcrRecognize(strokeCheck.ocrCanvas, { rawPass: true });
                     const verifiedText = extractVerifiedRealTextFromOcrResult(ocrRes);
                     if (verifiedText.length >= 3) {
                         const isDuplicate = uniqueCaptions.some(existing => computeTrigramSimilarity(existing.text, verifiedText) >= 0.65);
@@ -7438,7 +7753,34 @@
         ctx.restore();
     }
 
+    async function applyOptimalCameraTrackConstraints(stream) {
+        if (!stream || typeof stream.getVideoTracks !== 'function') return;
+        const track = stream.getVideoTracks()[0];
+        if (!track || typeof track.getCapabilities !== 'function' || typeof track.applyConstraints !== 'function') return;
+        try {
+            const caps = track.getCapabilities() || {};
+            const adv = {};
+            if (Array.isArray(caps.focusMode) && caps.focusMode.includes('continuous')) {
+                adv.focusMode = 'continuous';
+            }
+            if (Array.isArray(caps.exposureMode) && caps.exposureMode.includes('continuous')) {
+                adv.exposureMode = 'continuous';
+            }
+            if (Array.isArray(caps.whiteBalanceMode) && caps.whiteBalanceMode.includes('continuous')) {
+                adv.whiteBalanceMode = 'continuous';
+            }
+            if (Object.keys(adv).length > 0) {
+                await track.applyConstraints({ advanced: [adv] });
+            }
+        } catch (_) {}
+    }
+
     async function initAiModel() {
+        // Kalıcı (Persistent) OCR Worker motorunu arka planda önceden ısıt (kullanıcıyı bekletmeden)
+        setTimeout(() => {
+            ensurePersistentOcrWorker().catch(() => {});
+        }, 120);
+
         if ('BarcodeDetector' in window) {
             try {
                 state.barcodeDetector = new window.BarcodeDetector({
@@ -7465,6 +7807,7 @@
 
     async function startCamera() {
         radar.init();
+        ensurePersistentOcrWorker().catch(() => {});
 
         if (state.videoStream) {
             tryEnableHardwareTorch(false);
@@ -7484,8 +7827,8 @@
             audio: false,
             video: {
                 facingMode: { ideal: state.facingMode },
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
             }
         };
 
@@ -7497,13 +7840,25 @@
                 try {
                     stream = await navigator.mediaDevices.getUserMedia({
                         audio: false,
-                        video: { facingMode: state.facingMode }
+                        video: {
+                            facingMode: { ideal: state.facingMode },
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }
                     });
                 } catch (_2) {
-                    stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({
+                            audio: false,
+                            video: { facingMode: state.facingMode }
+                        });
+                    } catch (_3) {
+                        stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+                    }
                 }
             }
             state.videoStream = stream;
+            await applyOptimalCameraTrackConstraints(stream);
             el.video.srcObject = stream;
             await el.video.play();
 
@@ -11400,7 +11755,7 @@
             c.width = el.video.videoWidth;
             c.height = el.video.videoHeight;
             c.getContext('2d').drawImage(el.video, 0, 0);
-            const ocrRes = await window.Tesseract.recognize(c, 'tur+eng');
+            const ocrRes = await runFastOcrRecognize(c, { rawPass: true });
             const text = extractVerifiedRealTextFromOcrResult(ocrRes);
             const parsed = processTvSubtitleAndScoreText(text, isAutoTick);
             if (!isAutoTick || (parsed.hasNewSubtitle && parsed.subtitleLine.length > 4)) {
@@ -14312,4 +14667,11 @@
         }
         return false;
     };
+
+    // Çevrimdışı OCR ve Yapay Zeka Önbelleği İçin PWA Service Worker Kaydı (HTTPS üzerinde)
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        });
+    }
 })();
