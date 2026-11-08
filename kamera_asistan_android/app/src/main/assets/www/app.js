@@ -2955,7 +2955,6 @@
         state.moneyAutoAccumulate = !state.moneyAutoAccumulate;
         if (el.btnMoneyAutoToggle) {
             el.btnMoneyAutoToggle.classList.toggle('active-toggle', state.moneyAutoAccumulate);
-            el.btnMoneyAutoToggle.setAttribute('aria-pressed', String(state.moneyAutoAccumulate));
             el.btnMoneyAutoToggle.textContent = `🔄 Otomatik Biriktirme: ${state.moneyAutoAccumulate ? 'Açık' : 'Kapalı'}`;
         }
         announceGuidance(
@@ -4845,7 +4844,6 @@
             const bDeg = parseFloat(btn.getAttribute('data-deg') || btn.getAttribute('data-target-deg') || '');
             const isMatch = bDeg === num;
             btn.classList.toggle('active-toggle', isMatch);
-            btn.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
         });
 
         if (!options.silent) {
@@ -4887,7 +4885,6 @@
         const presetBtns = document.querySelectorAll('.degree-preset-btn');
         presetBtns.forEach(btn => {
             btn.classList.remove('active-toggle');
-            btn.setAttribute('aria-pressed', 'false');
         });
         if (!silent) {
             announceGuidance('Rehber derece sayısı temizlendi. Kamerayı ekrana tuttuğunuzda yalnızca o an ekranda yazan derece seslendirilecektir.', {
@@ -4983,7 +4980,6 @@
         const badge = document.getElementById('appliance-degree-badge');
         if (btn) {
             btn.classList.toggle('active-toggle', state.degreeLiveTrackingActive);
-            btn.setAttribute('aria-pressed', state.degreeLiveTrackingActive ? 'true' : 'false');
             btn.textContent = state.degreeLiveTrackingActive
                 ? '⏹️ Canlı Yol Göstericiyi Durdur'
                 : '▶️ Canlı Yol Göstericiyi Başlat (El İle Ayarlarken Söyler)';
@@ -8244,7 +8240,6 @@
             state.isRunning = true;
             state.lastUserInteractionAt = performance.now();
             el.btnStart.textContent = '⏹️ Kamerayı Durdur';
-            el.btnStart.setAttribute('aria-pressed', 'true');
             el.btnSwitchCam.disabled = false;
             el.btnToggleFlash.disabled = false;
             el.btnCaptureNow.disabled = false;
@@ -8289,7 +8284,6 @@
             const tvBtn = document.getElementById('btn-tv-auto-toggle') || el.btnTvToggleAuto;
             if (tvBtn) {
                 tvBtn.classList.remove('active-toggle');
-                tvBtn.setAttribute('aria-pressed', 'false');
                 tvBtn.textContent = '▶️ Otomatik TV Altyazı & Skor Spikerini Başlat';
             }
         }
@@ -8302,7 +8296,6 @@
             const degBtn = document.getElementById('btn-degree-live-toggle');
             if (degBtn) {
                 degBtn.classList.remove('active-toggle');
-                degBtn.setAttribute('aria-pressed', 'false');
                 degBtn.textContent = '▶️ Canlı Derece Takibini Başlat (Tuşa Bastıkça Söyler)';
             }
         }
@@ -8311,7 +8304,6 @@
             const lBtn = document.getElementById('btn-laundry-sort-toggle');
             if (lBtn) {
                 lBtn.classList.remove('active-toggle');
-                lBtn.setAttribute('aria-pressed', 'false');
                 lBtn.textContent = '🧺 Canlı Renkli / Beyaz Çamaşır Ayıklamayı Başlat';
             }
         }
@@ -8329,7 +8321,6 @@
             } catch (_) {}
         }
         el.btnStart.textContent = '📷 Kamerayı ve Sesli Rehberi Başlat';
-        el.btnStart.setAttribute('aria-pressed', 'false');
         announceGuidance('Kamera ve sesli rehber durduruldu.', { force: true });
     }
 
@@ -10176,13 +10167,11 @@
             state.songTunerActive = false;
             if (el.btnSongTuner) {
                 el.btnSongTuner.classList.remove('active-toggle');
-                el.btnSongTuner.setAttribute('aria-pressed', 'false');
                 el.btnSongTuner.textContent = '🎸 Sesli Enstrüman Akort & Makam: Kapalı';
             }
         }
         if (el.btnSongAutoRadar) {
             el.btnSongAutoRadar.classList.toggle('active-toggle', state.songAutoRadarEnabled);
-            el.btnSongAutoRadar.setAttribute('aria-pressed', String(state.songAutoRadarEnabled));
             el.btnSongAutoRadar.textContent = `📡 Otomatik Şarkı Takibi: ${state.songAutoRadarEnabled ? 'Açık' : 'Kapalı'}`;
         }
 
@@ -10219,13 +10208,11 @@
             }
             if (el.btnSongAutoRadar) {
                 el.btnSongAutoRadar.classList.remove('active-toggle');
-                el.btnSongAutoRadar.setAttribute('aria-pressed', 'false');
                 el.btnSongAutoRadar.textContent = '📡 Otomatik Şarkı Takibi: Kapalı';
             }
         }
         if (el.btnSongTuner) {
             el.btnSongTuner.classList.toggle('active-toggle', state.songTunerActive);
-            el.btnSongTuner.setAttribute('aria-pressed', String(state.songTunerActive));
             el.btnSongTuner.textContent = `🎸 Sesli Enstrüman Akort & Makam: ${state.songTunerActive ? 'Açık' : 'Kapalı'}`;
         }
 
@@ -10361,7 +10348,6 @@
             el.categoryTabs.forEach(tab => {
                 tab.classList.remove('active-toggle');
                 tab.setAttribute('aria-expanded', 'false');
-                tab.setAttribute('aria-pressed', 'false');
                 const folder = tab.closest('.category-folder');
                 if (folder) folder.classList.remove('open-folder');
             });
@@ -10385,7 +10371,6 @@
             const isSel = (catId === 'all' || tab.getAttribute('data-category') === catId);
             tab.classList.toggle('active-toggle', isSel);
             tab.setAttribute('aria-expanded', isSel ? 'true' : 'false');
-            tab.setAttribute('aria-pressed', isSel ? 'true' : 'false');
             const folder = tab.closest('.category-folder');
             if (folder) folder.classList.toggle('open-folder', isSel);
         });
@@ -12199,7 +12184,6 @@
         const badge = document.getElementById('tv-subtitle-badge');
         if (btn) {
             btn.classList.toggle('active-toggle', state.tvAutoReaderActive);
-            btn.setAttribute('aria-pressed', state.tvAutoReaderActive ? 'true' : 'false');
             btn.textContent = state.tvAutoReaderActive
                 ? '⏹️ Otomatik TV Altyazı & Skor Spikerini Durdur'
                 : '▶️ Otomatik TV Altyazı & Skor Spikerini Başlat';
@@ -12391,7 +12375,6 @@
         const btn = document.getElementById('btn-laundry-sort-toggle');
         if (btn) {
             btn.classList.toggle('active-toggle', state.laundrySortLiveActive);
-            btn.setAttribute('aria-pressed', state.laundrySortLiveActive ? 'true' : 'false');
             btn.textContent = `🧺 Seri Çamaşır Ayıklama: ${state.laundrySortLiveActive ? 'Açık' : 'Kapalı'}`;
         }
         if (state.laundrySortLiveActive && !state.isRunning) {
@@ -12774,7 +12757,6 @@
         const btn = document.getElementById('btn-step-toggle');
         if (btn) {
             btn.classList.toggle('active-toggle', state.stepCounterEnabled);
-            btn.setAttribute('aria-pressed', state.stepCounterEnabled ? 'true' : 'false');
             btn.textContent = state.stepCounterEnabled
                 ? '👟 Adım Sayacı: Açık (Yürüdükçe Sayar)'
                 : '⏸️ Adım Sayacı: Duraklatıldı';
@@ -13518,7 +13500,6 @@
         catBtns.forEach(btn => {
             const isSel = btn.getAttribute('data-cook-cat') === state.selectedCookingCategory;
             btn.classList.toggle('active-toggle', isSel);
-            btn.setAttribute('aria-pressed', isSel ? 'true' : 'false');
         });
         populateCookingRecipesSelect(state.selectedCookingCategory);
 
@@ -13592,7 +13573,6 @@
         const btn = document.getElementById('btn-cooking-timer');
         if (btn) {
             btn.classList.remove('active-toggle');
-            btn.setAttribute('aria-pressed', 'false');
             btn.textContent = '⏲️ Adım Süresini Başlat';
         }
         if (speakStopped) {
@@ -13623,7 +13603,6 @@
         const badgeEl = document.getElementById('cooking-status-badge');
         if (btn) {
             btn.classList.add('active-toggle');
-            btn.setAttribute('aria-pressed', 'true');
             btn.textContent = `⏹️ Kalan Süre: ${minutes}:00`;
         }
         announceGuidance(`Mutfak zamanlayıcısı ${minutes} dakika olarak başlatıldı (${rec.title}, ${state.currentCookingStepIndex + 1}. adım). Sürenin yarısında, son 1 dakikada ve süre tamamlandığında sesli bildirim yapılacaktır.`, {
@@ -14275,7 +14254,6 @@
             const tvBtn = document.getElementById('btn-tv-auto-toggle') || el.btnTvToggleAuto;
             if (tvBtn) {
                 tvBtn.classList.remove('active-toggle');
-                tvBtn.setAttribute('aria-pressed', 'false');
                 tvBtn.textContent = '▶️ Otomatik TV Altyazı & Skor Spikerini Başlat';
             }
         }
@@ -14288,7 +14266,6 @@
             const degBtn = document.getElementById('btn-degree-live-toggle');
             if (degBtn) {
                 degBtn.classList.remove('active-toggle');
-                degBtn.setAttribute('aria-pressed', 'false');
                 degBtn.textContent = '▶️ Canlı Derece Takibini Başlat (Tuşa Bastıkça Söyler)';
             }
         }
@@ -14297,7 +14274,6 @@
             const lBtn = document.getElementById('btn-laundry-sort-toggle');
             if (lBtn) {
                 lBtn.classList.remove('active-toggle');
-                lBtn.setAttribute('aria-pressed', 'false');
                 lBtn.textContent = '🧺 Seri Renkli Çamaşır Ayıklama: Kapalı';
             }
         }
@@ -14307,7 +14283,6 @@
                 state.songTunerActive = false;
                 if (el.btnSongTuner) {
                     el.btnSongTuner.classList.remove('active-toggle');
-                    el.btnSongTuner.setAttribute('aria-pressed', 'false');
                     el.btnSongTuner.textContent = '🎸 Sesli Enstrüman Akort & Makam: Kapalı';
                 }
             }
@@ -14329,7 +14304,6 @@
                 matchedCat = btn.getAttribute('data-category');
             }
             btn.classList.toggle('active', isMatch);
-            btn.setAttribute('aria-checked', isMatch ? 'true' : 'false');
         });
         if (matchedCat && state.openCategory !== matchedCat) {
             filterModesByLifeCategory(matchedCat, { forceOpen: true, silent: true });
@@ -14492,7 +14466,6 @@
     el.btnToggleRadar.addEventListener('click', () => {
         state.radarEnabled = !state.radarEnabled;
         el.btnToggleRadar.classList.toggle('active-toggle', state.radarEnabled);
-        el.btnToggleRadar.setAttribute('aria-pressed', String(state.radarEnabled));
         el.btnToggleRadar.textContent = `🎯 3D Sesli Radar: ${state.radarEnabled ? 'Açık' : 'Kapalı'}`;
         announceGuidance(`3 boyutlu sesli radar ${state.radarEnabled ? 'açıldı' : 'kapatıldı'}.`, { force: true });
     });
@@ -14500,7 +14473,6 @@
     el.btnToggleAuto.addEventListener('click', () => {
         state.autoCaptureEnabled = !state.autoCaptureEnabled;
         el.btnToggleAuto.classList.toggle('active-toggle', state.autoCaptureEnabled);
-        el.btnToggleAuto.setAttribute('aria-pressed', String(state.autoCaptureEnabled));
         el.btnToggleAuto.textContent = `⚡ Otomatik Çekim: ${state.autoCaptureEnabled ? 'Açık' : 'Kapalı'}`;
         announceGuidance(`Otomatik fotoğraf çekimi ${state.autoCaptureEnabled ? 'açıldı' : 'kapatıldı'}.`, { force: true });
     });

@@ -45,22 +45,22 @@
     <main id="main-controls" role="main" class="app-container">
         <!-- Hızlı Başlat / Kamera ve Donanım Kontrol Çubuğu -->
         <section aria-label="Kamera, Flaş ve Ses Kontrolleri" class="control-bar">
-            <button id="btn-start-camera" class="primary-btn pulse-btn" aria-pressed="false">
+            <button type="button" id="btn-start-camera" class="primary-btn pulse-btn">
                 📷 Kamerayı ve Sesli Rehberi Başlat
             </button>
-            <button id="btn-switch-camera" class="secondary-btn" aria-label="Ön ve Arka Kamera Arasında Geçiş Yap">
+            <button type="button" id="btn-switch-camera" class="secondary-btn" aria-label="Ön ve Arka Kamera Arasında Geçiş Yap">
                 🔄 Kamera: Arka
             </button>
-            <button id="btn-toggle-flash" class="secondary-btn" aria-pressed="false" aria-label="Telefon Işığını (Feneri) Aç veya Kapat (Kısayol: F)">
+            <button type="button" id="btn-toggle-flash" class="secondary-btn" aria-label="Telefon Işığını (Feneri) Aç veya Kapat (Kısayol: F)">
                 🔦 Işık / Fener: Otomatik
             </button>
-            <button id="btn-toggle-radar" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Yön Bulduran Sesli Sinyali Aç veya Kapat (Kısayol: R)">
+            <button type="button" id="btn-toggle-radar" class="secondary-btn active-toggle" aria-label="Yön Bulduran Sesli Sinyali Aç veya Kapat (Kısayol: R)">
                 🎯 Sesli Yön Sinyali: Açık
             </button>
-            <button id="btn-toggle-auto" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Tam Hizalandığında Otomatik Fotoğraf Çekimini Aç veya Kapat (Kısayol: O)">
+            <button type="button" id="btn-toggle-auto" class="secondary-btn active-toggle" aria-label="Tam Hizalandığında Otomatik Fotoğraf Çekimini Aç veya Kapat (Kısayol: O)">
                 ⚡ Otomatik Çekim: Açık
             </button>
-            <button id="btn-capture-now" class="action-btn" aria-label="Şimdi Fotoğraf Çek, Detaylı Betimle ve Sesli Oku (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
+            <button type="button" id="btn-capture-now" class="action-btn" aria-label="Şimdi Fotoğraf Çek, Detaylı Betimle ve Sesli Oku (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
                 📸 Şimdi Çek &amp; Betimle (Boşluk)
             </button>
             <button id="btn-upload-photo" class="primary-btn" type="button" style="background: linear-gradient(135deg, #0ea5e9, #2563eb);" aria-label="Telefon Galerisinden veya WhatsApp'tan Gelen Bir Fotoğrafı, Videoyu ya da PDF Belgesini Seçip Sayfa Sayfa Detaylı Betimlet ve Okut (Kısayol: M)">
@@ -124,25 +124,25 @@
                         💼 İş ve Eğitim (4 Bölüm) ▾
                     </button>
                     <div id="cat-panel-is_egitim" class="mode-grid category-panel" data-category-panel="is_egitim" role="group" aria-label="İş ve Eğitim Kategorisi Bölümleri" hidden>
-                        <button type="button" class="mode-card active" data-mode="exam_reader" data-category="is_egitim" role="radio" aria-checked="true" id="mode-btn-1" hidden aria-label="1. Sınav Sorusu ve Şık Okuyucu (A, B, C, D, E)">
+                        <button type="button" class="mode-card active" data-mode="exam_reader" data-category="is_egitim" id="mode-btn-1" hidden aria-label="1. Sınav Sorusu ve Şık Okuyucu (A, B, C, D, E)">
                             <span class="mode-icon" aria-hidden="true">📝🅰️</span>
                             <span class="mode-title">1. Sınav Sorusu ve Şık Okuyucu (A, B, C, D, E)</span>
                             <span class="mode-desc" aria-hidden="true">Kağıdın üzerindeki el ve telefon gölgesini temizler, yan yana iki sütunlu testleri birbirine karıştırmadan ayırır. Soruyu ve A, B, C, D, E şıklarını tek tek düğmeyle okur.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="qr_screen" data-category="is_egitim" role="radio" aria-checked="false" id="mode-btn-3" hidden aria-label="3. WhatsApp Web, Bilgisayar Ekranı ve Görsel QR Menü Okuyucu">
+                        <button type="button" class="mode-card" data-mode="qr_screen" data-category="is_egitim" id="mode-btn-3" hidden aria-label="3. WhatsApp Web, Bilgisayar Ekranı ve Görsel QR Menü Okuyucu">
                             <span class="mode-icon" aria-hidden="true">💻📱</span>
                             <span class="mode-title">3. WhatsApp Web, Ekran ve Görsel QR Menü Okuyucu</span>
                             <span class="mode-desc" aria-hidden="true">Bilgisayar ekranındaki karekodu (QR) sesle hizalar, 15 saniye sabitleme rehberi sunar ve restoran/kafe görsel QR menülerini temiz bir sesli yemek ve fiyat listesine dönüştürür.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="explorer" data-category="is_egitim" role="radio" aria-checked="false" id="mode-btn-8" hidden aria-label="8. Çevre Nesne Tanıma ve Belge Okuyucu">
+                        <button type="button" class="mode-card" data-mode="explorer" data-category="is_egitim" id="mode-btn-8" hidden aria-label="8. Çevre Nesne Tanıma ve Belge Okuyucu">
                             <span class="mode-icon" aria-hidden="true">🧭📦</span>
                             <span class="mode-title">8. Çevre Nesne Tanıma ve Belge / Metin Okuyucu</span>
                             <span class="mode-desc" aria-hidden="true">Çevredeki nesnelerin (sandalye, masa, kapı, bardak vb.) konumunu bildirir; basılı evrak, fatura ve metinleri Türkçe olarak seslendirir.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="signature_pen" data-category="is_egitim" role="radio" aria-checked="false" id="mode-btn-10" hidden aria-label="10. İmza Alanı ve Kalem Yönlendirici">
+                        <button type="button" class="mode-card" data-mode="signature_pen" data-category="is_egitim" id="mode-btn-10" hidden aria-label="10. İmza Alanı ve Kalem Yönlendirici">
                             <span class="mode-icon" aria-hidden="true">✍️👆</span>
                             <span class="mode-title">10. İmza Alanı ve Kalem Yönlendirici</span>
                             <span class="mode-desc" aria-hidden="true">Belge üzerindeki imza alanını ve kalem ucunu eşzamanlı takip ederek, kalemi doğru noktaya yönlendirmek için adım adım sesli konum talimatı verir.</span>
@@ -156,19 +156,19 @@
                         🍳 Mutfak (3 Bölüm) ▾
                     </button>
                     <div id="cat-panel-mutfak" class="mode-grid category-panel" data-category-panel="mutfak" role="group" aria-label="Mutfak Kategorisi Bölümleri" hidden>
-                        <button type="button" class="mode-card" data-mode="liquid_level" data-category="mutfak" role="radio" aria-checked="false" id="mode-btn-11" hidden aria-label="11. Masadaki Bardak, Kupa ve Şişe Bulucu">
+                        <button type="button" class="mode-card" data-mode="liquid_level" data-category="mutfak" id="mode-btn-11" hidden aria-label="11. Masadaki Bardak, Kupa ve Şişe Bulucu">
                             <span class="mode-icon" aria-hidden="true">☕🥛</span>
                             <span class="mode-title">11. Masadaki Bardak, Kupa ve Şişe Bulucu</span>
                             <span class="mode-desc" aria-hidden="true">Masadaki bardağın, kupanın veya şişenin tam yerini bulup elinizi çarpmadan ve devirmeden almanızı sağlar; üst ve alt kısmının rengini söyler.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="food_freshness" data-category="mutfak" role="radio" aria-checked="false" id="mode-btn-13" hidden aria-label="13. Paketli Gıda İçindekiler, Alerjen, SKT ve Market Birim Fiyat / İndirim Karşılaştırıcı">
+                        <button type="button" class="mode-card" data-mode="food_freshness" data-category="mutfak" id="mode-btn-13" hidden aria-label="13. Paketli Gıda İçindekiler, Alerjen, SKT ve Market Birim Fiyat / İndirim Karşılaştırıcı">
                             <span class="mode-icon" aria-hidden="true">🍎🛡️</span>
                             <span class="mode-title">13. Gıda Alerjen, SKT ve Market Birim Fiyat / İndirim Analizi</span>
                             <span class="mode-desc" aria-hidden="true">Market paketlerindeki içindekiler listesini, alerjenleri ve son tüketim tarihini (SKT) okur; ayrıca raf etiketlerindeki "2 Al 1 Öde" kampanyalarını ve gerçek kilo/litre birim fiyatını hesaplar.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="cooking_guide" data-category="mutfak" role="radio" aria-checked="false" id="mode-btn-22" hidden aria-label="22. Adım Adım Sesli Yemek Tarifleri Rehberi">
+                        <button type="button" class="mode-card" data-mode="cooking_guide" data-category="mutfak" id="mode-btn-22" hidden aria-label="22. Adım Adım Sesli Yemek Tarifleri Rehberi">
                             <span class="mode-icon" aria-hidden="true">👩‍🍳🍲</span>
                             <span class="mode-title">22. Adım Adım Sesli Yemek Tarifleri Rehberi</span>
                             <span class="mode-desc" aria-hidden="true">Görme engelliler için tam bardak ve kaşık ölçüsüyle, adım adım sesli yemek tarifleri anlatır. Evdeki malzemeleri söylediğinizde uygun tarifi bulur ve her adımı sırayla okur.</span>
@@ -182,31 +182,31 @@
                         🏠 Ev (5 Bölüm) ▾
                     </button>
                     <div id="cat-panel-ev" class="mode-grid category-panel" data-category-panel="ev" role="group" aria-label="Ev Kategorisi Bölümleri" hidden>
-                        <button type="button" class="mode-card" data-mode="anomaly_led" data-category="ev" role="radio" aria-checked="false" id="mode-btn-6" hidden aria-label="6. Düşen Eşya Saat Yönlü Radarı ve Cihaz Işığı Kontrolü">
+                        <button type="button" class="mode-card" data-mode="anomaly_led" data-category="ev" id="mode-btn-6" hidden aria-label="6. Düşen Eşya Saat Yönlü Radarı ve Cihaz Işığı Kontrolü">
                             <span class="mode-icon" aria-hidden="true">🔦🔍</span>
                             <span class="mode-title">6. Düşen Eşya Saat Yönlü Radarı ve Cihaz Işığı Kontrolü</span>
                             <span class="mode-desc" aria-hidden="true">Yere düşen anahtar, yüzük, ilaç hapı veya bozuk parayı "Saat 2 yönünde, ayağınızın 30 cm ilerisinde" diyerek ve hızlanan bip sesiyle buldurur; cihaz LED ışıklarını okur.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="light_meter" data-category="ev" role="radio" aria-checked="false" id="mode-btn-7" hidden aria-label="7. Evden Çıkış Güvenlik Taraması (Açık Işık, TV ve Aralık Kapı/Pencere Kontrolü)">
+                        <button type="button" class="mode-card" data-mode="light_meter" data-category="ev" id="mode-btn-7" hidden aria-label="7. Evden Çıkış Güvenlik Taraması (Açık Işık, TV ve Aralık Kapı/Pencere Kontrolü)">
                             <span class="mode-icon" aria-hidden="true">💡🧭</span>
                             <span class="mode-title">7. Evden Çıkış Taraması: Işık, TV ve Aralık Pencere/Kapı</span>
                             <span class="mode-desc" aria-hidden="true">Odada telefonu 360 derece döndürdüğünüzde açık kalan lambaları, açık unutulmuş televizyon/monitör ekranını ve aralık kalmış pencere veya balkon kapısı ışık sızıntısını raporlar.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="door_elevator_lcd" data-category="ev" role="radio" aria-checked="false" id="mode-btn-12" hidden aria-label="12. Derece Okuma ve Elle Ayarlama Yol Göstericisi (Kombi, Klima, Makine Ekranı ve Kapı Numarası)">
+                        <button type="button" class="mode-card" data-mode="door_elevator_lcd" data-category="ev" id="mode-btn-12" hidden aria-label="12. Derece Okuma ve Elle Ayarlama Yol Göstericisi (Kombi, Klima, Makine Ekranı ve Kapı Numarası)">
                             <span class="mode-icon" aria-hidden="true">🌡️🧭</span>
                             <span class="mode-title">12. Derece Okuma ve Elle Ayarlama Yol Göstericisi</span>
                             <span class="mode-desc" aria-hidden="true">Cihazlara hiçbir komut göndermez; yalnızca kamerayla ekranı okuyup siz kendi elinizle tuşa bastıkça veya düğmeyi çevirdikçe ekranda kaç derece yazdığını söyleyerek size yol gösterir.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="item_memory" data-category="ev" role="radio" aria-checked="false" id="mode-btn-17" hidden aria-label="17. Kendi Eşyamı Bul ve Tanı (Görsel Kavanoz, Poşet ve Konum Hafızası)">
+                        <button type="button" class="mode-card" data-mode="item_memory" data-category="ev" id="mode-btn-17" hidden aria-label="17. Kendi Eşyamı Bul ve Tanı (Görsel Kavanoz, Poşet ve Konum Hafızası)">
                             <span class="mode-icon" aria-hidden="true">🎙️🏷️</span>
                             <span class="mode-title">17. Kendi Eşyamı Bul ve Tanı (Kavanoz &amp; Konum Hafızası)</span>
                             <span class="mode-desc" aria-hidden="true">Eşyalarınızın yerini sesli kaydeder; ayrıca birbirine benzeyen cam kavanozları veya derin dondurucu poşetlerini görsel renk/doku imzasıyla kaydedip kameraya tuttuğunuzda içinde ne olduğunu tanır.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="sock_outfit_check" data-category="ev" role="radio" aria-checked="false" id="mode-btn-19" hidden aria-label="19. Kıyafet Kombin, Leke, Ters/Düz Kontrolcüsü ve Renkli Çamaşır Ayıklama Asistanı">
+                        <button type="button" class="mode-card" data-mode="sock_outfit_check" data-category="ev" id="mode-btn-19" hidden aria-label="19. Kıyafet Kombin, Leke, Ters/Düz Kontrolcüsü ve Renkli Çamaşır Ayıklama Asistanı">
                             <span class="mode-icon" aria-hidden="true">🧦👔</span>
                             <span class="mode-title">19. Çorap, Leke, Ters/Düz Kontrolü ve Çamaşır Ayıklama</span>
                             <span class="mode-desc" aria-hidden="true">Çorap çiftlerini eşleştirir, yemek/çay lekesini ve kıyafetin ters mi düz mü (dikiş/etiket dışarıda mı) olduğunu denetler; ayrıca çamaşır makinesi öncesi "Beyaz - Açık", "Koyu", "Canlı Renk" seri ayıklama yapar.</span>
@@ -220,13 +220,13 @@
                         🏥 Sağlık (2 Bölüm) ▾
                     </button>
                     <div id="cat-panel-saglik" class="mode-grid category-panel" data-category-panel="saglik" role="group" aria-label="Sağlık Kategorisi Bölümleri" hidden>
-                        <button type="button" class="mode-card" data-mode="medicine_skt" data-category="saglik" role="radio" aria-checked="false" id="mode-btn-9" hidden aria-label="9. İlaç Kutusu ve Son Kullanma Tarihi Kontrolü">
+                        <button type="button" class="mode-card" data-mode="medicine_skt" data-category="saglik" id="mode-btn-9" hidden aria-label="9. İlaç Kutusu ve Son Kullanma Tarihi Kontrolü">
                             <span class="mode-icon" aria-hidden="true">💊📅</span>
                             <span class="mode-title">9. İlaç Kutusu ve Son Kullanma Tarihi Kontrolü</span>
                             <span class="mode-desc" aria-hidden="true">İlaç kutusu üzerindeki ürün adını, miligram bilgisini, kullanım talimatını ve son kullanma tarihini (SKT) okuyarak sesli bilgilendirme yapar.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="step_calorie_guide" data-category="saglik" role="radio" aria-checked="false" id="mode-btn-21" hidden aria-label="21. Sesli Adım Sayacı ve Kalori / Besin Değeri Rehberi">
+                        <button type="button" class="mode-card" data-mode="step_calorie_guide" data-category="saglik" id="mode-btn-21" hidden aria-label="21. Sesli Adım Sayacı ve Kalori / Besin Değeri Rehberi">
                             <span class="mode-icon" aria-hidden="true">👟🥗</span>
                             <span class="mode-title">21. Sesli Adım Sayacı ve Kalori / Besin Rehberi</span>
                             <span class="mode-desc" aria-hidden="true">Yürüyüş sırasında adım sayısını, kat edilen mesafeyi ve harcanan enerjiyi sesli olarak bildirir; yemeklerin ve paketli gıdaların kalori ve besin değerlerini hesaplar.</span>
@@ -240,19 +240,19 @@
                         🧭 Navigasyon (3 Bölüm) ▾
                     </button>
                     <div id="cat-panel-navigasyon" class="mode-grid category-panel" data-category-panel="navigasyon" role="group" aria-label="Navigasyon Kategorisi Bölümleri" hidden>
-                        <button type="button" class="mode-card" data-mode="qibla_compass" data-category="navigasyon" role="radio" aria-checked="false" id="mode-btn-2" hidden aria-label="2. Sesli Kıble Pusulası ve Namaz Vakitleri">
+                        <button type="button" class="mode-card" data-mode="qibla_compass" data-category="navigasyon" id="mode-btn-2" hidden aria-label="2. Sesli Kıble Pusulası ve Namaz Vakitleri">
                             <span class="mode-icon" aria-hidden="true">🕋🧭</span>
                             <span class="mode-title">2. Sesli Kıble Pusulası ve Namaz Vakitleri</span>
                             <span class="mode-desc" aria-hidden="true">Kıble yönünü hem pusula hem de Güneşin yönüyle kontrol ederek yanılmadan buldurur. 81 ilin namaz vakitlerini, ne kadar süre kaldığını ve kerahat saatini sesli söyler.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="bus_stop_tracker" data-category="navigasyon" role="radio" aria-checked="false" id="mode-btn-15" hidden aria-label="15. Otobüs Hat Numarası Okuyucu ve Durak Yaklaşma Bildirimi">
+                        <button type="button" class="mode-card" data-mode="bus_stop_tracker" data-category="navigasyon" id="mode-btn-15" hidden aria-label="15. Otobüs Hat Numarası Okuyucu ve Durak Yaklaşma Bildirimi">
                             <span class="mode-icon" aria-hidden="true">🚌🔔</span>
                             <span class="mode-title">15. Otobüs Hat Numarası Okuyucu ve Durak Yaklaşma Bildirimi</span>
                             <span class="mode-desc" aria-hidden="true">Durağa yaklaşan toplu taşıma aracının hat numarasını okur. Seçilen hedef durağa 300 metre ve 50 metre kala sesli ve titreşimli yaklaşma bildirimi verir.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="where_am_i" data-category="navigasyon" role="radio" aria-checked="false" id="mode-btn-20" hidden aria-label="20. Konum, Açık Adres ve Çevre Tabelası Bildirimi">
+                        <button type="button" class="mode-card" data-mode="where_am_i" data-category="navigasyon" id="mode-btn-20" hidden aria-label="20. Konum, Açık Adres ve Çevre Tabelası Bildirimi">
                             <span class="mode-icon" aria-hidden="true">📍🏪</span>
                             <span class="mode-title">20. Konum, Açık Adres ve Çevre Tabelası Bildirimi</span>
                             <span class="mode-desc" aria-hidden="true">Bulunduğunuz cadde ve sokak bilgisini GPS üzerinden belirler, çevredeki işletme tabelalarını kameradan okur ve konum bilgisini WhatsApp üzerinden paylaşır.</span>
@@ -266,31 +266,31 @@
                         🌿 Günlük Yaşam (5 Bölüm) ▾
                     </button>
                     <div id="cat-panel-gunluk_yasam" class="mode-grid category-panel" data-category-panel="gunluk_yasam" role="group" aria-label="Günlük Yaşam Kategorisi Bölümleri" hidden>
-                        <button type="button" class="mode-card" data-mode="portrait" data-category="gunluk_yasam" role="radio" aria-checked="false" id="mode-btn-4" hidden aria-label="4. Özçekim (Selfie), Kişisel Bakım ve Görüntülü Görüşme Kadraj Asistanı">
+                        <button type="button" class="mode-card" data-mode="portrait" data-category="gunluk_yasam" id="mode-btn-4" hidden aria-label="4. Özçekim (Selfie), Kişisel Bakım ve Görüntülü Görüşme Kadraj Asistanı">
                             <span class="mode-icon" aria-hidden="true">🧑🛡️</span>
                             <span class="mode-title">4. Özçekim, Kişisel Bakım ve Görüntülü Görüşme Kadrajı</span>
                             <span class="mode-desc" aria-hidden="true">Yüzünüzün kadraj merkezinde olup olmadığını, tıraş/sakal simetrisini, saç düzenini ve Zoom/WhatsApp görüntülü görüşme öncesi arka planın nasıl göründüğünü sesli betimler.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="color_cloth" data-category="gunluk_yasam" role="radio" aria-checked="false" id="mode-btn-5" hidden aria-label="5. Madeni ve Kağıt Para Sayacı ile Kıyafet Rengi Tanıma">
+                        <button type="button" class="mode-card" data-mode="color_cloth" data-category="gunluk_yasam" id="mode-btn-5" hidden aria-label="5. Madeni ve Kağıt Para Sayacı ile Kıyafet Rengi Tanıma">
                             <span class="mode-icon" aria-hidden="true">🪙💵</span>
                             <span class="mode-title">5. Madeni ve Kağıt Para Sayacı ile Kıyafet Rengi</span>
                             <span class="mode-desc" aria-hidden="true">Kameraya gösterilen kağıt ve madeni paraları otomatik olarak toplar; "Toplam Tutarı Dinle" düğmesine basıldığında para dökümünü ve genel toplamı sesli olarak bildirir.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="song_finder" data-category="gunluk_yasam" role="radio" aria-checked="false" id="mode-btn-14" hidden aria-label="14. Sesli Müzik, Melodi ve Şarkı Sözü Tanıma">
+                        <button type="button" class="mode-card" data-mode="song_finder" data-category="gunluk_yasam" id="mode-btn-14" hidden aria-label="14. Sesli Müzik, Melodi ve Şarkı Sözü Tanıma">
                             <span class="mode-icon" aria-hidden="true">🎵🎤</span>
                             <span class="mode-title">14. Sesli Müzik, Melodi ve Şarkı Sözü Tanıma</span>
                             <span class="mode-desc" aria-hidden="true">Ortamda çalan müziği, mırıldanılan melodiyi veya söylenen şarkı sözlerini analiz ederek eser adını, sanatçısını ve şarkı sözlerini sesli olarak sunar.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="pos_iban_reader" data-category="gunluk_yasam" role="radio" aria-checked="false" id="mode-btn-16" hidden aria-label="16. POS Cihazı, Dokunmatik Kiosk / Sıra Alma Rehberi ve IBAN Kopyalayıcı">
+                        <button type="button" class="mode-card" data-mode="pos_iban_reader" data-category="gunluk_yasam" id="mode-btn-16" hidden aria-label="16. POS Cihazı, Dokunmatik Kiosk / Sıra Alma Rehberi ve IBAN Kopyalayıcı">
                             <span class="mode-icon" aria-hidden="true">💳📋</span>
                             <span class="mode-title">16. POS Cihazı, Dokunmatik Kiosk Rehberi ve IBAN Kopyalayıcı</span>
                             <span class="mode-desc" aria-hidden="true">POS ekranındaki tutarı doğrular, düz cam dokunmatik sıra alma/kiosk ekranlarındaki bölümlerin yerini ve parmağınızın konumunu tarif eder; 26 haneli TR IBAN numarasını panoya kopyalar.</span>
                         </button>
 
-                        <button type="button" class="mode-card" data-mode="tv_subtitle_score" data-category="gunluk_yasam" role="radio" aria-checked="false" id="mode-btn-18" hidden aria-label="18. Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri">
+                        <button type="button" class="mode-card" data-mode="tv_subtitle_score" data-category="gunluk_yasam" id="mode-btn-18" hidden aria-label="18. Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri">
                             <span class="mode-icon" aria-hidden="true">📺⚽</span>
                             <span class="mode-title">18. Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri</span>
                             <span class="mode-desc" aria-hidden="true">Televizyon ekranındaki dizi ve film altyazılarını, haber bilgi bantlarını ve karşılaşma skorlarını gerçek zamanlı olarak Türkçe seslendirir.</span>
@@ -314,7 +314,7 @@
                 <button type="button" id="btn-song-listen" class="primary-btn" style="background: linear-gradient(135deg, #9333ea, #6366f1);" aria-label="Mikrofonla Çalan Şarkıyı, Mırıldanmayı veya Söylediğiniz Sözleri Dinleyip Bul (Kısayol: H)">
                     🎤 Şarkıyı / Mırıldanmayı Dinle (H)
                 </button>
-                <button type="button" id="btn-song-auto-radar" class="secondary-btn" aria-pressed="false" aria-label="Çalan Her Yeni Şarkıyı Otomatik Bulup Haber Veren Otomatik Başlatma ve Takip Modunu Aç veya Kapat">
+                <button type="button" id="btn-song-auto-radar" class="secondary-btn" aria-label="Çalan Her Yeni Şarkıyı Otomatik Bulup Haber Veren Otomatik Başlatma ve Takip Modunu Aç veya Kapat">
                     📡 Otomatik Şarkı Takibi: Kapalı
                 </button>
                 <button type="button" id="btn-google-hum-search" class="secondary-btn" aria-label="Google Mırıldanarak veya Islık Çalarak Şarkı Bulma Motorunu Aç">
@@ -326,7 +326,7 @@
                 <button type="button" id="btn-song-read-lyrics" class="secondary-btn" disabled aria-label="Bulunan Şarkının Sözlerini Sesli Oku">
                     📜 Şarkı Sözlerini Oku
                 </button>
-                <button type="button" id="btn-song-tuner" class="secondary-btn" aria-pressed="false" aria-label="Sesli Enstrüman Akort ve Türk Müziği Makam Analizini Aç veya Kapat">
+                <button type="button" id="btn-song-tuner" class="secondary-btn" aria-label="Sesli Enstrüman Akort ve Türk Müziği Makam Analizini Aç veya Kapat">
                     🎸 Sesli Enstrüman Akort &amp; Makam: Kapalı
                 </button>
                 <button type="button" id="btn-song-history" class="secondary-btn" aria-label="Daha Önce Tanımlanan Şarkıların Geçmişini Sesli Dinle">
@@ -488,7 +488,7 @@
                 <button type="button" id="btn-money-add-current" class="secondary-btn" aria-label="Şu An Kameranın Gördüğü Parayı Hemen Toplama Ekle (Kısayol: Artı veya Z)">
                     ➕ Görünen Parayı Şimdi Ekle (Z)
                 </button>
-                <button type="button" id="btn-money-auto-toggle" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Kameraya Gösterilen Paraları Bir Yandan Otomatik Toplama Modunu Aç veya Kapat">
+                <button type="button" id="btn-money-auto-toggle" class="secondary-btn active-toggle" aria-label="Kameraya Gösterilen Paraları Bir Yandan Otomatik Toplama Modunu Aç veya Kapat">
                     🔄 Otomatik Biriktirme: Açık
                 </button>
                 <button type="button" id="btn-money-undo" class="secondary-btn" aria-label="Son Eklenen Parayı Geri Al ve Toplamdan Düş">
@@ -556,7 +556,7 @@
                 </ol>
             </div>
             <div class="exam-nav-row" role="group" aria-label="Canlı Ekran Okuma ve Yol Gösterici Kontrolleri">
-                <button type="button" id="btn-degree-live-toggle" class="primary-btn" style="background: linear-gradient(135deg, #0284c7, #2563eb);" aria-pressed="false" aria-label="Siz Kendi Elinizle Ayar Yaparken Ekrandaki Dereceyi Canlı Okuyup Yol Gösteren Takibi Başlat veya Durdur">
+                <button type="button" id="btn-degree-live-toggle" class="primary-btn" style="background: linear-gradient(135deg, #0284c7, #2563eb);" aria-label="Siz Kendi Elinizle Ayar Yaparken Ekrandaki Dereceyi Canlı Okuyup Yol Gösteren Takibi Başlat veya Durdur">
                     ▶️ Canlı Yol Göstericiyi Başlat (El İle Ayarlarken Söyler)
                 </button>
                 <button type="button" id="btn-degree-speak-guide" class="secondary-btn" aria-label="Ellerinizi ve Telefonu Nasıl Tutacağınızı Adım Adım Sesli Dinleyin">
@@ -745,7 +745,7 @@
                 Telefonu televizyon ekranına doğru tutun. Otomatik spiker açıldığında ekranın altından geçen <strong>dizi/film altyazılarını</strong>, haber bantlarını ve maçlardaki <strong>dakika ile skoru</strong> kesintisiz seslendirir:
             </p>
             <div class="exam-nav-row" role="group" aria-label="Televizyon Altyazı ve Maç Skoru Kontrolleri">
-                <button type="button" id="btn-tv-auto-toggle" class="primary-btn" style="background: linear-gradient(135deg, #db2777, #9333ea);" aria-pressed="false" aria-label="Televizyon Altyazılarını ve Maç Skorunu Otomatik Sürekli Okuma Spikerini Aç veya Kapat">
+                <button type="button" id="btn-tv-auto-toggle" class="primary-btn" style="background: linear-gradient(135deg, #db2777, #9333ea);" aria-label="Televizyon Altyazılarını ve Maç Skorunu Otomatik Sürekli Okuma Spikerini Aç veya Kapat">
                     ▶️ Otomatik TV Altyazı &amp; Skor Spikerini Başlat
                 </button>
                 <button type="button" id="btn-tv-read-now" class="secondary-btn" aria-label="Şu An Televizyon Ekranındaki Altyazıyı veya Maç Skorunu Hemen Oku">
@@ -783,7 +783,7 @@
                 <button type="button" id="btn-outfit-inside-out" class="secondary-btn" aria-label="Kıyafetin Ters mi Düz mü Giyildiğini, Dikiş ve İç Etiket Durumunu Kontrol Et">
                     🏷️ Ters / Düz ve Etiket Kontrolü
                 </button>
-                <button type="button" id="btn-laundry-sort-toggle" class="primary-btn" style="background: linear-gradient(135deg, #0284c7, #2563eb);" aria-pressed="false" aria-label="Çamaşır Makinesi İçin Hiç Tuşa Basmadan Seri Beyaz, Koyu ve Renkli Çamaşır Ayıklama Modunu Başlat veya Durdur">
+                <button type="button" id="btn-laundry-sort-toggle" class="primary-btn" style="background: linear-gradient(135deg, #0284c7, #2563eb);" aria-label="Çamaşır Makinesi İçin Hiç Tuşa Basmadan Seri Beyaz, Koyu ve Renkli Çamaşır Ayıklama Modunu Başlat veya Durdur">
                     🧺 Seri Çamaşır Ayıklama: Kapalı
                 </button>
             </div>
@@ -842,7 +842,7 @@
                 Yürüyüş sırasında adımlarınızı otomatik olarak sayar ve belirli aralıklarla sesli bilgilendirme yapar. Ayrıca tüketilen besinlerin adını yazarak, sesli söyleyerek veya ürün paketini kameraya okutarak <strong>kalori ve besin değerini</strong> öğrenebilirsiniz:
             </p>
             <div class="exam-nav-row" role="group" aria-label="Sesli Adım Sayacı Kontrolleri">
-                <button type="button" id="btn-step-toggle" class="primary-btn" style="background: linear-gradient(135deg, #0d9488, #059669);" aria-pressed="true" aria-label="Sesli Adım Sayacını Başlat veya Duraklat">
+                <button type="button" id="btn-step-toggle" class="primary-btn" style="background: linear-gradient(135deg, #0d9488, #059669);" aria-label="Sesli Adım Sayacını Başlat veya Duraklat">
                     👟 Adım Sayacı: Açık (Yürüdükçe Sayar)
                 </button>
                 <button type="button" id="btn-step-speak-status" class="secondary-btn" aria-label="Günlük Adım Sayısını, Yürüyüş Mesafesini ve Harcanan Enerjiyi Sesli Dinle">
@@ -892,13 +892,13 @@
                 Görme engelliler için tam su bardağı ve kaşık ölçüsüyle hazırlanmış <strong>adım adım sesli yemek tarifleri</strong>. Hiç ateş/ocak yakmadan hazırlayabileceğiniz <strong>🥗 Ocaksız Tarifler</strong> veya <strong>🍲 Klasik Ev Yemekleri</strong> arasından seçim yapıp adımları tek tek dinleyebilirsiniz:
             </p>
             <div class="exam-nav-row" role="group" aria-label="Yemek Tarifi Kategorisi Seçimi">
-                <button type="button" id="btn-cook-cat-ocaksiz" class="secondary-btn cook-cat-btn active-toggle" data-cook-cat="ocaksiz" aria-pressed="true" aria-label="Ocaksız Yapılabilecek Pratik Türk Yemekleri Kategorisi (14 Tarif)">
+                <button type="button" id="btn-cook-cat-ocaksiz" class="secondary-btn cook-cat-btn active-toggle" data-cook-cat="ocaksiz" aria-label="Ocaksız Yapılabilecek Pratik Türk Yemekleri Kategorisi (14 Tarif)">
                     🥗 Ocaksız Pratik Tarifler (14 Tarif)
                 </button>
-                <button type="button" id="btn-cook-cat-ocakli" class="secondary-btn cook-cat-btn" data-cook-cat="ocakli" aria-pressed="false" aria-label="Klasik Türk Ev Yemekleri Tarifleri Kategorisi (13 Tarif)">
+                <button type="button" id="btn-cook-cat-ocakli" class="secondary-btn cook-cat-btn" data-cook-cat="ocakli" aria-label="Klasik Türk Ev Yemekleri Tarifleri Kategorisi (13 Tarif)">
                     🍲 Klasik Ev Yemekleri Tarifleri (13 Tarif)
                 </button>
-                <button type="button" id="btn-cook-cat-all" class="secondary-btn cook-cat-btn" data-cook-cat="all" aria-pressed="false" aria-label="Tüm Yemek Tariflerini Göster (Toplam 27 Tarif)">
+                <button type="button" id="btn-cook-cat-all" class="secondary-btn cook-cat-btn" data-cook-cat="all" aria-label="Tüm Yemek Tariflerini Göster (Toplam 27 Tarif)">
                     🌟 Tüm Tarifler (27 Tarif)
                 </button>
             </div>
@@ -929,7 +929,7 @@
                 <button type="button" id="btn-cooking-next" class="primary-btn" style="background: linear-gradient(135deg, #16a34a, #059669);" aria-label="Sonraki Tarif Adımına Geç">
                     Sonraki Adım ➡️
                 </button>
-                <button type="button" id="btn-cooking-timer" class="secondary-btn" aria-pressed="false" aria-label="Bu Pişirme veya Dinlendirme Adımının Süresini Başlat veya Durdur">
+                <button type="button" id="btn-cooking-timer" class="secondary-btn" aria-label="Bu Pişirme veya Dinlendirme Adımının Süresini Başlat veya Durdur">
                     ⏲️ Adım Süresini Başlat
                 </button>
             </div>
