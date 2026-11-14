@@ -1297,7 +1297,9 @@
     function updateSpeechRateButtonUI() {
         const preset = SPEECH_RATE_PRESETS.find(p => Math.abs(p.rate - state.speechRate) < 0.05) || SPEECH_RATE_PRESETS[0];
         if (el.btnSpeechRate) {
-            el.btnSpeechRate.textContent = `🗣️ Okuma Hızı: ${preset.label}`;
+            const shortRate = preset.label.split(' (')[0];
+            el.btnSpeechRate.innerHTML = `<span class="btn-icon" aria-hidden="true">🗣️</span><span class="btn-text">Hız: ${shortRate}</span>`;
+            el.btnSpeechRate.setAttribute('aria-label', `Sesli Okuma Hızını Değiştir: ${preset.label} (Kısayol: Y)`);
         }
         if (window.AndroidSongBridge && typeof window.AndroidSongBridge.setNativeSpeechRate === 'function') {
             try { window.AndroidSongBridge.setNativeSpeechRate(state.speechRate); } catch (_) {}
@@ -8003,6 +8005,11 @@
         el.resultTitle.textContent = title;
         el.resultText.textContent = content;
 
+        const pdfNavEl = document.getElementById('pdf-nav-controls');
+        if (pdfNavEl) {
+            pdfNavEl.hidden = !(Array.isArray(state.activePdfPages) && state.activePdfPages.length > 0 && /PDF/i.test(title));
+        }
+
         const urlMatch = content.match(/https?:\/\/[^\s]+/i);
         if (urlMatch) {
             el.btnOpenLink.href = urlMatch[0].replace(/[.,;!?)\]"'>]+$/, '');
@@ -8240,6 +8247,7 @@
             state.isRunning = true;
             state.lastUserInteractionAt = performance.now();
             el.btnStart.textContent = '⏹️ Kamerayı Durdur';
+            el.btnStart.setAttribute('aria-label', 'Kamerayı ve Sesli Rehberi Durdur');
             el.btnSwitchCam.disabled = false;
             el.btnToggleFlash.disabled = false;
             el.btnCaptureNow.disabled = false;
@@ -8321,6 +8329,7 @@
             } catch (_) {}
         }
         el.btnStart.textContent = '📷 Kamerayı ve Sesli Rehberi Başlat';
+        el.btnStart.setAttribute('aria-label', 'Kamerayı ve Sesli Rehberi Başlat');
         announceGuidance('Kamera ve sesli rehber durduruldu.', { force: true });
     }
 
@@ -9780,15 +9789,14 @@
         state.songLyricLines = clean;
         state.currentLyricIndex = 0;
 
-        const hasLines = clean.length > 0;
-        if (el.btnLyricPrev) el.btnLyricPrev.disabled = !hasLines;
-        if (el.btnLyricCurrent) el.btnLyricCurrent.disabled = !hasLines;
-        if (el.btnLyricNext) el.btnLyricNext.disabled = !hasLines;
+        if (el.btnLyricPrev) el.btnLyricPrev.disabled = false;
+        if (el.btnLyricCurrent) el.btnLyricCurrent.disabled = false;
+        if (el.btnLyricNext) el.btnLyricNext.disabled = false;
     }
 
     function speakCurrentLyricLine() {
         if (!state.songLyricLines || state.songLyricLines.length === 0) {
-            announceGuidance('Bu şarkı için mısra mısra okunacak söz bulunamadı.', { force: true, bannerState: 'warning' });
+            announceGuidance('Henüz bir şarkı bulunmadı veya şarkı sözü yok; önce Şarkıyı Dinle düğmesine dokunun veya söz yazıp aratın.', { force: true, bannerState: 'warning' });
             return;
         }
         stopSongPreviewPlayback();
@@ -9801,7 +9809,10 @@
     }
 
     function stepLyricLine(delta) {
-        if (!state.songLyricLines || state.songLyricLines.length === 0) return;
+        if (!state.songLyricLines || state.songLyricLines.length === 0) {
+            announceGuidance('Henüz bir şarkı bulunmadı; önce Şarkıyı Dinle düğmesine dokunun veya söz yazıp aratın.', { force: true, bannerState: 'warning' });
+            return;
+        }
         const nextIdx = state.currentLyricIndex + delta;
         if (nextIdx < 0) {
             announceGuidance(`İlk mısradasınız: ${state.songLyricLines[0]}`, { force: true });
@@ -9857,13 +9868,13 @@
         if (el.songFoundAlbum) el.songFoundAlbum.textContent = `${foundTrack.album} • ${foundTrack.genre}`;
 
         if (el.btnSongPreview) {
-            el.btnSongPreview.disabled = !foundTrack.previewUrl;
+            el.btnSongPreview.disabled = false;
             el.btnSongPreview.textContent = foundTrack.previewUrl
                 ? '▶️ Bulunan Şarkıyı Dinle (Doğrula)'
                 : '▶️ Ses Kaydı Yok (YouTube\'da Açın)';
         }
         if (el.btnSongReadLyrics) {
-            el.btnSongReadLyrics.disabled = !foundTrack.lyrics;
+            el.btnSongReadLyrics.disabled = false;
         }
 
         const searchUrlQuery = encodeURIComponent(`${foundTrack.artist} ${foundTrack.title}`);
@@ -10242,7 +10253,10 @@
     }
 
     function toggleSongPreviewPlayback() {
-        if (!state.lastFoundSong || !state.lastFoundSong.previewUrl) return;
+        if (!state.lastFoundSong || !state.lastFoundSong.previewUrl) {
+            announceGuidance('Henüz dinlenecek bir şarkı kaydı bulunmadı; önce Şarkıyı Dinle düğmesine dokunun veya söz yazıp aratın.', { force: true, bannerState: 'warning' });
+            return;
+        }
         if (state.songPreviewAudio && !state.songPreviewAudio.paused) {
             stopSongPreviewPlayback();
             announceGuidance('Şarkı önizlemesi durduruldu.', { force: true });
@@ -10307,86 +10321,106 @@
     // 6.5. YENİ HAYAT ALANI KATEGORİLERİ VE 16-21 ARASI EFSANE GÜNLÜK YAŞAM MODLARI
     // =========================================================================
     const LIFE_CATEGORY_LABELS = {
-        'all': 'Tümü (22 Özellik)',
-        'mutfak': 'Mutfak ve Yemek Yapma Kategorisi',
-        'ev': 'Ev Kategorisi',
-        'is_egitim': 'İş ve Eğitim Kategorisi',
-        'saglik': 'Sağlık Kategorisi',
-        'navigasyon': 'Navigasyon Kategorisi',
-        'gunluk_yasam': 'Günlük Yaşam Kategorisi'
+        'is_egitim': '1. Sekme: İş ve Okuma (4 Bölüm)',
+        'ev': '2. Sekme: Ev (5 Bölüm)',
+        'mutfak_saglik': '3. Sekme: Mutfak ve Sağlık (5 Bölüm)',
+        'gunluk_yasam': '4. Sekme: Günlük Yaşam (5 Bölüm)',
+        'yol_ayar': '5. Sekme: Yol ve Ayarlar (5 Öğe)'
+    };
+
+    const LIFE_TAB_HEADINGS = {
+        'is_egitim': '💼 1. Sekme: İş ve Okuma (4 Bölüm)',
+        'ev': '🏠 2. Sekme: Ev (5 Bölüm)',
+        'mutfak_saglik': '🍳 3. Sekme: Mutfak ve Sağlık (5 Bölüm)',
+        'gunluk_yasam': '🌿 4. Sekme: Günlük Yaşam (5 Bölüm)',
+        'yol_ayar': '🧭 5. Sekme: Yol ve Ayarlar (5 Öğe)'
     };
 
     const SMART_SCENARIO_PRESETS = {
-        'shopping': { title: 'Mutfak ve Alışveriş', category: 'mutfak', primaryMode: 'color_cloth' },
-        'commute': { title: 'Navigasyon ve Yolculuk', category: 'navigasyon', primaryMode: 'bus_stop_tracker' },
-        'kitchen_home': { title: 'Ev ve Mutfak', category: 'mutfak', primaryMode: 'cooking_guide' },
-        'health': { title: 'Sağlık ve İlaç', category: 'saglik', primaryMode: 'medicine_skt' },
-        'study_work': { title: 'İş ve Eğitim', category: 'is_egitim', primaryMode: 'exam_reader' }
+        'shopping': { title: 'Günlük Yaşam ve Alışveriş', category: 'gunluk_yasam', primaryMode: 'color_cloth' },
+        'commute': { title: 'Yol ve Navigasyon', category: 'yol_ayar', primaryMode: 'bus_stop_tracker' },
+        'kitchen_home': { title: 'Mutfak ve Sağlık', category: 'mutfak_saglik', primaryMode: 'cooking_guide' },
+        'health': { title: 'Mutfak ve Sağlık', category: 'mutfak_saglik', primaryMode: 'medicine_skt' },
+        'study_work': { title: 'İş ve Okuma', category: 'is_egitim', primaryMode: 'exam_reader' }
     };
 
     function activateSmartUsageScenarioPreset(scenarioId) {
         const preset = SMART_SCENARIO_PRESETS[scenarioId];
         if (!preset) return false;
-        filterModesByLifeCategory(preset.category);
+        filterModesByLifeCategory(preset.category, { forceOpen: true, silent: true });
         setMode(preset.primaryMode);
         return true;
     }
     window.activateSmartUsageScenarioPreset = activateSmartUsageScenarioPreset;
 
-    state.openCategory = null;
+    state.openCategory = 'is_egitim';
     state.modePanelOpen = false;
 
     function filterModesByLifeCategory(catId, options = {}) {
         if (!el.categoryTabs || !el.modeButtons) return;
+        const normalizedMap = {
+            'mutfak': 'mutfak_saglik',
+            'saglik': 'mutfak_saglik',
+            'navigasyon': 'yol_ayar',
+            'kamera_ayarlari': 'yol_ayar',
+            'ses_yardim': 'yol_ayar'
+        };
+        const targetCat = normalizedMap[catId] || catId || 'is_egitim';
         const forceOpen = Boolean(options && options.forceOpen);
         const silent = Boolean(options && options.silent);
+        const modeHeadingEl = document.getElementById('mode-heading');
 
-        // Açık olan kategoriye tekrar dokunulursa kategoriyi ve içindeki tüm alt butonları kapat
-        if (!forceOpen && state.openCategory === catId) {
-            state.openCategory = null;
+        // Açık olan alt sekmeye tekrar dokunulursa açık alt kumandayı kapatıp o sekmenin 5'li listesinin başına döner
+        if (!forceOpen && state.openCategory === targetCat) {
             state.modePanelOpen = false;
-            el.categoryTabs.forEach(tab => {
-                tab.classList.remove('active-toggle');
-                tab.setAttribute('aria-expanded', 'false');
-                const folder = tab.closest('.category-folder');
-                if (folder) folder.classList.remove('open-folder');
-            });
-            document.querySelectorAll('[data-category-panel]').forEach(panel => {
-                panel.hidden = true;
-            });
-            el.modeButtons.forEach(btn => {
-                btn.hidden = true;
-                btn.style.display = 'none';
-            });
             syncModePanelsVisibility(state.mode);
+            if (typeof window.closeAllSubGroupFolders === 'function') {
+                window.closeAllSubGroupFolders();
+            }
             if (!silent) {
-                const closedLabel = LIFE_CATEGORY_LABELS[catId] || 'Kategori';
-                announceGuidance(`${closedLabel} kapatıldı.`, { force: true, bannerState: 'normal' });
+                if (modeHeadingEl) {
+                    try { modeHeadingEl.focus(); } catch (_) {}
+                }
+                const curLabel = LIFE_CATEGORY_LABELS[targetCat] || 'Sekme';
+                announceGuidance(`${curLabel} listesinin başına dönüldü. Özellikleri dinlemek için sağa kaydırın.`, {
+                    force: true,
+                    bannerState: 'normal'
+                });
             }
             return;
         }
 
-        state.openCategory = catId;
+        state.openCategory = targetCat;
+        if (modeHeadingEl && LIFE_TAB_HEADINGS[targetCat]) {
+            modeHeadingEl.textContent = LIFE_TAB_HEADINGS[targetCat];
+        }
+
         el.categoryTabs.forEach(tab => {
-            const isSel = (catId === 'all' || tab.getAttribute('data-category') === catId);
+            const tCat = tab.getAttribute('data-category');
+            const isSel = (tCat === targetCat);
             tab.classList.toggle('active-toggle', isSel);
-            tab.setAttribute('aria-expanded', isSel ? 'true' : 'false');
-            const folder = tab.closest('.category-folder');
-            if (folder) folder.classList.toggle('open-folder', isSel);
+            const baseLabel = LIFE_CATEGORY_LABELS[tCat] || 'Sekme';
+            tab.setAttribute('aria-label', isSel ? `Seçili — ${baseLabel}` : `${baseLabel} — Geçmek İçin Dokunun`);
+        });
+
+        document.querySelectorAll('[data-category-folder]').forEach(folder => {
+            const fCat = folder.getAttribute('data-category-folder');
+            const isMatch = (fCat === targetCat);
+            folder.hidden = !isMatch;
+            folder.classList.toggle('open-folder', isMatch);
         });
 
         document.querySelectorAll('[data-category-panel]').forEach(panel => {
             const pCat = panel.getAttribute('data-category-panel');
-            const showPanel = (catId === 'all' || pCat === catId);
-            panel.hidden = !showPanel;
+            panel.hidden = (pCat !== targetCat);
         });
 
         let visibleCount = 0;
         let activeModeInThisCategory = false;
         el.modeButtons.forEach(btn => {
-            const btnCat = btn.getAttribute('data-category') || 'all';
+            const btnCat = btn.getAttribute('data-category') || '';
             const btnMode = btn.getAttribute('data-mode');
-            const show = (catId === 'all' || btnCat === catId);
+            const show = (btnCat === targetCat);
             btn.hidden = !show;
             btn.style.display = show ? '' : 'none';
             if (show) {
@@ -10397,14 +10431,24 @@
             }
         });
 
-        if (!activeModeInThisCategory) {
+        if (!forceOpen || !activeModeInThisCategory) {
             state.modePanelOpen = false;
         }
         syncModePanelsVisibility(state.mode);
+        if (typeof window.closeAllSubGroupFolders === 'function') {
+            window.closeAllSubGroupFolders();
+        }
 
         if (!silent) {
-            const label = LIFE_CATEGORY_LABELS[catId] || 'Seçili Kategori';
-            announceGuidance(`${label} açıldı. İçindeki ${visibleCount} bölümü dinlemek için sağa kaydırın.`, {
+            if (modeHeadingEl) {
+                try {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    modeHeadingEl.focus({ preventScroll: true });
+                } catch (_) {}
+            }
+            const label = LIFE_CATEGORY_LABELS[targetCat] || 'Seçili Sekme';
+            const countInfo = targetCat === 'yol_ayar' ? '5 öğeyi' : `${visibleCount} bölümü`;
+            announceGuidance(`${label} açıldı. İçindeki ${countInfo} dinlemek için sağa kaydırın.`, {
                 force: true,
                 bannerState: 'normal'
             });
@@ -11303,14 +11347,14 @@
         if (/(?:feneri\s*aç|flaşı\s*aç|ışığı\s*aç|feneri\s*kapat|flaşı\s*kapat|ön\s*kameraya\s*geç|arka\s*kameraya\s*geç|kamerayı\s*çevir|kamerayı\s*başlat|kamerayı\s*durdur|kamerayı\s*kapat)/u.test(q)) {
             if (/(?:feneri\s*aç|flaşı\s*aç|ışığı\s*aç)/u.test(q)) {
                 state.flashMode = 'on';
-                if (el.btnToggleFlash) el.btnToggleFlash.textContent = '🔦 Flaş / Işık: Açık';
+                if (el.btnToggleFlash) el.btnToggleFlash.textContent = '🔦 Fener: Açık';
                 tryEnableHardwareTorch(true);
                 announceGuidance('Telefon feneri ve ışık desteği açıldı.', { force: true });
                 return 'hardware_torch_on';
             }
             if (/(?:feneri\s*kapat|flaşı\s*kapat)/u.test(q)) {
                 state.flashMode = 'off';
-                if (el.btnToggleFlash) el.btnToggleFlash.textContent = '🔦 Flaş / Işık: Kapalı';
+                if (el.btnToggleFlash) el.btnToggleFlash.textContent = '🔦 Fener: Kapalı';
                 tryEnableHardwareTorch(false);
                 announceGuidance('Telefon feneri kapatıldı.', { force: true });
                 return 'hardware_torch_off';
@@ -13495,7 +13539,7 @@
     }
 
     function filterCookingRecipesByCategory(catId, speakNow = true) {
-        state.selectedCookingCategory = catId || 'all';
+        state.selectedCookingCategory = (catId && catId !== 'all') ? catId : 'ocaksiz';
         const catBtns = document.querySelectorAll('.cook-cat-btn');
         catBtns.forEach(btn => {
             const isSel = btn.getAttribute('data-cook-cat') === state.selectedCookingCategory;
@@ -13733,6 +13777,7 @@
 
     function syncModePanelsVisibility(activeMode) {
         const allowSubPanel = Boolean(state.modePanelOpen && state.openCategory);
+        const camActionPanel = document.getElementById('camera-mode-action-panel');
         const modePanelMap = {
             'exam_reader': el.examRemotePanel,
             'color_cloth': el.moneyCounterPanel,
@@ -13748,17 +13793,29 @@
             'cooking_guide': el.cookingGuidePanel,
             'door_elevator_lcd': el.applianceDegreePanel
         };
+        const usesCameraActionPanel = !modePanelMap[activeMode];
 
         // Aktif bölümün kontrol panelini doğrudan kendi kategori kutusunun içinde, bölüm butonlarının hemen altına düzenli olarak yerleştir
         if (allowSubPanel && el.modeButtons) {
             const activeBtn = Array.from(el.modeButtons).find(b => b.getAttribute('data-mode') === activeMode);
-            const activePanel = modePanelMap[activeMode] || ((activeMode === 'explorer' || activeMode === 'qr_screen') ? el.targetFilterSection : null);
+            const activePanel = modePanelMap[activeMode] || camActionPanel;
             const catFolder = activeBtn ? activeBtn.closest('.category-folder') : null;
             if (catFolder && activePanel && activePanel.parentElement !== catFolder) {
                 try {
                     catFolder.appendChild(activePanel);
                 } catch (_) {}
             }
+            if (usesCameraActionPanel && camActionPanel && activeBtn) {
+                const headingEl = document.getElementById('camera-mode-action-heading');
+                const titleSpan = activeBtn.querySelector('.mode-title');
+                if (headingEl && titleSpan) {
+                    headingEl.textContent = `📷 ${titleSpan.textContent.trim()} Kumandası`;
+                }
+            }
+        }
+
+        if (camActionPanel) {
+            camActionPanel.hidden = !(allowSubPanel && usesCameraActionPanel);
         }
 
         if (el.examRemotePanel) {
@@ -14226,7 +14283,7 @@
         if (newMode === 'portrait' && state.facingMode !== 'user') {
             state.facingMode = 'user';
             if (el.btnSwitchCam) {
-                el.btnSwitchCam.textContent = '🔄 Kamera: Ön Selfie';
+                el.btnSwitchCam.textContent = '🤳 Kamera: Ön';
             }
             if (state.isRunning) {
                 startCamera();
@@ -14444,8 +14501,9 @@
             state.torchActive = false;
         }
         state.facingMode = state.facingMode === 'environment' ? 'user' : 'environment';
-        const label = state.facingMode === 'user' ? 'Ön Selfie' : 'Arka';
-        el.btnSwitchCam.textContent = `🔄 Kamera: ${label}`;
+        const label = state.facingMode === 'user' ? 'Ön' : 'Arka';
+        el.btnSwitchCam.innerHTML = `<span class="btn-icon" aria-hidden="true">${state.facingMode === 'user' ? '🤳' : '🔄'}</span><span class="btn-text">Kamera: ${label}</span>`;
+        el.btnSwitchCam.setAttribute('aria-label', `Ön ve Arka Kamera Arasında Geçiş Yap — Şu An: ${state.facingMode === 'user' ? 'Ön Selfie Kamerası' : 'Arka Kamera'}`);
         if (state.isRunning) {
             startCamera();
         } else {
@@ -14458,7 +14516,8 @@
         const nextIdx = (order.indexOf(state.flashMode) + 1) % order.length;
         state.flashMode = order[nextIdx];
         const labels = { 'auto': 'Otomatik', 'on': 'Açık', 'off': 'Kapalı' };
-        el.btnToggleFlash.textContent = `🔦 Flaş / Işık: ${labels[state.flashMode]}`;
+        el.btnToggleFlash.innerHTML = `<span class="btn-icon" aria-hidden="true">🔦</span><span class="btn-text">Fener: ${labels[state.flashMode]}</span>`;
+        el.btnToggleFlash.setAttribute('aria-label', `Telefon Işığını (Feneri) Aç veya Kapat (Kısayol: F) — Şu An: ${labels[state.flashMode]}`);
         await tryEnableHardwareTorch(state.flashMode === 'on');
         announceGuidance(`Flaş ve ekran ışığı modu: ${labels[state.flashMode]} olarak ayarlandı.`, { force: true });
     });
@@ -14466,14 +14525,16 @@
     el.btnToggleRadar.addEventListener('click', () => {
         state.radarEnabled = !state.radarEnabled;
         el.btnToggleRadar.classList.toggle('active-toggle', state.radarEnabled);
-        el.btnToggleRadar.textContent = `🎯 3D Sesli Radar: ${state.radarEnabled ? 'Açık' : 'Kapalı'}`;
+        el.btnToggleRadar.innerHTML = `<span class="btn-icon" aria-hidden="true">🎯</span><span class="btn-text">Yön Sinyali: ${state.radarEnabled ? 'Açık' : 'Kapalı'}</span>`;
+        el.btnToggleRadar.setAttribute('aria-label', `Yön Bulduran Sesli Sinyali Aç veya Kapat (Kısayol: R) — Şu An: ${state.radarEnabled ? 'Açık' : 'Kapalı'}`);
         announceGuidance(`3 boyutlu sesli radar ${state.radarEnabled ? 'açıldı' : 'kapatıldı'}.`, { force: true });
     });
 
     el.btnToggleAuto.addEventListener('click', () => {
         state.autoCaptureEnabled = !state.autoCaptureEnabled;
         el.btnToggleAuto.classList.toggle('active-toggle', state.autoCaptureEnabled);
-        el.btnToggleAuto.textContent = `⚡ Otomatik Çekim: ${state.autoCaptureEnabled ? 'Açık' : 'Kapalı'}`;
+        el.btnToggleAuto.innerHTML = `<span class="btn-icon" aria-hidden="true">⚡</span><span class="btn-text">Oto Çekim: ${state.autoCaptureEnabled ? 'Açık' : 'Kapalı'}</span>`;
+        el.btnToggleAuto.setAttribute('aria-label', `Tam Hizalandığında Otomatik Fotoğraf Çekimini Aç veya Kapat (Kısayol: O) — Şu An: ${state.autoCaptureEnabled ? 'Açık' : 'Kapalı'}`);
         announceGuidance(`Otomatik fotoğraf çekimi ${state.autoCaptureEnabled ? 'açıldı' : 'kapatıldı'}.`, { force: true });
     });
 
@@ -14550,6 +14611,56 @@
             : getActiveModeSpokenStatus();
         announceGuidance(textToRepeat, { force: true });
     });
+
+    // Kategori İçi Hızlı Kamera Kumandası ve PDF Sayfa Gezinme Düğmeleri
+    const btnSubCapture = document.getElementById('btn-sub-capture-now');
+    if (btnSubCapture) {
+        btnSubCapture.addEventListener('click', () => el.btnCaptureNow && el.btnCaptureNow.click());
+    }
+    const btnSubUpload = document.getElementById('btn-sub-upload-media');
+    if (btnSubUpload) {
+        btnSubUpload.addEventListener('click', () => el.btnUploadPhoto && el.btnUploadPhoto.click());
+    }
+    const btnSubStartCam = document.getElementById('btn-sub-start-cam');
+    if (btnSubStartCam) {
+        btnSubStartCam.addEventListener('click', () => el.btnStart && el.btnStart.click());
+    }
+    const btnSubGuide = document.getElementById('btn-sub-mode-guide');
+    if (btnSubGuide) {
+        btnSubGuide.addEventListener('click', () => openModeOnboardingModal(state.mode, true));
+    }
+    const btnPdfPrev = document.getElementById('btn-pdf-prev-page');
+    if (btnPdfPrev) {
+        btnPdfPrev.addEventListener('click', () => {
+            if (Array.isArray(state.examQuestions) && state.examQuestions.length > 0) {
+                if (state.currentExamIndex > 0) {
+                    state.currentExamIndex--;
+                    updateExamRemoteUI();
+                }
+                readCurrentExamQuestionAloud();
+            }
+        });
+    }
+    const btnPdfCurr = document.getElementById('btn-pdf-curr-page');
+    if (btnPdfCurr) {
+        btnPdfCurr.addEventListener('click', () => {
+            if (Array.isArray(state.examQuestions) && state.examQuestions.length > 0) {
+                readCurrentExamQuestionAloud();
+            }
+        });
+    }
+    const btnPdfNext = document.getElementById('btn-pdf-next-page');
+    if (btnPdfNext) {
+        btnPdfNext.addEventListener('click', () => {
+            if (Array.isArray(state.examQuestions) && state.examQuestions.length > 0) {
+                if (state.currentExamIndex < state.examQuestions.length - 1) {
+                    state.currentExamIndex++;
+                    updateExamRemoteUI();
+                }
+                readCurrentExamQuestionAloud();
+            }
+        });
+    }
 
     // Kıble Pusulası Düğmeleri
     if (el.btnStartQibla) {
@@ -14731,7 +14842,8 @@
     if (el.categoryTabs && el.categoryTabs.length > 0) {
         el.categoryTabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                filterModesByLifeCategory(tab.getAttribute('data-category') || 'all');
+                const targetCat = tab.getAttribute('data-category');
+                if (targetCat) filterModesByLifeCategory(targetCat);
             });
         });
     }
@@ -14918,7 +15030,7 @@
     if (cookCatBtns && cookCatBtns.length > 0) {
         cookCatBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                filterCookingRecipesByCategory(btn.getAttribute('data-cook-cat') || 'all', true);
+                filterCookingRecipesByCategory(btn.getAttribute('data-cook-cat') || 'ocaksiz', true);
             });
         });
     }
@@ -15166,6 +15278,8 @@
                 openModeOnboardingModal(initialRequestedMode, false);
             }
         } else {
+            filterModesByLifeCategory('is_egitim', { forceOpen: true, silent: true });
+            state.modePanelOpen = false;
             syncModePanelsVisibility(state.mode);
         }
         updateExamRemoteUI();
@@ -15227,8 +15341,19 @@
             acceptActiveModeOnboarding();
             return true;
         }
-        if (state.openCategory) {
-            filterModesByLifeCategory(state.openCategory);
+        if (document.querySelector('.sub-group-folder.open-sub-folder') && typeof window.closeAllSubGroupFolders === 'function') {
+            window.closeAllSubGroupFolders();
+            announceGuidance('Alt kategori kapatıldı.', { force: true });
+            return true;
+        }
+        if (state.modePanelOpen) {
+            state.modePanelOpen = false;
+            syncModePanelsVisibility(state.mode);
+            announceGuidance('Bölüm kumandası kapatıldı, sekme listesine dönüldü.', { force: true });
+            return true;
+        }
+        if (state.openCategory && state.openCategory !== 'is_egitim') {
+            filterModesByLifeCategory('is_egitim');
             return true;
         }
         return false;
@@ -15240,4 +15365,100 @@
             navigator.serviceWorker.register('sw.js').catch(() => {});
         });
     }
+
+    /* AUTO_BUTTON_ICON_BADGE_SYNC */
+    (function setupButtonIconBadgeNormalizer() {
+        const ICON_LEAD_RE = /^((?:\p{Extended_Pictographic}|\u2139|\u23F8|\u23F9|\u25B6|\u2B05|\u27A1|\u21A9|\u2795|\u2705|\u274C|\u2753)(?:\uFE0F|\u200D(?:\p{Extended_Pictographic}|[\u2640\u2642])\uFE0F?)*)\s+([\s\S]+)$/u;
+        let syncingBtnBadge = false;
+        function normalizeBtnBadge(btn) {
+            if (!btn || btn.nodeType !== 1 || btn.tagName !== 'BUTTON') return;
+            if (btn.classList.contains('mode-card') || btn.classList.contains('category-tab') || btn.classList.contains('sub-group-toggle') || btn.classList.contains('exam-opt-btn')) return;
+            if (btn.querySelector('.btn-icon')) return;
+            if (btn.children.length > 0) return;
+            const raw = (btn.textContent || '').trim();
+            if (!raw) return;
+            const m = raw.match(ICON_LEAD_RE);
+            if (!m) return;
+            syncingBtnBadge = true;
+            try {
+                btn.textContent = '';
+                const iconSpan = document.createElement('span');
+                iconSpan.className = 'btn-icon';
+                iconSpan.setAttribute('aria-hidden', 'true');
+                iconSpan.textContent = m[1];
+                const textSpan = document.createElement('span');
+                textSpan.className = 'btn-text';
+                textSpan.textContent = m[2].trim();
+                btn.appendChild(iconSpan);
+                btn.appendChild(textSpan);
+            } finally {
+                syncingBtnBadge = false;
+            }
+        }
+        document.querySelectorAll('button').forEach(normalizeBtnBadge);
+        if (typeof MutationObserver === 'function' && document.body) {
+            const obs = new MutationObserver((mutations) => {
+                if (syncingBtnBadge) return;
+                for (let i = 0; i < mutations.length; i++) {
+                    const t = mutations[i].target;
+                    const btn = t && t.nodeType === 1
+                        ? (t.tagName === 'BUTTON' ? t : (t.closest ? t.closest('button') : null))
+                        : (t && t.parentElement && t.parentElement.tagName === 'BUTTON' ? t.parentElement : null);
+                    if (btn) normalizeBtnBadge(btn);
+                }
+            });
+            obs.observe(document.body, { childList: true, characterData: true, subtree: true });
+        }
+    })();
+
+
+    /* SUB_GROUP_ACCORDION_CONTROLLER */
+    (function setupSubGroupAccordions() {
+        function closeSubFolder(folder) {
+            if (!folder) return;
+            folder.classList.remove('open-sub-folder');
+            const btn = folder.querySelector('.sub-group-toggle');
+            const panel = folder.querySelector('.sub-group-panel');
+            if (btn) {
+                btn.classList.remove('active-toggle');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+            if (panel) panel.hidden = true;
+        }
+
+        window.closeAllSubGroupFolders = function (scopeEl) {
+            const root = scopeEl || document;
+            root.querySelectorAll('.sub-group-folder.open-sub-folder').forEach(closeSubFolder);
+        };
+
+        document.querySelectorAll('.sub-group-toggle').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const folder = btn.closest('.sub-group-folder');
+                const panelId = btn.getAttribute('aria-controls');
+                const panel = panelId ? document.getElementById(panelId) : (folder ? folder.querySelector('.sub-group-panel') : null);
+                if (!folder || !panel) return;
+                const title = btn.getAttribute('data-sub-title') || 'Alt kategori';
+                const isOpening = panel.hidden;
+
+                const parentContainer = folder.closest('.exam-remote-section, .guidance-panel') || folder.parentElement;
+                if (parentContainer) {
+                    parentContainer.querySelectorAll('.sub-group-folder.open-sub-folder').forEach((other) => {
+                        if (other !== folder) closeSubFolder(other);
+                    });
+                }
+
+                if (isOpening) {
+                    folder.classList.add('open-sub-folder');
+                    btn.classList.add('active-toggle');
+                    btn.setAttribute('aria-expanded', 'true');
+                    panel.hidden = false;
+                    announceGuidance(`${title} açıldı. İçindekileri dinlemek için sağa kaydırın.`, { force: true, bannerState: 'normal' });
+                } else {
+                    closeSubFolder(folder);
+                    announceGuidance(`${title} kapatıldı.`, { force: true, bannerState: 'normal' });
+                }
+            });
+        });
+    })();
+
 })();
