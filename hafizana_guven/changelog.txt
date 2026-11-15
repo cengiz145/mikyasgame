@@ -1,4 +1,14 @@
-﻿# Haf�zana G�ven - De�i�iklik G�nl��� (Changelog)
+# Hafızana Güven - Değişiklik Günlüğü (Changelog)
+
+[v0.98.0.2] - 15.11.2026
+
+Kayıp Notalar (Hikaye Modu) Kapsamlı Hata Düzeltmeleri:
+- C (Konum sorgulama) ve T (Süre sorgulama) kısayollarının hikaye modunda çakışması ve çalışmaması giderildi (toplam jeton için yürüyüş esnasında Alt+C kullanılabilir).
+- Haritaya ilk girişte konum anonsunun kesilmesi, X: 30 yön ipucu hatası ve diyalogları atla seçeneğinde ev müziğinin çalmaya devam etmesi düzeltildi.
+- Hikaye tamamlandığında başarımların tetiklenmemesi, XP verilmemesi, ses paketi bilgisinin istemsizce paketi değiştirmesi ve eksik tebrik/alkış sesleri onarıldı.
+- Kayıp Notalar modu için duraklatma menüsü, Ctrl+S ile kaydetme, Kayıtlı Oyundan Devam Et menüsü ve en hızlı tamamlama süresi kaydı aktif edildi.
+- Hikaye modu adım, nota ve arka plan seslerinin Ayarlar menüsündeki Müzik/Efekt ses düzeylerine tam uyumu sağlandı.
+- Mobil dokunmatik kontroller (zafer ekranında Devam Et butonu, durum metnine dokunma ve geri tuşu koruması) ile Türkçe karakter bozulmaları düzeltildi.
 
 [v0.98.0.1] - 20.10.2026
 

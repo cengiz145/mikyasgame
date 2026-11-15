@@ -110,7 +110,7 @@ window.checkDailyStreak = function() {
         localStorage.setItem('hafizaGuvenLoginStreak', streak);
         localStorage.setItem('hafizaGuvenBuzsuzGun', buzsuzGun);
         
-        // BAÅARI KONTROLÜ (Buzsuz 3 Gün)
+        // BAŞARI KONTROLÜ (Buzsuz 3 Gün)
         if (!window.userAchievements) window.userAchievements = JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}");
         if (buzsuzGun >= 3 && !window.userAchievements.buzsuz_3_gun) {
             window.userAchievements.buzsuz_3_gun = true;
@@ -244,6 +244,7 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'game') buttons = getBtns(window.gameMenu, '.menu-button');
     else if (window.currentActiveMenu === 'profile') buttons = getBtns(window.profileMenu, '.stat-item, .stat-copy-btn, .menu-button');
     else if (window.currentActiveMenu === 'saved-games') buttons = getBtns(window.savedGamesMenu, 'li[tabindex="0"], .menu-button');
+    else if (window.currentActiveMenu === 'achievement_modal') buttons = getBtns(document.getElementById('achievement-modal'), '.menu-button');
     else if (window.currentActiveMenu === 'social') buttons = getBtns(window.socialMenu, 'li[tabindex="0"], .menu-button');
     else if (window.currentActiveMenu === 'social-action') buttons = getBtns(document.getElementById('social-action-modal'), '.menu-button');
     else if (window.currentActiveMenu === 'play-mode') buttons = getBtns(document.getElementById('play-mode-menu-container'), '.menu-button');
@@ -252,6 +253,10 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'pvp-lobby') buttons = getBtns(document.getElementById('pvp-lobby-menu-container'), '.menu-button');
     else if (window.currentActiveMenu === 'pvp-create') buttons = getBtns(document.getElementById('pvp-create-menu-container'), '.menu-button, input, select');
     else if (window.currentActiveMenu === 'settings') buttons = getBtns(document.getElementById('settings-menu-container'), '.menu-button, input[type="range"], select');
+
+    if (window.gameIsPaused) {
+        buttons = getBtns(document.getElementById('pause-action-modal'), '.menu-button');
+    }
 
     return buttons.filter(btn => {
         const li = btn.closest('li');
@@ -264,7 +269,7 @@ window.updateMobileKeysVisibility = function () {
     const mobilePiano = document.getElementById('mobile-piano-container');
     const mobileEnter = document.getElementById('mobile-enter-container');
     const mobileReplay = document.getElementById('mobile-replay-btn');
-    const desktopExitLi = document.querySelector('.desktop-exit-li');
+    const desktopExitLi = document.querySelector('#game-menu-container .desktop-exit-li');
 
     document.body.classList.remove('show-mobile-keys', 'show-mobile-enter', 'show-bottom-nav');
 
@@ -308,7 +313,7 @@ window.updateMobileKeysVisibility = function () {
             if (mobilePiano) mobilePiano.removeAttribute('aria-hidden');
         }
     } else if (window.currentActiveMenu === 'story') {
-        if (typeof window.inStoryMode !== 'undefined' && window.inStoryMode && !window.isGridWalkingPhase) {
+        if (typeof window.inStoryMode !== 'undefined' && window.inStoryMode && (!window.isGridWalkingPhase || window.isStoryModeWon)) {
             document.body.classList.add('show-mobile-enter');
             if (mobileEnter) mobileEnter.removeAttribute('aria-hidden');
         } else {
@@ -318,7 +323,7 @@ window.updateMobileKeysVisibility = function () {
     }
     
     if (typeof window.updateMobileStoryKeys === 'function') {
-        window.updateMobileStoryKeys(window.currentActiveMenu === 'story' && window.inStoryMode && window.isGridWalkingPhase);
+        window.updateMobileStoryKeys(Boolean(window.currentActiveMenu === 'story' && window.inStoryMode && window.isGridWalkingPhase && !window.isStoryModeWon));
     }
 };
 
@@ -364,8 +369,8 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
         window.isMenuTransitioning = false;
     }, 600);
 
-    // Mobil Geri Tuşu Koruması (Yeni bir alt menüye geçiliyorsa History'e ekle)
-    if (newActiveMenuName !== 'main' && newActiveMenuName !== 'game' && newActiveMenuName !== 'story') {
+    // Mobil Geri Tuşu Koruması (Yeni bir alt menüye veya oyuna geçiliyorsa History'e ekle)
+    if (newActiveMenuName !== 'main') {
         history.pushState({ modalOpen: true }, "");
     }
 
@@ -377,7 +382,7 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
         window.lastFocusedElement = document.activeElement;
     }
 
-    // ARAYÜZ VE EKRAN OKUYUCU (NVDA) ÇAKIÅMA ENGELLEYİCİSİ:
+    // ARAYÜZ VE EKRAN OKUYUCU (NVDA) ÇAKIŞMA ENGELLEYİCİSİ:
     // Animasyon (300ms) süresince NVDA'nın her iki menüyü de okumasını (Ghosting) engellemek için anında gizleriz.
     hideMenu.setAttribute('aria-hidden', 'true');
     hideMenu.setAttribute('inert', ''); // NVDA ve diğer araçların içeriğe erişimini kökünden keser
@@ -558,6 +563,13 @@ window.updateStatsDisplay = function() {
     let hardCount = (window.gameModes && window.gameModes.hard) ? window.gameModes.hard.completionCount : 0;
     let storyCount = (window.gameModes && window.gameModes.missing_notes) ? window.gameModes.missing_notes.completionCount : 0;
     let rhythmCount = (window.gameModes && window.gameModes.rhythm_mode) ? window.gameModes.rhythm_mode.completionCount : 0;
+    let storyBestSec = parseInt(localStorage.getItem('hafizaGuvenStoryBestTime')) || 0;
+    let storyBestStr = "";
+    if (storyBestSec > 0) {
+        let bm = Math.floor(storyBestSec / 60);
+        let bs = storyBestSec % 60;
+        storyBestStr = ` (En Hızlı: ${bm > 0 ? bm + ' dk ' : ''}${bs} sn)`;
+    }
 
     let rank = "Oyuncu";
 
@@ -616,7 +628,7 @@ window.updateStatsDisplay = function() {
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Kolay Mod: ${easyCount} kez tamamlandı">Kolay Mod: ${easyCount} kez tamamlandı</li>
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Orta Mod: ${mediumCount} kez tamamlandı">Orta Mod: ${mediumCount} kez tamamlandı</li>
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Zor Mod: ${hardCount} kez tamamlandı">Zor Mod: ${hardCount} kez tamamlandı</li>
-                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Kayıp Notalar: ${storyCount} kez tamamlandı">Kayıp Notalar: ${storyCount} kez tamamlandı</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Kayıp Notalar: ${storyCount} kez tamamlandı${storyBestStr}">Kayıp Notalar: ${storyCount} kez tamamlandı${storyBestStr}</li>
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Ritim Avcısı: En Yüksek Seviye ${rhythmCount}">Ritim Avcısı: En Yüksek Seviye ${rhythmCount}</li>
                 ${achievementsHtml}
                 <li style="margin-top: 15px;">
@@ -635,7 +647,7 @@ window.updateStatsDisplay = function() {
     // Kopyalama butonu işlevini ata
     document.querySelectorAll('.stat-copy-btn').forEach(btn => {
         btn.onclick = function() {
-            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\r\nBakiye: ${tokens} Jeton\r\nGünlük Seri: ${streakCount} Gün\r\nSeri Dondurma: ${sdCount}\r\nHata Koruması: ${hk}\r\nZaman Koruması: ${zk}\r\nKolay: ${easyCount}\r\nOrta: ${mediumCount}\r\nZor: ${hardCount}\r\nKayıp Notalar: ${storyCount}\r\nRitim Avcısı: En Yüksek Seviye ${rhythmCount}`;
+            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\r\nBakiye: ${tokens} Jeton\r\nGünlük Seri: ${streakCount} Gün\r\nSeri Dondurma: ${sdCount}\r\nHata Koruması: ${hk}\r\nZaman Koruması: ${zk}\r\nKolay: ${easyCount}\r\nOrta: ${mediumCount}\r\nZor: ${hardCount}\r\nKayıp Notalar: ${storyCount}${storyBestStr}\r\nRitim Avcısı: En Yüksek Seviye ${rhythmCount}`;
             navigator.clipboard.writeText(copyText).then(() => {
                 if (window.announceToScreenReader) window.announceToScreenReader("İstatistikleriniz panoya kopyalandı.", true);
                 if (window.correctSound) window.correctSound.play();
@@ -808,7 +820,7 @@ window.renderSocialList = function() {
         
         if (titleEl) {
             titleEl.innerText = `Sosyal (${meCount} Kişi Çevrimiçi)`;
-            titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Åuan toplam ${meCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
+            titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Şuan toplam ${meCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
         }
         
         if (navBtnSocial) {
@@ -846,7 +858,7 @@ window.renderSocialList = function() {
 
     if (titleEl) {
         titleEl.innerText = `Sosyal (${totalCount} Kişi Çevrimiçi)`;
-        titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Åuan toplam ${totalCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
+        titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Şuan toplam ${totalCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
     }
     
     if (navBtnSocial) {
@@ -1509,7 +1521,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (nameEl) nameEl.innerText = newName;
                     
                     if (window.successSound) {
-                        window.successSound.volume(0.8);
+                        let sfxScale = window.getSfxScale ? window.getSfxScale() : 1;
+                        window.successSound.volume(0.8 * sfxScale);
                         window.successSound.play();
                     }
                     if (window.announceToScreenReader) {
@@ -1605,7 +1618,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let diffHours = Math.floor(diffMs / (1000 * 60 * 60));
                 let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
                 eventsBtnMain.innerText = `Etkinlik: Çift Jeton (${diffHours}sa ${diffMinutes}dk)`;
-                eventsBtnMain.setAttribute('aria-label', `Åu an Çift Jeton Etkinliği AKTİF! Etkinliğin bitmesine ${diffHours} saat ${diffMinutes} dakika kaldı.`);
+                eventsBtnMain.setAttribute('aria-label', `Şu an Çift Jeton Etkinliği AKTİF! Etkinliğin bitmesine ${diffHours} saat ${diffMinutes} dakika kaldı.`);
             } else {
                 let start = new Date(now);
                 let daysUntilSaturday = 6 - day;
@@ -1618,7 +1631,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
                 eventsBtnMain.innerText = `Sıradaki Etkinlik: Çift Jeton (${diffDays}g ${diffHours}sa ${diffMinutes}dk)`;
-                eventsBtnMain.setAttribute('aria-label', `Åu an aktif etkinlik yok. Sıradaki etkinlik: Çift Jeton Etkinliği. Başlamasına ${diffDays} gün, ${diffHours} saat, ${diffMinutes} dakika var.`);
+                eventsBtnMain.setAttribute('aria-label', `Şu an aktif etkinlik yok. Sıradaki etkinlik: Çift Jeton Etkinliği. Başlamasına ${diffDays} gün, ${diffHours} saat, ${diffMinutes} dakika var.`);
             }
         };
         
@@ -1699,6 +1712,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.chatReceiveSound) window.chatReceiveSound.volume(1.0 * scale);
             if (window.achievementSound) window.achievementSound.volume(1.0 * scale);
             if (window.getCoinsSound) window.getCoinsSound.volume(1.0 * scale);
+            if (window.successSound) window.successSound.volume(0.8 * scale);
+            if (window.applauseSound) window.applauseSound.volume(0.8 * scale);
             
             if (window.pianoNotes) {
                 for (let k in window.pianoNotes) window.pianoNotes[k].volume(1.0 * scale);
@@ -2652,7 +2667,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Ekstra: Åifre alanında enter tuşu ile onSubmit tetikleme
+    // Ekstra: Şifre alanında enter tuşu ile onSubmit tetikleme
     if (pvpJoinCodeInput) {
         pvpJoinCodeInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && pvpJoinSubmitBtn) {
@@ -2846,33 +2861,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
                 if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
+                if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
+                if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
                 if (window.doorCloseSound && window.doorCloseSound.playing()) window.doorCloseSound.stop();
                 clearTimeout(window.stepIntervalId);
-
-                if (window.house2Sound && !window.house2Sound.playing()) {
-                    window.house2Sound.volume(0.8);
-                    window.house2Sound.play();
-                }
+                clearTimeout(window.storyEntryTimeout);
 
                 window.inStoryMode = true;
                 window.isStarted = true;
-                
+                window.isStoryModeWon = false;
+                window.isRhythmUnlockDialogWaitingForEnter = false;
+                window.isSoundPacksUnlockDialogWaitingForEnter = false;
+
                 let skipStoryDialogues = localStorage.getItem('hafizaGuvenDisableStoryMode') === 'true';
-                
+
                 if (skipStoryDialogues) {
                     window.isGridWalkingPhase = true;
                     window.isDialogPhase = false;
-                    window.playerX = 1;
-                    if (typeof window.initializeMissingNotesMap === 'function') window.initializeMissingNotesMap();
                     window.currentAutoWalkStep = 0;
-                    
-                    if (window.announceToScreenReader) window.announceToScreenReader("Kayıp Notalar macerasına başlıyorsunuz. İlk notayı bulmak için sağ ok tuşuna basıp karlı zeminde yürüyün.", false);
+
+                    if (typeof window.initializeMissingNotesMap === 'function') {
+                        window.initializeMissingNotesMap();
+                    }
                     if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
-                    
-                    if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.stop();
-                    if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
-                    if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();                
-                    
+
                     if (window.playAutomatedWalkingScene) {
                         window.playAutomatedWalkingScene();
                     } else {
@@ -2880,8 +2892,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (storyStatus) storyStatus.innerHTML = `X Konumu: ${window.playerX}`;
                     }
                 } else {
+                    if (window.house2Sound && !window.house2Sound.playing() && localStorage.getItem('hafizaGuvenMusicMuted') !== 'true') {
+                        let mScale = window.getMusicScale ? window.getMusicScale() : 1;
+                        window.house2Sound.volume(0.6 * mScale);
+                        window.house2Sound.play();
+                    }
+                    window.isGridWalkingPhase = false;
                     window.isDialogPhase = true;
                     window.currentStoryIndex = 0;
+                    if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
                     window.storyEntryTimeout = setTimeout(() => {
                         if (window.playCurrentStoryDialog) window.playCurrentStoryDialog();
                         if (window.triggerStoryAnimations) window.triggerStoryAnimations(0);
@@ -2953,6 +2972,13 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         // Canlı sohbet kendi ESC dinleyicisine sahip
         if (window.isChatOpen) return;
+
+        // Duraklatma menüsü açıksa ESC ile oyuna dön
+        if (window.gameIsPaused) {
+            e.preventDefault();
+            if (window.resumeFromPause) window.resumeFromPause();
+            return;
+        }
         
         const menusWithBackBtns = {
             'store': 'store-back-btn',
@@ -2965,15 +2991,17 @@ document.addEventListener('keydown', (e) => {
             'play-mode': 'play-mode-back-btn',
             'multiplayer-select': 'multiplayer-select-back-btn',
             'pvp-rooms': 'pvp-rooms-back-btn',
-            'settings': 'settings-back-btn'
+            'settings': 'settings-back-btn',
+            'saved-games': 'saved-games-back-btn'
         };
 
         if (window.currentActiveMenu && menusWithBackBtns[window.currentActiveMenu]) {
              const backBtn = document.getElementById(menusWithBackBtns[window.currentActiveMenu]);
              if (backBtn) backBtn.click();
+             return;
         }
 
-        // OYUN VE HİKAYE MODUNDAN GÜVENLİ KAÇIÅ PROTOKOLÜ
+        // OYUN VE HİKAYE MODUNDAN GÜVENLİ KAÇIŞ PROTOKOLÜ
         if (window.currentActiveMenu === 'game' || window.currentActiveMenu === 'story') {
             const mobileGameBackBtn = document.getElementById('mobile-game-back-btn');
             const gameBackBtn = document.getElementById('game-back-btn');
@@ -2989,6 +3017,13 @@ document.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('popstate', (e) => {
+    // 0. Duraklatma menüsü açıksa kapat
+    if (window.gameIsPaused && typeof window.resumeFromPause === 'function') {
+        window.resumeFromPause();
+        history.pushState(null, "", "");
+        return;
+    }
+
     // 1. Canlı sohbet açıksa kapat
     if (window.isChatOpen && typeof window.toggleChat === 'function') {
         window.toggleChat();
@@ -3008,13 +3043,23 @@ window.addEventListener('popstate', (e) => {
         'play-mode': 'play-mode-back-btn',
         'multiplayer-select': 'multiplayer-select-back-btn',
         'pvp-rooms': 'pvp-rooms-back-btn',
-        'pvp-lobby': 'pvp-lobby-cancel-btn'
+        'pvp-lobby': 'pvp-lobby-cancel-btn',
+        'settings': 'settings-back-btn',
+        'saved-games': 'saved-games-back-btn'
     };
     
     if (window.currentActiveMenu && menusWithBackBtns[window.currentActiveMenu]) {
          const backBtn = document.getElementById(menusWithBackBtns[window.currentActiveMenu]);
          if (backBtn) backBtn.click();
          history.pushState(null, "", "");
+         return;
+    }
+
+    // 3. Oyun veya Hikaye modundaysa güvenli çıkış / duraklatma menüsünü aç
+    if (window.currentActiveMenu === 'game' || window.currentActiveMenu === 'story') {
+        const mobileGameBackBtn = document.getElementById('mobile-game-back-btn');
+        if (mobileGameBackBtn) mobileGameBackBtn.click();
+        history.pushState(null, "", "");
     }
 });
 
@@ -3054,7 +3099,7 @@ document.addEventListener('keydown', function (event) {
         }
     }
 
-    if (window.isGridWalkingPhase && window.currentActiveMenu === 'story') {
+    if (!window.gameIsPaused && window.isGridWalkingPhase && window.currentActiveMenu === 'story') {
         return;
     }
 
@@ -3064,7 +3109,7 @@ document.addEventListener('keydown', function (event) {
     }
 
     // Seçenekler (Ayarlar) menüsünde yukarı/aşağı oklarıyla dolaşmayı iptal ederek "Tab" kullanımını (standart gezinme) zorla
-    if (window.currentActiveMenu === 'settings') {
+    if (!window.gameIsPaused && window.currentActiveMenu === 'settings') {
         if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
             return;
         }
@@ -3072,10 +3117,10 @@ document.addEventListener('keydown', function (event) {
 
     if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Enter'].includes(event.key)) {
         // Ok tuşlarıyla mesajı tekrar okuma ve Enter ile sessizce geçme mantığı
-        if ((window.currentActiveMenu === 'story' && window.isDialogPhase) ||
+        if (!window.gameIsPaused && ((window.currentActiveMenu === 'story' && window.isDialogPhase) ||
             (window.currentActiveMenu === 'practice' && window.isDialogPhase) ||
             window.currentActiveMenu === 'server-message' ||
-            window.currentActiveMenu === 'update') {
+            window.currentActiveMenu === 'update')) {
             
             event.preventDefault();
 
@@ -3167,7 +3212,7 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
-// --- CANLI SOHBET SİSTEMİ ARAYÜZ MANTIÄI ---
+// --- CANLI SOHBET SİSTEMİ ARAYÜZ MANTIĞI ---
 window.isChatOpen = false;
 
 // --- ANLIK BİLDİRİM (TOAST) FONKSİYONU ---
@@ -3347,7 +3392,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: false });
 });
 
-// --- CANLI SOHBET SİSTEMİ VERİTABANI (FİREBASE) MANTIÄI ---
+// --- CANLI SOHBET SİSTEMİ VERİTABANI (FİREBASE) MANTIĞI ---
 document.addEventListener('DOMContentLoaded', () => {
     const chatNicknameInput = document.getElementById('chat-nickname');
     const chatMessageInput = document.getElementById('chat-message-input');
@@ -3507,7 +3552,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     addLocalSystemMessage("DİKKAT: Global Wipe (Küresel Sıfırlama) Komutu çalıştırıldı! Tüm oyuncuların istatistikleri ve Firebase bulut yedekleri siliniyor...");
                 }
             } else if (command === '/saat' || command === '/zaman') {
-                addLocalSystemMessage("Åu anki cihaz saati: " + new Date().toLocaleTimeString('tr-TR'));
+                addLocalSystemMessage("Şu anki cihaz saati: " + new Date().toLocaleTimeString('tr-TR'));
             } else if (command === '/jeton' || command === '/bakiye') {
                 const totalTokensLocal = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 addLocalSystemMessage(`Cüzdanınızdaki mevcut bakiye: ${totalTokensLocal} jeton.`);
@@ -3551,7 +3596,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         if (fb.nickname && fb.nickname.toLowerCase() === currentUser.toLowerCase()) {
                                             count++;
                                             biletFound = true;
-                                            addLocalSystemMessage(`Bilet #${count} | Durum: Geliştiriciye ulaştı, inceleniyor â³ | Åikayetiniz: ${fb.message}`);
+                                            addLocalSystemMessage(`Bilet #${count} | Durum: Geliştiriciye ulaştı, inceleniyor â³ | Şikayetiniz: ${fb.message}`);
                                         }
                                     });
                                 }
@@ -3571,7 +3616,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     }
                                     
                                     if (!biletFound) {
-                                        addLocalSystemMessage("Åu anda adınıza tanımlı açık veya yeni çözülmüş hiçbir bilet bulunamadı.");
+                                        addLocalSystemMessage("Şu anda adınıza tanımlı açık veya yeni çözülmüş hiçbir bilet bulunamadı.");
                                     } else {
                                         addLocalSystemMessage(`Toplam ${count} adet bilet-kayıt listelendi.`);
                                     }
@@ -3895,7 +3940,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- GÖREV 1 Kaldırıldı (Tab yönetimi game.js'deki exception'lar ile yapılıyor) ---
 
-// --- ÖZEL MESAJLAÅMA (PRIVATE CHAT) VE KULLANICI İÅLEM MENÜSÜ ---
+// --- ÖZEL MESAJLAŞMA (PRIVATE CHAT) VE KULLANICI İŞLEM MENÜSÜ ---
 document.addEventListener('DOMContentLoaded', () => {
     const actionModal = document.getElementById('social-action-modal');
     const actionTitle = document.getElementById('social-action-title');
@@ -4213,7 +4258,7 @@ window.addEventListener('online', () => {
     }
 });
 
-// --- NVDA İÇİN MESAJ KUYRUÄU SİSTEMİ ---
+// --- NVDA İÇİN MESAJ KUYRUĞU SİSTEMİ ---
 if (!window.orijinalAnnounce) {
     window.orijinalAnnounce = window.announceToScreenReader;
     window.srMesajKuyrugu = [];
@@ -4249,38 +4294,49 @@ if (!window.orijinalAnnounce) {
     };
 }
 
-// --- DURAKLATMA / ÇIKIÅ MENÜSÜ MANTIÄI ---
+// --- DURAKLATMA / ÇIKIŞ MENÜSÜ MANTIĞI ---
 window.gameIsPaused = false;
 window.requestPauseMenu = function() {
+    if (window.gameIsPaused) return;
     window.gameIsPaused = true;
     const modal = document.getElementById('pause-action-modal');
     if (modal) {
         modal.style.display = 'flex';
+        modal.removeAttribute('inert');
+        modal.removeAttribute('aria-hidden');
         if (window.clockTickSound && window.clockTickSound.playing()) window.clockTickSound.pause();
         
         setTimeout(() => {
             modal.style.opacity = '1';
-            modal.removeAttribute('aria-hidden');
-            const title = document.getElementById('pause-action-title');
-            if (title) {
-                title.focus();
+            window.currentFocusIndex = 0;
+            const firstBtn = document.getElementById('pause-btn-exit');
+            if (firstBtn) {
+                firstBtn.focus();
+            } else {
+                const title = document.getElementById('pause-action-title');
+                if (title) title.focus();
             }
             if (window.announceToScreenReader) {
-                window.announceToScreenReader("Oyun duraklatıldı. Ne yapmak istiyorsunuz? Seçenekler için TAB veya ok tuşlarını kullanabilirsiniz.", true);
+                window.announceToScreenReader("Oyun duraklatıldı. Ne yapmak istiyorsunuz? Seçenekler arasında ok tuşlarıyla gezinebilirsiniz.", true);
             }
         }, 10);
     }
 };
 
 window.resumeFromPause = function() {
+    if (!window.gameIsPaused) return;
+    window.gameIsPaused = false;
     const modal = document.getElementById('pause-action-modal');
     if (modal) {
         modal.style.opacity = '0';
         modal.setAttribute('aria-hidden', 'true');
+        modal.setAttribute('inert', '');
         setTimeout(() => {
             modal.style.display = 'none';
-            window.gameIsPaused = false;
-            if (window.clockTickSound && window.clockTickSound.state() === 'loaded') {
+            if (window.currentActiveMenu === 'story') {
+                const storyStatus = document.getElementById('story-status-text');
+                if (storyStatus) storyStatus.focus();
+            } else if (window.clockTickSound && window.clockTickSound.state() === 'loaded') {
                 if (!window.clockTickSound.playing() && window.gameTimer > 0 && !window.isComputerPlaying) {
                     window.clockTickSound.play();
                 }
@@ -4290,9 +4346,26 @@ window.resumeFromPause = function() {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    const btnScoreMissing = document.getElementById('btn-score-missing-notes');
+    if (btnScoreMissing) {
+        btnScoreMissing.addEventListener('click', () => {
+            if (!window.gameModes || !window.gameModes.missing_notes.isUnlocked) return;
+            let cnt = window.gameModes.missing_notes.completionCount || 0;
+            let bestSec = parseInt(localStorage.getItem('hafizaGuvenStoryBestTime')) || 0;
+            let bestTxt = bestSec > 0
+                ? ` En hızlı tamamlama süreniz: ${Math.floor(bestSec / 60) > 0 ? Math.floor(bestSec / 60) + ' dakika ' : ''}${bestSec % 60} saniye.`
+                : "";
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader(`Kayıp Notalar modunu toplam ${cnt} kez tamamladınız.${bestTxt}`, true);
+            }
+        });
+    }
+
     const pauseInterceptor = (e) => {
         let isMultiplayer = window.isMultiplayerGame;
-        if (window.gameIsActive && !window.isGameOverPhase && window.currentActiveMenu === 'game' && !isMultiplayer) {
+        let canPauseMainGame = (window.gameIsActive && !window.isGameOverPhase && window.currentActiveMenu === 'game' && !isMultiplayer);
+        let canPauseStory = (window.inStoryMode && !window.isStoryModeWon && window.currentActiveMenu === 'story');
+        if (canPauseMainGame || canPauseStory) {
             if (e && e.type !== 'click') { e.preventDefault(); e.stopPropagation(); }
             else if (e) { e.preventDefault(); e.stopImmediatePropagation(); }
             window.requestPauseMenu();
@@ -4304,6 +4377,13 @@ document.addEventListener('DOMContentLoaded', () => {
         gBtn.addEventListener('click', pauseInterceptor, true);
         gBtn.addEventListener('pointerdown', pauseInterceptor, true);
         gBtn.addEventListener('touchstart', pauseInterceptor, {passive: false, capture: true});
+    }
+
+    const sBtn = document.getElementById('story-back-btn');
+    if (sBtn) {
+        sBtn.addEventListener('click', pauseInterceptor, true);
+        sBtn.addEventListener('pointerdown', pauseInterceptor, true);
+        sBtn.addEventListener('touchstart', pauseInterceptor, {passive: false, capture: true});
     }
     
     const mBtn = document.getElementById('mobile-game-back-btn');
@@ -4317,12 +4397,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnSave = document.getElementById('pause-btn-save');
     const btnCancel = document.getElementById('pause-btn-cancel');
 
+    const exitCurrentPausedSession = () => {
+        if (window.currentActiveMenu === 'story') {
+            if (window.menuCloseSound) window.menuCloseSound.play();
+            if (window.quitStoryMode) window.quitStoryMode();
+            if (window.switchMenu && window.storyMenu && window.mainMenu) {
+                window.switchMenu(window.storyMenu, window.mainMenu, 'main');
+            }
+            if (window.bgMusic && !window.bgMusic.playing() && localStorage.getItem('hafizaGuvenMusicMuted') !== 'true') {
+                window.bgMusic.play();
+            }
+        } else {
+            if (window.endMainGame) window.endMainGame(false, false, true);
+        }
+    };
+
     const handleExit = (e) => {
         if (e) { e.preventDefault(); e.stopPropagation(); }
+        if (!window.gameIsPaused) return;
         window.resumeFromPause();
-        setTimeout(() => {
-            if (window.endMainGame) window.endMainGame(false, false, true);
-        }, 350);
+        setTimeout(exitCurrentPausedSession, 350);
     };
 
     if (btnExit) {
@@ -4333,13 +4427,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleSave = (e) => {
         if (e) { e.preventDefault(); e.stopPropagation(); }
+        if (!window.gameIsPaused) return;
         if (window.saveCurrentGame) {
             window.saveCurrentGame();
         }
         window.resumeFromPause();
-        setTimeout(() => {
-            if (window.endMainGame) window.endMainGame(false, false, true);
-        }, 350);
+        setTimeout(exitCurrentPausedSession, 350);
     };
 
     if (btnSave) {
@@ -4350,6 +4443,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleCancel = (e) => {
         if (e) { e.preventDefault(); e.stopPropagation(); }
+        if (!window.gameIsPaused) return;
         window.resumeFromPause();
     };
 

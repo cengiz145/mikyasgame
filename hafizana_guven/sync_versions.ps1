@@ -1,14 +1,14 @@
 ﻿$ErrorActionPreference = "Stop"
 $dir = $PSScriptRoot
 if (-not $dir) { $dir = ".\" }
-$newVersion = "0.98.0.1"
+$newVersion = "0.98.0.2"
 
 Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"
 $vJson = Get-Content $vJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $vJson.version = $newVersion
 $vJson.buildId = [int][double]::Parse((Get-Date -UFormat %s))
-$vJson.changelog = "Başarımlar listesindeki hata düzeltildi, rütbe ve bilişsel başarılar sistemi aktif edildi."
+$vJson.changelog = "Kayıp Notalar (Hikaye Modu) kapsamlı hata düzeltmeleri: C ve T kısayolları, başlangıç konumu anonsu, başarımlar ve XP ödülü, ses düzeyi uyumu, mobil kontroller ve kayıtlı oyundan devam sistemi onarıldı."
 $vJson | ConvertTo-Json -Depth 5 | Set-Content $vJsonPath -Encoding UTF8
 
 Write-Host "Updating package.json..."

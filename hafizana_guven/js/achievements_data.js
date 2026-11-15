@@ -128,84 +128,84 @@
     {
         id: "missing_notes_1",
         title: "Kayıp Notalar Çırak",
-        description: "Kayıp Notalaru 1 kez tamamla",
+        description: "Kayıp Notalar modunu 1 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['missing_notes'] && window.gameModes['missing_notes'].completionCount >= 1; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['missing_notes'] ? window.gameModes['missing_notes'].completionCount : 0) + "/1"; }
     },
     {
         id: "missing_notes_5",
         title: "Kayıp Notalar Hevesli",
-        description: "Kayıp Notalaru 5 kez tamamla",
+        description: "Kayıp Notalar modunu 5 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['missing_notes'] && window.gameModes['missing_notes'].completionCount >= 5; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['missing_notes'] ? window.gameModes['missing_notes'].completionCount : 0) + "/5"; }
     },
     {
         id: "missing_notes_10",
         title: "Kayıp Notalar Deneyimli",
-        description: "Kayıp Notalaru 10 kez tamamla",
+        description: "Kayıp Notalar modunu 10 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['missing_notes'] && window.gameModes['missing_notes'].completionCount >= 10; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['missing_notes'] ? window.gameModes['missing_notes'].completionCount : 0) + "/10"; }
     },
     {
         id: "missing_notes_25",
         title: "Kayıp Notalar Uzman",
-        description: "Kayıp Notalaru 25 kez tamamla",
+        description: "Kayıp Notalar modunu 25 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['missing_notes'] && window.gameModes['missing_notes'].completionCount >= 25; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['missing_notes'] ? window.gameModes['missing_notes'].completionCount : 0) + "/25"; }
     },
     {
         id: "missing_notes_50",
         title: "Kayıp Notalar Usta",
-        description: "Kayıp Notalaru 50 kez tamamla",
+        description: "Kayıp Notalar modunu 50 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['missing_notes'] && window.gameModes['missing_notes'].completionCount >= 50; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['missing_notes'] ? window.gameModes['missing_notes'].completionCount : 0) + "/50"; }
     },
     {
         id: "missing_notes_100",
         title: "Kayıp Notalar Efsane",
-        description: "Kayıp Notalaru 100 kez tamamla",
+        description: "Kayıp Notalar modunu 100 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['missing_notes'] && window.gameModes['missing_notes'].completionCount >= 100; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['missing_notes'] ? window.gameModes['missing_notes'].completionCount : 0) + "/100"; }
     },
     {
         id: "rhythm_mode_1",
         title: "Ritim Avcısı Çırak",
-        description: "Ritim Avcısıu 1 kez tamamla",
+        description: "Ritim Avcısı modunu 1 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['rhythm_mode'] && window.gameModes['rhythm_mode'].completionCount >= 1; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['rhythm_mode'] ? window.gameModes['rhythm_mode'].completionCount : 0) + "/1"; }
     },
     {
         id: "rhythm_mode_5",
         title: "Ritim Avcısı Hevesli",
-        description: "Ritim Avcısıu 5 kez tamamla",
+        description: "Ritim Avcısı modunu 5 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['rhythm_mode'] && window.gameModes['rhythm_mode'].completionCount >= 5; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['rhythm_mode'] ? window.gameModes['rhythm_mode'].completionCount : 0) + "/5"; }
     },
     {
         id: "rhythm_mode_10",
         title: "Ritim Avcısı Deneyimli",
-        description: "Ritim Avcısıu 10 kez tamamla",
+        description: "Ritim Avcısı modunu 10 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['rhythm_mode'] && window.gameModes['rhythm_mode'].completionCount >= 10; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['rhythm_mode'] ? window.gameModes['rhythm_mode'].completionCount : 0) + "/10"; }
     },
     {
         id: "rhythm_mode_25",
         title: "Ritim Avcısı Uzman",
-        description: "Ritim Avcısıu 25 kez tamamla",
+        description: "Ritim Avcısı modunu 25 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['rhythm_mode'] && window.gameModes['rhythm_mode'].completionCount >= 25; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['rhythm_mode'] ? window.gameModes['rhythm_mode'].completionCount : 0) + "/25"; }
     },
     {
         id: "rhythm_mode_50",
         title: "Ritim Avcısı Usta",
-        description: "Ritim Avcısıu 50 kez tamamla",
+        description: "Ritim Avcısı modunu 50 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['rhythm_mode'] && window.gameModes['rhythm_mode'].completionCount >= 50; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['rhythm_mode'] ? window.gameModes['rhythm_mode'].completionCount : 0) + "/50"; }
     },
     {
         id: "rhythm_mode_100",
         title: "Ritim Avcısı Efsane",
-        description: "Ritim Avcısıu 100 kez tamamla",
+        description: "Ritim Avcısı modunu 100 kez tamamla",
         checkCondition: function() { return window.gameModes && window.gameModes['rhythm_mode'] && window.gameModes['rhythm_mode'].completionCount >= 100; },
         progressText: function() { return "İlerleme: " + (window.gameModes && window.gameModes['rhythm_mode'] ? window.gameModes['rhythm_mode'].completionCount : 0) + "/100"; }
     },

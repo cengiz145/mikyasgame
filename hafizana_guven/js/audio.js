@@ -114,6 +114,16 @@ window.gameWinSound = new Howl({
     html5: true
 });
 
+window.successSound = new Howl({
+    src: ['sounds/win.ogg'],
+    volume: 0.8
+});
+
+window.applauseSound = new Howl({
+    src: ['sounds/win2.ogg'],
+    volume: 0.8
+});
+
 window.music60Sound = new Howl({
     src: ['sounds/music60.ogg'],
     loop: false,
@@ -319,21 +329,29 @@ window.kanunNotes = {
 
 window.activeInstrument = localStorage.getItem('hafizaGuvenInstrument') || 'piano';
 
+window.getCurrentInstrumentNotesMap = function () {
+    if (window.activeInstrument === 'baglama') return window.baglamaNotes;
+    if (window.activeInstrument === 'kaval') return window.kavalNotes;
+    if (window.activeInstrument === 'flut') return window.flutNotes;
+    if (window.activeInstrument === 'kanun') return window.kanunNotes;
+    return window.pianoNotes;
+};
+
 window.activeNotes = new Proxy({}, {
     get: function(target, prop) {
-        let map;
-        if (window.activeInstrument === 'baglama') {
-            map = window.baglamaNotes;
-        } else if (window.activeInstrument === 'kaval') {
-            map = window.kavalNotes;
-        } else if (window.activeInstrument === 'flut') {
-            map = window.flutNotes;
-        } else if (window.activeInstrument === 'kanun') {
-            map = window.kanunNotes;
-        } else {
-            map = window.pianoNotes;
+        const map = window.getCurrentInstrumentNotesMap();
+        return map ? map[prop] : undefined;
+    },
+    ownKeys: function() {
+        const map = window.getCurrentInstrumentNotesMap();
+        return map ? Reflect.ownKeys(map) : [];
+    },
+    getOwnPropertyDescriptor: function(target, prop) {
+        const map = window.getCurrentInstrumentNotesMap();
+        if (map && Object.prototype.hasOwnProperty.call(map, prop)) {
+            return { enumerable: true, configurable: true, value: map[prop] };
         }
-        return map[prop];
+        return undefined;
     }
 });
 

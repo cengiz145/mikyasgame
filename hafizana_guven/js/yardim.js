@@ -1,8 +1,8 @@
 ﻿window.practiceCorrectMessages = [
     "Harika!", "Süper!", "Mükemmel!", "Tam isabet!", "Doğru tuş!", "Çok iyi!", "Devam et!", "Aynen böyle!", "Bravo!", "Harikulade!",
-    "Müthişsin!", "Doğru bildin!", "Åahane!", "Kusursuz!", "İşte bu!", "Aferin!", "Çok başarılı!", "Alkışlar sana!", "Doğru nota!",
+    "Müthişsin!", "Doğru bildin!", "Şahane!", "Kusursuz!", "İşte bu!", "Aferin!", "Çok başarılı!", "Alkışlar sana!", "Doğru nota!",
     "Yeteneklisin!", "Odaklanman harika!", "Doğru yoldasın!", "Süper gidiyorsun!", "Çok net!", "Nefis!", "Muazzam!", "Tebrikler!",
-    "Doğru seçim!", "Harika duyum!", "Kulakların çok iyi!", "Çok doğru!", "Bravo sana!", "Åampiyon gibi!", "Tam üstüne bastın!",
+    "Doğru seçim!", "Harika duyum!", "Kulakların çok iyi!", "Çok doğru!", "Bravo sana!", "Şampiyon gibi!", "Tam üstüne bastın!",
     "Ritmi yakaladın!", "Müzik kulağın süper!", "Doğru frekans!", "Eksiksiz!", "Mükemmel uyum!", "Helal olsun!", "İşte yetenek!",
     "Doğru ses!", "Tam zamanında!", "Çok yakıştın bu işe!", "Harika iş!", "Süper odak!", "Aklına sağlık!", "Devam, durma!",
     "Çok iyisin!", "Doğruluk abidesi!"
@@ -26,7 +26,7 @@ window.practiceDialogues = [
     "Hangi sesin hangi harfe denk geldiğini öğrenmek için bu Alıştırma Modunu kullanabilirsiniz. Devam etmek için Enter'a basın.",
     "Notaların karşılıkları kısaca şöyledir: Do notası C, Re notası D, Mi notası E, Fa notası F, Sol notası G, La notası A, Si notası B tuşudur. Devam etmek için Enter'a basın.",
     "Alıştırmalara başlamadan hemen önce klavye kısayollarını hatırlatalım. Menülerde sağ ve sol ok tuşlarıyla gezinebilir, Enter tuşu ile seçim yapabilirsiniz. Sesi Page Up ve Page Down tuşlarıyla ayarlayabilirsiniz. Oyun içindeyken S tuşu ile skorunuzu, T tuşu ile kalan sürenizi öğrenebilir, Boşluk tuşu ile bir saniye ceza karşılığında ses dizisini tekrar dinleyebilirsiniz. Devam etmek için Enter'a basın.",
-    "Åimdi öğrenme vakti! Sistemi tanımak için sizden istenen tuşa 3 defa üst üste basın. 3 defa doğru bastığınızda otomatik olarak bir sonraki notaya geçeceksiniz. Devam etmek için Enter'a basın.",
+    "Şimdi öğrenme vakti! Sistemi tanımak için sizden istenen tuşa 3 defa üst üste basın. 3 defa doğru bastığınızda otomatik olarak bir sonraki notaya geçeceksiniz. Devam etmek için Enter'a basın.",
     "Eğer hangi tuşa basacağınızı unutur veya yanlış bir tuşa basarsanız, sistem size yardımcı olacaktır. Sakın hata yapmaktan korkmayın; burada sadece öğrenmek var! Devam etmek için Enter'a basın."
 ];
 
@@ -39,7 +39,7 @@ window.msg1to4 = [
     "Başlangıç ateşi!", "Emin adımlarla!", "Harika odak!", "Dinlemeye devam!", "Sesi iyi yakaladın!",
     "Çok net!", "Nefis gidiyorsun!", "Bravo sana!", "Müzikal yetenek!", "Sesler senin elinde!",
     "Piyano seninle konuşuyor!", "Tuşların efendisi!", "Harikalar yaratıyorsun!", "Ritmi hisset!", "İyi iş çıkardın!",
-    "Nota senden sorulur!", "Çok başarılı!", "Harfsiz notalar, muazzam kulak!", "Åahane!", "Böyle devam et!",
+    "Nota senden sorulur!", "Çok başarılı!", "Harfsiz notalar, muazzam kulak!", "Şahane!", "Böyle devam et!",
     "Hızlanmaya başlıyoruz!", "Odaklan ve dinle!", "Aklına sağlık!", "Doğru tuş!", "Müzik dehası!",
     "Süper başlangıç!", "Sarsılmaz odak!", "Altın kulak!", "Gümbür gümbür!", "Pes etmeden devam!"
 ];
@@ -49,34 +49,34 @@ window.msg5 = [
     "Alev aldın! Böyle devam et şampiyon!", "Çılgın atıyorsun! Kulakların süper güç misali!", "İnanılmaz! Nefes kesici bir hız!",
     "Enerji tavan yaptı! Durmak yok!", "Gazı kökle! Zafere sadece 5 adım kaldı!", "Sen bir efsanesin! Yarıyı devirdin!",
     "Durdurulamazsın! Notalar senden korkuyor!", "Patlama anı! Süper ilerliyorsun!", "Aslanım benim! Zafere koş!",
-    "Åov yapıyorsun! Mükemmelsin!", "Zirveye uçuyoruz! Harikasın!", "Durma, coşku dorukta!",
+    "Şov yapıyorsun! Mükemmelsin!", "Zirveye uçuyoruz! Harikasın!", "Durma, coşku dorukta!",
     "Nefisti! 5. nota da cepte!", "Müzik senin kanında var! Muazzamsın!", "Fırtına gibi esiyorsun!",
     "Canavar gibi odaklandın! Harika!", "Sınırları aşıyorsun! Süper!", "Bu ne hız! Uçuyoruz!",
     "Yıldırım gibisin! Yarıladık bile!", "Gaza bas! Çok iyi geldin!", "Sende bu iş tamam! Mükemmel!",
     "Yetenek fışkırıyor! Zafere 5 kala!", "Rekor kırıyorsun! Durma!", "Kusursuz seri! Aynen böyle!",
     "Büyüleyicisin! Efsane seri!", "Helal olsun! Tam gaz ileri!", "Zafere açsın! Müthişsin!",
     "Dev aynası! Büyük oynuyorsun!", "Konsantrasyonun zirvesi! Yarıladık!", "İnanılmaz kulak! Tam isabet!",
-    "Yola devam! Åampiyonluk yakın!", "Mükemmelliğin tanımı! Yarı yarıya bitti!", "Durmak yok, efsaneler pes etmez!",
+    "Yola devam! Şampiyonluk yakın!", "Mükemmelliğin tanımı! Yarı yarıya bitti!", "Durmak yok, efsaneler pes etmez!",
     "Heyecan dorukta! Çok iyisin!", "Titretin buraları! Müthiş!", "Süper modundasın! Fişek gibi!",
     "Alev alev yanıyorsun! Harikulade!", "Yetenek avcısı! Müzik senden sorulur!", "Gaz kesme! Mermisin!",
     "Zirveye tırmanış! Çok iyi!", "Efsanevi duyum! Asla yanılmıyorsun!", "Makine gibisin! Mükemmel!",
-    "Altın değerinde bir doğru! Yarıda yarı!", "Harika ötesi! Åampiyon ruhu!", "Notalar sana boyun eğdi!", "İşte şampiyon! Tamamlayacaksın!", "Gaza geldik! Kusursuz gidiyor!"
+    "Altın değerinde bir doğru! Yarıda yarı!", "Harika ötesi! Şampiyon ruhu!", "Notalar sana boyun eğdi!", "İşte şampiyon! Tamamlayacaksın!", "Gaza geldik! Kusursuz gidiyor!"
 ];
 
 window.msg6to9 = [
     "Mükemmel gidiyorsun, çok az kaldı!", "Sona çok yakınsın, sakın bozma!", "Kusursuz bir ritim, harika!",
     "İnanılmaz bir hafıza, son virajdasın!", "Notalar aklına kazınmış, mükemmel!", "Zafere ramak kala, çok iyi!",
-    "Åampiyonluğa adım adım, bravo!", "Hataya yer yok, kusursuzsun!", "Az kaldı, dayan!",
+    "Şampiyonluğa adım adım, bravo!", "Hataya yer yok, kusursuzsun!", "Az kaldı, dayan!",
     "Son düzlük, harikasın!", "Müzik ustası sensin, devam!", "Sonsuz başarı, süper gidiyorsun!",
     "Bitişe çok az kaldı, sabret!", "Altın kulak devrede, muazzam!", "Kusursuz seri devam ediyor!",
     "Hedef odaklı, harika ilerleyiş!", "İnanılmazsın, final yaklaşıyor!", "Büyük finale doğru, mükemmelsin!",
     "Az adım kaldı, başaracaksın!", "Muhteşem konsantrasyon, bozma!", "Sabır ve yetenek, mükemmel uyum!",
-    "Åahane gidiyor, sona sadece birkaç adım!", "Kulakların mucizeler yaratıyor, devam!", "Büyüleyici bir performans, çok iyi!",
+    "Şahane gidiyor, sona sadece birkaç adım!", "Kulakların mucizeler yaratıyor, devam!", "Büyüleyici bir performans, çok iyi!",
     "İşte başarı budur, son düzlüğe girdin!", "Kusursuz hatıra, muazzam yetenek!", "Odaklan ve bitir, başarıyorsun!",
     "İleriye dönük mükemmel duyum, az kaldı!", "Büyük ödül için son ataklar, bravo!", "Pes etmek yok, zirve çok yakın!",
     "Kusursuz ilerliyor, şampiyonluğa az kaldı!", "Harika gidiyor, kazanacaksın!", "Müthiş hafıza, finale doğru ilerliyoruz!",
     "Zafere doğru güçlü adımlar, mükemmel!", "Odaklan ve dinle, mucizeye az kaldı!", "Müthişsin, notalar elinde oyuncak oldu!",
-    "Finale adım adım, efsane performans!", "Åampiyon gibi oynuyorsun, son viraj!", "Hatasız seri, destan yazıyorsun!",
+    "Finale adım adım, efsane performans!", "Şampiyon gibi oynuyorsun, son viraj!", "Hatasız seri, destan yazıyorsun!",
     "Zirve ufukta göründü, muazzam kulak!", "Son adımlar, şampiyon sensin!", "Gücünü göster, final çizgisi yakında!",
     "Kusursuz bir his, heyecan dorukta!", "Büyük başarıya çok az kaldı!", "Zafer çığlıkları yakın, mükemmelsin!",
     "Ateşli performans, bitirme anı yaklaşıyor!", "Gurur verici bir oyun, çok iyi gidiyor!", "Final için nefesler tutuldu, bravo!",
@@ -85,7 +85,7 @@ window.msg6to9 = [
 
 window.missingNotesDialogues = [
     "Pan evinde piyano çalışmaktadır. O sırada evin küçük yaramaz çocuğu Bili odaya girer. Devam etmek için Enter'a basın.",
-    "Bili: Heey! Åu aleti ben de bir çalabilir miyim? Devam etmek için Enter'a basın.",
+    "Bili: Heey! Şu aleti ben de bir çalabilir miyim? Devam etmek için Enter'a basın.",
     "Pan cevap veriyor: Hayır. O benim. Babam bana bunu doğum günümde hediye olarak aldı. Devam etmek için Enter'a basın.",
     "Bili: Sadece 5 dakika. Sonra söz veriyorum ki onu sana geri vereceğim. Devam etmek için Enter'a basın.",
     "Pan: Tüm oyuncaklarım senin yüzünden paramparça oldu. Bu çok özel bir hediye. Bunu sana veremem. Devam etmek için Enter'a basın.",
@@ -95,7 +95,7 @@ window.missingNotesDialogues = [
     "Pan: Bili! Sen! Sen! Sen ne yaptığını zannediyorsun? Devam etmek için Enter'a basın.",
     "Bili: Ben hiçbir şey yapmadım ki. Devam etmek için Enter'a basın.",
     "Pan: Kırdın işte. Devam etmek için Enter'a basın.",
-    "Bili: Baban sana yenisini alır merak etme hahaha. Zaten bu işe yaramaz bir şey. Hiçbir şey anlamıyorum. Åu tuşlar falan bana çok garip geliyor. Devam etmek için Enter'a basın.",
+    "Bili: Baban sana yenisini alır merak etme hahaha. Zaten bu işe yaramaz bir şey. Hiçbir şey anlamıyorum. Şu tuşlar falan bana çok garip geliyor. Devam etmek için Enter'a basın.",
     "Pan: Ah Bili ah! Normal şartlarda seni affetmemem ve dışarı çıkartmam gerekiyordu. Ama ne yapalım ki ben iyi bir insanım. Lütfen beni biraz yalnız bırak. Rahatlamam gerekiyor. Babama bu durumu nasıl açıklayacağım? Kesinlikle bana çok kızacak. Devam etmek için Enter'a basın.",
     "Bili: Parçalarını toplarsın artık yollardan, ahahahah! der ve kapıdan dışarıya çıkarak hızlıca uzaklaşır. Devam etmek için Enter'a basın.",
     "Pan dışarı çıkar ve kaybolan tuşları aramaya koyulur. Notalarını karların içinde ararken dışarıda kendi kendine yürümeye başlar... Devam etmek için Enter'a basın.",
@@ -115,4 +115,3 @@ window.missingNotesHappyMessages = [
     "Biliyordum senin bizi bulacağını! Çok teşekkür ederim benim güzel Pan'ım!",
     "Buz gibi karların içinden kurtardın beni, Pan sen harikasın!"
 ];
-
