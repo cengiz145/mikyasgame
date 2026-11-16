@@ -1,14 +1,14 @@
 ﻿$ErrorActionPreference = "Stop"
 $dir = $PSScriptRoot
 if (-not $dir) { $dir = ".\" }
-$newVersion = "0.98.1.0"
+$newVersion = "0.98.1.1"
 
 Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"
 $vJson = Get-Content $vJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $vJson.version = $newVersion
 $vJson.buildId = [int][double]::Parse((Get-Date -UFormat %s))
-$vJson.changelog = "Kayıp Notalar (Hikaye Modu) tam sesli dublaj (Radyo Tiyatrosu) güncellemesi: Anlatıcı, Pan, Bili ve kurtarılan sihirli notalar için özel Türkçe karakter seslendirmeleri, Ayarlar menüsüne Sesli Dublaj açma/kapatma seçeneği ve detaylı Oyun Yardımı rehber sayfası eklendi."
+$vJson.changelog = "Kayıp Notalar (Hikaye Modu) sesli dublaj kadrosu %100 ana dili İstanbul Türkçesi olan profesyonel stüdyo sanatçılarıyla (Eleven v4 motoru) baştan sona yenilendi."
 $vJson | ConvertTo-Json -Depth 5 | Set-Content $vJsonPath -Encoding UTF8
 
 Write-Host "Updating package.json..."
@@ -41,10 +41,9 @@ if ($firstVersion -notmatch "\[v$newVersion\]") {
     $newEntry = @"
 [v$newVersion] - $todayDate
 
-Kayıp Notalar Sesli Dublaj (Radyo Tiyatrosu) ve Oyun Yardımı Rehberi:
-- Kayıp Notalar (Hikaye Modu) baştan sona Türkçe karakter dublajlarıyla seslendirildi! Masal Anlatıcısı, Pan, yaramaz kardeş Bili ve karların içinden kurtarılan sihirli notalar artık kendi özgün sesleriyle konuşuyor.
-- Ayarlar menüsüne "Kayıp Notalar Sesli Dublaj (Açık/Kapalı)" seçeneği eklendi.
-- Oyunun tüm ana menü ve yan başlıklarını sırasıyla anlatan kapsamlı Oyun Yardımı web sayfası eklendi.
+Kayıp Notalar %100 Doğal İstanbul Türkçesi Stüdyo Dublajı:
+- Kayıp Notalar (Hikaye Modu) seslendirme kadrosu yabancı çok dilli sesler yerine %100 ana dili İstanbul Türkçesi olan gerçek stüdyo ve tiyatro sanatçılarıyla (Anlatıcı Uğur Işık, Pan Orhan, Bili Deniz, Sihirli Notalar Ezgi) ve yeni nesil Eleven v4 Türkçe ses motoruyla baştan sona yeniden kaydedildi.
+- Ses dosyalarına sürüm tabanlı önbellek yenileyici eklendi.
 
 "@
     $newChangelog = @()

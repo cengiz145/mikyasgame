@@ -173,7 +173,8 @@ window.playCurrentStoryDialog = function () {
 
     if (useVoiceover && sceneIdx >= 0 && sceneIdx <= 16) {
         const padIdx = String(sceneIdx).padStart(2, '0');
-        const voiceAudio = new window.Audio(`sounds/story/story_${padIdx}.mp3`);
+        const audioVer = encodeURIComponent(window.UYGULAMA_SURUMU || '0.98.1.1');
+        const voiceAudio = new window.Audio(`sounds/story/story_${padIdx}.mp3?v=${audioVer}`);
         voiceAudio.volume = Math.max(0, Math.min(1, window.getSfxScale()));
         window.currentStoryVoiceAudio = voiceAudio;
 
@@ -657,7 +658,8 @@ window.handleStoryWalking = function (key) {
                     if (!disableMotivation && useVoiceover && noteIdx >= 0 && noteIdx < 10) {
                         window.stopStoryVoiceover();
                         const padNote = String(noteIdx).padStart(2, '0');
-                        const happyAudio = new window.Audio(`sounds/story/happy_${padNote}.mp3`);
+                        const happyVer = encodeURIComponent(window.UYGULAMA_SURUMU || '0.98.1.1');
+                        const happyAudio = new window.Audio(`sounds/story/happy_${padNote}.mp3?v=${happyVer}`);
                         happyAudio.volume = Math.max(0, Math.min(1, sfxScale));
                         window.currentStoryVoiceAudio = happyAudio;
 

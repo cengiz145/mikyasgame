@@ -1,5 +1,12 @@
 ﻿# Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.98.1.1] - 17.11.2026
+
+Kayıp Notalar %100 Doğal İstanbul Türkçesi Stüdyo Dublajı:
+- Kayıp Notalar (Hikaye Modu) seslendirme kadrosu yabancı çok dilli sesler yerine %100 ana dili İstanbul Türkçesi olan gerçek stüdyo ve tiyatro sanatçılarıyla (Anlatıcı Uğur Işık, Pan Orhan, Bili Deniz, Sihirli Notalar Ezgi) ve yeni nesil Eleven v4 Türkçe ses motoruyla baştan sona yeniden kaydedildi.
+- Ses dosyalarına sürüm tabanlı önbellek yenileyici eklendi.
+
+
 [v0.98.1.0] - 16.11.2026
 
 Kayıp Notalar Sesli Dublaj (Radyo Tiyatrosu) ve Oyun Yardımı Rehberi:
