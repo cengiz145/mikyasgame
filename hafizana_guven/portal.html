@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <link rel="canonical" href="https://mikyasstudio.com.tr/hafizana_guven/portal.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Hafızana Güven - Mikyas Studio</title>
+    <meta name="description" content="Hafızana Güven sesli müzik ve hafıza oyunu. Oyuna hemen başlayın veya tüm menülerin anlatıldığı oyun yardımını okuyun.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-bg: #0f172a;
+            --gradient-1: #3b82f6;
+            --gradient-2: #8b5cf6;
+            --gradient-3: #f59e0b;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --focus-ring: #ffb703;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .bg-blobs {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(85px);
+            opacity: 0.45;
+        }
+
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, var(--gradient-1), transparent 70%); }
+        .blob-2 { bottom: -10%; right: -10%; width: 55vw; height: 55vw; background: radial-gradient(circle, var(--gradient-2), transparent 70%); }
+        .blob-3 { top: 35%; left: 35%; width: 35vw; height: 35vw; background: radial-gradient(circle, var(--gradient-3), transparent 70%); opacity: 0.25; }
+
+        .portal-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            max-width: 680px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+        }
+
+        .game-badge {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff, #fde68a, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lead-text {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+        }
+
+        .actions-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .action-btn {
+            font-family: inherit;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            padding: 1.15rem 2rem;
+            border-radius: 16px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            width: 100%;
+        }
+
+        .btn-play-game {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 8px 22px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-play-game:hover {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            transform: translateY(-2px);
+        }
+
+        .btn-read-help {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 8px 22px rgba(217, 119, 6, 0.35);
+        }
+
+        .btn-read-help:hover {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            transform: translateY(-2px);
+        }
+
+        .action-btn:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 4px;
+        }
+
+        @media (max-width: 600px) {
+            .portal-card {
+                padding: 2rem 1.5rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .action-btn {
+                font-size: 1.08rem;
+                padding: 1rem 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-blobs" aria-hidden="true">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <main class="portal-card">
+        <div class="game-badge" aria-hidden="true">🧠🎹</div>
+        <h1>Hafızana Güven</h1>
+        <p class="lead-text">
+            Enstrüman notalarını ve sesli ipuçlarını takip ederek işitsel hafızanızı, ritim duygunuzu ve müzik bilginizi geliştirin. Oyuna hemen başlayabilir veya tüm menülerin sırasıyla anlatıldığı oyun yardımını inceleyebilirsiniz.
+        </p>
+
+        <div class="actions-wrapper">
+            <button type="button" class="action-btn btn-play-game" onclick="window.location.href='index.html'">
+                Oyunu Oynamak İçin Tıklayın
+            </button>
+            <button type="button" class="action-btn btn-read-help" onclick="window.location.href='yardim.html'">
+                Oyun Yardımını Okumak İçin Tıklayın
+            </button>
+        </div>
+    </main>
+</body>
+</html>

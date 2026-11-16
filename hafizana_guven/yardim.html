@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <link rel="canonical" href="https://mikyasstudio.com.tr/hafizana_guven/yardim.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Hafızana Güven - Oyun Yardımı</title>
+    <meta name="description" content="Hafızana Güven oyununun tüm ana menü seçenekleri, alt menüleri, oyun modları ve klavye kısayolları rehberi.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.78);
+            --subcard-bg: rgba(15, 23, 42, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --accent-gold: #fbbf24;
+            --accent-blue: #60a5fa;
+            --accent-green: #34d399;
+            --focus-ring: #ffb703;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            line-height: 1.7;
+            padding: 2rem 1rem 4rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-box {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            padding: 2.5rem 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .intro-note {
+            font-size: 1.08rem;
+            color: var(--text-muted);
+            max-width: 740px;
+            margin: 0 auto 1.75rem auto;
+        }
+
+        .nav-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .action-btn {
+            font-family: inherit;
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #ffffff;
+            padding: 0.9rem 1.8rem;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-play {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-play:hover {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-2px);
+        }
+
+        .action-btn:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 3px;
+        }
+
+        .menu-section {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .menu-section h2 {
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(251, 191, 36, 0.25);
+        }
+
+        .menu-section > p {
+            color: var(--text-main);
+            margin-bottom: 1.25rem;
+            font-size: 1.05rem;
+        }
+
+        .submenu-box {
+            background: var(--subcard-bg);
+            border-left: 4px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 1.25rem 1.4rem;
+            margin-top: 1rem;
+        }
+
+        .submenu-box h3 {
+            font-size: 1.28rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .submenu-box p {
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .submenu-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .mode-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 1rem 1.2rem;
+            margin-top: 0.85rem;
+        }
+
+        .mode-item h4 {
+            font-size: 1.12rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 0.35rem;
+        }
+
+        ul.help-list {
+            margin: 0.5rem 0 0.25rem 1.25rem;
+            color: var(--text-muted);
+        }
+
+        ul.help-list li {
+            margin-bottom: 0.4rem;
+        }
+
+        strong {
+            color: #ffffff;
+        }
+
+        .footer-box {
+            margin-top: 2.5rem;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .hero-box, .menu-section {
+                padding: 1.5rem 1.2rem;
+            }
+            h1 {
+                font-size: 1.85rem;
+            }
+            .menu-section h2 {
+                font-size: 1.4rem;
+            }
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="hero-box">
+            <h1>Hafızana Güven - Oyun Yardımı</h1>
+            <p class="intro-note">
+                Bu rehberde oyunun <strong>Ana Menü</strong> seçenekleri yukarıdan aşağıya doğru tam sırasıyla başlık olarak anlatılmıştır. Her ana menünün içine girdiğinizde karşınıza çıkan alt seçenekler ise yan başlıklar halinde yer almaktadır. Ekran okuyucu kullanıyorsanız <strong>2</strong> tuşuyla ana menü seçenekleri arasında, <strong>3</strong> ve <strong>4</strong> tuşlarıyla ise menü içindeki yan başlıklar arasında hızlıca gezinebilirsiniz.
+            </p>
+            <nav class="nav-actions" aria-label="Üst İşlem Menüsü">
+                <button type="button" class="action-btn btn-play" onclick="window.location.href='index.html'">
+                    Oyunu Oynamak İçin Tıklayın
+                </button>
+                <button type="button" class="action-btn btn-back" onclick="window.location.href='portal.html'">
+                    Geri Dön
+                </button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- 1. OYUNA BAŞLA -->
+            <section class="menu-section">
+                <h2>1. Oyuna Başla</h2>
+                <p>Ana menünün ilk seçeneğidir. Seçtiğinizde <strong>Oyun Modu Seçimi</strong> ekranı açılır ve karşınıza tek başınıza veya diğer oyuncularla oynayabileceğiniz yan başlıklar gelir.</p>
+
+                <div class="submenu-box">
+                    <h3>Çevrimdışı (Klasik) Oyna</h3>
+                    <p>Tek başınıza ilerleyebileceğiniz zorluk seviyelerini, hikayeli modu ve müzik eğitimi modlarını içeren menüyü açar:</p>
+
+                    <div class="mode-item">
+                        <h4>Kolay Mod</h4>
+                        <p>Başlangıçta tüm oyunculara açıktır. 30 saniye süre ve 3 hata hakkıyla başlarsınız. Bilgisayarın çaldığı nota dizisini doğru tuşlarla tekrar ederek <strong>2 turu</strong> tamamladığınızda kazanırsınız. Her doğru turda ek süre ve jeton verilir. Kolay modu <strong>5 kez</strong> tamamladığınızda Orta Modun kilidi açılır.</p>
+                    </div>
+
+                    <div class="mode-item">
+                        <h4>Orta Mod</h4>
+                        <p>Kolay modu 5 kez tamamladığınızda açılır. Kazanmak için <strong>5 turluk</strong> nota dizisini tamamlamanız gerekir. Tur başına daha yüksek jeton ve tamamladığınızda 25 XP kazandırır. Orta modu <strong>5 kez</strong> tamamladığınızda Zor Mod açılır.</p>
+                    </div>
+
+                    <div class="mode-item">
+                        <h4>Zor Mod</h4>
+                        <p>Orta modu 5 kez tamamladığınızda açılır. Hafızanızı en üst düzeyde sınayan <strong>10 turluk</strong> uzun nota dizilerinden oluşur. Başarıyla tamamladığınızda 100 Jeton ve 50 XP ödülü verir. Zor modu <strong>5 kez</strong> tamamladığınızda Kayıp Notalar hikaye modu açılır.</p>
+                    </div>
+
+                    <div class="mode-item">
+                        <h4>Kayıp Notalar</h4>
+                        <p>Zor modu 5 kez tamamladığınızda açılan sesli hikayeli macera modudur. Pan ve küçük kardeşi Bili arasında geçen ses efektli hikaye sahneleriyle başlar (diyalogları <strong>Enter</strong> tuşuyla ilerletebilirsiniz). Ardından karlı yolda (<strong>X: 0</strong> ile <strong>X: 30</strong> arasında) <strong>220 saniye</strong> içinde kaybolan 7 piyano tuşunu sırasıyla (<strong>Do, Re, Mi, Fa, Sol, La, Si</strong>) bulup <strong>X: 0</strong> konumundaki piyanoya tek tek yerleştirmeniz gerekir:</p>
+                        <ul class="help-list">
+                            <li><strong>Sağ Ok ve Sol Ok:</strong> Karlı yolda sağa ve sola yürümenizi sağlar; yaklaştığınız notaların sesini duyarsınız.</li>
+                            <li><strong>C Tuşu:</strong> Bulunduğunuz X konumunu, elinizde taşıdığınız notayı ve piyanoda kaç nota olduğunu seslendirir.</li>
+                            <li><strong>F Tuşu:</strong> Bulunduğunuz konumdaki notayı yerden alır veya X: 0 konumundayken notayı piyanoya yerleştirir.</li>
+                            <li><strong>T Tuşu:</strong> Kalan sürenizi söyler.</li>
+                            <li><strong>Alt + C:</strong> Yürüyüş sırasında toplam jeton bakiyenizi okur.</li>
+                            <li><strong>Enter Tuşu:</strong> Tüm 7 nota piyanoya yerleştirildikten sonra oyunu tamamlar ve 300 Jeton ödül kazandırır.</li>
+                        </ul>
+                    </div>
+
+                    <div class="mode-item">
+                        <h4>Ritim Avcısı</h4>
+                        <p>Metronom vuruşları eşliğinde çalınan notaları hem doğru tuşla hem de doğru zamanlamayla çaldığınız ritim modudur. Notaların çalınmadığı es (boşluk) vuruşlarında tuşa basmadan beklemeniz gerekir. 60 BPM hızdan başlar; her 3 başarılı turda seviye ve tempo artar. Toplam 3 hata hakkınız bulunur.</p>
+                    </div>
+
+                    <div class="mode-item">
+                        <h4>Müzik Terminolojisi</h4>
+                        <p>Müzik terimlerini öğrenip kendinizi sınayabileceğiniz eğitim modudur. İçine girdiğinizde <strong>Tempo (Hız)</strong>, <strong>Dinamik (Nüans)</strong>, <strong>Artikülasyon</strong>, <strong>İfade (Duygu)</strong> ve <strong>Tüm Terimleri Göster</strong> kategorileri karşınıza çıkar. Bir kategori seçtiğinizde açılan menüde şu seçenekler yer alır:</p>
+                        <ul class="help-list">
+                            <li><strong>Müzik Terminolojisi Sözlüğü:</strong> Seçilen kategorideki tüm terimleri ve anlamlarını aşağı/yukarı ok tuşlarıyla inceleyebilirsiniz.</li>
+                            <li><strong>Öğrenme Moduna Gir (Kartlar):</strong> Terimleri çalışma kartları halinde Sağ Ok (Sonraki) ve Sol Ok (Önceki) tuşlarıyla tek tek çalışabilirsiniz.</li>
+                            <li><strong>Kendini Test Et (Sınav):</strong> 8 kapalı karttan oluşan hafıza eşleştirme sınavıdır. Önce tüm kartları açıp terimlerin ve anlamlarının yerini ezberler, <strong>Hazırım, Kartları Kapat!</strong> butonuna bastıktan sonra eşleştirmeleri tamamlarsınız.</li>
+                        </ul>
+                    </div>
+
+                    <div class="mode-item">
+                        <h4>Geri Dön</h4>
+                        <p>Zorluk ve mod seçimi menüsünden çıkıp Ana Menüye döner.</p>
+                    </div>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Çok Oyunculu Oyna</h3>
+                    <p>Arkadaşlarınızla veya yapay zekaya karşı gerçek zamanlı yarışabileceğiniz çok oyunculu menüyü açar:</p>
+
+                    <div class="mode-item">
+                        <h4>Maç Oluştur</h4>
+                        <p>Size özel bir <strong>Oyun Lobisi</strong> ve oda kodu oluşturur. Lobi ekranında <strong>Bireysel</strong> veya <strong>Takım Modu</strong> seçimi yapabilir, <strong>Kodu Kopyala</strong> butonuyla oda numaranızı arkadaşlarınıza gönderebilir ve odaya oyuncular katıldığında (4 kişiye kadar) <strong>Maçı Başlat</strong> butonuyla karşılaşmayı başlatabilirsiniz.</p>
+                    </div>
+
+                    <div class="mode-item">
+                        <h4>Var Olan Bir Oyuna Katıl</h4>
+                        <p>Arkadaşınızın paylaştığı oda kodunu ilgili alana yazıp <strong>Katıl</strong> butonuna basarak bekleyen oyun lobisine katılmanızı sağlar.</p>
+                    </div>
+
+                    <div class="mode-item">
+                        <h4>Bota Karşı Oyna</h4>
+                        <p>Çevrimiçi oyuncu beklemeden doğrudan yapay zeka botuna karşı bire bir hafıza yarışı başlatır.</p>
+                    </div>
+
+                    <div class="mode-item">
+                        <h4>Geri</h4>
+                        <p>Çok Oyunculu menüsünden çıkıp Oyun Modu Seçimi ekranına döner.</p>
+                    </div>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Geri</h3>
+                    <p>Oyun Modu Seçimi ekranından çıkıp Ana Menüye geri döner.</p>
+                </div>
+            </section>
+
+            <!-- 2. OYUNU YENİDEN BAŞLAT -->
+            <section class="menu-section">
+                <h2>2. Oyunu Yeniden Başlat</h2>
+                <p>Oyuncu ilerlemenizi silmeden tarayıcı önbelleğini temizleyerek oyunu baştan yükleyen bakım seçeneğidir.</p>
+
+                <div class="submenu-box">
+                    <h3>Önbellek Temizleme ve Veri Koruma</h3>
+                    <p>Bu seçeneğe tıkladığınızda jetonlarınız, rütbeniz, başarımlarınız ve açtığınız oyun modları tamamen korunur; yalnızca geçici tarayıcı önbelleği temizlenerek sayfa taze biçimde yeniden başlatılır. Ses gecikmesi veya bağlantı takılması yaşadığınızda güvenle kullanabilirsiniz.</p>
+                </div>
+            </section>
+
+            <!-- 3. SES PAKETİNİ DEĞİŞTİR -->
+            <section class="menu-section">
+                <h2>3. Ses Paketini Değiştir</h2>
+                <p>Oyun içindeki notaları hangi enstrüman sesiyle duyacağınızı Ana Menüden çıkmadan tek tuşla değiştirmenizi sağlar.</p>
+
+                <div class="submenu-box">
+                    <h3>Piyano ve Satın Alınan Enstrüman Paketleri</h3>
+                    <p>Varsayılan olarak <strong>Piyano</strong> ses paketi aktiftir. Mağazadan <strong>Bağlama</strong>, <strong>Kaval</strong>, <strong>Flüt</strong> veya <strong>Kanun</strong> ses paketlerini satın aldıysanız, bu butona her tıkladığınızda sahip olduğunuz enstrümanlar arasında sırayla geçiş yapılır ve aktif olan enstrüman sesli olarak bildirilir.</p>
+                </div>
+            </section>
+
+            <!-- 4. KAYITLI OYUNDAN DEVAM ET -->
+            <section class="menu-section">
+                <h2>4. Kayıtlı Oyundan Devam Et</h2>
+                <p>Daha önce yarıda bırakıp kaydettiğiniz oyunları görüntüleyip kaldığınız turdan veya sahneden devam etmenizi sağlayan menüdür.</p>
+
+                <div class="submenu-box">
+                    <h3>Kayıtlı Oyunlar Listesi</h3>
+                    <p>Kaydettiğiniz oyunlar yeniden eskiye doğru sıralanır. Her kaydın üzerinde kayıt tarihi, oyun modu, kaldığınız tur/skor veya Kayıp Notalar modunda topladığınız nota sayısı ile kalan süreniz okunur. İstediğiniz kaydın üzerine gelip <strong>Enter</strong> tuşuna bastığınızda oyun kaldığı yerden devam eder.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Oyun Nasıl Kaydedilir?</h3>
+                    <p>Klasik modlarda (sıra sizdeyken), Alıştırma Modunda veya Kayıp Notalar Hikaye Modunda oynarken <strong>Ctrl + S</strong> tuşlarına basarak ya da çıkış butonuna bastığınızda açılan Duraklatma Menüsündeki <strong>Oyunu Kaydet</strong> seçeneğini kullanarak oyununuzu kaydedebilirsiniz.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Geri</h3>
+                    <p>Kayıtlı Oyunlar menüsünden Ana Menüye döner.</p>
+                </div>
+            </section>
+
+            <!-- 5. ALIŞTIRMA MODU -->
+            <section class="menu-section">
+                <h2>5. Alıştırma Modu</h2>
+                <p>Oyuna yeni başlayanlar veya süre sınırı olmadan nota-tuş eşleşmelerini öğrenmek isteyenler için hazırlanmış eğitim menüsüdür.</p>
+
+                <div class="submenu-box">
+                    <h3>Bilgilendirme Diyalogları</h3>
+                    <p>Alıştırma Moduna girdiğinizde önce oyunun amacını, 7 notanın hangi harflere karşılık geldiğini ve oyun içi klavye kısayollarını anlatan sesli metinler açılır. Her adımı dinledikten sonra <strong>Enter</strong> tuşuna basarak ilerleyebilirsiniz.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Uygulamalı Nota Çalışması</h3>
+                    <p>Diyalogların ardından sistem sizden sırasıyla <strong>C (Do), D (Re), E (Mi), F (Fa), G (Sol), A (La) ve B (Si)</strong> tuşlarına 3'er defa üst üste doğru basmanızı ister. Yanlış tuşa bastığınızda hak veya süre kaybı olmaz; sistem doğru notayı bulmanız için size rehberlik eder.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Geri</h3>
+                    <p>Tüm notaları tamamladığınızda veya <strong>Escape</strong> tuşuna bastığınızda Ana Menüye döner.</p>
+                </div>
+            </section>
+
+            <!-- 6. BAŞARILAR -->
+            <section class="menu-section">
+                <h2>6. Başarılar</h2>
+                <p>Oyun boyunca kazandığınız bilişsel, hız ve sadakat ödüllerini inceleyebileceğiniz ve yeni hedeflerinizi takip edebileceğiniz menüdür.</p>
+
+                <div class="submenu-box">
+                    <h3>Kazanılanlar</h3>
+                    <p>Şimdiye kadar tamamladığınız tüm başarımların listelendiği bölümdür. Ayrıca oyun sırasında yeni bir başarım kazandığınızda açılan pencereden <strong>Mesajı Kopyala</strong>, <strong>WhatsApp'ta Paylaş</strong> veya <strong>Telegram'da Paylaş</strong> butonlarını kullanabilirsiniz.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Sıradaki Hedefler</h3>
+                    <p>Henüz açılmamış başarımları, tamamlanma yüzdelerini ve hedefi başardığınızda kazanacağınız Jeton / XP ödüllerini gösterir.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Geri</h3>
+                    <p>Başarılar menüsünden Ana Menüye döner.</p>
+                </div>
+            </section>
+
+            <!-- 7. MAĞAZA -->
+            <section class="menu-section">
+                <h2>7. Mağaza</h2>
+                <p>Oyunlardan ve günlük giriş serilerinden biriktirdiğiniz Jetonlarla koruyucu güçlendirmeler ve kalıcı enstrüman ses paketleri satın alabileceğiniz menüdür. Girişte mevcut jeton bakiyeniz seslendirilir.</p>
+
+                <div class="submenu-box">
+                    <h3>Hata Koruması Satın Al (50 Jeton)</h3>
+                    <p>Tek kullanımlık koruma kalkanıdır ve aynı anda en fazla 1 adet taşınabilir. Klasik oyun modlarında yanlış notaya bastığınızda hakkınız gitmez, 5 saniye süre cezası uygulanmaz ve nota dizisi yeniden çalınır.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Zaman Koruması Satın Al (30 Jeton)</h3>
+                    <p>Tek kullanımlık süre kalkanıdır ve aynı anda en fazla 1 adet taşınabilir. Süreniz sıfırlandığında oyun bitmez; otomatik olarak devreye girip size tek seferlik <strong>15 saniye</strong> ek süre kazandırır.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Seri Dondurma Satın Al (80 Jeton)</h3>
+                    <p>En fazla 2 adet taşınabilir. Oyuna giremediğiniz her gün için 1 adet harcanarak günlük giriş serinizin bozulmamasını sağlar.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Bağlama Ses Paketi Satın Al (500 Jeton)</h3>
+                    <p>Notaları piyano yerine bağlama sesiyle duymanızı sağlar. Kalıcı olarak açılır; satın aldıktan sonra mağazadan veya Ana Menüden istediğiniz zaman etkinleştirip kapatabilirsiniz.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Kaval Ses Paketi Satın Al (100 Jeton)</h3>
+                    <p>Notaları piyano yerine kaval sesiyle duymanızı sağlar ve kalıcı olarak hesabınıza eklenir.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Flüt Ses Paketi Satın Al (200 Jeton)</h3>
+                    <p>Notaları piyano yerine flüt sesiyle duymanızı sağlar ve kalıcı olarak hesabınıza eklenir.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Kanun Ses Paketi Satın Al (300 Jeton)</h3>
+                    <p>Notaları piyano yerine kanun sesiyle duymanızı sağlar ve kalıcı olarak hesabınıza eklenir.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Geri</h3>
+                    <p>Mağazadan çıkıp Ana Menüye döner.</p>
+                </div>
+            </section>
+
+            <!-- 8. AYARLAR -->
+            <section class="menu-section">
+                <h2>8. Ayarlar</h2>
+                <p>Ses seviyelerini, görsel temayı, klavye düzenini ve bildirim tercihlerini özelleştirebileceğiniz menüdür.</p>
+
+                <div class="submenu-box">
+                    <h3>Müzik Sesi Düzeyi</h3>
+                    <p>Arka plan müziklerinin ses düzeyini yüzde 0 ile yüzde 100 arasında sağ ve sol ok tuşlarıyla ayarlar.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Oyun Efekt Sesi Düzeyi</h3>
+                    <p>Enstrüman notalarının, yürüme adımlarının, doğru/yanlış uyarılarının ve menü geçiş efektlerinin ses düzeyini yüzde 0 ile yüzde 100 arasında ayarlar.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Oyun Müziğini Devre Dışı Bırak / Etkinleştir</h3>
+                    <p>Arka plan müziklerini tamamen susturur veya yeniden açar.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Başlangıçta Logoyu Atla</h3>
+                    <p>Açık konuma getirildiğinde oyun açılışındaki yapımcı imzası ve sesli logo ekranı atlanarak doğrudan Ana Menüye geçilir.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Kayıp Notalar Hikaye Diyaloğunu Atla</h3>
+                    <p>Açık konuma getirildiğinde Kayıp Notalar moduna girerken başlangıçtaki hikaye diyalogları atlanır ve doğrudan karlı haritada nota arama bölümü başlar.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Çevrimiçi Bildirimleri</h3>
+                    <p>Diğer oyuncular çevrimiçi olduğunda veya oyundan çıktığında duyulan sesli bildirimleri açıp kapatmanızı sağlar.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Oyun İçi Motivasyon Mesajları</h3>
+                    <p>Başarılı turlardan sonra okunan coşkulu motivasyon mesajlarını açar veya daha kısa ve hızlı anonslar için kapatır.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Oyun Teması</h3>
+                    <p>Görsel renk görünümünü değiştirmenizi sağlar: <strong>Varsayılan (Karanlık)</strong>, <strong>Aydınlık</strong>, <strong>Okyanus</strong>, <strong>Orman</strong>, <strong>Gün Batımı</strong>, <strong>Hacker</strong> ve <strong>Retro</strong>.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Oyun İçi Klavye Düzeni</h3>
+                    <p>Notaları çalmak için kullanacağınız tuş düzenini belirler:</p>
+                    <ul class="help-list">
+                        <li><strong>Evrensel Düzen:</strong> Notalar <strong>A, B, C, D, E, F, G</strong> harfleriyle çalınır (Do: C, Re: D, Mi: E, Fa: F, Sol: G, La: A, Si: B).</li>
+                        <li><strong>Numaratör Düzeni:</strong> Notalar <strong>1, 2, 3, 4, 5, 6, 7</strong> rakamlarıyla çalınır (1: La, 2: Si, 3: Do, 4: Re, 5: Mi, 6: Fa, 7: Sol).</li>
+                    </ul>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Ayarları Kaydet ve Geri</h3>
+                    <p><strong>Ayarları Kaydet</strong> butonu yaptığınız değişiklikleri onaylayarak Ana Menüye döner; <strong>Geri</strong> butonu doğrudan Ana Menüye çıkar.</p>
+                </div>
+            </section>
+
+            <!-- 9. GERİ BİLDİRİM -->
+            <section class="menu-section">
+                <h2>9. Geri Bildirim</h2>
+                <p>Oyun oynarken karşılaştığınız sorunları veya yeni fikirlerinizi doğrudan geliştiriciye iletmenizi sağlayan form menüsüdür.</p>
+
+                <div class="submenu-box">
+                    <h3>Adınız (İsteğe Bağlı)</h3>
+                    <p>Dilerseniz adınızı veya oyuncu takma adınızı yazabileceğiniz metin alanıdır.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Kategori Seçin</h3>
+                    <p>Mesajınızın konusuna göre <strong>Hata önerin</strong> veya <strong>Öneride bulunun</strong> seçeneklerinden birini belirlediğiniz seçim kutusudur.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Biletiniz - Mesajınız</h3>
+                    <p>Yaşadığınız hatayı veya önerinizi ayrıntılı olarak yazabileceğiniz metin kutusudur. Form alanları arasında <strong>Tab</strong> tuşuyla gezinebilirsiniz.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Gönder ve Geri</h3>
+                    <p><strong>Gönder</strong> butonu mesajınızı sunucuya iletir ve onay mesajının ardından Ana Menüye döner; <strong>Geri</strong> butonu formu kapatıp Ana Menüye çıkar.</p>
+                </div>
+            </section>
+
+            <!-- 10. GÜNCELLEME DURUMU -->
+            <section class="menu-section">
+                <h2>10. Güncelleme Durumu</h2>
+                <p>Oyunun sunucudaki en son sürümle uyumlu olup olmadığını gösteren bilgi düğmesidir.</p>
+
+                <div class="submenu-box">
+                    <h3>Zorunlu Güncelleme ve Yapılan Son Değişiklik</h3>
+                    <p>Yeni bir güncelleme yayınlandığında otomatik olarak güncelleme penceresi açılır; <strong>Yükle (Sayfayı Yenile)</strong> butonuyla en güncel sürüm yüklenir ve açılışta son sürümde yapılan yenilikler okunur.</p>
+                </div>
+            </section>
+
+            <!-- 11. ETKİNLİK DURUMU -->
+            <section class="menu-section">
+                <h2>11. Etkinlik Durumu</h2>
+                <p>Aktif etkinliği veya sıradaki etkinliğin başlamasına kalan süreyi gösteren durum alanıdır.</p>
+
+                <div class="submenu-box">
+                    <h3>Çift Jeton Etkinliği</h3>
+                    <p>Her hafta <strong>Cumartesi saat 12:00</strong>'den <strong>Pazar gece 23:59</strong>'a kadar Çift Jeton Etkinliği aktif olur. Bu süre boyunca oyun turlarından, Kayıp Notalar modundan ve günlük giriş ödüllerinden kazandığınız tüm jetonlar 2 katına çıkar.</p>
+                </div>
+            </section>
+
+            <!-- 12. TELEGRAM KANALINA KATILIN -->
+            <section class="menu-section">
+                <h2>12. Telegram Kanalına Katılın</h2>
+                <p>Hafızana Güven resmi Telegram topluluk kanalını yeni sekmede açar.</p>
+
+                <div class="submenu-box">
+                    <h3>Duyurular ve Topluluk</h3>
+                    <p>Güncelleme notlarını, etkinlik duyurularını ve oyuncu paylaşımlarını resmi Telegram kanalı üzerinden takip edebilirsiniz.</p>
+                </div>
+            </section>
+
+            <!-- 13. ÇIKIŞ -->
+            <section class="menu-section">
+                <h2>13. Çıkış</h2>
+                <p>Ana menünün son seçeneğidir. Seçtiğinizde oyunu güvenli şekilde sonlandırır ve sekmenizi kapatabileceğinizi sesli olarak bildirir.</p>
+            </section>
+
+            <!-- EK BÖLÜM 1: ALT SEKMELER VE CANLI SOHBET -->
+            <section class="menu-section">
+                <h2>Alt Sekmeler ve Canlı Sohbet</h2>
+                <p>Mobil cihazlarda ekranın altındaki sekme çubuğundan, bilgisayarda ise kısayol tuşlarıyla erişebileceğiniz sosyal ve profil ekranlarıdır.</p>
+
+                <div class="submenu-box">
+                    <h3>Ev (Ana Sayfa - Kısayol: Alt + 1)</h3>
+                    <p>Sosyal veya Profil sekmesindeyken doğrudan Ana Menüye dönmenizi sağlar.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Sosyal Menüsü (Kısayol: Alt + 2)</h3>
+                    <p>O an oyunda çevrimiçi olan oyuncuları listeler. Bir oyuncunun üzerine gelip seçtiğinizde açılan işlem menüsünden <strong>Özel Mesaj Gönder</strong> veya <strong>Kullanıcıyı Sustur</strong> seçeneklerini kullanabilirsiniz.</p>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Oyuncu Profili ve İstatistikler (Kısayol: Alt + 3)</h3>
+                    <p>Profil bilgilerinizi ve tüm oyun geçmişinizi barındırır:</p>
+                    <ul class="help-list">
+                        <li><strong>Kullanıcı Adını Değiştir:</strong> Sohbet ve çevrimiçi listede görünen adınızı günceller.</li>
+                        <li><strong>Oyun Bildirimlerini Aç:</strong> Tarayıcı bildirimlerine izin vererek hatırlatma ve duyuru bildirimleri almanızı sağlar.</li>
+                        <li><strong>Rütbe ve İstatistikler:</strong> Kazandığınız XP puanına göre rütbenizi (<em>Çaylak, Çırak, Deneyimli, Hafıza Ustası, Zihin Okuyucu, Zeka Küpü, Efsane</em>), jeton bakiyenizi, günlük giriş serinizi, mod tamamlama sayılarınızı gösterir ve <strong>İstatistiklerimi Kopyala</strong> butonuyla panoya kopyalamanızı sağlar.</li>
+                    </ul>
+                </div>
+
+                <div class="submenu-box">
+                    <h3>Canlı Sohbet (Kısayol: Nokta Tuşu)</h3>
+                    <p>Klavyeden <strong>Nokta (.)</strong> tuşuna basarak veya ekrandaki Canlı Sohbet düğmesine tıklayarak diğer oyuncularla anlık mesajlaşabileceğiniz pencereyi açıp kapatabilirsiniz. Kapatmak için <strong>Escape</strong> tuşunu da kullanabilirsiniz.</p>
+                </div>
+            </section>
+
+            <!-- EK BÖLÜM 2: KISAYOLLAR ÖZETİ -->
+            <section class="menu-section">
+                <h2>Oyun İçi Klavye Kısayolları Özeti</h2>
+                <p>Oyun sırasında ve menülerde hız kazandıran temel klavye kısayolları şunlardır:</p>
+
+                <div class="submenu-box">
+                    <h3>Genel ve Oyun İçi Kısayollar</h3>
+                    <ul class="help-list">
+                        <li><strong>Yukarı / Aşağı / Sağ / Sol Ok Tuşları:</strong> Menülerde seçenekler arasında gezinir.</li>
+                        <li><strong>Enter Tuşu:</strong> Seçili menü öğesini onaylar ve diyalogları ilerletir.</li>
+                        <li><strong>Escape Tuşu:</strong> Alt menülerden geri çıkar; oyun içindeyken Duraklatma / Çıkış menüsünü kontrol eder.</li>
+                        <li><strong>Boşluk (Space) Tuşu:</strong> Klasik oyun sırasında 1 saniye süre cezası karşılığında nota dizisini tekrar dinletir (mobilde <strong>Tekrar Dinle</strong> butonu görünür).</li>
+                        <li><strong>S Tuşu:</strong> Klasik oyun sırasında geçilen turu ve o oyunda kazanılan jetonu okur.</li>
+                        <li><strong>T Tuşu:</strong> Kalan süreyi seslendirir.</li>
+                        <li><strong>C Tuşu (Hikaye modunda Alt + C):</strong> Toplam jeton bakiyenizi okur (Kayıp Notalar yürüyüş aşamasında tek başına C tuşu konumu sorgular).</li>
+                        <li><strong>Ctrl + S:</strong> Aktif oyunu kaydeder.</li>
+                        <li><strong>Home ve End Tuşları:</strong> Oyunun genel ses düzeyini artırır ve azaltır.</li>
+                        <li><strong>Page Up ve Page Down Tuşları:</strong> Arka plan müzik sesini artırır ve azaltır.</li>
+                        <li><strong>M Tuşu:</strong> Arka plan müziklerini hızlıca sessize alır veya açar.</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <footer class="hero-box footer-box">
+            <nav class="nav-actions" aria-label="Alt İşlem Menüsü">
+                <button type="button" class="action-btn btn-play" onclick="window.location.href='index.html'">
+                    Oyunu Oynamak İçin Tıklayın
+                </button>
+                <button type="button" class="action-btn btn-back" onclick="window.location.href='portal.html'">
+                    Geri Dön
+                </button>
+            </nav>
+        </footer>
+    </div>
+</body>
+</html>
