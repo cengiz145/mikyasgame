@@ -1,14 +1,14 @@
 ﻿$ErrorActionPreference = "Stop"
 $dir = $PSScriptRoot
 if (-not $dir) { $dir = ".\" }
-$newVersion = "0.98.1.1"
+$newVersion = "0.98.1.2"
 
 Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"
 $vJson = Get-Content $vJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $vJson.version = $newVersion
 $vJson.buildId = [int][double]::Parse((Get-Date -UFormat %s))
-$vJson.changelog = "Kayıp Notalar (Hikaye Modu) sesli dublaj kadrosu %100 ana dili İstanbul Türkçesi olan profesyonel stüdyo sanatçılarıyla (Eleven v4 motoru) baştan sona yenilendi."
+$vJson.changelog = "Kayıp Notalar (Hikaye Modu) Pan ve Bili karakter sesleri yenilendi: Pan akıllı ve sevecen genç erkek çocuk tınısıyla, Bili ise şımarık, egoist ve yaramaz küçük erkek kardeş tınısıyla yeniden seslendirildi."
 $vJson | ConvertTo-Json -Depth 5 | Set-Content $vJsonPath -Encoding UTF8
 
 Write-Host "Updating package.json..."
@@ -41,9 +41,8 @@ if ($firstVersion -notmatch "\[v$newVersion\]") {
     $newEntry = @"
 [v$newVersion] - $todayDate
 
-Kayıp Notalar %100 Doğal İstanbul Türkçesi Stüdyo Dublajı:
-- Kayıp Notalar (Hikaye Modu) seslendirme kadrosu yabancı çok dilli sesler yerine %100 ana dili İstanbul Türkçesi olan gerçek stüdyo ve tiyatro sanatçılarıyla (Anlatıcı Uğur Işık, Pan Orhan, Bili Deniz, Sihirli Notalar Ezgi) ve yeni nesil Eleven v4 Türkçe ses motoruyla baştan sona yeniden kaydedildi.
-- Ses dosyalarına sürüm tabanlı önbellek yenileyici eklendi.
+Pan ve Bili Özel Genç Erkek Karakter Dublajı:
+- Pan için akıllı, kibar ve sevecen genç erkek karakter sesi; Bili için ise şımarık, egoist, ukala ve yaramaz küçük erkek kardeş sesi özel olarak tasarlanıp tüm diyalog sahneleri yeniden kaydedildi.
 
 "@
     $newChangelog = @()
