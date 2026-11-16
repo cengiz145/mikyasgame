@@ -1,7 +1,7 @@
 ﻿$ErrorActionPreference = "Stop"
 $dir = $PSScriptRoot
 if (-not $dir) { $dir = ".\" }
-$newVersion = "0.98.1.3"
+$newVersion = "0.98.1.4"
 
 Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"

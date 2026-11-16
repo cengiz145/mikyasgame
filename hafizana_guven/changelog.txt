@@ -1,5 +1,11 @@
 ﻿# Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.98.1.4] - 17.11.2026
+
+Pan ve Bili Özel Genç Erkek Karakter Dublajı:
+- Pan için akıllı, kibar ve sevecen genç erkek karakter sesi; Bili için ise şımarık, egoist, ukala ve yaramaz küçük erkek kardeş sesi özel olarak tasarlanıp tüm diyalog sahneleri yeniden kaydedildi.
+
+
 [v0.98.1.3] - 17.11.2026
 
 Pan ve Bili Özel Genç Erkek Karakter Dublajı:
