@@ -1,4 +1,4 @@
-﻿
+
 window.getRankInfo = function(xp) {
     if (xp < 100) return { name: 'Çaylak', next: 100 };
     if (xp < 300) return { name: 'Çırak', next: 300 };
@@ -1739,6 +1739,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.storyNoteSounds) {
                 for (let i = 0; i < window.storyNoteSounds.length; i++) window.storyNoteSounds[i].volume(0.15 * scale);
             }
+            if (window.currentStoryVoiceAudio) {
+                window.currentStoryVoiceAudio.volume = Math.max(0, Math.min(1, scale));
+            }
         };
 
         if (sfxVolumeSlider && sfxVolumeDisplay) {
@@ -1845,6 +1848,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.updateStoryBtnState();
                 if (window.announceToScreenReader) {
                     window.announceToScreenReader(disableStory ? "Hikaye diyalogları atlanacak." : "Hikaye diyalogları gösterilecek.", true);
+                }
+            });
+        }
+
+        const toggleStoryVoiceBtn = document.getElementById('toggle-story-voice-btn');
+        window.updateStoryVoiceBtnState = () => {
+            let disableVoice = localStorage.getItem('hafizaGuvenDisableStoryVoice') === 'true';
+            if (toggleStoryVoiceBtn) {
+                toggleStoryVoiceBtn.innerText = disableVoice ? "Kayıp Notalar Sesli Dublaj (Kapalı)" : "Kayıp Notalar Sesli Dublaj (Açık)";
+                toggleStoryVoiceBtn.setAttribute('aria-label', toggleStoryVoiceBtn.innerText);
+            }
+        };
+
+        if (toggleStoryVoiceBtn) {
+            window.updateStoryVoiceBtnState();
+            toggleStoryVoiceBtn.addEventListener('click', () => {
+                if (window.menuEnterSound) window.menuEnterSound.play();
+                let disableVoice = localStorage.getItem('hafizaGuvenDisableStoryVoice') === 'true';
+                disableVoice = !disableVoice;
+                localStorage.setItem('hafizaGuvenDisableStoryVoice', disableVoice);
+                window.updateStoryVoiceBtnState();
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader(disableVoice ? "Kayıp Notalar sesli dublajı kapatıldı. Hikaye metinlerini ekran okuyucu okuyacak." : "Kayıp Notalar sesli dublajı açıldı.", true);
                 }
             });
         }
@@ -4305,6 +4331,10 @@ window.requestPauseMenu = function() {
         modal.removeAttribute('inert');
         modal.removeAttribute('aria-hidden');
         if (window.clockTickSound && window.clockTickSound.playing()) window.clockTickSound.pause();
+        if (window.currentStoryVoiceAudio && !window.currentStoryVoiceAudio.paused) {
+            window.storyVoicePausedByMenu = true;
+            window.currentStoryVoiceAudio.pause();
+        }
         
         setTimeout(() => {
             modal.style.opacity = '1';
@@ -4336,6 +4366,10 @@ window.resumeFromPause = function() {
             if (window.currentActiveMenu === 'story') {
                 const storyStatus = document.getElementById('story-status-text');
                 if (storyStatus) storyStatus.focus();
+                if (window.storyVoicePausedByMenu && window.currentStoryVoiceAudio) {
+                    window.storyVoicePausedByMenu = false;
+                    window.currentStoryVoiceAudio.play().catch(() => {});
+                }
             } else if (window.clockTickSound && window.clockTickSound.state() === 'loaded') {
                 if (!window.clockTickSound.playing() && window.gameTimer > 0 && !window.isComputerPlaying) {
                     window.clockTickSound.play();

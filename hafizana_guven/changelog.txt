@@ -1,4 +1,12 @@
-# Hafızana Güven - Değişiklik Günlüğü (Changelog)
+﻿# Hafızana Güven - Değişiklik Günlüğü (Changelog)
+
+[v0.98.1.0] - 16.11.2026
+
+Kayıp Notalar Sesli Dublaj (Radyo Tiyatrosu) ve Oyun Yardımı Rehberi:
+- Kayıp Notalar (Hikaye Modu) baştan sona Türkçe karakter dublajlarıyla seslendirildi! Masal Anlatıcısı, Pan, yaramaz kardeş Bili ve karların içinden kurtarılan sihirli notalar artık kendi özgün sesleriyle konuşuyor.
+- Ayarlar menüsüne "Kayıp Notalar Sesli Dublaj (Açık/Kapalı)" seçeneği eklendi.
+- Oyunun tüm ana menü ve yan başlıklarını sırasıyla anlatan kapsamlı Oyun Yardımı web sayfası eklendi.
+
 
 [v0.98.0.2] - 15.11.2026
 

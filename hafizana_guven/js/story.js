@@ -1,4 +1,4 @@
-﻿// story.js - Hikaye Modu, Yürüme Mekanikleri ve Kayıp Notalar
+// story.js - Hikaye Modu, Yürüme Mekanikleri ve Kayıp Notalar
 
 window.inStoryMode = false;
 window.currentStoryIndex = 0;
@@ -10,6 +10,21 @@ window.isStoryModeFinishedWaitingForEnter = false;
 window.isRhythmUnlockDialogWaitingForEnter = false;
 window.isSoundPacksUnlockDialogWaitingForEnter = false;
 window.storyWinAchievementsChecked = false;
+window.currentStoryVoiceAudio = null;
+window.storyVoicePausedByMenu = false;
+
+window.stopStoryVoiceover = function () {
+    window.storyVoicePausedByMenu = false;
+    if (window.currentStoryVoiceAudio) {
+        try {
+            window.currentStoryVoiceAudio.onended = null;
+            window.currentStoryVoiceAudio.onerror = null;
+            window.currentStoryVoiceAudio.pause();
+            window.currentStoryVoiceAudio.currentTime = 0;
+        } catch (e) {}
+        window.currentStoryVoiceAudio = null;
+    }
+};
 
 window.getSfxScale = function () {
     let saved = localStorage.getItem('hafizaGuvenSfxVolume');
@@ -96,6 +111,7 @@ window.quitStoryMode = function () {
     window.isSoundPacksUnlockDialogWaitingForEnter = false;
     window.carryingNote = null;
     window.gameIsPaused = false;
+    window.stopStoryVoiceover();
 
     // Zamanlayıcıyı temizle (oyun genelindeki diğer zamanlayıcıları bozmadan)
     if (window.storyTimerIntervalId) {
@@ -137,21 +153,62 @@ window.playCurrentStoryDialog = function () {
 
     if (!window.missingNotesDialogues || !window.missingNotesDialogues[window.currentStoryIndex]) return;
 
-    let appendedText = window.missingNotesDialogues[window.currentStoryIndex];
+    window.stopStoryVoiceover();
+
+    const sceneIdx = window.currentStoryIndex;
+    let appendedText = window.missingNotesDialogues[sceneIdx];
     let formattedText = appendedText.replace(
         /(Devam etmek için (?:entıra|Enter'a|Enter tuşuna) basın\.|Hikaye sona erdi, oyuna başlamak için Enter tuşuna basın\.)/gi,
         "<strong>$1</strong>"
     );
     let finalHtml = window.localizeText ? window.localizeText(formattedText) : formattedText;
+    let localizedPlain = window.localizeText ? window.localizeText(appendedText) : appendedText;
+    const useVoiceover = localStorage.getItem('hafizaGuvenDisableStoryVoice') !== 'true';
 
     if (window.dado3Sound) {
         let sid = window.dado3Sound.play();
-        window.dado3Sound.volume(0.8 * window.getSfxScale(), sid);
+        window.dado3Sound.volume((useVoiceover ? 0.35 : 0.8) * window.getSfxScale(), sid);
     }
     storyStatus.innerHTML = finalHtml;
 
-    if (window.announceToScreenReader) {
-        window.announceToScreenReader(window.localizeText ? window.localizeText(appendedText) : appendedText, true);
+    if (useVoiceover && sceneIdx >= 0 && sceneIdx <= 16) {
+        const padIdx = String(sceneIdx).padStart(2, '0');
+        const voiceAudio = new window.Audio(`sounds/story/story_${padIdx}.mp3`);
+        voiceAudio.volume = Math.max(0, Math.min(1, window.getSfxScale()));
+        window.currentStoryVoiceAudio = voiceAudio;
+
+        const fallbackToSR = () => {
+            if (window.currentStoryVoiceAudio === voiceAudio) {
+                window.currentStoryVoiceAudio = null;
+            }
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader(localizedPlain, true);
+            }
+        };
+
+        voiceAudio.onerror = fallbackToSR;
+        voiceAudio.onended = () => {
+            if (window.currentStoryVoiceAudio === voiceAudio) {
+                window.currentStoryVoiceAudio = null;
+            }
+            if (!window.inStoryMode || window.isGridWalkingPhase || window.currentStoryIndex !== sceneIdx) return;
+            if (sceneIdx === 0 && window.announceToScreenReader) {
+                const hint = window.localizeText ? window.localizeText("Devam etmek için Enter tuşuna basın.") : "Devam etmek için Enter tuşuna basın.";
+                window.announceToScreenReader(hint, false);
+            } else if (sceneIdx === 16 && window.announceToScreenReader) {
+                const endHint = window.localizeText ? window.localizeText("Hikaye sona erdi, oyuna başlamak için Enter tuşuna basın.") : "Hikaye sona erdi, oyuna başlamak için Enter tuşuna basın.";
+                window.announceToScreenReader(endHint, false);
+            }
+        };
+
+        const p = voiceAudio.play();
+        if (p !== undefined) {
+            p.catch(() => fallbackToSR());
+        }
+    } else {
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader(localizedPlain, true);
+        }
     }
 };
 
@@ -182,14 +239,18 @@ window.triggerStoryAnimations = function (index) {
         ? window.hgfzZamanlayici.setInterval.bind(window.hgfzZamanlayici)
         : setInterval;
 
+    const useVoiceover = localStorage.getItem('hafizaGuvenDisableStoryVoice') !== 'true';
+
     if (index === 0) {
         let count = 0;
+        const noteVolFactor = useVoiceover ? 0.32 : 0.8;
+        const doorVolFactor = useVoiceover ? 0.45 : 1.0;
         window.storyAnimInterval1 = setLoop(() => {
             const keys = ['c', 'e', 'g', 'c', 'f', 'a', 'd', 'b', 'g'];
             const randomKey = keys[Math.floor(Math.random() * keys.length)];
             if (window.activeNotes && window.activeNotes[randomKey]) {
                 let sndId = window.activeNotes[randomKey].play();
-                window.activeNotes[randomKey].volume(0.8 * sfxScale, sndId);
+                window.activeNotes[randomKey].volume(noteVolFactor * sfxScale, sndId);
                 window.activeNotes[randomKey].seek(0.045, sndId);
             }
             count++;
@@ -199,14 +260,14 @@ window.triggerStoryAnimations = function (index) {
         window.storyAnimTimeout1 = setTimer(() => {
             if (window.enterHouseSound) {
                 let eid = window.enterHouseSound.play();
-                window.enterHouseSound.volume(1.0 * sfxScale, eid);
+                window.enterHouseSound.volume(doorVolFactor * sfxScale, eid);
             }
             let stepCount = 0;
             window.storyAnimInterval2 = setLoop(() => {
                 if (window.carpetStepSounds && window.carpetStepSounds.length > 0) {
                     let s = window.carpetStepSounds[Math.floor(Math.random() * window.carpetStepSounds.length)];
                     let sid = s.play();
-                    s.volume(Math.min(1.0, 0.2 + (stepCount * 0.2)) * sfxScale, sid);
+                    s.volume(Math.min(doorVolFactor, 0.15 + (stepCount * 0.12)) * sfxScale, sid);
                 }
                 stepCount++;
                 if (stepCount > 3) {
@@ -215,7 +276,7 @@ window.triggerStoryAnimations = function (index) {
                         if (window.doorCloseSound) {
                             let did = window.doorCloseSound.play();
                             window.doorCloseSound.rate(1.0, did);
-                            window.doorCloseSound.volume(1.0 * sfxScale, did);
+                            window.doorCloseSound.volume(doorVolFactor * sfxScale, did);
                         }
                     }, 500);
                 }
@@ -226,16 +287,23 @@ window.triggerStoryAnimations = function (index) {
         if (window.storyBGM) {
             let isMuted = localStorage.getItem('hafizaGuvenMusicMuted') === 'true';
             window.storyBGM.mute(isMuted);
-            window.storyBGM.volume(0.5 * window.getMusicScale());
+            window.storyBGM.volume((useVoiceover ? 0.25 : 0.5) * window.getMusicScale());
             if (!window.storyBGM.playing()) window.storyBGM.play();
         }
-        if (window.glasshitSound) {
-            let gid = window.glasshitSound.play();
-            window.glasshitSound.volume(1.0 * sfxScale, gid);
-        }
-        if (window.wrongSound) {
-            let wid = window.wrongSound.play();
-            window.wrongSound.volume(1.0 * sfxScale, wid);
+        const playCrash = () => {
+            if (window.glasshitSound) {
+                let gid = window.glasshitSound.play();
+                window.glasshitSound.volume(1.0 * sfxScale, gid);
+            }
+            if (window.wrongSound) {
+                let wid = window.wrongSound.play();
+                window.wrongSound.volume(0.85 * sfxScale, wid);
+            }
+        };
+        if (useVoiceover) {
+            window.storyAnimTimeout3 = setTimer(playCrash, 950);
+        } else {
+            playCrash();
         }
     } else if (index === 8) {
         window.storyAnimTimeout3 = setTimer(() => {
@@ -388,6 +456,7 @@ window.startStoryTimer = function (initialSeconds) {
 };
 
 window.initializeMissingNotesMap = function () {
+    window.stopStoryVoiceover();
     window.notesInPiano = [];
     window.carryingNote = null;
     window.isStoryModeWon = false;
@@ -514,6 +583,7 @@ window.handleStoryWalking = function (key) {
     } else if (key.toLowerCase() === 'f') {
         if (window.playerX === window.pianoX) {
             if (window.carryingNote) {
+                window.stopStoryVoiceover();
                 window.notesInPiano.push(window.carryingNote);
                 let droppedNote = window.carryingNote;
                 window.carryingNote = null;
@@ -575,13 +645,42 @@ window.handleStoryWalking = function (key) {
 
                     let baseMsg = "Notayı yerden aldınız. Şimdi X: 0 konumundaki piyanoya bırakmanız gerekiyor.";
                     let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
-                    if (!disableMotivation && window.missingNotesHappyMessages && window.missingNotesHappyMessages.length > window.notesInPiano.length) {
-                        baseMsg = window.missingNotesHappyMessages[window.notesInPiano.length] + " Şimdi onu X: 0 konumundaki piyanoya götürmelisin.";
+                    let useVoiceover = localStorage.getItem('hafizaGuvenDisableStoryVoice') !== 'true';
+                    const noteIdx = window.notesInPiano.length;
+                    if (!disableMotivation && window.missingNotesHappyMessages && window.missingNotesHappyMessages.length > noteIdx) {
+                        baseMsg = window.missingNotesHappyMessages[noteIdx] + " Şimdi onu X: 0 konumundaki piyanoya götürmelisin.";
                     }
 
                     const storyStatus = document.getElementById('story-status-text');
                     if (storyStatus) storyStatus.innerHTML = baseMsg;
-                    if (window.announceToScreenReader) window.announceToScreenReader(baseMsg);
+
+                    if (!disableMotivation && useVoiceover && noteIdx >= 0 && noteIdx < 10) {
+                        window.stopStoryVoiceover();
+                        const padNote = String(noteIdx).padStart(2, '0');
+                        const happyAudio = new window.Audio(`sounds/story/happy_${padNote}.mp3`);
+                        happyAudio.volume = Math.max(0, Math.min(1, sfxScale));
+                        window.currentStoryVoiceAudio = happyAudio;
+
+                        happyAudio.onerror = () => {
+                            if (window.currentStoryVoiceAudio === happyAudio) window.currentStoryVoiceAudio = null;
+                            if (window.announceToScreenReader) window.announceToScreenReader(baseMsg);
+                        };
+                        happyAudio.onended = () => {
+                            if (window.currentStoryVoiceAudio === happyAudio) window.currentStoryVoiceAudio = null;
+                            if (window.inStoryMode && window.isGridWalkingPhase && window.carryingNote === foundNote && window.announceToScreenReader) {
+                                window.announceToScreenReader("Şimdi onu X: 0 konumundaki piyanoya götürmelisin.", false);
+                            }
+                        };
+                        const hp = happyAudio.play();
+                        if (hp !== undefined) {
+                            hp.catch(() => {
+                                if (window.currentStoryVoiceAudio === happyAudio) window.currentStoryVoiceAudio = null;
+                                if (window.announceToScreenReader) window.announceToScreenReader(baseMsg);
+                            });
+                        }
+                    } else {
+                        if (window.announceToScreenReader) window.announceToScreenReader(baseMsg);
+                    }
 
                 } else {
                     if (window.activeNotes && window.activeNotes[foundNote]) {

@@ -1,5 +1,5 @@
-{
-    "version": "0.98.0.2",
-    "buildId": 1794736229,
-    "changelog": "Kayıp Notalar (Hikaye Modu) kapsamlı hata düzeltmeleri: C ve T kısayolları, başlangıç konumu anonsu, başarımlar ve XP ödülü, ses düzeyi uyumu, mobil kontroller ve kayıtlı oyundan devam sistemi onarıldı."
+﻿{
+    "version":  "0.98.1.0",
+    "buildId":  1794873364,
+    "changelog":  "Kayıp Notalar (Hikaye Modu) tam sesli dublaj (Radyo Tiyatrosu) güncellemesi: Anlatıcı, Pan, Bili ve kurtarılan sihirli notalar için özel Türkçe karakter seslendirmeleri, Ayarlar menüsüne Sesli Dublaj açma/kapatma seçeneği ve detaylı Oyun Yardımı rehber sayfası eklendi."
 }

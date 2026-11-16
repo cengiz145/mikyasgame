@@ -1,14 +1,14 @@
 ﻿$ErrorActionPreference = "Stop"
 $dir = $PSScriptRoot
 if (-not $dir) { $dir = ".\" }
-$newVersion = "0.98.0.2"
+$newVersion = "0.98.1.0"
 
 Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"
 $vJson = Get-Content $vJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $vJson.version = $newVersion
 $vJson.buildId = [int][double]::Parse((Get-Date -UFormat %s))
-$vJson.changelog = "Kayıp Notalar (Hikaye Modu) kapsamlı hata düzeltmeleri: C ve T kısayolları, başlangıç konumu anonsu, başarımlar ve XP ödülü, ses düzeyi uyumu, mobil kontroller ve kayıtlı oyundan devam sistemi onarıldı."
+$vJson.changelog = "Kayıp Notalar (Hikaye Modu) tam sesli dublaj (Radyo Tiyatrosu) güncellemesi: Anlatıcı, Pan, Bili ve kurtarılan sihirli notalar için özel Türkçe karakter seslendirmeleri, Ayarlar menüsüne Sesli Dublaj açma/kapatma seçeneği ve detaylı Oyun Yardımı rehber sayfası eklendi."
 $vJson | ConvertTo-Json -Depth 5 | Set-Content $vJsonPath -Encoding UTF8
 
 Write-Host "Updating package.json..."
@@ -41,8 +41,10 @@ if ($firstVersion -notmatch "\[v$newVersion\]") {
     $newEntry = @"
 [v$newVersion] - $todayDate
 
-Düzeltme:
-- Başarımlar listesindeki hata giderildi, rütbe ve bilişsel başarılar sistemi aktif edildi.
+Kayıp Notalar Sesli Dublaj (Radyo Tiyatrosu) ve Oyun Yardımı Rehberi:
+- Kayıp Notalar (Hikaye Modu) baştan sona Türkçe karakter dublajlarıyla seslendirildi! Masal Anlatıcısı, Pan, yaramaz kardeş Bili ve karların içinden kurtarılan sihirli notalar artık kendi özgün sesleriyle konuşuyor.
+- Ayarlar menüsüne "Kayıp Notalar Sesli Dublaj (Açık/Kapalı)" seçeneği eklendi.
+- Oyunun tüm ana menü ve yan başlıklarını sırasıyla anlatan kapsamlı Oyun Yardımı web sayfası eklendi.
 
 "@
     $newChangelog = @()
