@@ -38,9 +38,7 @@ try {
     }
 } catch(e) {}
 
-﻿/* ==========================================================================
-   TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU OYUN MOTORU (GAME.JS)
- ==========================================================================
+/* ==========================================================================
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU OYUN MOTORU (GAME.JS)
    ========================================================================== */
 
@@ -55,8 +53,9 @@ const Game = {
     busTemperature: 22,
     isACOn: false,
     airPressure: 120,
-    isLowAirAlarmActive: false,
+        isLowAirAlarmActive: false,
     isEmergencyBrakeLocked: false,
+    isHandbrakeOn: false,
     selectedBus: null,
     engineStarted: false,
     isRetarderActive: false,
@@ -529,9 +528,6 @@ const Game = {
         }
         this.isRampDeployed = !this.isRampDeployed;
         const rampEl = document.getElementById('hud-ramp');
-        if (typeof BusConceptGuide !== 'undefined') {
-            BusConceptGuide.announceAction('ramp', this.isRampDeployed);
-        }
         if (this.isRampDeployed) {
             if (typeof audio !== 'undefined' && typeof audio.playRampDeploy === 'function') audio.playRampDeploy();
             if (rampEl) rampEl.style.display = 'inline-block';
@@ -544,18 +540,26 @@ const Game = {
                 this.addXP(30, "Tekerlekli Sandalye Rampası Hizmeti");
                 xpGained = true;
             }
-            const msg = xpGained
-                ? "Tekerlekli sandalye rampası açıldı. Yolcu güvenle biniyor: Çok teşekkür ederim kaptanım, iyi görevler. Kapatmak için tekrar U tuşuna basınız."
-                : "Tekerlekli sandalye rampası açıldı. Kapatmak için tekrar U tuşuna basınız.";
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+            if (xpGained) {
+                const msg = "Tekerlekli sandalye rampası açıldı. Yolcu güvenle biniyor: Çok teşekkür ederim kaptanım, iyi görevler. Kapatmak için tekrar U tuşuna basınız.";
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onRampThank())) {
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                    if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+                }
+            } else if (!(typeof BusConceptGuide !== 'undefined' && BusConceptGuide.announceAction('ramp', true))) {
+                const msg = "Tekerlekli sandalye rampası açıldı. Kapatmak için tekrar U tuşuna basınız.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+            }
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(xpGained ? "♿ Rampa Açıldı (+30 XP)" : "♿ Rampa Açıldı", "info");
         } else {
             if (typeof audio !== 'undefined' && typeof audio.playRampRetract === 'function') audio.playRampRetract();
             if (rampEl) rampEl.style.display = 'none';
-            const msg = "Rampa toplandı ve kilitlendi. Güvenlik kilidi açıldı, yola devam edebilirsiniz.";
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+            if (!(typeof BusConceptGuide !== 'undefined' && BusConceptGuide.announceAction('ramp', false))) {
+                const msg = "Rampa toplandı ve kilitlendi. Güvenlik kilidi açıldı, yola devam edebilirsiniz.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+            }
         }
     },
 
@@ -837,7 +841,9 @@ const Game = {
         this.radioBroadcastIndex++;
         const message = dispatchMessages[idx];
         
-        if (typeof audio !== 'undefined' && typeof audio.playDispatchRadio === 'function') {
+        if (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playDispatch(idx)) {
+            // ElevenLabs gerçek merkez amiri telsiz sesi devrede
+        } else if (typeof audio !== 'undefined' && typeof audio.playDispatchRadio === 'function') {
             audio.playDispatchRadio(message);
         } else if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
             audio.speak(message);
@@ -1187,7 +1193,12 @@ const Game = {
         this.academyCompleted = false;
         this.playMode = 'career';
         if (this._circuitBreaker) {
-            this._circuitBreaker = { failureCount: 0, blockedUntil: 0 };
+            this._circuitBreaker = {
+                errorCount: 0,
+                blockedUntil: 0,
+                tripThreshold: 3,
+                cooldownDurationMs: 60000
+            };
         }
         this._lastFirebasePayloadHash = null;
 
@@ -2133,6 +2144,7 @@ const Game = {
             }).catch(e => console.warn('[Game] LiveWeather fetch hatası:', e));
         }
         this.passengerComfort = 100;
+        if (typeof window.HumanNpcVoices !== 'undefined') window.HumanNpcVoices.resetForNewRoute();
         this.stopRequestBellTriggered = false;
         if (this.currentStopIndex === 0 && !isResume && !this.terminalAnnouncedForRoute) {
             this.terminalAnnouncedForRoute = true;
@@ -2424,7 +2436,12 @@ const Game = {
         
         // Temizle
         this.savedState = null;
-        document.getElementById('btn-start-game').innerText = "Yeni Bir Oyuna Başla";
+        const btnResumeEl = document.getElementById('btn-start-game');
+        if (btnResumeEl) {
+            btnResumeEl.style.display = 'none';
+            const lblResume = document.getElementById('btn-start-game-label');
+            if (lblResume) lblResume.innerText = "Kaldığın Yerden Devam Et";
+        }
         
         // Sürüş durumunu ayarla
         this.isDriving = true;
@@ -2439,6 +2456,9 @@ const Game = {
         this.rearDoorOpen = false;
         this.airPressure = 120; // BUG FIX: Sanayiden çıkınca hava tankları fullenir
         this.isEmergencyBrakeLocked = false;
+        this.isHandbrakeOn = false;
+        const hbHudResume = document.getElementById('hud-handbrake');
+        if (hbHudResume) hbHudResume.style.display = 'none';
         this.isLowAirAlarmActive = false;
         this.isHeadlightsOn = false;
         this.isNight = (this.clockMinutes < 360 || this.clockMinutes >= 1080); // Başlangıç saat kontrolü
@@ -2580,7 +2600,10 @@ const Game = {
         }
         this.isLowAirAlarmActive = false;
         this.isEmergencyBrakeLocked = false;
+        this.isHandbrakeOn = false;
         this.isBrakeKeyDown = false;
+        const hbHudStart = document.getElementById('hud-handbrake');
+        if (hbHudStart) hbHudStart.style.display = 'none';
 
         // Sefer Başlatma Başarımları ve İstatistik Kaydı (Tüm iklim, yakıt, otobüs ve rota verileri hazırlandıktan sonra)
         if (!restoreMode && typeof DriverBadges !== 'undefined' && typeof DriverBadges.recordRouteStart === 'function') {
@@ -2599,6 +2622,12 @@ const Game = {
         UI.switchScreen('driving-screen');
         
         audio.stopMenuMusic();
+        if (!restoreMode && typeof audio !== 'undefined' && typeof audio.startEngine === 'function') {
+            this.engineStarted = true;
+            if (!audio.isEngineRunning) {
+                audio.startEngine();
+            }
+        }
         
         // Zemin Ses Kaynaklarını Haritaya Yerleştir (3D)
         audio.placeAmbientSources(this.activeRouteData, this.licenseLevel);
@@ -3152,7 +3181,11 @@ const Game = {
                             if (susp >= 90 && (!this.busDamage || (this.busDamage.suspension || 0) < 30)) {
                                 audio.speak("Çukurdan geçtik, havalı süspansiyon körükleri darbeyi yumuşakça sönümledi.");
                             } else {
-                                audio.speak("Çukura sert girdik! Süspansiyon körükleri zorlandı ve yolcular sarsıldı.");
+                                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onRoughDriving('pothole', this.passengersOnBoard))) {
+                                    audio.speak("Çukura sert girdik! Süspansiyon körükleri zorlandı ve yolcular sarsıldı.");
+                                } else if (typeof audio.updateNvdaLiveRegion === 'function') {
+                                    audio.updateNvdaLiveRegion("Çukura sert girdik! Yolcular sarsıldı.");
+                                }
                             }
                         }
                     }
@@ -3214,8 +3247,10 @@ const Game = {
                     if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
                         UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
                     }
-                    if (typeof audio !== 'undefined' && audio.speak) {
-                        audio.speak("DİKKAT: Kırmızı ışıkta geçtiniz! Yüz elli lira trafik cezası kesildi.");
+                    if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onRedLightViolation())) {
+                        if (typeof audio !== 'undefined' && audio.speak) {
+                            audio.speak("DİKKAT: Kırmızı ışıkta geçtiniz! Yüz elli lira trafik cezası kesildi.");
+                        }
                     }
                 }
                 this.trafficLightDistance = null;
@@ -3737,24 +3772,28 @@ const Game = {
             this.keys.arrowup = false;
         }
         
-                // BUG FIX: Gerçek otobüslerde kapılar veya rampa/bagaj açıkken gaza basamazsın (Kapı Fren İnterlok Sistemi)
+        // BUG FIX: Gerçek otobüslerde kapılar, rampa, bagaj açıkken veya imdat çekiliyken gaza basamazsın (Emniyet Kilidi)
         // AYRICA: Çekici üzerindeyken gaz verilmesini engelle
         let canAccelerate = true;
-        if (this.frontDoorOpen || this.rearDoorOpen || this.isRampDeployed || this.isLuggageOpen) {
+        if (this.frontDoorOpen || this.rearDoorOpen || this.isRampDeployed || this.isLuggageOpen || this.isHandbrakeOn) {
             canAccelerate = false;
         }
         if (this.isBeingTowed) {
             canAccelerate = false;
         }
 
-        // Kapılar veya rampa açıkken gaza basılırsa sürücüye sesli ikaz ver
+        // Kapılar, rampa veya imdat çekiliyken gaza basılırsa sürücüye sesli ikaz ver
         if (!canAccelerate && (this.keys.w || this.keys.arrowup)) {
             const now = performance.now();
             if (!this.lastInterlockWarnTime || now - this.lastInterlockWarnTime > 3500) {
                 this.lastInterlockWarnTime = now;
                 const reason = (this.frontDoorOpen || this.rearDoorOpen) 
                     ? "Kapılar açıkken emniyet kilidi devrededir, gaz verilemez."
-                    : (this.isRampDeployed ? "Engelli rampası açıkken araç hareket edemez." : "Bagaj kapakları açıkken gaz verilemez.");
+                    : (this.isRampDeployed
+                        ? "Engelli rampası açıkken araç hareket edemez."
+                        : (this.isHandbrakeOn
+                            ? "İmdat park freni çekili. Kalkış yapmak için Shift ve Boşluk tuşlarına basarak imdatı indiriniz."
+                            : "Bagaj kapakları açıkken gaz verilemez."));
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(reason);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛑 Emniyet Kilidi: " + reason, "warning");
             }
@@ -4371,6 +4410,9 @@ const Game = {
                 const now = performance.now();
                 if (!this.lastHarshBrakeWarningTime || now - this.lastHarshBrakeWarningTime > 8000) {
                     this.lastHarshBrakeWarningTime = now;
+                    if (typeof window.HumanNpcVoices !== 'undefined') {
+                        window.HumanNpcVoices.onRoughDriving('brake', this.passengersOnBoard);
+                    }
                     if (typeof UI !== 'undefined' && UI.showToast) {
                         UI.showToast(`Eğitim İpucu: Kademeli frenleme daha konforludur (Konfor: %${Math.round(this.passengerComfort)})`, 'info');
                     }
@@ -4434,6 +4476,9 @@ const Game = {
                 if (this.speed > 35) { // Kasise hızlı girildiğinde yolcuların sarsılma iniltisi
                     if (this.passengersOnBoard > 0 && typeof audio !== 'undefined' && audio.playPassengerBump) {
                         audio.playPassengerBump();
+                    }
+                    if (typeof window.HumanNpcVoices !== 'undefined') {
+                        window.HumanNpcVoices.onRoughDriving('kasis', this.passengersOnBoard);
                     }
                 }
                 if (this.speed > 45) { // 45 km/h kasis hız limiti
@@ -4853,6 +4898,15 @@ const Game = {
                 npc.audioObj.howlObj.rate(dopplerRate, npc.audioObj.soundId);
             }
 
+            // --- TEHLİKELİ YAKIN GEÇİŞ (SIFIR GEÇME - KORNA & KIZGIN SÜRÜCÜ) ---
+            if (!npc.hasCollided && !npc.nearMissTriggered && Math.abs(npc.y) <= 10 && this.speed > 42) {
+                const distLat = Math.abs(npc.x - this.lanePosition);
+                if (distLat >= 20 && distLat <= 27 && typeof window.HumanNpcVoices !== 'undefined') {
+                    npc.nearMissTriggered = true;
+                    window.HumanNpcVoices.onNearMiss(npc.x < this.lanePosition ? 'left' : 'right');
+                }
+            }
+
             // --- ÇARPIŞMA VE FİZİKSEL HASAR (KİNETİK ENERJİ FORMÜLÜ) ---
             if (!npc.hasCollided && Math.abs(npc.y) <= 12) {
                 if (!this.isBeingTowed && this.speed >= 15 && Math.abs(npc.x - this.lanePosition) < 20) {
@@ -4885,42 +4939,51 @@ const Game = {
                     
                     // Şeride ve parça sağlamlık kademesine göre bölgesel hasar ve uyarılar
                     const relCrashX = npc.x - this.lanePosition;
+                    const useHumanCrash = (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.canSpeakInCabin());
+                    let crashSummaryText = "";
+                    let crashSide = "front";
                     if (relCrashX < -8) {
+                        crashSide = "left";
                         // Hassas dış donanım (Sol Cam - 1.0x)
                         let outcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (outcome === 2) {
                             this.busDamage.leftWindow = 100;
-                            audio.speak("Sol taraftan çarptık! Sol cam tamamen kırıldı.");
+                            crashSummaryText = "Sol taraftan çarptık! Sol cam tamamen kırıldı.";
                         } else if (outcome === 1) {
                             this.busDamage.leftWindow = Math.max(this.busDamage.leftWindow, 50);
-                            audio.speak("Sol taraftan çarptık! Sol cam çatladı, yüzde elli hasarlı.");
+                            crashSummaryText = "Sol taraftan çarptık! Sol cam çatladı, yüzde elli hasarlı.";
                         } else {
-                            audio.speak("Sol taraftan hafif sürttük! Cam kırılmadı.");
+                            crashSummaryText = "Sol taraftan hafif sürttük! Cam kırılmadı.";
                         }
+                        if (!useHumanCrash) audio.speak(crashSummaryText);
                         // Orta-ağır yan darbede sol süspansiyon körüğü etkilenir (1.75x)
                         if (this.calculateCrashOutcome(damageAmount, 2) >= 1) {
                             this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + Math.round(damageAmount / 1.75));
                         }
                     } else if (relCrashX > 8) {
+                        crashSide = "right";
                         // Hassas dış donanım (Sağ Cam - 1.0x)
                         let outcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (outcome === 2) {
                             this.busDamage.rightWindow = 100;
-                            audio.speak("Sağ taraftan çarptık! Sağ cam tamamen kırıldı.");
+                            crashSummaryText = "Sağ taraftan çarptık! Sağ cam tamamen kırıldı.";
                         } else if (outcome === 1) {
                             this.busDamage.rightWindow = Math.max(this.busDamage.rightWindow, 50);
-                            audio.speak("Sağ taraftan çarptık! Sağ cam çatladı, yüzde elli hasarlı.");
+                            crashSummaryText = "Sağ taraftan çarptık! Sağ cam çatladı, yüzde elli hasarlı.";
                         } else {
-                            audio.speak("Sağ taraftan hafif sürttük! Cam kırılmadı.");
+                            crashSummaryText = "Sağ taraftan hafif sürttük! Cam kırılmadı.";
                         }
+                        if (!useHumanCrash) audio.speak(crashSummaryText);
                         if (this.calculateCrashOutcome(damageAmount, 2) >= 1) {
                             this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + Math.round(damageAmount / 1.75));
                         }
                     } else {
+                        crashSide = "front";
                         // ÖNDEN ÇARPIŞMA: Darbe sırasıyla Far/Silecek -> Ön Çelik Tampon & Şanzıman -> Motor & Şasi üzerinden sönümlenir
                         const frontBumpDmg = Math.max(4, Math.round(damageAmount / 1.8));
                         this.busDamage.front = Math.min(100, (this.busDamage.front || 0) + frontBumpDmg);
-                        audio.speak(`Önden çarpıştık! Ön çelik tampon ve kaporta ${frontBumpDmg} puan hasar aldı!`);
+                        crashSummaryText = `Önden çarpıştık! Ön çelik tampon ve kaporta ${frontBumpDmg} puan hasar aldı!`;
+                        if (!useHumanCrash) audio.speak(crashSummaryText);
                         
                         // Ön Farlar (1.0x)
                         let hlOutcome = this.calculateCrashOutcome(damageAmount, 1);
@@ -4980,6 +5043,9 @@ const Game = {
                     audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
                     this.speed = 0;
                     audio.playCrash();
+                    if (useHumanCrash && this.busDamage.health >= 20) {
+                        window.HumanNpcVoices.onCollision(crashSide, damageAmount, this.passengersOnBoard, crashSummaryText);
+                    }
                     
                     if (this.busDamage.health < 20) {
                         this.triggerTowTruck();
@@ -5247,6 +5313,21 @@ const Game = {
         }
         
         UI.switchScreen('stop-screen');
+        // İnecek yolcu varsa ama arka kapı 7 saniye içinde açılmazsa emekli amca seslenir
+        if (alighting > 0 && typeof window.HumanNpcVoices !== 'undefined') {
+            if (this.rearDoorRemindTimer) clearTimeout(this.rearDoorRemindTimer);
+            this.rearDoorRemindTimer = setTimeout(() => {
+                if (!this.isDriving && !this.rearDoorOpen && window.HumanNpcVoices.canSpeakInCabin()) {
+                    window.HumanNpcVoices.playClip('amca_reardoor.mp3', {
+                        pan: -0.35,
+                        volume: 0.92,
+                        nvdaText: 'Yolcu: Kaptan arka kapıyı açsana evladım, durakta ineceğiz!',
+                        toastText: '🗣️ Yolcu: "Kaptan! Arka kapıyı açsana, durakta ineceğiz!" (PageDown)',
+                        toastType: 'warning'
+                    });
+                }
+            }, 7200);
+        }
         // Durağa varış tamamlandı; kapılar henüz açılmadı. Kalkış işlemi yolcular binip kapılar kapandıktan sonra tetiklenir.
     },
 
@@ -5300,7 +5381,7 @@ const Game = {
         this.isDriving = true; // Sürüş modunu aktif et
         this.currentStopIndex++;
         
-        // BUG FIX: Kapı kapandığında rastgele yolcu ekleme ve hileli (magical) 50â‚º verme hatası kaldırıldı.
+        // BUG FIX: Kapı kapandığında rastgele yolcu ekleme ve hileli (magical) 50 ₺ verme hatası kaldırıldı.
         // Binişler zaten automatedTicketProcess() üzerinden doğru şekilde sayılıyor ve ücretlendiriliyor.
         
         UI.switchScreen('driving-screen');
@@ -5361,8 +5442,10 @@ const Game = {
             if (hudPass) hudPass.innerText = `${this.passengersOnBoard} / ${seatCapacity}`;
 
             const fullMsg = `Kapıyı açtınız ve koşan yolcu bindi! Yolcu: ${praise} 60 Lira yetiştirme primi ve 30 tecrübe kazandınız.`;
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
-            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(fullMsg);
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onRunningPassengerBoarded())) {
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
+                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(fullMsg);
+            }
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🏃 Yetişen Yolcu Bonusu (+60 ₺ / +30 XP)", "success");
             return;
         }
@@ -5390,7 +5473,9 @@ const Game = {
             
             // YOLCU TEPKİSİ: Kapı açıldığında nezaket
             if (this.passengersOnBoard > 0 && (this.currentStopIndex % 3 === 0)) {
-                audio.speak("Kolay gelsin kaptan.");
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.canSpeakInCabin())) {
+                    audio.speak("Kolay gelsin kaptan.");
+                }
             }
             
             if (!this.isDriving) {
@@ -5503,8 +5588,10 @@ const Game = {
         if (alertText) alertText.innerText = '🏃 Koşan Yolcu: "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı!" (Açmak için PageUp tuşu veya buton)';
 
         const msg = "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı! Durağa doğru koşan bir yolcu var. Kapıyı açmak için Sayfa Yukarı yani PageUp tuşuna veya Ön Kapıyı Aç butonuna basınız.";
-        if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
-        if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+        if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onRunningPassengerAppear())) {
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+        }
 
         if (this.runningPassengerTimer) clearTimeout(this.runningPassengerTimer);
         this.runningPassengerTimer = setTimeout(() => {
@@ -5514,8 +5601,10 @@ const Game = {
                 if (el) el.classList.add('hidden');
 
                 const missMsg = "Yolcu durağa yetişemedi: Ah be kaptanım, kıl payı kaçırdım... Bir sonraki aracı bekleyeceğim.";
-                if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(missMsg);
-                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(missMsg);
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onRunningPassengerMissed())) {
+                    if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(missMsg);
+                    if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(missMsg);
+                }
 
                 this.checkAutoDepart();
             }
@@ -5552,8 +5641,10 @@ const Game = {
             }
 
             const announce = "Yolcuya izin verdiniz. Yolcu: Çok sağ olun kaptanım, Allah razı olsun! 50 Lira gönlü zengin kaptan primi kazandınız.";
-            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announce);
-            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(announce);
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onInsufficientBalanceResolved(true))) {
+                if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announce);
+                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(announce);
+            }
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("❤️ Kaptan İnsiyatifi (+50 ₺ / +25 XP)", "success");
         } else {
             // İndirildi (Kuralcı Kaptan)
@@ -5567,8 +5658,10 @@ const Game = {
             }
 
             const announce = "Yolcuyu indirdiniz. Yolcu: Peki kaptanım, canınız sağ olsun, iyi nöbetler.";
-            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announce);
-            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(announce);
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onInsufficientBalanceResolved(false))) {
+                if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announce);
+                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(announce);
+            }
         }
 
         if (stopData && stopData.bekleyenYolcu > 0) {
@@ -5637,6 +5730,25 @@ const Game = {
             pType = (seq === 0) ? "yasli" : ((seq === 2) ? "ogrenci" : "tam");
         }
         
+        // YETERSİZ BAKİYE AKILLI YOLCU OLAYI (Öğrenci kartında %18 ihtimalle durak başına en fazla 1 kez)
+        const choiceBox = document.getElementById('passenger-choice-box');
+        if (pType === "ogrenci" && choiceBox && !this.insufficientBalanceTriggeredAtStop && !this.isTrainingRoute && Math.random() < 0.18) {
+            this.insufficientBalanceTriggeredAtStop = true;
+            this.activePassengerEvent = { type: 'insufficient_balance' };
+            choiceBox.classList.remove('hidden');
+            if (typeof audio !== 'undefined' && typeof audio.playValidatorSound === 'function') {
+                audio.playValidatorSound('yetersiz');
+            }
+            const dEl = document.getElementById('passenger-dialog');
+            if (dEl) dEl.innerText = '"Şey kaptan abi, öğrenci kartımda bakiye bitmiş de... idare edebilir misin?" (Y: İzin Ver / N: İndir)';
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onInsufficientBalanceAsk())) {
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak("Kartta bakiye yetersiz! Yolcuya izin vermek için Y tuşuna, indirmek için N tuşuna basınız.");
+                }
+            }
+            return false;
+        }
+
         let fare = this.ticketPrices[pType];
         let pricingMult = 1.0;
         if (typeof CompanySystem !== 'undefined' && CompanySystem.data && CompanySystem.data.ticketPricingMultiplier) {
@@ -5681,6 +5793,9 @@ const Game = {
         
         if (!isStanding) {
             document.getElementById('passenger-dialog').innerText = '"Kolay gelsin."';
+        }
+        if (typeof window.HumanNpcVoices !== 'undefined') {
+            window.HumanNpcVoices.onPassengerBoarded(pType, this.currentStopIndex, isStanding);
         }
     },
 
@@ -5737,9 +5852,9 @@ const Game = {
             const cargoMsg = `📦 Otogar Yazıhanesi Emanet & Paket Kargo: ${cargoPackagesCount} koli teslim edildi (+${cargoEarnings.toLocaleString('tr-TR')} ₺)${agencyNote}.`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(cargoMsg, 'success');
             // Şirket Dinlenme Tesisi Seferi Temettüsü
+            let finishDiv = 0;
             if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
                 const termOfficeLvl = Math.max(CompanySystem.getInstitutionLevel('terminal_offices'), CompanySystem.getInstitutionLevel('highway_resort'));
-                let finishDiv = 0;
                 if (termOfficeLvl === 2) finishDiv = 1500;
                 else if (termOfficeLvl >= 3) finishDiv = 3500;
                 if (finishDiv > 0) {
@@ -6314,6 +6429,31 @@ const Game = {
         }
         if (!e.shiftKey && !e.altKey && !e.ctrlKey && this.keys.hasOwnProperty(k)) this.keys[k] = true;
 
+        // Shift + Boşluk: Mekanik İmdat / Park Freni (Maxi Brake)
+        if (e.shiftKey && e.code === 'Space') {
+            e.preventDefault();
+            this.isHandbrakeOn = !this.isHandbrakeOn;
+            if (typeof audio !== 'undefined' && typeof audio.playHandbrakeAir === 'function') {
+                audio.playHandbrakeAir();
+            }
+            const hbHud = document.getElementById('hud-handbrake');
+            if (hbHud) {
+                hbHud.style.display = this.isHandbrakeOn ? 'inline-block' : 'none';
+            }
+            if (this.isHandbrakeOn && this.speed < 8) {
+                this.speed = 0;
+            }
+            if (typeof BusConceptGuide !== 'undefined' && typeof BusConceptGuide.announceAction === 'function' && BusConceptGuide.announceAction('handbrake', this.isHandbrakeOn)) {
+                return;
+            }
+            const hbMsg = this.isHandbrakeOn
+                ? "İmdat park freni çekildi. Arka dingil yayları kilitlendi."
+                : "İmdat park freni indirildi. Araç kalkışa hazır.";
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(hbMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(this.isHandbrakeOn ? "🅿️ İmdat Freni Çekildi" : "🅿️ İmdat Freni İndirildi", this.isHandbrakeOn ? "warning" : "info");
+            return;
+        }
+
         // Özel aksiyonlar (M veya Boşluk tuşu: Motor Çalıştırma)
         if (k === 'm' || e.code === 'KeyM' || e.code === 'Space') {
             e.preventDefault();
@@ -6708,11 +6848,24 @@ const SanayiMechanic = {
         Game.busDamage.health = 100;
         if (typeof Game.refuel === 'function') Game.refuel();
         
-        document.getElementById('btn-start-game').innerText = "Kaldığın Yerden Devam Et";
+        const btnResume = document.getElementById('btn-start-game');
+        if (btnResume) {
+            btnResume.style.display = 'flex';
+            btnResume.classList.remove('hidden');
+            btnResume.removeAttribute('aria-hidden');
+            const lbl = document.getElementById('btn-start-game-label');
+            if (lbl) lbl.innerText = "Kaldığın Yerden Devam Et";
+            else btnResume.innerText = "🛠️ Kaldığın Yerden Devam Et";
+        }
         
         UI.switchScreen('title-screen');
+        if (typeof KeyboardNav !== 'undefined' && typeof KeyboardNav.initForScreen === 'function') {
+            KeyboardNav.initForScreen();
+        }
         // Erişilebilirlik için butona direkt odaklan
-        document.getElementById('btn-start-game').focus();
+        if (btnResume) {
+            try { btnResume.focus(); } catch(e) {}
+        }
         if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("Ana menüye döndünüz. Ekrandaki 'Kaldığın Yerden Devam Et' düğmesine tıklayarak veya enter tuşuna basarak yarım kalan seferinize devam edebilirsiniz.");
     }
 };

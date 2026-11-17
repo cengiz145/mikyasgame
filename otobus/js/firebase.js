@@ -1,4 +1,4 @@
-﻿// Firebase Bağlantı Ayarları
+// Firebase Bağlantı Ayarları
 const firebaseConfig = { 
     apiKey: "AIzaSyBDGdQjm6NX8ANQm90HJR8wD2Nk2E1h-ro", 
     authDomain: "hgfz-5a1ca.firebaseapp.com", 
@@ -18,7 +18,7 @@ try {
         throw new Error("Firebase kütüphanesi yüklenemedi.");
     }
 } catch (error) {
-    console.warn("[ÇEVRİMDİÅİ MOD AKTİF] Veritabanı bağlantısı yok veya internet koptu:", error);
+    console.warn("[ÇEVRİMDİŞİ MOD AKTİF] Veritabanı bağlantısı yok veya internet koptu:", error);
     window.db = null; // Sistem çevrimdışı oynanış için db'yi nazikçe atlar
 }
 

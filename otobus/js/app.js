@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU BAÅLATICI (APP.JS)
+   TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU BAŞLATICI (APP.JS)
    ========================================================================== */
 
 // 81 İl Karayolları Mesafeleri js/data.js içerisinde tanımlıdır ve window.sehirlerarasiMesafeler üzerinden erişilir.
@@ -1139,23 +1139,43 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-clear-cache').addEventListener('click', () => {
         audio.playSelect();
         
-        // Sadece tutulması gerekenleri ayır
+        // Sadece tutulması gereken tüm oyuncu ilerleme, şirket, başarım ve takvim verilerini ayır
         const safeKeys = [
             'otobusUsername',
             'licenseLevel',
+            'driverLicenseLevel',
             'completedTasks',
             'para',
             'playerXP',
             'clockMinutes',
             'unlockedCities',
             'merkezUs',
+            'currentCity',
             'activeDistrict',
+            'activeNeighborhood',
             'selectedBusId',
+            'academyCompleted',
+            'gamePlayMode',
+            'otobusCompany',
+            'otobusDriverId',
+            'otobusPlate',
             'tekulas_owned_buses_v1',
-            'driver_lifetime_stats_v1',
-            'driver_badges_v1',
+            'otobus_company_data_v2',
+            'otobus_company_data',
+            'otobus_community_companies_v1',
+            'tekulas_driver_badges_v2',
+            'tekulas_driver_stats_v2',
+            'tekulas_driver_equipped_title_v1',
+            'tekulas_driver_unlocked_titles_v1',
+            'otobus_highway_data',
             'tekulas_discovered_stops_v1',
-            'copilot_enabled'
+            'otobus_welcome_calendar_v1',
+            'copilot_enabled',
+            'openweather_api_key',
+            'wipe_all_data_20261024_v1',
+            'sim_season_fresh_v2',
+            'driver_lifetime_stats_v1',
+            'driver_badges_v1'
         ];
         const savedData = {};
         
@@ -1192,7 +1212,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof UI !== 'undefined' && UI.switchScreen) {
                 UI.switchScreen('title-screen');
             }
-            const btnStart = document.getElementById('btn-start-city');
+            const btnStart = document.getElementById('btn-mode-career') || document.getElementById('btn-start-city');
             if (btnStart) btnStart.focus();
         });
     }
@@ -1729,7 +1749,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const btnStart = document.getElementById('btn-start-game');
             if (btnStart) {
                 btnStart.onclick = null;
-                btnStart.innerText = "Yeni Bir Oyuna Başla";
+                if (!Game.savedState) btnStart.style.display = 'none';
             }
             UI.renderRoutes(Game.currentCity || "Tekirdağ", Game.completedTasks);
             UI.switchScreen('route-menu');
@@ -1744,7 +1764,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btnStart = document.getElementById('btn-start-game');
         if (btnStart) {
             btnStart.onclick = null;
-            btnStart.innerText = "Yeni Bir Oyuna Başla";
+            if (!Game.savedState) btnStart.style.display = 'none';
         }
         
         if (typeof Game !== 'undefined' && Game.playMode === 'career') {

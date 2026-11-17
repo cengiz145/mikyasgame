@@ -4,7 +4,7 @@
 
 const masterCitiesList = ["Gümüşhane", "Giresun", "Gaziantep", "Eskişehir", "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin", "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Elazığ", "Erzincan", "Erzurum", "Konya", "Tekirdağ", "Yalova", "Bayburt", "Edirne", "Kırklareli", "İstanbul", "Çanakkale", "Sinop", "Hakkâri", "Hatay", "Isparta", "Mersin", "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırşehir", "Kocaeli", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", "Sivas", "Tokat", "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van", "Yozgat", "Zonguldak", "Aksaray", "Karaman", "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Karabük", "Kilis", "Osmaniye", "Düzce"];
 
-// Åehirlerin sadece coğrafi komşuları ve API sorguları bulunur. Rotalar dinamik oluşturulur.
+// Şehirlerin sadece coğrafi komşuları ve API sorguları bulunur. Rotalar dinamik oluşturulur.
 const sehirRotalari = {
     "Adana": {
         plaka: "01",

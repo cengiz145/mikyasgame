@@ -26,7 +26,7 @@
         {
             id: "kneeling",
             title: "Kneeling (Yana Yatma & Kaldırıma Alçalma)",
-            key: "Ön Kapı açıldığında otomatik / K Tuşu",
+            key: "Kapı açıldığında otomatik devreye girer",
             shortDesc: "Sağ taraftaki havalı körükleri indirerek otobüsü kaldırıma doğru 8-10 cm alçaltan konfor sistemi.",
             whatIs: "Kneeling (diz çökme), otobüsün sağ yanındaki pnömatik hava körüklerinin havasını tahliye ederek aracın sağ tarafını kaldırım hizasına kadar eğmesidir.",
             whyExists: "Şehir içi otobüslerde yaşlılar, çocuklar, pusetli anneler ve yürüme güçlüğü çeken vatandaşlar yüksek basamak tırmanamaz. Otobüs yana yattığında basamak yüksekliği neredeyse sıfıra iner ve yolcular sanki düz yolda yürür gibi biner.",
@@ -46,7 +46,7 @@
         {
             id: "air_brake",
             title: "Pnömatik (Havalı) Fren & Kompresör Sistemi",
-            key: "S / Aşağı Ok (Fren) | Boşluk (İmdat)",
+            key: "S / Aşağı Ok (Fren) | Shift + Boşluk (İmdat)",
             shortDesc: "Binek araçlardaki hidrolik sıvısı yerine 8-12 bar basınçlı hava ile çalışan güçlü ağır vasıta freni.",
             whatIs: "Otobüslerde fren pedalı doğrudan tekerleğe değil, hava tanklarındaki yüksek basınçlı havayı fren körüklerine yönlendiren hava valflerine kumanda eder.",
             whyExists: "16 tonluk bir aracı hidrolik yağ borularıyla durduramazsınız; boru patlayabilir veya güç yetmez. Pnömatik sistemde hava motor kompresörü tarafından sürekli üretilir. Hava biterse güvenlik amacıyla yaylı imdat freni tekerlekleri otomatik olarak kilitler; araç asla frensiz kalmaz.",
@@ -56,21 +56,21 @@
         {
             id: "handbrake",
             title: "İmdat Freni (Mekanik Park Freni - Maxi Brake)",
-            key: "P Tuşu / Shift + Boşluk (Çek / Bırak)",
+            key: "Shift + Boşluk (Çek / Bırak)",
             shortDesc: "Arka dingildeki güçlü çelik helezon yaylarla aracı mekanik olarak kilitleyen park freni.",
             whatIs: "Hava basıncı kesildiğinde arka tekerlek fren körüklerindeki dev çelik yayların disklere kilitlenmesini sağlayan emniyet frenidir.",
             whyExists: "Otobüs dik bir rampada park edildiğinde veya motor durduğunda aracın geriye kayıp faciaya yol açmasını engeller. Tamamen mekanik kilitlendiği için hava kaçsa bile araç milim kıpırdamaz.",
-            howToUse: "Son durakta, otogarda veya dik bir yokuşta yolcu indirirken P tuşuna basarak imdatı çekiniz. Kalkış yapmadan önce tekrar P tuşuyla imdatı bırakınız.",
+            howToUse: "Son durakta, otogarda veya dik bir yokuşta yolcu indirirken Shift ve Boşluk tuşlarına basarak imdatı çekiniz. Kalkış yapmadan önce tekrar Shift ve Boşluk ile imdatı bırakınız (P tuşu bagaj kapaklarını açıp kapatır).",
             category: "fren"
         },
         {
             id: "doors_interlock",
             title: "Kapı Güvenlik Kilidi (Interlock Sistemi)",
-            key: "E (Ön Kapı) | Q (Arka Kapı)",
+            key: "PageUp (Ön Kapı) | PageDown (Arka Kapı)",
             shortDesc: "Kapılardan biri bile açıkken motorun gaz yemesini engelleyen güvenlik kilidi.",
             whatIs: "Kapı mekanizmasına bağlı elektronik bir güvenlik devresidir. Kapı açık kaldığı sürece motor gaz pedalı devreden çıkarılır.",
             whyExists: "Geçmişte kapı kapanmadan hareket eden otobüslerden yolcuların düşüp yaralanması sebebiyle tüm modern belediye otobüslerinde yasal zorunluluk haline getirilmiştir.",
-            howToUse: "Durağa tam yanaşıp durduktan sonra E veya Q ile kapıları açınız. Tüm yolcular binip inene kadar bekleyiniz. Kapıları kapattıktan sonra gaz vererek hareket ediniz.",
+            howToUse: "Durağa tam yanaşıp durduktan sonra PageUp veya PageDown ile kapıları açınız. Tüm yolcular binip inene kadar bekleyiniz. Kapıları kapattıktan sonra gaz vererek hareket ediniz.",
             category: "güvenlik"
         },
         {

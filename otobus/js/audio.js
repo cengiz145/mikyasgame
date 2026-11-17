@@ -1964,7 +1964,7 @@ startEngine() {
         osc.start(this.ctx.currentTime);
         osc.stop(this.ctx.currentTime + 0.5);
         
-        // Åangırtı Sesi (Kopan metal parçası)
+        // Şangırtı Sesi (Kopan metal parçası)
         setTimeout(() => this.playUnderbodyHit(), 200);
     }
     

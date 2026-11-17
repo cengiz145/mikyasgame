@@ -21,9 +21,9 @@ class VoiceAssistant {
                 stage: 1,
                 stageName: '1. Bölüm: Direksiyon Başına Geçiş',
                 title: 'Aracı Kullanırken Dikkat Edilmesi Gereken Kavramlar (9 Hayati Kavram)',
-                keys: 'F2 veya Shift+K (Sözlük), B (Retarder), U (Rampa), Space (İmdat Freni), PageUp/PageDown (Kapılar), T (Telsiz)',
+                keys: 'F2 veya Shift+K (Sözlük), B (Retarder), U (Rampa), Shift+Boşluk (İmdat Freni), PageUp/PageDown (Kapılar), T (Telsiz)',
                 tip: 'Otobüs kullanırken bilmen gereken 9 kavram: Retarder, Kneeling, Rampa, Havalı Fren, İmdat, Kapı Emniyet Kilidi, Radyatör Fanı, Zirve Saatler ve Telsiz.',
-                speech: 'Aracı kullanırken dikkat edilmesi gereken dokuz temel kavram şunlardır: Birincisi Retarder: Yokuş aşağı inerken B tuşuyla devreye aldığın şanzıman frenidir, balatalara dokunmadan otobüsü yavaşlatır ve fren balatalarının aşırı ısınıp frenin şişmesini yani tutmaz hale gelmesini önler. İkincisi Kneeling: Durakta yaşlı ve çocuklu yolcuların rahat binmesi için otobüsün sağ körük havasını tahliye ederek kaldırıma doğru sekiz santim yatmasıdır. Üçüncüsü Engelli Rampası: U tuşuyla açılan tekerlekli sandalye rampasıdır, rampa açıkken güvenlik kilidi devreye girer ve araç kilitlenir. Dördüncüsü Pnömatik Havalı Fren: Ağır vasıtayı durduran yüksek basınçlı hava tanklarıdır; frene sürekli peş peşe basıp pompalarsanız hava biter. Beşincisi İmdat Freni: Boşluk tuşuyla çekilen mekanik yaylı el frenidir, hava kaçağı olsa dahi aracı kilitler. Altıncısı Kapı Fren Emniyet Kilidi: Kapılar veya rampa açıkken otobüsün gaz yememesi ve hareket etmemesidir. Yedincisi Hidrostatik Radyatör Fanı: Dik tırmanışta motor hararet yapıp doksan beş dereceyi geçince devreye giren dev soğutma pervanesidir. Sekizincisi Yoğun Zirve Saat Dinamiği: Sabah ve akşam mesai çıkışlarında yolcu sayısının ve otobüs ağırlığının iki katına çıkmasıdır. Dokuzuncusu Telsiz Dispeçer Anonsları: T tuşuna basarak filo amirliğiyle haberleşmenizdir. Bu kavramların tüm detayları ve açıklamaları için dilediğiniz an F2 veya Shift K tuşuna basabilirsiniz.'
+                speech: 'Aracı kullanırken dikkat edilmesi gereken dokuz temel kavram şunlardır: Birincisi Retarder: Yokuş aşağı inerken B tuşuyla devreye aldığın şanzıman frenidir, balatalara dokunmadan otobüsü yavaşlatır ve fren balatalarının aşırı ısınıp frenin şişmesini yani tutmaz hale gelmesini önler. İkincisi Kneeling: Durakta yaşlı ve çocuklu yolcuların rahat binmesi için kapılar açıldığında otobüsün sağ körük havasını tahliye ederek kaldırıma doğru sekiz santim otomatik yatmasıdır. Üçüncüsü Engelli Rampası: U tuşuyla açılan tekerlekli sandalye rampasıdır, rampa açıkken güvenlik kilidi devreye girer ve araç kilitlenir. Dördüncüsü Pnömatik Havalı Fren: Ağır vasıtayı durduran yüksek basınçlı hava tanklarıdır; frene sürekli peş peşe basıp pompalarsanız hava biter. Beşincisi İmdat Freni: Shift ve Boşluk tuşlarıyla çekilen mekanik yaylı park frenidir, hava kaçağı olsa dahi aracı kilitler. Altıncısı Kapı Fren Emniyet Kilidi: Kapılar veya rampa açıkken otobüsün gaz yememesi ve hareket etmemesidir. Yedincisi Hidrostatik Radyatör Fanı: Dik tırmanışta motor hararet yapıp doksan beş dereceyi geçince devreye giren dev soğutma pervanesidir. Sekizincisi Yoğun Zirve Saat Dinamiği: Sabah ve akşam mesai çıkışlarında yolcu sayısının ve otobüs ağırlığının iki katına çıkmasıdır. Dokuzuncusu Telsiz Dispeçer Anonsları: T tuşuna basarak filo amirliğiyle haberleşmenizdir. Bu kavramların tüm detayları ve açıklamaları için dilediğiniz an F2 veya Shift K tuşuna basabilirsiniz.'
             },
             // 1. BÖLÜM: DİREKSİYON BAŞINA GEÇİŞ
             {
@@ -80,9 +80,9 @@ class VoiceAssistant {
                 stage: 2,
                 stageName: '2. Bölüm: Yolcularımız ve Duraklar',
                 title: '4. Tekerlekli Sandalyeli Yolcular ve Rampa',
-                keys: 'K (Otobüsü Sağa Yatır), U (Engelli Rampası)',
-                tip: 'Tekerlekli sandalyeli yolcu görünce rampayı aç, yolcu binince kapat.',
-                speech: 'Durakta tekerlekli sandalyeli veya yaşlı bir yolcumuz bekliyorsa oyun sana haber verir. Durup kapıyı açtıktan sonra K tuşuna basarak otobüsü kaldırıma doğru eğebilirsin. U tuşuna basınca rampa açılır ve yolcumuz biner. Yolcumuz binince tekrar U tuşuna basıp rampayı kapatırsın ve yola devam edersin.'
+                keys: 'Kapı Açılınca Otomatik Yana Yatma (Kneeling), U (Engelli Rampası)',
+                tip: 'Tekerlekli sandalyeli yolcu görünce kapıyı açıp U tuşuyla rampayı indir, yolcu binince kapat.',
+                speech: 'Durakta tekerlekli sandalyeli veya yaşlı bir yolcumuz bekliyorsa oyun sana haber verir. Durup kapıyı açtığında otobüs kaldırıma doğru otomatik olarak eğilir. U tuşuna basınca rampa açılır ve yolcumuz biner. Yolcumuz binince tekrar U tuşuna basıp rampayı kapatırsın ve yola devam edersin.'
             },
             {
                 id: 'bumps',
@@ -496,7 +496,9 @@ class VoiceAssistant {
                 ⚡ <strong>Hızlı Kaptan Kısayolları:</strong> 
                 <strong>B:</strong> Retarder Kolu (1-5 Kademe) • 
                 <strong>Shift + B:</strong> Retarder Kapat • 
-                <strong>Space:</strong> İmdat Freni / Kontak • 
+                <strong>Space / M:</strong> Motor Kontak • 
+                <strong>Shift + Space:</strong> İmdat / Park Freni • 
+                <strong>K:</strong> Klima • 
                 <strong>PageUp / PageDown:</strong> Ön / Arka Kapı & İnterlok • 
                 <strong>U:</strong> Engelli Rampası • 
                 <strong>Shift + R:</strong> Telemetri & Zirve Saat • 
@@ -525,7 +527,7 @@ class VoiceAssistant {
             <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(6, 182, 212, 0.35);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <h4 style="color: #22d3ee; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>📐</span> <span>2. Kneeling (Kaldırıma Sağa Yatma / Körük Çökertme) - [ Otomatik / K ]</span>
+                        <span>📐</span> <span>2. Kneeling (Kaldırıma Sağa Yatma / Körük Çökertme) - [ Kapı Açılınca Otomatik ]</span>
                     </h4>
                     <button class="modern-btn btn-read-section nav-item" data-text="İkinci Kavram: Kneeling yani Kaldırıma Sağa Yatma. Ne işe yarar? Durakta bekleyen yaşlı, çocuk ve engelli yolcular için otobüsün sağ havalı körüklerinin havası boşaltılır ve araç kaldırıma doğru sekiz santimetre yatar. Neden vardır? Yüksek basamak yolcuların düşmesine veya zorlanmasına yol açar; basamak yüksekliği sıfırlanır. Nasıl kullanılır? Durakta durup kapıyı açtığınızda otomatik yatar; kapılar kapanıp gaza basıldığında kompresör körükleri şişirip aracı normal sürüş yüksekliğine kaldırır." style="padding: 4px 10px; background: rgba(6,182,212,0.2); border: 1px solid #06b6d4; color: #a5f3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
                 </div>
@@ -570,14 +572,14 @@ class VoiceAssistant {
             <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(239, 68, 68, 0.35);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <h4 style="color: #f87171; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>🅿️</span> <span>5. İmdat Freni / Park Freni - Kısayol: [ Space / Boşluk ]</span>
+                        <span>🅿️</span> <span>5. İmdat Freni / Park Freni - Kısayol: [ Shift + Boşluk ]</span>
                     </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Beşinci Kavram: İmdat Freni ve Park Freni. Ne işe yarar? Otobüs dururken veya park halindeyken tekerlekleri mekanik çelik yaylarla kilitleyerek kaymayı önler. Neden vardır? Havalı frenlerde hava kaçağı olsa bile imdat freni hava basıncıyla değil içine sıkıştırılmış dev çelik yayların gerilimiyle tutar; araçta hiç hava kalmasa dahi otobüs yokuş aşağı kayamaz. Nasıl kullanılır? Durakta durduğunuzda veya son durakta Boşluk tuşuna basarak imdat frenini çekiniz; kalkış yapmadan önce tekrar basarak serbest bırakınız." style="padding: 4px 10px; background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Beşinci Kavram: İmdat Freni ve Park Freni. Ne işe yarar? Otobüs dururken veya park halindeyken tekerlekleri mekanik çelik yaylarla kilitleyerek kaymayı önler. Neden vardır? Havalı frenlerde hava kaçağı olsa bile imdat freni hava basıncıyla değil içine sıkıştırılmış dev çelik yayların gerilimiyle tutar; araçta hiç hava kalmasa dahi otobüs yokuş aşağı kayamaz. Nasıl kullanılır? Durakta durduğunuzda veya son durakta Shift ve Boşluk tuşlarına basarak imdat frenini çekiniz; kalkış yapmadan önce tekrar Shift ve Boşluk ile serbest bırakınız. Boşluk tuşu tek başına motor kontağını açıp kapatır." style="padding: 4px 10px; background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
                 </div>
                 <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
                     • <strong>📌 Ne İşe Yarar?:</strong> Otobüs park halindeyken veya yolcu alırken tekerlekleri mekanik yay kuvvetiyle sabitler.<br>
                     • <strong>🛡️ Neden Hayatidir?:</strong> Sistemde hava kaçağı olsa bile dev çelik yaylar tekerlekleri mekanik kilitler, araç asla geriye kaymaz.<br>
-                    • <strong>🎮 Nasıl Kullanılır?:</strong> <strong>Boşluk (Space)</strong> tuşuna basarak çekilir veya indirilir.
+                    • <strong>🎮 Nasıl Kullanılır?:</strong> <strong>Shift + Boşluk (Shift + Space)</strong> tuşlarına basarak çekilir veya indirilir (tek başına <strong>Boşluk / M</strong> motoru çalıştırır veya durdurur).
                 </div>
             </div>
 

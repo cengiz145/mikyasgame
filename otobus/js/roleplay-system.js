@@ -81,6 +81,9 @@
             const reply = passengerReplies[Math.floor(Math.random() * passengerReplies.length)];
 
             setTimeout(() => {
+                if (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playCologneSequence(true)) {
+                    return;
+                }
                 if (typeof UI !== 'undefined' && UI.showToast) {
                     UI.showToast(`🧴 [İkram Servisi] Kolonya ikram edildi. Yolcu: "${reply}" (+12 Konfor)`, "success");
                 }
@@ -161,6 +164,9 @@
                         if (typeof Game !== 'undefined') Game.addXP(30);
                         const msg = `👮 [Bölge Trafik Polisi] "Düdük çaldı, sağa yanaştınız. Takograf incelendi: Hızınız saatte ${currentSpeed} km, kurallara uygun. Takograf tertemiz kaptan, hayırlı yolculuklar!" (+30 XP)`;
                         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
+                        if (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playPoliceInspectionResult(false, currentSpeed, true)) {
+                            return;
+                        }
                         if (typeof audio !== 'undefined' && audio.speak) {
                             audio.speak(`Trafik polisi takograf fişini inceledi. Hızınız saatte ${currentSpeed} kilometre, limitlere uygun. Takograf temiz kaptan, iyi yolculuklar!`);
                         }
@@ -171,6 +177,9 @@
                         }
                         const warnMsg = `⚠️ [Trafik Cezası] "Polis takograf fişini inceledi: Hızınız ${currentSpeed} km/s! 100 km/s otoyol hız sınırı aşıldığı için 350 ₺ ceza kesildi. Lütfen hız limitlerine uyalım kaptan!"`;
                         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
+                        if (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playPoliceInspectionResult(true, currentSpeed, true)) {
+                            return;
+                        }
                         if (typeof audio !== 'undefined' && audio.speak) {
                             audio.speak(`Dikkat! Polis takograf fişinde ${currentSpeed} kilometre aşırı hız tespit etti. Üç yüz elli lira trafik cezası kesildi.`);
                         }
@@ -225,6 +234,9 @@
             const chat = chats[Math.floor(Math.random() * chats.length)];
 
             setTimeout(() => {
+                if (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playChannel19Chat(true)) {
+                    return;
+                }
                 if (typeof UI !== 'undefined' && UI.showToast) {
                     UI.showToast(`📻 [Kanal 19 Telsiz]: "${chat}"`, "info");
                 }
@@ -448,6 +460,27 @@
                     </div>
                 </div>
 
+                <!-- 6. ElevenLabs Yaşayan İnsan & Akıllı NPC Ses Motoru -->
+                <div style="background: rgba(30, 41, 59, 0.8); border: 1.5px solid #ec4899; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 1.25rem; font-weight: bold; color: #fbcfe8;">🗣️ Canlı İnsan & Akıllı NPC (12 Ses)</div>
+                        <p style="color: #cbd5e1; font-size: 0.85rem; margin: 6px 0 10px 0;">
+                            Çarpışma ve yakın geçişte sağ/sol kulaklıktan bağıran sürücü/yayalar, kademeli sinirlenen hafızalı yolcular, koşan yolcu ve polis sesleri.
+                        </p>
+                        <div style="color: #f472b6; font-size: 0.85rem; font-weight: bold; margin-bottom: 8px;">
+                            Durum: ${(window.HumanNpcVoices && window.HumanNpcVoices.isEnabled()) ? '<span style="color:#4ade80;">🔊 Açık (Aktif)</span>' : '<span style="color:#94a3b8;">⏹️ Kapalı</span>'}
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button id="rp-btn-npc-toggle" class="modern-btn" style="padding: 9px; background: ${(window.HumanNpcVoices && window.HumanNpcVoices.isEnabled()) ? '#db2777' : '#334155'}; color: #fff; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;" aria-label="Canlı insan ve akıllı NPC seslerini aç veya kapat">
+                            ${(window.HumanNpcVoices && window.HumanNpcVoices.isEnabled()) ? '🔊 Canlı NPC Seslerini Kapat' : '▶️ Canlı NPC Seslerini Aç'}
+                        </button>
+                        <button id="rp-btn-npc-crash-test" class="modern-btn" style="padding: 7px; background: rgba(236, 72, 153, 0.25); border: 1px solid #ec4899; color: #fbcfe8; font-size: 0.82rem; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="3 boyutlu çarpışma ve sinirli sürücü tepkisini test et">
+                            💥 Çarpışma & Kızgın Sürücü Sesi Test Et
+                        </button>
+                    </div>
+                </div>
+
             </div>`;
 
             container.innerHTML = html;
@@ -463,6 +496,24 @@
             document.getElementById('rp-btn-radio').addEventListener('click', () => this.triggerColleagueRadioChat());
             const btnRadioTest = document.getElementById('rp-btn-radio-test');
             if (btnRadioTest) btnRadioTest.addEventListener('click', () => this.testRadioTransmission());
+            const btnNpcToggle = document.getElementById('rp-btn-npc-toggle');
+            if (btnNpcToggle && window.HumanNpcVoices) {
+                btnNpcToggle.addEventListener('click', () => {
+                    const st = window.HumanNpcVoices.toggleEnabled();
+                    this.renderModalContent();
+                    if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+                        audio.updateNvdaLiveRegion(st ? 'Canlı İnsan ve Akıllı NPC sesleri açıldı.' : 'Canlı İnsan ve Akıllı NPC sesleri kapatıldı.');
+                    }
+                });
+            }
+            const btnNpcCrashTest = document.getElementById('rp-btn-npc-crash-test');
+            if (btnNpcCrashTest && window.HumanNpcVoices) {
+                btnNpcCrashTest.addEventListener('click', () => {
+                    window.HumanNpcVoices.setEnabled(true);
+                    const side = Math.random() < 0.5 ? 'left' : 'right';
+                    window.HumanNpcVoices.onCollision(side, 24, 10, 'Test darbesi:', true);
+                });
+            }
         }
     };
 
