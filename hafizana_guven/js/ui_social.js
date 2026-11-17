@@ -1,4 +1,4 @@
-﻿// --- PRESENCE (VARLIK) & SOSYAL LİSTE SİSTEMİ ---
+// --- PRESENCE (VARLIK) & SOSYAL LİSTE SİSTEMİ ---
 window.initPresenceSystem = function() {
     const checkDb = setInterval(() => {
         if (window.db) {
@@ -159,7 +159,7 @@ window.renderSocialList = function() {
         
         if (titleEl) {
             titleEl.innerText = `Sosyal (${meCount} Kişi Çevrimiçi)`;
-            titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Ã…Âuan toplam ${meCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
+            titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Şu an toplam ${meCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
         }
         
         if (navBtnSocial) {
@@ -197,7 +197,7 @@ window.renderSocialList = function() {
 
     if (titleEl) {
         titleEl.innerText = `Sosyal (${totalCount} Kişi Çevrimiçi)`;
-        titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Ã…Âuan toplam ${totalCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
+        titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Şu an toplam ${totalCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
     }
     
     if (navBtnSocial) {
@@ -264,7 +264,7 @@ window.renderSocialList = function() {
         statusSpan.style.color = isOnline ? "#00a884" : "#888888";
         statusSpan.innerText = isOnline ? "Çevrimiçi" : "Çevrimdışı";
 
-        li.setAttribute('aria-label', `${p.name} kullanıcısı şuan ${isOnline ? "çevrimiçi" : "çevrimdışı"}. İşlem yapmak için tıklayın veya Enter'a basın.`);
+        li.setAttribute('aria-label', `${p.name} kullanıcısı şu an ${isOnline ? "çevrimiçi" : "çevrimdışı"}. İşlem yapmak için tıklayın veya Enter'a basın.`);
         li.setAttribute('tabindex', '0');
 
         const triggerAction = () => {

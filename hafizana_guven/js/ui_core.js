@@ -1,4 +1,4 @@
-﻿// ui.js - Kullanıcı Arayüzü, Mobil Tespit ve Ekran Okuyucu Fonksiyonları
+// ui.js - Kullanıcı Arayüzü, Mobil Tespit ve Ekran Okuyucu Fonksiyonları
 
 // Mobil Cihaz Tespiti
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
@@ -82,7 +82,7 @@ window.checkDailyStreak = function() {
         localStorage.setItem('hafizaGuvenLoginStreak', streak);
         localStorage.setItem('hafizaGuvenBuzsuzGun', buzsuzGun);
         
-        // BAÃ…ÂARI KONTROLÜ (Buzsuz 3 Gün)
+        // BAŞARI KONTROLÜ (Buzsuz 3 Gün)
         if (!window.userAchievements) window.userAchievements = JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}");
         if (buzsuzGun >= 3 && !window.userAchievements.buzsuz_3_gun) {
             window.userAchievements.buzsuz_3_gun = true;
@@ -349,7 +349,7 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
         window.lastFocusedElement = document.activeElement;
     }
 
-    // ARAYÜZ VE EKRAN OKUYUCU (NVDA) ÇAKIÃ…ÂMA ENGELLEYİCİSİ:
+    // ARAYÜZ VE EKRAN OKUYUCU (NVDA) ÇAKIŞMA ENGELLEYİCİSİ:
     // Animasyon (300ms) süresince NVDA'nın her iki menüyü de okumasını (Ghosting) engellemek için anında gizleriz.
     hideMenu.setAttribute('aria-hidden', 'true');
     hideMenu.setAttribute('inert', ''); // NVDA ve diğer araçların içeriğe erişimini kökünden keser
@@ -452,7 +452,7 @@ window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReaso
         btnElement.setAttribute('aria-disabled', 'true');
         btnElement.classList.add('locked-btn');
         const displayName = modeData.name === "Hayatta Kalma" ? modeData.name : modeData.name + " Mod";
-        btnElement.innerHTML = displayName + " ğÅ¸â€â€™";
+        btnElement.innerHTML = displayName + " 🔒";
         btnElement.setAttribute('aria-label', `${modeData.name} modu kilitli. Açmak için ${lockReason}.`);
     }
 };
@@ -556,13 +556,13 @@ window.updateStatsDisplay = function() {
         }
     }
     let earnedAch = [];
-    if (userAch && userAch.hafizam_gucleniyor) earnedAch.push("âœ… Hafızam Güçleniyor");
-    if (userAch && userAch.buzsuz_3_gun) earnedAch.push("âœ… Sadık Oyuncu");
+    if (userAch && userAch.hafizam_gucleniyor) earnedAch.push("✅ Hafızam Güçleniyor");
+    if (userAch && userAch.buzsuz_3_gun) earnedAch.push("✅ Sadık Oyuncu");
     
     if (earnedAch.length > 0) {
         achievementsHtml = `<li style="margin-top: 15px; font-weight: bold; color: #4ade80;">Kazanılan Başarımlar:</li>`;
         earnedAch.forEach(ach => {
-            achievementsHtml += `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #4ade80;" aria-label="Kazanıldı: ${ach.replace('âœ… ', '')}">${ach}</li>`;
+            achievementsHtml += `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #4ade80;" aria-label="Kazanıldı: ${ach.replace('✅ ', '')}">${ach}</li>`;
         });
     } else {
         achievementsHtml = `<li style="margin-top: 15px; font-weight: bold; color: #cbd5e1;">Kazanılan Başarımlar:</li>`;
@@ -571,9 +571,9 @@ window.updateStatsDisplay = function() {
 
     let html = "";
     if (tokens === 0 && hk === 0 && zk === 0 && easyCount === 0 && mediumCount === 0 && hardCount === 0 && storyCount === 0 && earnedAch.length === 0) {
-        html = '<div id="empty-stats-alert" tabindex="0" role="textbox" aria-readonly="true" aria-label="İstatistik sekmesi boş. Hiç bir istatistiğe sahip değilsiniz." style="color: #ff4444; font-weight: bold; margin-top: 10px; padding: 15px; border: 2px solid #ff4444; border-radius: 8px; text-align: center; background: rgba(255,68,68,0.1);">Bu sekme boş. İstatistik bulunamadı.</div>';
+        html = '<div id="empty-stats-alert" tabindex="0" role="textbox" aria-readonly="true" aria-label="İstatistik sekmesi boş. Hiçbir istatistiğe sahip değilsiniz." style="color: #ff4444; font-weight: bold; margin-top: 10px; padding: 15px; border: 2px solid #ff4444; border-radius: 8px; text-align: center; background: rgba(255,68,68,0.1);">Bu sekme boş. İstatistik bulunamadı.</div>';
         if (window.announceToScreenReader && window.currentActiveMenu === 'stats') {
-            setTimeout(() => window.announceToScreenReader("Bu sekme boş. Henüz hiç bir istatistiğiniz bulunmuyor."), 300);
+            setTimeout(() => window.announceToScreenReader("Bu sekme boş. Henüz hiçbir istatistiğiniz bulunmuyor."), 300);
         }
     } else {
         html = `
@@ -1237,7 +1237,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let diffHours = Math.floor(diffMs / (1000 * 60 * 60));
                 let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
                 eventsBtnMain.innerText = `Etkinlik: Çift Jeton (${diffHours}sa ${diffMinutes}dk)`;
-                eventsBtnMain.setAttribute('aria-label', `Ã…Âu an Çift Jeton Etkinliği AKTİF! Etkinliğin bitmesine ${diffHours} saat ${diffMinutes} dakika kaldı.`);
+                eventsBtnMain.setAttribute('aria-label', `Şu an Çift Jeton Etkinliği AKTİF! Etkinliğin bitmesine ${diffHours} saat ${diffMinutes} dakika kaldı.`);
             } else {
                 let start = new Date(now);
                 let daysUntilSaturday = 6 - day;
@@ -1250,7 +1250,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
                 eventsBtnMain.innerText = `Sıradaki Etkinlik: Çift Jeton (${diffDays}g ${diffHours}sa ${diffMinutes}dk)`;
-                eventsBtnMain.setAttribute('aria-label', `Ã…Âu an aktif etkinlik yok. Sıradaki etkinlik: Çift Jeton Etkinliği. Başlamasına ${diffDays} gün, ${diffHours} saat, ${diffMinutes} dakika var.`);
+                eventsBtnMain.setAttribute('aria-label', `Şu an aktif etkinlik yok. Sıradaki etkinlik: Çift Jeton Etkinliği. Başlamasına ${diffDays} gün, ${diffHours} saat, ${diffMinutes} dakika var.`);
             }
         };
         
@@ -2245,7 +2245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Ekstra: Ã…Âifre alanında enter tuşu ile onSubmit tetikleme
+    // Ekstra: Oda kodu alanında enter tuşu ile onSubmit tetikleme
     if (pvpJoinCodeInput) {
         pvpJoinCodeInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && pvpJoinSubmitBtn) {
@@ -2566,7 +2566,7 @@ document.addEventListener('keydown', (e) => {
              if (backBtn) backBtn.click();
         }
 
-        // OYUN VE HİKAYE MODUNDAN GÜVENLİ KAÇIÃ…Â PROTOKOLÜ
+        // OYUN VE HİKAYE MODUNDAN GÜVENLİ KAÇIŞ PROTOKOLÜ
         if (window.currentActiveMenu === 'game' || window.currentActiveMenu === 'story') {
             const mobileGameBackBtn = document.getElementById('mobile-game-back-btn');
             const gameBackBtn = document.getElementById('game-back-btn');
@@ -2760,7 +2760,7 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
-// --- DURAKLATMA / ÇIKIÃ…Â MENÜSÜ MANTIÃ„ÂI ---
+// --- DURAKLATMA / ÇIKIŞ MENÜSÜ MANTIĞI ---
 window.gameIsPaused = false;
 window.requestPauseMenu = function() {
     window.gameIsPaused = true;
@@ -2864,3 +2864,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.resumeFromPause();
     };
 
+if (btnCancel) {
+        btnCancel.addEventListener('click', handleCancel);
+        btnCancel.addEventListener('pointerdown', handleCancel);
+        btnCancel.addEventListener('touchstart', handleCancel, {passive: false});
+    }
+});

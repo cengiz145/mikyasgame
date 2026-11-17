@@ -1,4 +1,4 @@
-﻿window.achievementsList = [
+window.achievementsList = [
     {
         id: "easy_1",
         title: "Kolay Mod Çırak",
@@ -800,12 +800,13 @@ window.userAchievements = {
 if (window.achievementsList) {
     window.achievementsList.forEach(ach => {
         if (!ach.reward) {
-            if (ach.id.includes('_100000') || ach.id.includes('_1000')) { ach.reward = 1000; }
-            else if (ach.id.includes('_50000') || ach.id.includes('_500')) { ach.reward = 500; }
-            else if (ach.id.includes('_10000') || ach.id.includes('_250') || ach.id.includes('_100')) { ach.reward = 250; }
-            else if (ach.id.includes('_5000') || ach.id.includes('_50')) { ach.reward = 100; }
-            else if (ach.id.includes('_1000') || ach.id.includes('_25')) { ach.reward = 50; }
-            else if (ach.id.includes('_10')) { ach.reward = 25; }
+            if (/_100000$/.test(ach.id)) { ach.reward = 1000; }
+            else if (/_50000$/.test(ach.id) || /_1000$/.test(ach.id)) { ach.reward = 500; }
+            else if (/_10000$/.test(ach.id) || /_500$/.test(ach.id)) { ach.reward = 300; }
+            else if (/_5000$/.test(ach.id) || /_250$/.test(ach.id) || /_100$/.test(ach.id)) { ach.reward = 250; }
+            else if (/_50$/.test(ach.id)) { ach.reward = 100; }
+            else if (/_25$/.test(ach.id)) { ach.reward = 50; }
+            else if (/_10$/.test(ach.id)) { ach.reward = 25; }
             else { ach.reward = 10; }
         }
     });
@@ -842,7 +843,11 @@ if (window.achievementsList) {
         description: "Mağazadaki tüm enstrüman ses paketlerini satın al",
         reward: 250,
         checkCondition: function() { return localStorage.getItem('hafizaGuvenBaglamaPack') === 'true' && localStorage.getItem('hafizaGuvenKavalPack') === 'true' && localStorage.getItem('hafizaGuvenFlutPack') === 'true' && localStorage.getItem('hafizaGuvenKanunPack') === 'true'; },
-        progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_shop_collector') ? 1 : 0) + "/1"; }
+        progressText: function() {
+            let owned = ['hafizaGuvenBaglamaPack', 'hafizaGuvenKavalPack', 'hafizaGuvenFlutPack', 'hafizaGuvenKanunPack']
+                .filter(k => localStorage.getItem(k) === 'true').length;
+            return "İlerleme: " + owned + "/4";
+        }
     });
 
     addAch({
@@ -903,18 +908,19 @@ if (window.achievementsList) {
     addAch({
         id: "ach_systematic_investment",
         title: "Sistematik Yatırım",
-        description: "Aynı anda 10 Hata Koruması ve 10 Zaman Koruması stokla.",
+        description: "Aynı anda Hata Koruması, Zaman Koruması ve 2 Seri Dondurma stokla.",
         reward: 500,
         checkCondition: function() { 
             let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
             let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
-            return hk >= 10 && zk >= 10; 
+            let sd = parseInt(localStorage.getItem('hafizaGuvenSeriDondurma')) || 0;
+            return hk >= 1 && zk >= 1 && sd >= 2; 
         },
         progressText: function() { 
-            let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
-            let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
-            let min = Math.min(hk, zk);
-            return "İlerleme: " + Math.min(10, min) + "/10"; 
+            let hk = Math.min(1, parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0);
+            let zk = Math.min(1, parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0);
+            let sd = Math.min(2, parseInt(localStorage.getItem('hafizaGuvenSeriDondurma')) || 0);
+            return "İlerleme: " + (hk + zk + sd) + "/4"; 
         }
     });
 

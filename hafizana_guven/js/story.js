@@ -718,7 +718,7 @@ window.handleStoryWalking = function (key) {
         if (window.playerX === window.pianoX) {
             msg += "Şu an piyanodasın. ";
             if (window.notesInPiano.length === window.MAX_NOTES) {
-                msg += "Bütün notalar piyanoya yerleştirildi. Oyunu kazanmak için entıra basın.";
+                msg += "Bütün notalar piyanoya yerleştirildi. Oyunu kazanmak için Enter'a basın.";
             } else {
                 const nextNote = trNames[expectedOrder[window.notesInPiano.length]];
                 msg += `Piyanodaki nota sayısı: ${window.notesInPiano.length} / ${window.MAX_NOTES}. Sıradaki aranan nota: ${nextNote}.`;
@@ -767,7 +767,7 @@ window.handleStoryWalking = function (key) {
                     window.applauseSound.volume(0.8 * sfxScale, aid);
                 }
 
-                let packsMsg = "Ayrıca harika bir haberimiz daha var! Artık diğer ses paketlerini de oynayabileceksiniz. Tüm enstrümanları seçebilme seçeneği ana menüye eklendi ve mağazada yeni enstrüman paketleri ortaya çıktı! Ana menüye dönmek için entıra basın.";
+                let packsMsg = "Ayrıca harika bir haberimiz daha var! Artık diğer ses paketlerini de oynayabileceksiniz. Tüm enstrümanları seçebilme seçeneği ana menüye eklendi ve mağazada yeni enstrüman paketleri ortaya çıktı! Ana menüye dönmek için Enter'a basın.";
 
                 const storyStatus = document.getElementById('story-status-text');
                 if (storyStatus) storyStatus.innerHTML = window.localizeText ? window.localizeText(packsMsg) : packsMsg;
@@ -798,7 +798,7 @@ window.handleStoryWalking = function (key) {
                         window.applauseSound.volume(0.8 * sfxScale, aid);
                     }
 
-                    let unlockMsg = "Tebrikler. Kayıp Notalar modunu tamamladınız ve Ritim Avcısı oyun modunu açtınız! İletişim kutusunu geçmek için entıra basın.";
+                    let unlockMsg = "Tebrikler. Kayıp Notalar modunu tamamladınız ve Ritim Avcısı oyun modunu açtınız! İletişim kutusunu geçmek için Enter'a basın.";
 
                     const storyStatus = document.getElementById('story-status-text');
                     if (storyStatus) storyStatus.innerHTML = window.localizeText ? window.localizeText(unlockMsg) : unlockMsg;
@@ -877,7 +877,7 @@ window.handleStoryWalking = function (key) {
 
             window.storyWinTimeout = setTimer(() => {
                 window.isStoryModeFinishedWaitingForEnter = true;
-                const promptText = "Ana menüye dönmek için entıra basın.";
+                const promptText = "Ana menüye dönmek için Enter'a basın.";
                 if (window.announceToScreenReader) {
                     window.announceToScreenReader(promptText, true);
                 }

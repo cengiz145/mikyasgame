@@ -1,58 +1,53 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $dir = $PSScriptRoot
 if (-not $dir) { $dir = ".\" }
-$newVersion = "0.98.1.4"
+$newVersion = "0.98.1.5"
 
 Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"
-$vJson = Get-Content $vJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+$vJson = [System.IO.File]::ReadAllText($vJsonPath, $utf8NoBom) | ConvertFrom-Json
 $vJson.version = $newVersion
 $vJson.buildId = [int][double]::Parse((Get-Date -UFormat %s))
-$vJson.changelog = "Kayıp Notalar (Hikaye Modu) Pan ve Bili karakter sesleri yenilendi: Pan akıllı ve sevecen genç erkek çocuk tınısıyla, Bili ise şımarık, egoist ve yaramaz küçük erkek kardeş tınısıyla yeniden seslendirildi."
-$vJson | ConvertTo-Json -Depth 5 | Set-Content $vJsonPath -Encoding UTF8
+$vJson.changelog = "Oyun genelindeki tüm yazım, kodlama (UTF-8), odak tuzağı, Başarılar menüsü, Ritim Avcısı, Terminoloji Sınavı, 5 haneli PvP oda kodu ve mobil Tekrar Dinle hataları giderildi."
+[System.IO.File]::WriteAllText($vJsonPath, ($vJson | ConvertTo-Json -Depth 5), $utf8NoBom)
 
 Write-Host "Updating package.json..."
 $pJsonPath = Join-Path $dir "package.json"
-$pJson = Get-Content $pJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+$pJson = [System.IO.File]::ReadAllText($pJsonPath, $utf8NoBom) | ConvertFrom-Json
 $pJson.version = $newVersion
-$pJson | ConvertTo-Json -Depth 5 | Set-Content $pJsonPath -Encoding UTF8
+[System.IO.File]::WriteAllText($pJsonPath, ($pJson | ConvertTo-Json -Depth 5), $utf8NoBom)
 
 Write-Host "Updating index.html..."
 $htmlPath = Join-Path $dir "index.html"
-$htmlContent = Get-Content $htmlPath -Encoding UTF8
+$htmlContent = [System.IO.File]::ReadAllText($htmlPath, $utf8NoBom)
 $htmlContent = $htmlContent -replace '\?v=[\d\._a-zA-Z]+', "?v=$newVersion"
 $htmlContent = $htmlContent -replace "window\.UYGULAMA_SURUMU\s*=\s*'[\d\._a-zA-Z]+';", "window.UYGULAMA_SURUMU = '$newVersion';"
 $htmlContent = $htmlContent -replace 'Sürüm:\s*[\d\.]+', "Sürüm: $newVersion"
 $htmlContent = $htmlContent -replace 'Sürüm\s*[\d\.]+', "Sürüm $newVersion"
 $htmlContent = $htmlContent -replace 'v[\d\.]+(?=</div>)', "v$newVersion"
-$htmlContent | Set-Content $htmlPath -Encoding UTF8
+[System.IO.File]::WriteAllText($htmlPath, $htmlContent, $utf8NoBom)
 
 Write-Host "Updating .last_sent_version.txt..."
 $lvPath = Join-Path $dir ".last_sent_version.txt"
-Set-Content $lvPath -Value "v$newVersion" -Encoding UTF8
+[System.IO.File]::WriteAllText($lvPath, "v$newVersion", $utf8NoBom)
 
 Write-Host "Checking changelog.txt..."
 $changelogPath = Join-Path $dir "changelog.txt"
-$changelogContent = Get-Content $changelogPath -Encoding UTF8
-$firstVersion = $changelogContent | Where-Object { $_ -match '^\[v[\d\.]+\]' } | Select-Object -First 1
+$changelogLines = [System.IO.File]::ReadAllLines($changelogPath, $utf8NoBom)
+$firstVersion = $changelogLines | Where-Object { $_ -match '^\[v[\d\.]+\]' } | Select-Object -First 1
 
 if ($firstVersion -notmatch "\[v$newVersion\]") {
     $todayDate = (Get-Date).ToString('dd.MM.yyyy')
-    $newEntry = @"
-[v$newVersion] - $todayDate
-
-Pan ve Bili Özel Genç Erkek Karakter Dublajı:
-- Pan için akıllı, kibar ve sevecen genç erkek karakter sesi; Bili için ise şımarık, egoist, ukala ve yaramaz küçük erkek kardeş sesi özel olarak tasarlanıp tüm diyalog sahneleri yeniden kaydedildi.
-
-"@
-    $newChangelog = @()
-    $newChangelog += $changelogContent[0] # Header
-    $newChangelog += ""
-    $newChangelog += $newEntry
-    for ($i=1; $i -lt $changelogContent.Length; $i++) {
-        $newChangelog += $changelogContent[$i]
-    }
-    $newChangelog | Set-Content $changelogPath -Encoding UTF8
+    $newEntry = @(
+        "[v$newVersion] - $todayDate",
+        "",
+        "Kapsamlı Yazım ve Kod Hataları Onarımı:",
+        "- Oyun genelindeki tüm yazım, kodlama (UTF-8), odak tuzağı, Başarılar menüsü, Ritim Avcısı, Terminoloji Sınavı, 5 haneli PvP oda kodu ve mobil Tekrar Dinle hataları giderildi.",
+        ""
+    )
+    $newChangelog = @($changelogLines[0], "") + $newEntry + $changelogLines[1..($changelogLines.Length - 1)]
+    [System.IO.File]::WriteAllLines($changelogPath, $newChangelog, $utf8NoBom)
 }
 
 Write-Host "Tüm sürümler v$newVersion olarak eşitlendi!"

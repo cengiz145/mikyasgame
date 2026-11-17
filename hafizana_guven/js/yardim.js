@@ -1,4 +1,4 @@
-﻿window.practiceCorrectMessages = [
+window.practiceCorrectMessages = [
     "Harika!", "Süper!", "Mükemmel!", "Tam isabet!", "Doğru tuş!", "Çok iyi!", "Devam et!", "Aynen böyle!", "Bravo!", "Harikulade!",
     "Müthişsin!", "Doğru bildin!", "Şahane!", "Kusursuz!", "İşte bu!", "Aferin!", "Çok başarılı!", "Alkışlar sana!", "Doğru nota!",
     "Yeteneklisin!", "Odaklanman harika!", "Doğru yoldasın!", "Süper gidiyorsun!", "Çok net!", "Nefis!", "Muazzam!", "Tebrikler!",
@@ -34,7 +34,7 @@ window.practiceDialogues = [
 window.msg1to4 = [
     "Harika bir başlangıç!", "Güzel bir giriş!", "Aynen böyle devam!", "Kulakların çok iyi!", "Konsantrasyonun harika!",
     "Böyle ilerle!", "Süpersin!", "Tam isabet!", "Doğru nota!", "Mükemmel uyum!",
-    "Tempo harika!", "Ritm efsane!", "Müzik kulağın çok iyi!", "Müthişsin!", "Hiç bozma!",
+    "Tempo harika!", "Ritim efsane!", "Müzik kulağın çok iyi!", "Müthişsin!", "Hiç bozma!",
     "Doğru bildin!", "Kulak misafiri değilsin, ustasısın!", "Bravo!", "Muazzam giriş!", "İlk adımlar sağlam!",
     "Başlangıç ateşi!", "Emin adımlarla!", "Harika odak!", "Dinlemeye devam!", "Sesi iyi yakaladın!",
     "Çok net!", "Nefis gidiyorsun!", "Bravo sana!", "Müzikal yetenek!", "Sesler senin elinde!",
@@ -57,7 +57,7 @@ window.msg5 = [
     "Büyüleyicisin! Efsane seri!", "Helal olsun! Tam gaz ileri!", "Zafere açsın! Müthişsin!",
     "Dev aynası! Büyük oynuyorsun!", "Konsantrasyonun zirvesi! Yarıladık!", "İnanılmaz kulak! Tam isabet!",
     "Yola devam! Şampiyonluk yakın!", "Mükemmelliğin tanımı! Yarı yarıya bitti!", "Durmak yok, efsaneler pes etmez!",
-    "Heyecan dorukta! Çok iyisin!", "Titretin buraları! Müthiş!", "Süper modundasın! Fişek gibi!",
+    "Heyecan dorukta! Çok iyisin!", "Titrettin buraları! Müthiş!", "Süper modundasın! Fişek gibi!",
     "Alev alev yanıyorsun! Harikulade!", "Yetenek avcısı! Müzik senden sorulur!", "Gaz kesme! Mermisin!",
     "Zirveye tırmanış! Çok iyi!", "Efsanevi duyum! Asla yanılmıyorsun!", "Makine gibisin! Mükemmel!",
     "Altın değerinde bir doğru! Yarıda yarı!", "Harika ötesi! Şampiyon ruhu!", "Notalar sana boyun eğdi!", "İşte şampiyon! Tamamlayacaksın!", "Gaza geldik! Kusursuz gidiyor!"
@@ -105,10 +105,10 @@ window.missingNotesDialogues = [
 
 window.missingNotesHappyMessages = [
     "Yaşasın! Beni buldun Pan, sana çok teşekkür ederim!",
-    "Ah, çok üşümüştüm! Beni kurtardığın için sağol Pan!",
+    "Ah, çok üşümüştüm! Beni kurtardığın için sağ ol Pan!",
     "Beni sıcak piyanomuzun yanına götüreceğin için çok mutluyum Pan!",
     "Sonunda biri beni fark etti! Harikasın Pan!",
-    "Pan! Sensiz buralar çok ıssızdı, beni aldığın için sağol!",
+    "Pan! Sensiz buralar çok ıssızdı, beni aldığın için sağ ol!",
     "Karda kaybolmaktan çok korkmuştum, kahramanımsın Pan!",
     "Sıcacık yuvama dönüyorum sayende, çok teşekkürler Pan!",
     "Beni kurtardın! Hadi hemen diğer kardeşlerimi de bulalım Pan!",

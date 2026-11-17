@@ -1,4 +1,4 @@
-﻿// autoRepair.js - Otomatik Hata Onarım ve Teşhis Sistemi (Auto-Repair & Diagnostics)
+// autoRepair.js - Otomatik Hata Onarım ve Teşhis Sistemi (Auto-Repair & Diagnostics)
 
 window.HafizanaGuvenAutoRepair = {
     isRepairing: false,
@@ -148,15 +148,26 @@ window.HafizanaGuvenAutoRepair = {
     runLocalStorageDoctor: function() {
         // Kayıtlı verilerin formatını ve veri tiplerini tarar
         try {
-            // 1. Jetonlar Kontrolü (NaN hatası kalkanı)
-            let tokens = localStorage.getItem('hafizaGuvenTotalTokens');
-            if (tokens !== null) {
-                let parsedTokens = parseInt(tokens);
-                if (isNaN(parsedTokens) || parsedTokens < 0) {
-                    console.warn("[AutoRepair] Bozuk jeton verisi tespit edildi. Onarılıyor...");
-                    localStorage.setItem('hafizaGuvenTotalTokens', '0');
+            // 1. Sayısal Sayaçlar Kontrolü (NaN hatası kalkanı)
+            const numericKeys = [
+                'hafizaGuvenTotalTokens',
+                'hafizaGuvenLifetimeScore',
+                'hafizaGuvenXP',
+                'hafizaGuvenFlawlessWins',
+                'hafizaGuvenTotalMistakesAllTime',
+                'hafizaGuvenTermFullScore',
+                'hafizaGuvenTermLearnCount'
+            ];
+            numericKeys.forEach(k => {
+                let raw = localStorage.getItem(k);
+                if (raw !== null) {
+                    let parsed = parseInt(raw, 10);
+                    if (isNaN(parsed) || parsed < 0) {
+                        console.warn(`[AutoRepair] Bozuk sayısal veri (${k}: ${raw}) tespit edildi. Onarılıyor...`);
+                        localStorage.setItem(k, '0');
+                    }
                 }
-            }
+            });
 
             // 2. Oyun Modları (JSON Format Hatası Koruması)
             let modes = localStorage.getItem('hafizaGuvenModes');
@@ -191,9 +202,9 @@ window.HafizanaGuvenAutoRepair = {
     startHeartbeatMonitor: function() {
         // Oyunun takılıp takılmadığını (deadlock) her 5 saniyede bir denetler
         setInterval(() => {
-            if (window.gameIsActive && window.gameTimer > 0) {
+            if (window.gameIsActive && window.gameTimer > 0 && !window.isComputerPlaying && window.activeDifficulty !== 'rhythm_mode') {
                 
-                // Eğer oyun aktifse ve 10 saniye boyunca zamanlayıcı aynı kaldıysa (takıldıysa)
+                // Eğer oyun aktifse, bilgisayar çalmıyorsa ve zamanlayıcı aynı kaldıysa (takıldıysa)
                 if (this.lastHeartbeatState && this.lastHeartbeatState.timer === window.gameTimer && !window.gameIsPaused) {
                     this.lastHeartbeatState.frozenCount = (this.lastHeartbeatState.frozenCount || 0) + 1;
                     

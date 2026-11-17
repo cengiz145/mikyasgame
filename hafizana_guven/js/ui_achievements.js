@@ -1,12 +1,3 @@
-﻿
-    if (btnCancel) {
-        btnCancel.addEventListener('click', handleCancel);
-        btnCancel.addEventListener('pointerdown', handleCancel);
-        btnCancel.addEventListener('touchstart', handleCancel, {passive: false});
-    }
-});
-
-
 // Achievement Modal Logic
 document.addEventListener('DOMContentLoaded', () => {
     const achievementModal = document.getElementById('achievement-modal');
@@ -27,18 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         window.showAchievementModal = function(achName) {
         let gameLink = "https://mikyasstudio.com.tr/hafizanaguven.html";
-        let shareText = "Tebrikler! Hafizana Guven'de " + achName + " basarimini elde ettim! \n\nSen de benimle beraber bu basariyi yakalamak istiyorsan, haydi sen de oyna!\n\nOyunu Oyna: " + gameLink;
+        let shareText = "Tebrikler! Hafızana Güven'de " + achName + " başarımını elde ettim! \n\nSen de benimle beraber bu başarıyı yakalamak istiyorsan, haydi sen de oyna!\n\nOyunu Oyna: " + gameLink;
         
         let textElem = document.getElementById('achievement-modal-text');
         if (textElem) {
-            textElem.textContent = "Tebrikler! " + achName + " basarimini elde ettiniz! Bunu arkadaslarinizla paylasabilirsiniz.";
+            textElem.textContent = "Tebrikler! " + achName + " başarımını elde ettiniz! Bunu arkadaşlarınızla paylaşabilirsiniz.";
             textElem.focus();
         }
         
         if (btnAchCopy) {
             btnAchCopy.onclick = () => {
                 navigator.clipboard.writeText(shareText).then(() => {
-                    if (window.announceToScreenReader) window.announceToScreenReader("Mesaj kopyalandÃƒâ€Â±!");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Mesaj kopyalandı!");
                     if (window.correctSound) window.correctSound.play();
                 });
             };

@@ -1,4 +1,4 @@
-﻿const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 
 // Pencere nesnesini global referansta tutuyoruz.

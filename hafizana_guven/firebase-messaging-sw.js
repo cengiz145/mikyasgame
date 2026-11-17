@@ -1,4 +1,4 @@
-﻿importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
 // DİKKAT: Skorları tutmak için oyununda zaten kullandığın 
@@ -22,7 +22,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: '/ikon.png' // Eğer oyununun bir logosu varsa buraya dosya adını yazabilirsin
+    icon: './icon.png' // Eğer oyununun bir logosu varsa buraya dosya adını yazabilirsin
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

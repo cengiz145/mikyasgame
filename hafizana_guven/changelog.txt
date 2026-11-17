@@ -1,4 +1,10 @@
-﻿# Hafızana Güven - Değişiklik Günlüğü (Changelog)
+# Hafızana Güven - Değişiklik Günlüğü (Changelog)
+
+[v0.98.1.5] - 17.11.2026
+
+Kapsamlı Yazım ve Kod Hataları Onarımı:
+- Oyun genelindeki tüm yazım, kodlama (UTF-8), odak tuzağı, Başarılar menüsü, Ritim Avcısı, Terminoloji Sınavı, 5 haneli PvP oda kodu ve mobil Tekrar Dinle hataları giderildi.
+
 
 [v0.98.1.4] - 17.11.2026
 
@@ -68,73 +74,73 @@ Oyun deneyimini çok daha sürükleyici ve rekabetçi kılan bu güncellemeyi he
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.97.4.63] - 19.09.2026
 
 Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 
 [v0.98.0.0] - 16.09.2026
@@ -149,37 +155,37 @@ Genel:
 [v0.97.4.61] - 31.07.2026
 
 Genel:
-- Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
+- Sistem genelindeki tüm versiyon numaraları (index.html, package.json, version.json) senkronize edildi ve eşitlendi.
 
 
 [v0.97.4.61] - 30.07.2026
 
 Genel:
-- Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
+- Sistem genelindeki tüm versiyon numaraları (index.html, package.json, version.json) senkronize edildi ve eşitlendi.
 
 
 [v0.97.4.61] - 30.07.2026
 
 Genel:
-- Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
+- Sistem genelindeki tüm versiyon numaraları (index.html, package.json, version.json) senkronize edildi ve eşitlendi.
 
 
 [v0.97.4.61] - 30.07.2026
 
 Genel:
-- Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
+- Sistem genelindeki tüm versiyon numaraları (index.html, package.json, version.json) senkronize edildi ve eşitlendi.
 
 
 [v0.97.4.61] - 30.07.2026
 
 Genel:
-- Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
+- Sistem genelindeki tüm versiyon numaraları (index.html, package.json, version.json) senkronize edildi ve eşitlendi.
 
 
 [v0.97.4.61] - 30.07.2026
 
 Genel:
-- Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
+- Sistem genelindeki tüm versiyon numaraları (index.html, package.json, version.json) senkronize edildi ve eşitlendi.
 
 
 [v0.97.4.61] - 29.07.2026
@@ -191,253 +197,238 @@ Genel:
 [v0.97.4.56] - 17.06.2026
 
 Genel:
-- Sistem genelindeki t�m versiyon numaralar� (index.html, package.json, version.json) senkronize edildi ve e�itlendi.
+- Sistem genelindeki tüm versiyon numaraları (index.html, package.json, version.json) senkronize edildi ve eşitlendi.
 
 
 [v0.97.4.51] - 17.06.2026
 
-Hata D�zeltmeleri ve �yile�tirmeler:
-- Kay�p Notalar modunda son nota yerle�tirildi�inde art�k do�rudan tamamlama men�s�ne ge�i� yap�l�yor.
-- Eski dosyalar�n �nbellekte (cache) kalmas�n� �nlemek i�in t�m JS ve CSS dosyalar�na s�r�m etiketi eklendi.
+Hata Düzeltmeleri ve İyileştirmeler:
+- Kayıp Notalar modunda son nota yerleştirildiğinde artık doğrudan tamamlama menüsüne geçiş yapılıyor.
+- Eski dosyaların önbellekte (cache) kalmasını önlemek için tüm JS ve CSS dosyalarına sürüm etiketi eklendi.
 [v0.97.4.50] - 16.06.2026
 
-Yeni �zellikler:
-- Yeni Oyun Modu: "Ritim Avc�s�". Bilgisayar�n 60 BPM (ve giderek h�zlanan) metronom e�li�inde �ald��� �retti�i notalar� tekrarlaman�z� isteyen, �a�r�-cevap tabanl� yepyeni bir ritim diktesi modu eklendi.
-- NVDA Ekran Okuyucu �yile�tirmesi: Uygulaman�n okuma modlar� aras�nda ya�anan anlams�z "Belge / Uygulama" ge�i�leri, HTML odak rollerinin onar�lmas�yla d�zeltildi.
+Yeni Özellikler:
+- Yeni Oyun Modu: "Ritim Avcısı". Bilgisayarın 60 BPM (ve giderek hızlanan) metronom eşliğinde çaldığı ürettiği notaları tekrarlamanızı isteyen, çağrı-cevap tabanlı yepyeni bir ritim diktesi modu eklendi.
+- NVDA Ekran Okuyucu İyileştirmesi: Uygulamanın okuma modları arasında yaşanan anlamsız "Belge / Uygulama" geçişleri, HTML odak rollerinin onarılmasıyla düzeltildi.
 
 [v0.97.4.45] - 26.05.2026
 
-Yeni �zellikler:
-- Yeni Ba�ar�m Eklendi: Sad�k Oyuncu. 3 g�n boyunca hi� Seri Dondurma kullanmadan oyuna girerek bu ba�ar�m� kazanabilirsiniz.
-- G�venlik Katman�: Ana sayfa altyap�s�na d�� m�dahaleleri �nlemek i�in XSS ve Clickjacking g�venlik kalkanlar� eklendi.
+Yeni Özellikler:
+- Yeni Başarım Eklendi: Sadık Oyuncu. 3 gün boyunca hiç Seri Dondurma kullanmadan oyuna girerek bu başarımı kazanabilirsiniz.
+- Güvenlik Katmanı: Ana sayfa altyapısına dış müdahaleleri önlemek için XSS ve Clickjacking güvenlik kalkanları eklendi.
 
 [v0.97.4.44] - 25.05.2026
 
-Otomatik Hata Onar�m (Auto-Repair) Sistemi Eklendi:
-- Oyundaki sorunlar giderildi. Art�k oyunun rahat�a keyfini ��kartabilirsiniz.
+Otomatik Hata Onarım (Auto-Repair) Sistemi Eklendi:
+- Oyundaki sorunlar giderildi. Artık oyunun rahatça keyfini çıkartabilirsiniz.
 
 [v0.97.4.43] - 25.05.2026
 
-D�zeltmeler:
-- Kolay modun Orta mod kilidini a�ma �art� yeniden 5 kez tamamlanma olarak ayarland�.
-- Oyun i�i men�lerdeki bilgilendirme metinleri "Kolay modu 5 kez tamamla" olarak d�zeltildi.
+Düzeltmeler:
+- Kolay modun Orta mod kilidini açma şartı yeniden 5 kez tamamlanma olarak ayarlandı.
+- Oyun içi menülerdeki bilgilendirme metinleri "Kolay modu 5 kez tamamla" olarak düzeltildi.
 
 [v0.97.4.42] - 25.05.2026
 
-D�zeltmeler ve Optimizasyonlar:
-- Zaman Korumas� Hatas�: Yanl�� nota bas�ld���nda al�nan ceza s�reyi 0'�n alt�na d���r�rse, "Zaman Korumas�" hakk�n�n devreye girmeden oyunun bitmesi mant�k hatas� tamamen onar�ld�.
-- Eksik Anons Hatas�: S�renin -5 saniye cezalarla ani d��mesi sebebiyle ekran okuyucunun 20sn ve 10sn uyar�lar�n� atlamas� (okumamas�) sorunu ��z�ld�.
-- Memory Leak (Bellek S�z�nt�s�): Oyun motorundaki eski saya�lar�n bellekten silinmeden arka planda �al��maya devam etmesi problemi `hgfzZamanlayici` sistemi g�ncellenerek tamamen giderildi. Oyun art�k daha hafif.
+Düzeltmeler ve Optimizasyonlar:
+- Zaman Koruması Hatası: Yanlış nota basıldığında alınan ceza süreyi 0'ın altına düşürürse, "Zaman Koruması" hakkının devreye girmeden oyunun bitmesi mantık hatası tamamen onarıldı.
+- Eksik Anons Hatası: Sürenin -5 saniye cezalarla ani düşmesi sebebiyle ekran okuyucunun 20sn ve 10sn uyarılarını atlaması (okumaması) sorunu çözüldü.
+- Memory Leak (Bellek Sızıntısı): Oyun motorundaki eski sayaçların bellekten silinmeden arka planda çalışmaya devam etmesi problemi `hgfzZamanlayici` sistemi güncellenerek tamamen giderildi. Oyun artık daha hafif.
 
 [v0.97.4.41] - 25.05.2026
 
-Yeni �zellikler ve Hata Onar�mlar�:
-- Hata Ay�klama (Debug) Modu aktif edildi (Ctrl+Shift+D).
-- Story modundaki seslerin di�er modlar� bozmas� (Global Volume) hatas� giderildi.
-- Ekran okuyucu uzun bildirim kesilme hatas� onar�ld�.
-- Taray�c� performans�n� etkileyen Memory Leak hatalar� temizlendi.
+Yeni Özellikler ve Hata Onarımları:
+- Hata Ayıklama (Debug) Modu aktif edildi (Ctrl+Shift+D).
+- Story modundaki seslerin diğer modları bozması (Global Volume) hatası giderildi.
+- Ekran okuyucu uzun bildirim kesilme hatası onarıldı.
+- Tarayıcı performansını etkileyen Memory Leak hataları temizlendi.
 
 [v0.97.4.40] - 25.05.2026
 
-Yeni �zellikler ve Hediyeler:
-- Veri s�f�rlanmas� sebebiyle t�m oyunculara bir kereli�e mahsus 2000 jeton �z�r hediyesi eklendi. Oyuna giren herkesin bakiyesine an�nda yans�yacakt�r.
+Yeni Özellikler ve Hediyeler:
+- Veri sıfırlanması sebebiyle tüm oyunculara bir kereliğe mahsus 2000 jeton özür hediyesi eklendi. Oyuna giren herkesin bakiyesine anında yansıyacaktır.
 
 [v0.97.4.39] - 25.05.2026
 
-D�zeltmeler ve �yile�tirmeler:
-- �statistik s�f�rlama mekanizmas� devred��� b�rak�ld�. Oyuncular�n verilerini ve ilerlemelerini yanl��l�kla s�f�rlayan eski temizlik kodlar� (hfzReset_AllProgress_v2 ve hfzAdmin_ServerWipe_v2) kald�r�ld�.
+Düzeltmeler ve İyileştirmeler:
+- İstatistik sıfırlama mekanizması devredışı bırakıldı. Oyuncuların verilerini ve ilerlemelerini yanlışlıkla sıfırlayan eski temizlik kodları (hfzReset_AllProgress_v2 ve hfzAdmin_ServerWipe_v2) kaldırıldı.
 
 [v0.97.4.38] - 07.05.2026
 
-Yeni �zellikler ve �yile�tirmeler:
-- Geli�tirici ve "Tester" yetkisine sahip kullan�c�lar�n, di�er oyunculara r�tbe atayabilmesi i�in komut sistemi geli�tirildi. Sosyal (Sohbet) penceresine "/r�tbe [isim] [r�tbe_ad�]" yaz�larak herhangi bir oyuncunun r�tbesi kal�c� olarak de�i�tirilebilir (�rn: /r�tbe ali Tester).
-- R�tbeler sohbet alan�nda ismin ba��nda renkli baloncuklar ile g�sterilecek �ekilde �zelle�tirildi (Geli�tirici turuncu, Tester pembe renkli olacak).
+Yeni Özellikler ve İyileştirmeler:
+- Geliştirici ve "Tester" yetkisine sahip kullanıcıların, diğer oyunculara rütbe atayabilmesi için komut sistemi geliştirildi. Sosyal (Sohbet) penceresine "/rütbe [isim] [rütbe_adı]" yazılarak herhangi bir oyuncunun rütbesi kalıcı olarak değiştirilebilir (Örn: /rütbe ali Tester).
+- Rütbeler sohbet alanında ismin başında renkli baloncuklar ile gösterilecek şekilde özelleştirildi (Geliştirici turuncu, Tester pembe renkli olacak).
 
 [v0.97.4.37] - 07.05.2026
 
-Yeni �zellikler ve �yile�tirmeler:
-- Profil men�s�ne kullan�c� ad�n� istenildi�i zaman h�zl�ca de�i�tirebilmek i�in yeni bir buton eklendi. Girdi�iniz yeni isim, oyun i�indeki ve sosyal sohbet alanlar�ndaki isminizi otomatik olarak an�nda g�nceller.
+Yeni Özellikler ve İyileştirmeler:
+- Profil menüsüne kullanıcı adını istenildiği zaman hızlıca değiştirebilmek için yeni bir buton eklendi. Girdiğiniz yeni isim, oyun içindeki ve sosyal sohbet alanlarındaki isminizi otomatik olarak anında günceller.
 
 [v0.97.4.36] - 07.05.2026
 
-D�zeltmeler ve �yile�tirmeler:
-- Kay�p Notalar hikaye modunu bitiren oyunculara "Farkl� ses paketlerinin kilidi a��ld�" demesine ra�men ma�azada enstr�manlar�n (Ba�lama, Kaval vb.) a��lmamas�na neden olan zorluk seviyesi �art� (Kolay, Orta, Zor 5 kez bitirme) hatas� d�zeltildi. Art�k sadece Kay�p Notalar modunu 1 kez bitirmek, ma�azadaki enstr�man paketlerinin kilitlerini a�mak i�in yeterli olacak.
+Düzeltmeler ve İyileştirmeler:
+- Kayıp Notalar hikaye modunu bitiren oyunculara "Farklı ses paketlerinin kilidi açıldı" demesine rağmen mağazada enstrümanların (Bağlama, Kaval vb.) açılmamasına neden olan zorluk seviyesi şartı (Kolay, Orta, Zor 5 kez bitirme) hatası düzeltildi. Artık sadece Kayıp Notalar modunu 1 kez bitirmek, mağazadaki enstrüman paketlerinin kilitlerini açmak için yeterli olacak.
 
 [v0.97.4.35] - 07.05.2026
 
-D�zeltmeler ve �yile�tirmeler:
-- Kay�p Notalar modunda 7. ve son notay� piyanoya yerle�tirdikten sonra oyuncu yanl��l�kla piyanodan (X:0 konumundan) uzakla�t���nda "Onay (Enter)" tu�unun veya mobil "Onay" butonunun �al��mas�n� engelleyen (oyunun bitmesini engelleyen) kritik bir hata d�zeltildi. Art�k 7. notay� yerle�tirdi�iniz an piyanodan ayr�lamayacaks�n�z ve Onay tu�u her ko�ulta ba�ar�yla �al��acak.
-- Kay�p Notalar modunda 3 saniyelik "Tebrikler / Alk��" sesi bitmeden Onay (Enter) tu�una art arda bas�ld���nda, yeni enstr�man paketi hediyelerinin (Ba�lama, Kaval, Fl�t) kazan�m�n� iptal eden gizli bir hata giderildi. Art�k oyuncular alk�� bitene (3 saniye) kadar Onay tu�una bas�p �d�llerini iptal edemeyecek.
-- Kay�p Notalar modunda, oyuncu yanl�� s�radaki bir notay� buldu�unda sistem art�k sadece "Bir nota buldunuz ama s�ras� de�il" demek yerine, do�rudan hangi notay� buldu�unuzu (�rn: "Burada Mi notas� var ama s�ras� de�il!") s�yleyecek. Bu sayede notalar�n yerlerini akl�n�zda tutman�z �ok daha kolayla�acak.
-- Kay�p Notalar hikaye diyaloglar�n� atlama se�ene�i a��k oldu�unda, her oyuna giri�te tekrarlanan 30 saniyelik uzun kurallar a��klamas� k�salt�ld�. Sadece oyuncunun bulundu�u X konumu okunacak.
+Düzeltmeler ve İyileştirmeler:
+- Kayıp Notalar modunda 7. ve son notayı piyanoya yerleştirdikten sonra oyuncu yanlışlıkla piyanodan (X:0 konumundan) uzaklaştığında "Onay (Enter)" tuşunun veya mobil "Onay" butonunun çalışmasını engelleyen (oyunun bitmesini engelleyen) kritik bir hata düzeltildi. Artık 7. notayı yerleştirdiğiniz an piyanodan ayrılamayacaksınız ve Onay tuşu her koşulta başarıyla çalışacak.
+- Kayıp Notalar modunda 3 saniyelik "Tebrikler / Alkış" sesi bitmeden Onay (Enter) tuşuna art arda basıldığında, yeni enstrüman paketi hediyelerinin (Bağlama, Kaval, Flüt) kazanımını iptal eden gizli bir hata giderildi. Artık oyuncular alkış bitene (3 saniye) kadar Onay tuşuna basıp ödüllerini iptal edemeyecek.
+- Kayıp Notalar modunda, oyuncu yanlış sıradaki bir notayı bulduğunda sistem artık sadece "Bir nota buldunuz ama sırası değil" demek yerine, doğrudan hangi notayı bulduğunuzu (Örn: "Burada Mi notası var ama sırası değil!") söyleyecek. Bu sayede notaların yerlerini aklınızda tutmanız çok daha kolaylaşacak.
+- Kayıp Notalar hikaye diyaloglarını atlama seçeneği açık olduğunda, her oyuna girişte tekrarlanan 30 saniyelik uzun kurallar açıklaması kısaltıldı. Sadece oyuncunun bulunduğu X konumu okunacak.
 
 [v0.97.4.34] - 07.05.2026
 
-Yeni �zellikler:
-- Se�enekler men�s�ne "Oyun ��i Motivasyon Mesajlar�" ayar� eklendi. Ana oyunda veya Al��t�rma modunda ��kan "Harika!", "S�per!" gibi bildirimleri kapatarak sadece "Do�ru" veya "Yanl��" gibi sade geri bildirimler almak isteyenler bu �zelli�i kullanabilir.
+Yeni Özellikler:
+- Seçenekler menüsüne "Oyun İçi Motivasyon Mesajları" ayarı eklendi. Ana oyunda veya Alıştırma modunda çıkan "Harika!", "Süper!" gibi bildirimleri kapatarak sadece "Doğru" veya "Yanlış" gibi sade geri bildirimler almak isteyenler bu özelliği kullanabilir.
 
-D�zeltmeler:
-- Mobil cihazlarda Kay�p Notalar modunda, oyuncular�n "Kalan S�reyi" kontrol edebilecekleri (T tu�una kar��l�k gelen) bir buton eksikli�i giderildi. Art�k mobil ekran men�s�nde s�re sorgulama butonu aktif.
+Düzeltmeler:
+- Mobil cihazlarda Kayıp Notalar modunda, oyuncuların "Kalan Süreyi" kontrol edebilecekleri (T tuşuna karşılık gelen) bir buton eksikliği giderildi. Artık mobil ekran menüsünde süre sorgulama butonu aktif.
 
 [v0.97.4.33] - 07.05.2026
 
-Yeni �zellikler:
-- Se�enekler men�s�ne "�evrimi�i Bildirimleri" ayar� eklendi. Bu ayar sayesinde di�er oyuncular�n oyuna giri� ve ��k��lar�nda gelen �evrimi�i/�evrimd��� mesajlar�n� devre d��� b�rakabilirsiniz. (Varsay�lan: A��k)
+Yeni Özellikler:
+- Seçenekler menüsüne "Çevrimiçi Bildirimleri" ayarı eklendi. Bu ayar sayesinde diğer oyuncuların oyuna giriş ve çıkışlarında gelen çevrimiçi/çevrimdışı mesajlarını devre dışı bırakabilirsiniz. (Varsayılan: Açık)
 
 [v0.97.4.32] - 06.05.2026
 
-D�zeltmeler:
-- Kay�p Notalar modunda 7. nota piyanoya yerle�tirildi�inde s�renin durmamas� ve "Ent�ra bas�n" yaz�s�n� okurken oyunun kaybettin olarak sonu�lanmas� sorunu tamamen ��z�ld�. Art�k t�m notalar topland��� anda arka plandaki geri say�m an�nda duruyor.
+Düzeltmeler:
+- Kayıp Notalar modunda 7. nota piyanoya yerleştirildiğinde sürenin durmaması ve "Entıra basın" yazısını okurken oyunun kaybettin olarak sonuçlanması sorunu tamamen çözüldü. Artık tüm notalar toplandığı anda arka plandaki geri sayım anında duruyor.
 
 [v0.97.4.31] - 06.05.2026
 
-�yile�tirmeler:
-- Se�eneklerdeki "Kay�p Notalar Hikaye Modu" ayar� "Kay�p Notalar Hikaye Diyalo�unu Atla" olarak de�i�tirildi. Art�k bu ayar a��ld���nda oyun modunu tamamen kapatmak yerine sadece ba�lang��taki diyaloglar� atlayarak do�rudan oyuna girilmesini sa�l�yor.
+İyileştirmeler:
+- Seçeneklerdeki "Kayıp Notalar Hikaye Modu" ayarı "Kayıp Notalar Hikaye Diyaloğunu Atla" olarak değiştirildi. Artık bu ayar açıldığında oyun modunu tamamen kapatmak yerine sadece başlangıçtaki diyalogları atlayarak doğrudan oyuna girilmesini sağlıyor.
 
 [v0.97.4.30] - 06.05.2026
 
-�yile�tirmeler ve D�zeltmeler:
-- Se�enekler men�s�ne Kay�p Notalar hikaye modunu kapatma se�ene�i eklendi. (Varsay�lan: A��k)
-- Kay�p Notalar modunda 2. ve 3. oynan��larda ekran okuyucunun hikayeyi bazen okumamas� sorunu giderildi.
-- Kay�p Notalar modunda oyun bitiminde tebrikler ekran�n�n ��kmamas� sorunu ��z�ld�.
+İyileştirmeler ve Düzeltmeler:
+- Seçenekler menüsüne Kayıp Notalar hikaye modunu kapatma seçeneği eklendi. (Varsayılan: Açık)
+- Kayıp Notalar modunda 2. ve 3. oynanışlarda ekran okuyucunun hikayeyi bazen okumaması sorunu giderildi.
+- Kayıp Notalar modunda oyun bitiminde tebrikler ekranının çıkmaması sorunu çözüldü.
 
 [v0.97.4.29] - 05.05.2026
 
-�yile�tirmeler:
-- Kay�p Notalar modunun s�resi 40 saniye uzat�ld� ve heyecan art�r�c� kalp at��� sesi son 1 dakika yerine son 30 saniye kala ba�layacak �ekilde g�ncellendi.
+İyileştirmeler:
+- Kayıp Notalar modunun süresi 40 saniye uzatıldı ve heyecan artırıcı kalp atışı sesi son 1 dakika yerine son 30 saniye kala başlayacak şekilde güncellendi.
 
 [v0.97.4.28] - 03.05.2026
 
-D�zeltmeler:
-- "Orta" zorluk modunun kilidini a�mak i�in "Kolay" modun tamamlanma gereksinimi d�zeltildi. Art�k 1 kere de�il, di�er modlarda oldu�u gibi 5 kere tamamland���nda kilit a��lacak.
-- Sosyal men�s�ndeki canl� oyuncu say�s�n�n ekran okuyucuyla veya ba�l�kta anla��lamamas� sorunu giderildi. Oyuncu say�s� anl�k olarak men�ye ve butonlara yazd�r�ld�.
+Düzeltmeler:
+- "Orta" zorluk modunun kilidini açmak için "Kolay" modun tamamlanma gereksinimi düzeltildi. Artık 1 kere değil, diğer modlarda olduğu gibi 5 kere tamamlandığında kilit açılacak.
+- Sosyal menüsündeki canlı oyuncu sayısının ekran okuyucuyla veya başlıkta anlaşılamaması sorunu giderildi. Oyuncu sayısı anlık olarak menüye ve butonlara yazdırıldı.
 
 [v0.97.4.27] - 02.05.2026
 
-Yeni �zellikler ve �yile�tirmeler:
-- Y�neticiler i�in eklenen bilet ve mesaj alarm (admintell.ogg) sistemi oyuncu talebi �zerine de�i�tirildi. Alarm sesi art�k 15 saniyede bir d�ng�ye girmek yerine **sadece** oyuna her giri�inizde okunmam�� bilet/mesaj varsa ve oyun esnas�nda yeni bir bildirim geldi�inde tek seferlik uyaracak �ekilde ayarland�. Ayr�ca, siz oyunda yokken (�evrimd���yken) gelen �zel mesajlar�n size bildirilmeden sessizce silinmesine yol a�an �nemli bir hata giderilerek, oyuna girdi�inizde "Siz yokken �u ki�ilerden �zel mesaj geldi" anonsuyla duyurulmas� sa�land�.
+Yeni Özellikler ve İyileştirmeler:
+- Yöneticiler için eklenen bilet ve mesaj alarm (admintell.ogg) sistemi oyuncu talebi üzerine değiştirildi. Alarm sesi artık 15 saniyede bir döngüye girmek yerine **sadece** oyuna her girişinizde okunmamış bilet/mesaj varsa ve oyun esnasında yeni bir bildirim geldiğinde tek seferlik uyaracak şekilde ayarlandı. Ayrıca, siz oyunda yokken (çevrimdışıyken) gelen özel mesajların size bildirilmeden sessizce silinmesine yol açan önemli bir hata giderilerek, oyuna girdiğinizde "Siz yokken şu kişilerden özel mesaj geldi" anonsuyla duyurulması sağlandı.
 
 [v0.97.4.26] - 02.05.2026
 
-Yeni �zellikler ve �yile�tirmeler:
-- Y�neticiler i�in "Kal�c� Uyar� (admintell.ogg)" sistemi devreye al�nd�. Size �zel bir mesaj geldi�inde veya yeni bir geri bildirim (bilet) a��ld���nda bu �zel ses efekti �almaya ba�layacak ve siz bileti (/bilet komutuyla) veya mesaj� (�zel sohbet penceresinden) okuyana kadar her 15 saniyede bir sizi uyarmaya devam edecek.
+Yeni Özellikler ve İyileştirmeler:
+- Yöneticiler için "Kalıcı Uyarı (admintell.ogg)" sistemi devreye alındı. Size özel bir mesaj geldiğinde veya yeni bir geri bildirim (bilet) açıldığında bu özel ses efekti çalmaya başlayacak ve siz bileti (/bilet komutuyla) veya mesajı (özel sohbet penceresinden) okuyana kadar her 15 saniyede bir sizi uyarmaya devam edecek.
 
 [v0.97.4.25] - 01.05.2026
 
-Yeni �zellikler ve �yile�tirmeler:
-- Y�neticiler (ekrem) i�in "Ger�ek Zamanl� Bilet Bildirim Sistemi" eklendi! Art�k oyuna giri� yapt���n�zda okunmam�� bilet varsa ekran okuyucu sizi otomatik uyaracak. Ayr�ca siz oyundayken birisi geri bildirim yollarsa an�nda sesli bildirim ve ekran uyar�s� alacaks�n�z.
+Yeni Özellikler ve İyileştirmeler:
+- Yöneticiler (ekrem) için "Gerçek Zamanlı Bilet Bildirim Sistemi" eklendi! Artık oyuna giriş yaptığınızda okunmamış bilet varsa ekran okuyucu sizi otomatik uyaracak. Ayrıca siz oyundayken birisi geri bildirim yollarsa anında sesli bildirim ve ekran uyarısı alacaksınız.
 
 [v0.97.4.24] - 01.05.2026
 
-Yeni �zellikler ve �yile�tirmeler:
-- Kay�p Notalar modunu tamamlayan oyuncular i�in Ma�aza'daki ses paketlerinin (Ba�lama, Kaval, Fl�t, Kanun vb.) kilitlerinin otomatik a��lmas� sa�land�.
-- G�ncelleme sonras� t�m test oyuncular�n�n ve y�neticilerin ilerlemelerinin s�f�rdan ve e�it ba�lamas� i�in "Otomatik S�f�rlama" sistemi eklendi.
-- Ana men�ye ilerlemeyi silmeden taray�c� �nbelle�ini tazeleyen "Oyunu Yeniden Ba�lat" se�ene�i eklendi.
-- Profil ekran�nda kullan�c� ad�n�n "Bilinmeyen" olarak g�r�nmesi hatas� giderildi.
+Yeni Özellikler ve İyileştirmeler:
+- Kayıp Notalar modunu tamamlayan oyuncular için Mağaza'daki ses paketlerinin (Bağlama, Kaval, Flüt, Kanun vb.) kilitlerinin otomatik açılması sağlandı.
+- Güncelleme sonrası tüm test oyuncularının ve yöneticilerin ilerlemelerinin sıfırdan ve eşit başlaması için "Otomatik Sıfırlama" sistemi eklendi.
+- Ana menüye ilerlemeyi silmeden tarayıcı önbelleğini tazeleyen "Oyunu Yeniden Başlat" seçeneği eklendi.
+- Profil ekranında kullanıcı adının "Bilinmeyen" olarak görünmesi hatası giderildi.
 
 [v0.97.4.23] - 01.05.2026
 
-Eri�ilebilirlik Optimizasyonu:
-- Ekran okuyucunun gereksiz yere men�ler aras� ge�i�lerde "Haf�zana G�ven" �eklinde oyun ad�n� defalarca tekrar etmesine (say�klamas�na) neden olan ana etiketleme sorunu tamamen kald�r�ld�.
+Erişilebilirlik Optimizasyonu:
+- Ekran okuyucunun gereksiz yere menüler arası geçişlerde "Hafızana Güven" şeklinde oyun adını defalarca tekrar etmesine (sayıklamasına) neden olan ana etiketleme sorunu tamamen kaldırıldı.
 
 [v0.97.4.22] - 01.05.2026
 
-Ses ve Ayar Optimizasyonlar�:
-- Oyun i�i ses paketleri (Piyano, Ba�lama, Kanun vb.) de�i�tirildi�inde arka plan m�zi�inin varsay�lan (en y�ksek) d�zeye d�nmesi hatas� giderildi. Art�k enstr�man de�i�tirdi�inizde daha �nce ayarlad���n�z m�zik ve efekt sesi d�zeyleri aynen korunacak.
-- Fl�t ses paketi de ana ses ayar� d�ng�s�ne eklendi.
+Ses ve Ayar Optimizasyonları:
+- Oyun içi ses paketleri (Piyano, Bağlama, Kanun vb.) değiştirildiğinde arka plan müziğinin varsayılan (en yüksek) düzeye dönmesi hatası giderildi. Artık enstrüman değiştirdiğinizde daha önce ayarladığınız müzik ve efekt sesi düzeyleri aynen korunacak.
+- Flüt ses paketi de ana ses ayarı döngüsüne eklendi.
 
 [v0.97.4.21] - 01.05.2026
 
-Eri�ilebilirlik ve Ekran Okuyucu D�zeltmeleri:
-- Oyun y�klendikten sonra ana men�ye ge�erken ekran okuyucunun (NVDA) odaklanmay� kaybederek "Bo�" veya "Uygulama" demesi hatas� giderildi.
-- "Ba�l�k seviyesi 1" olarak anons edilen ana men� ba�l��� yeniden d�zenlendi. Art�k oyuna girildi�inde do�rudan "Haf�zana G�ven oyununa ho� geldiniz" �eklinde sesli bir okuma ile kar��la�acaks�n�z.
-- Odak (focus) y�netimindeki gecikme ve s��ramalar d�zeltilerek gereksiz sessizlikler ve men�ler aras� kaybolmalar engellendi.
+Erişilebilirlik ve Ekran Okuyucu Düzeltmeleri:
+- Oyun yüklendikten sonra ana menüye geçerken ekran okuyucunun (NVDA) odaklanmayı kaybederek "Boş" veya "Uygulama" demesi hatası giderildi.
+- "Başlık seviyesi 1" olarak anons edilen ana menü başlığı yeniden düzenlendi. Artık oyuna girildiğinde doğrudan "Hafızana Güven oyununa hoş geldiniz" şeklinde sesli bir okuma ile karşılaşacaksınız.
+- Odak (focus) yönetimindeki gecikme ve sıçramalar düzeltilerek gereksiz sessizlikler ve menüler arası kaybolmalar engellendi.
 
 [v0.97.4.20] - 01.05.2026
 
-Hesap G�venli�i:
-- Sadece "ekrem" isimli kullan�c� "Geli�tirici" yetkilerine (banlama vb.) sahip olacak �ekilde sistem yeniden ayarland�.
+Hesap Güvenliği:
+- Sadece "ekrem" isimli kullanıcı "Geliştirici" yetkilerine (banlama vb.) sahip olacak şekilde sistem yeniden ayarlandı.
 
 [v0.97.4.19] - 01.05.2026
 
-Geli�tirici �yile�tirmeleri ve UI Temizli�i:
-- Sohbet kanal�ndaki gereksiz b�l� (slash) komutlar� (`/ban`, `/unban`, `/��z`, `/pm`) kald�r�larak temizlendi. 
-- Bu komutlar�n tamam� art�k "Sosyal" men�s�ndeki oyuncu listesinde aktif hale getirildi. Oyuncu profiline t�klad���n�zda, e�er r�tbeniz "Geli�tirici" ise do�rudan men�de "Oyuncuyu Banla", "Ban� Kald�r" ve "Bilet ��z" gibi gizli butonlar aktifle�ecektir.
-- �zel Mesaj (PM) atmak i�inse zaten geli�tirici olman�za gerek kalmadan men�deki "�zel Mesaj G�nder" butonunu kullanabilirsiniz.
+Geliştirici İyileştirmeleri ve UI Temizliği:
+- Sohbet kanalındaki gereksiz bölü (slash) komutları (`/ban`, `/unban`, `/çöz`, `/pm`) kaldırılarak temizlendi. 
+- Bu komutların tamamı artık "Sosyal" menüsündeki oyuncu listesinde aktif hale getirildi. Oyuncu profiline tıkladığınızda, eğer rütbeniz "Geliştirici" ise doğrudan menüde "Oyuncuyu Banla", "Banı Kaldır" ve "Bilet Çöz" gibi gizli butonlar aktifleşecektir.
+- Özel Mesaj (PM) atmak içinse zaten geliştirici olmanıza gerek kalmadan menüdeki "Özel Mesaj Gönder" butonunu kullanabilirsiniz.
 
 [v0.97.4.18] - 01.05.2026
 
-Eri�ilebilirlik D�zeltmeleri:
-- NVDA gibi ekran okuyucular�n�n Al��t�rma (veya Hikaye/Oyun) men�lerine girildi�inde i� i�e ge�mi� etiketlerden dolay� gereksiz yere "bo� uygulama" veya "al��t�rma alan� uygulama" anonsu yapmas� sorunu giderildi.
+Erişilebilirlik Düzeltmeleri:
+- NVDA gibi ekran okuyucularının Alıştırma (veya Hikaye/Oyun) menülerine girildiğinde iç içe geçmiş etiketlerden dolayı gereksiz yere "boş uygulama" veya "alıştırma alanı uygulama" anonsu yapması sorunu giderildi.
 
 [v0.97.4.17] - 01.05.2026
 
-Hata D�zeltmeleri ve �yile�tirmeler:
-- Sosyal Men� Temizli�i: Oyuncu listesinde art�k sadece o an "�evrimi�i" olan oyuncular listelenecek. �nceden kalma �evrimd��� kullan�c�lar listeden gizlendi.
-- Hayalet Kullan�c� (Misafir) Spam� Onar�ld�: Oyuna hen�z takma ad belirlemeden giren "Misafir" ba�lant�lar�n�n "Sohbete kat�ld�" veya "�evrimd��� oldu" �eklinde s�rekli bildirim g�ndermesine (ve ekran okuyucuyu gereksiz yere me�gul etmesine) neden olan altyap� sorunu ��z�ld�. Art�k sadece ge�erli bir ad� olan oyuncular anons edilecek.
+Hata Düzeltmeleri ve İyileştirmeler:
+- Sosyal Menü Temizliği: Oyuncu listesinde artık sadece o an "Çevrimiçi" olan oyuncular listelenecek. Önceden kalma çevrimdışı kullanıcılar listeden gizlendi.
+- Hayalet Kullanıcı (Misafir) Spamı Onarıldı: Oyuna henüz takma ad belirlemeden giren "Misafir" bağlantılarının "Sohbete katıldı" veya "Çevrimdışı oldu" şeklinde sürekli bildirim göndermesine (ve ekran okuyucuyu gereksiz yere meşgul etmesine) neden olan altyapı sorunu çözüldü. Artık sadece geçerli bir adı olan oyuncular anons edilecek.
 
 [v0.97.4.16] - 01.05.2026
 
-Hata D�zeltmeleri:
-- Mobil cihazlarda oyunu duraklatma, ��k�� ve kaydetme butonlar�n�n dokunmatik ekranlarda tepki vermemesi sorunu (Touch eventleri eklenerek) onar�ld�.
+Hata Düzeltmeleri:
+- Mobil cihazlarda oyunu duraklatma, çıkış ve kaydetme butonlarının dokunmatik ekranlarda tepki vermemesi sorunu (Touch eventleri eklenerek) onarıldı.
 
 [v0.97.4.15] - 01.05.2026
 
-Yeni �zellikler:
-- PvP �ok Oyunculu Tak�m Modu Eklendi: Art�k oyuna "Bireysel" veya "Tak�m Modu" se�ene�iyle ba�layabilirsiniz.
-- Tak�m Modu i�leyi�i: Ma�� kuran ki�i oda ayarlamalar�nda tak�m modunu se�ebilir. Odadaki oyuncular s�ras�yla A ve B tak�mlar�na atan�r. Oyun i�inde ilk �nce do�ru notay� basan oyuncu kendi tak�m�na puan kazand�r�r. Tak�m arkada�� hata yapsa dahi puan tak�ma eklenir. Oyun skorlar� art�k tak�mlara g�re hesaplan�r.
+Yeni Özellikler:
+- PvP Çok Oyunculu Takım Modu Eklendi: Artık oyuna "Bireysel" veya "Takım Modu" seçeneğiyle başlayabilirsiniz.
+- Takım Modu işleyişi: Maçı kuran kişi oda ayarlamalarında takım modunu seçebilir. Odadaki oyuncular sırasıyla A ve B takımlarına atanır. Oyun içinde ilk önce doğru notayı basan oyuncu kendi takımına puan kazandırır. Takım arkadaşı hata yapsa dahi puan takıma eklenir. Oyun skorları artık takımlara göre hesaplanır.
 
 [v0.97.4.14] - 01.05.2026
 
-Yeni �zellikler ve D�zeltmeler:
-- Oyunu Kaydetme ve Devam Etme Sistemi: Art�k oyun esnas�nda ilerlemenizi anl�k olarak kaydedebilirsiniz. Ana men�ye yeni eklenen "Kay�tl� Oyundan Devam Et" sekmesi �zerinden, daha �nce kaydetti�iniz oyunlar� tarih s�ralamas�na g�re g�r�nt�leyebilir ve istedi�iniz kay�ttan tam kald���n�z notalarla oynamaya devam edebilirsiniz.
-- Sohbet Bildirimi Kalabal��� Giderildi: Di�er oyuncular�n oyuna giri�/��k�� bildirimleri ("Sohbete kat�ld�", "�evrimd��� oldu") art�k genel sohbet ge�mi�ine kal�c� olarak yaz�lmayacak. Bu bildirimler, sadece okuyucunuzun anl�k olarak f�s�ldayaca�� ve ekranda sadece o an belirip kaybolan ge�ici bildirimler (toast) haline getirildi. B�ylece sohbet listeniz hep temiz kalacak.
-- Sistem �yile�tirmeleri: T�rk�e karakterlerin (�, �, �, �) ekran okuyucuda spam / anlams�z sese d�n��mesine sebep olan s�r�m kodlamas� hatas� kal�c� olarak onar�ld�.
+Yeni Özellikler ve Düzeltmeler:
+- Oyunu Kaydetme ve Devam Etme Sistemi: Artık oyun esnasında ilerlemenizi anlık olarak kaydedebilirsiniz. Ana menüye yeni eklenen "Kayıtlı Oyundan Devam Et" sekmesi üzerinden, daha önce kaydettiğiniz oyunları tarih sıralamasına göre görüntüleyebilir ve istediğiniz kayıttan tam kaldığınız notalarla oynamaya devam edebilirsiniz.
+- Sohbet Bildirimi Kalabalığı Giderildi: Diğer oyuncuların oyuna giriş/çıkış bildirimleri ("Sohbete katıldı", "Çevrimdışı oldu") artık genel sohbet geçmişine kalıcı olarak yazılmayacak. Bu bildirimler, sadece okuyucunuzun anlık olarak fısıldayacağı ve ekranda sadece o an belirip kaybolan geçici bildirimler (toast) haline getirildi. Böylece sohbet listeniz hep temiz kalacak.
+- Sistem İyileştirmeleri: Türkçe karakterlerin (ö, ş, ğ, ı) ekran okuyucuda spam / anlamsız sese dönüşmesine sebep olan sürüm kodlaması hatası kalıcı olarak onarıldı.
 
 [v0.97.4.6] - 27.04.2026
 
-Eri�ilebilirlik ve NVDA �yile�tirmeleri:
-- Ana men�deki anl�k durum g�ncellemeleri (Etkinlik ve G�ncelleme kontrolleri) art�k ekran okuyucular taraf�ndan %100 okunacak �ekilde teknik altyap�s� yenilendi.
-- Sosyal men�s�nde ok tu�lar�yla dola��rken kendinizi listenin en ba��nda g�rebilmeniz sa�land�. Geri d�n butonu ve istatistik men�s� maddeleri ok tu�lar�yla dola��l�rken NVDA taraf�ndan atlanmamas� i�in onar�ld�.
-- Kay�p Notalar modunda, diyaloglar� ge�erken Enter tu�una h�zl� bas�ld���nda ortaya ��kan seslerin �st �ste binme sorunu tamamen ��z�ld�.
+Erişilebilirlik ve NVDA İyileştirmeleri:
+- Ana menüdeki anlık durum güncellemeleri (Etkinlik ve Güncelleme kontrolleri) artık ekran okuyucular tarafından %100 okunacak şekilde teknik altyapısı yenilendi.
+- Sosyal menüsünde ok tuşlarıyla dolaşırken kendinizi listenin en başında görebilmeniz sağlandı. Geri dön butonu ve istatistik menüsü maddeleri ok tuşlarıyla dolaşılırken NVDA tarafından atlanmaması için onarıldı.
+- Kayıp Notalar modunda, diyalogları geçerken Enter tuşuna hızlı basıldığında ortaya çıkan seslerin üst üste binme sorunu tamamen çözüldü.
 
 [v0.97.4.5] - 26.04.2026
 
-Yeni �zellikler:
-- Kay�p Notalar moduna 3 dakikal�k gizli zamanlay�c� eklendi. Arka planda sessizce i�leyen bu s�re, son 2 dakika, 1 dakika ve 20 saniye kala sizi uyaracak. S�renin dolmas�na 1 dakika kala heyecan� art�racak geri say�m ses efektleri duyulmaya ba�lanacak! S�re doldu�unda oyuncu g�revden ba�ar�s�z say�lacak.
+Yeni Özellikler:
+- Kayıp Notalar moduna 3 dakikalık gizli zamanlayıcı eklendi. Arka planda sessizce işleyen bu süre, son 2 dakika, 1 dakika ve 20 saniye kala sizi uyaracak. Sürenin dolmasına 1 dakika kala heyecanı artıracak geri sayım ses efektleri duyulmaya başlanacak! Süre dolduğunda oyuncu görevden başarısız sayılacak.
 
 [v0.97.4.4] - 26.04.2026
 
-Yeni �zellikler ve Etkinlikler:
-- G�nl�k Giri� Serisi (Takvim) eklendi! Art�k oyuna art arda girdi�iniz her g�n i�in ekstra jeton kazanacaks�n�z. Seriyi bozmamaya dikkat edin!
-- Hafta Sonu �ift Jeton Etkinli�i ba�lat�ld�! Bundan b�yle Cumartesi g�n� ��leden sonra 12.00'den Pazar gecesi 23.59'a kadar oyunlardan (Klasik mod, Hikaye modu ve PvP) kazand���n�z t�m jetonlar 2 kat�na ��kacak.
+Yeni Özellikler ve Etkinlikler:
+- Günlük Giriş Serisi (Takvim) eklendi! Artık oyuna art arda girdiğiniz her gün için ekstra jeton kazanacaksınız. Seriyi bozmamaya dikkat edin!
+- Hafta Sonu Çift Jeton Etkinliği başlatıldı! Bundan böyle Cumartesi günü öğleden sonra 12.00'den Pazar gecesi 23.59'a kadar oyunlardan (Klasik mod, Hikaye modu ve PvP) kazandığınız tüm jetonlar 2 katına çıkacak.
 
 [v0.97.4.3] - 26.04.2026
 
-B�y�k Duyuru ve Yenilikler:
-- Art�k resmi bir Telegram kanal�m�z var! Oyun ana men�s�ndeki "Telegram Kanal�na Kat�l�n" butonu ile toplulu�umuza kat�labilir, bizlerle do�rudan ileti�ime ge�ebilirsiniz.
-- �zel bildirim altyap�s� kuruldu: Bundan b�yle oyuna eklenecek olan t�m yeni �zellikleri ve g�ncellemeleri an�nda kendi kurdu�umuz sistem �zerinden Telegram kanal�m�za otomatik olarak duyuraca��z! Yeniliklerden ilk sizin haberiniz olacak.
-- �e�itli hata d�zeltmeleri yap�ld�.
+Büyük Duyuru ve Yenilikler:
+- Artık resmi bir Telegram kanalımız var! Oyun ana menüsündeki "Telegram Kanalına Katılın" butonu ile topluluğumuza katılabilir, bizlerle doğrudan iletişime geçebilirsiniz.
+- Özel bildirim altyapısı kuruldu: Bundan böyle oyuna eklenecek olan tüm yeni özellikleri ve güncellemeleri anında kendi kurduğumuz sistem üzerinden Telegram kanalımıza otomatik olarak duyuracağız! Yeniliklerden ilk sizin haberiniz olacak.
+- Çeşitli hata düzeltmeleri yapıldı.
 
 [v0.97.2.9] - 18.04.2026
 
-### Hata D�zeltmeleri:
-[v0.98.0.0] - 23.09.2026
-
-Büyük Bilişsel ve Ekonomik Güncelleme! 🧠💰
-
-Yeni Başarılar ve Rütbe Sistemi:
-- Oyuna yepyeni "Bilişsel Başarımlar" eklendi! Kusursuz İcra, Kritik Eşik, Zihinsel Dayanıklılık gibi zekanızı ve soğukkanlılığınızı test edecek zorlu hedefler eklendi.
-- XP ve Rütbe sistemi aktif edildi. Jeton kazandıkça Tecrübe Puanı (XP) biriktirerek "Çaylak" rütbesinden "Efsane" statüsüne kadar yükselebilirsiniz! Oyuna girdiğinizde ekran okuyucu sizi kendi rütbenizle karşılayacak.
-- Başarılar sayfası tamamen yenilendi. Artık liste çok uzun değil; sadece kazanılan başarımları ve "Sıradaki Hedefleri" göstererek size her zaman ulaşılabilir bir hedef sunuyor.
-
-Oyun Ekonomisi ve Dengelemeler:
-- Zor mod oynayanların yeterince ödüllendirilmediği (sadece 1 Jeton kazandığı) büyük bir hata düzeltildi. Artık Zor modda her hamleniz 20-30 Jeton kazandırıyor.
-- Tüm başarımlara devasa Jeton ve XP ödülleri eklendi. 
-
-Oyun deneyimini çok daha sürükleyici ve rekabetçi kılan bu güncellemeyi hemen deneyin! 🚀
-
-- PvP Lobi Men�leri: 'A��k Ma�lar' ve 'Ma� Kur' men�leri ana ok gezinti sistemine dahil edildi. Art�k bu men�lere girildi�inde NVDA sekme i�eri�ini 'b�l�m' vb. �eklinde okuyarak gezinim/sanal (Browse) moduna d��meyecek. Do�rudan a��k a��k ok tu�lar�n� kullanarak oyuncular�n kurdu�u ma�lar listesinde liste eleman� ya da d��me olarak dola�abileceksiniz.
+### Hata Düzeltmeleri:
+- PvP Lobi Menüleri: 'Açık Maçlar' ve 'Maç Kur' menüleri ana ok gezinti sistemine dahil edildi. Artık bu menülere girildiğinde NVDA sekme içeriğini 'bölüm' vb. şeklinde okuyarak gezinim/sanal (Browse) moduna düşmeyecek. Doğrudan açık açık ok tuşlarını kullanarak oyuncuların kurduğu maçlar listesinde liste elemanı ya da düğme olarak dolaşabileceksiniz.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -448,8 +439,8 @@ Yeni Ozellikler:
 
 [v0.97.2.8] - 18.04.2026
 
-### Hata D�zeltmeleri:
-- Anl�k Bildirimler: Oyunda PageUp ve PageDown (M�zik sesi artt�rma vb.) kullan�ld���nda, Focus modundayken okuyucunun bunu anl�k olarak de�il, sadece Sanal Okuma (Browse Modu)'na ge�ildi�inde okumas� sorunu d�zeltildi. Anonslar� sa�layan zemin ��esine "Kesin Bildirim (alert/assertive)" �zelli�i atanarak tepkime h�zland�r�ld�.
+### Hata Düzeltmeleri:
+- Anlık Bildirimler: Oyunda PageUp ve PageDown (Müzik sesi arttırma vb.) kullanıldığında, Focus modundayken okuyucunun bunu anlık olarak değil, sadece Sanal Okuma (Browse Modu)'na geçildiğinde okuması sorunu düzeltildi. Anonsları sağlayan zemin öğesine "Kesin Bildirim (alert/assertive)" özelliği atanarak tepkime hızlandırıldı.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -460,8 +451,8 @@ Yeni Ozellikler:
 
 [v0.97.2.7] - 18.04.2026
 
-### �yile�tirmeler:
-- Tebrikler / Oyun Sonu Ekran�: Oyun bitti�inde "Oyunu Bitir" veya "Devam Et" butonuna d��en odak (focus) y�z�nden NVDA'n�n kapan�� jeton bildirilerini okumamas� ve kesintiye u�ramas� sorunu �zerine oyun sonu bir "Diyalog Modeli"ne �ekildi. Art�k oyun bitti�inde puan ve jetonlar�n�z kesintisiz okunacak, ana men�ye d�nmek i�in herhangi bir butona gitmeye gerek kalmaks�z�n direkt olarak "Enter" tu�una basman�z yeterli olacakt�r.
+### İyileştirmeler:
+- Tebrikler / Oyun Sonu Ekranı: Oyun bittiğinde "Oyunu Bitir" veya "Devam Et" butonuna düşen odak (focus) yüzünden NVDA'nın kapanış jeton bildirilerini okumaması ve kesintiye uğraması sorunu üzerine oyun sonu bir "Diyalog Modeli"ne çekildi. Artık oyun bittiğinde puan ve jetonlarınız kesintisiz okunacak, ana menüye dönmek için herhangi bir butona gitmeye gerek kalmaksızın direkt olarak "Enter" tuşuna basmanız yeterli olacaktır.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -472,8 +463,8 @@ Yeni Ozellikler:
 
 [v0.97.2.6] - 18.04.2026
 
-### Hata D�zeltmeleri:
-- Sesli Anons Kal�nt�lar�: Ekran okuyucusunun y�n tu�lar�yla HTML/Makale yap�s�nda (Browse Mode) gezinirken ge�mi�te okunmu� olan ve HTML kodlar�nda tak�l� kalan eski Sunucu mesajlar�n� anlams�z yere men�n�n sonunda tekrar okumas� ve kafa kar��t�rmas� engellendi. ARIA Live b�lgesi metni art�k okunduktan 20 saniye sonra bellekten silindi�i i�in "Bu eski mesaj�n men�de ne i�i var" karma�as� giderilmi�tir.
+### Hata Düzeltmeleri:
+- Sesli Anons Kalıntıları: Ekran okuyucusunun yön tuşlarıyla HTML/Makale yapısında (Browse Mode) gezinirken geçmişte okunmuş olan ve HTML kodlarında takılı kalan eski Sunucu mesajlarını anlamsız yere menünün sonunda tekrar okuması ve kafa karıştırması engellendi. ARIA Live bölgesi metni artık okunduktan 20 saniye sonra bellekten silindiği için "Bu eski mesajın menüde ne işi var" karmaşası giderilmiştir.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -484,8 +475,8 @@ Yeni Ozellikler:
 
 [v0.97.2.5] - 18.04.2026
 
-### Hata D�zeltmeleri:
-- Eri�ilebilirlik (Odak Y�netimi): Oyun a��l���nda ekran okuyucular�n (NVDA) oda�� bir H1 ba�l���na d��t��� i�in zorla "Makale Okuma" moduna (Browse Mode) girmesi ve kullan�c�n�n zorla Insert+Bo�luk vb. k�sayollar kullanmas�na ra�men makale gibi hissetmesi sorunu ��z�ld�. Art�k, okuyucu metni sorunsuz �ekilde okurken ekran okuyucusu otomatik olarak Odak/Uygulama (Focus Mode) kipinde kalmaya devam edecektir.
+### Hata Düzeltmeleri:
+- Erişilebilirlik (Odak Yönetimi): Oyun açılışında ekran okuyucuların (NVDA) odağı bir H1 başlığına düştüğü için zorla "Makale Okuma" moduna (Browse Mode) girmesi ve kullanıcının zorla Insert+Boşluk vb. kısayollar kullanmasına rağmen makale gibi hissetmesi sorunu çözüldü. Artık, okuyucu metni sorunsuz şekilde okurken ekran okuyucusu otomatik olarak Odak/Uygulama (Focus Mode) kipinde kalmaya devam edecektir.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -496,8 +487,8 @@ Yeni Ozellikler:
 
 [v0.97.2.4] - 18.04.2026
 
-### Hata D�zeltmeleri:
-- M�zik Oynat�c�s�: Ba�lama ses paketindeki arka plan m�zi�inin isimlendirmesi y�z�nden baz� cihazlarda �al�namamas� sorunu �zerine dosya `menu-music2.mp3` olarak adland�r�ld� ve k�k dizine al�nd�.
+### Hata Düzeltmeleri:
+- Müzik Oynatıcısı: Bağlama ses paketindeki arka plan müziğinin isimlendirmesi yüzünden bazı cihazlarda çalınamaması sorunu üzerine dosya `menu-music2.mp3` olarak adlandırıldı ve kök dizine alındı.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -508,8 +499,8 @@ Yeni Ozellikler:
 
 [v0.97.2.2] - 18.04.2026
 
-### �yile�tirmeler:
-- Eri�ilebilirlik (Sesli Kar��lama): Ana men�deki giri� e�itimi mesaj�n�n okunmas� s�ras�nda direkt olarak 'Oyuna Ba�la' d��mesine odaklan�lmas� ve duyuruyu yar�da kesmesi engellendi. Art�k a��l�� e�itimi dinlenirken arka planda butonlar oda�a girmeyecektir. Kullan�c� ok tu�lar�na veya Tab'a bast���nda butonlara normal bir �ekilde girmeye devam edecektir.
+### İyileştirmeler:
+- Erişilebilirlik (Sesli Karşılama): Ana menüdeki giriş eğitimi mesajının okunması sırasında direkt olarak 'Oyuna Başla' düğmesine odaklanılması ve duyuruyu yarıda kesmesi engellendi. Artık açılış eğitimi dinlenirken arka planda butonlar odağa girmeyecektir. Kullanıcı ok tuşlarına veya Tab'a bastığında butonlara normal bir şekilde girmeye devam edecektir.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -519,9 +510,9 @@ Yeni Ozellikler:
 
 [v0.97.2.1] - 18.04.2026
 
-### Hata D�zeltmeleri:
-- Medya Kodlama Hatas�: Ba�lama modu arkaplan m�zi�inin dosya ad�ndaki T�rk�e karakterlerden (�, �, vs.) �t�r� baz� taray�c�larda 404 (bulunamad�) hatas�na sebep olmas� �nlendi. Dosya ad� standart karakterlere d�n��t�r�l�p sistem g�ncellendi.
-- Ekran Okuyucu & Dado Efekti: Hikaye ve Al��t�rma modlar�nda ��retici diyaloglar� "Enter" ile ge�erken dado ses efektinin �almamas� ve metnin ekran okuyucuya zorunlu olarak g�nderilmemesi hatas� giderildi. Art�k Enter'a bas�ld�k�a sesli onay gelir ve s�radaki metin kesintisiz okunur.
+### Hata Düzeltmeleri:
+- Medya Kodlama Hatası: Bağlama modu arkaplan müziğinin dosya adındaki Türkçe karakterlerden (ğ, ü, vs.) ötürü bazı tarayıcılarda 404 (bulunamadı) hatasına sebep olması önlendi. Dosya adı standart karakterlere dönüştürülüp sistem güncellendi.
+- Ekran Okuyucu & Dado Efekti: Hikaye ve Alıştırma modlarında öğretici diyalogları "Enter" ile geçerken dado ses efektinin çalmaması ve metnin ekran okuyucuya zorunlu olarak gönderilmemesi hatası giderildi. Artık Enter'a basıldıkça sesli onay gelir ve sıradaki metin kesintisiz okunur.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -532,8 +523,8 @@ Yeni Ozellikler:
 
 [v0.97.2.0] - 18.04.2026
 
-### Eklenenler / De�i�tirilenler:
-- Dinamik Men� M�zi�i: Ba�lama Ses Paketi ma�azadan etkinle�tirildi�inde (veya oyun ba��nda y�klendi�inde) oyunun Ana Men� arka plan m�zi�i otomatik olarak 'baglama-ses-paketi-m�zi�i.mp3' dosyas�na ge�i� yapacak �ekilde uyarland�.
+### Eklenenler / Değiştirilenler:
+- Dinamik Menü Müziği: Bağlama Ses Paketi mağazadan etkinleştirildiğinde (veya oyun başında yüklendiğinde) oyunun Ana Menü arka plan müziği otomatik olarak 'baglama-ses-paketi-müziği.mp3' dosyasına geçiş yapacak şekilde uyarlandı.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -544,8 +535,8 @@ Yeni Ozellikler:
 
 [v0.97.1.9] - 18.04.2026
 
-### Hata D�zeltmeleri:
-- Oyun Sonu Okuma (Anons) Hatas�: Oyun bitti�inde ekran okuyucunun mesaj� okumas�n� engelleyen ufak bir aktiflik/pasiflik engeli tamamen kald�r�ld�. Art�k oyun sonland���nda jetonlar� verirken ekran okuyucu kesintiye u�ramadan final c�mlesini tamamlayacakt�r.
+### Hata Düzeltmeleri:
+- Oyun Sonu Okuma (Anons) Hatası: Oyun bittiğinde ekran okuyucunun mesajı okumasını engelleyen ufak bir aktiflik/pasiflik engeli tamamen kaldırıldı. Artık oyun sonlandığında jetonları verirken ekran okuyucu kesintiye uğramadan final cümlesini tamamlayacaktır.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -556,8 +547,8 @@ Yeni Ozellikler:
 
 [v0.97.1.8] - 2026-04-18
 
-### Hata D�zeltmeleri:
-- newmotd1/2 Ses Efektleri: Oyun bitti�inde/mod kilidi a��ld���nda �alan baz� ses dosyalar�n�n (newmotd1 ve newmotd2) taray�c�lar�n bellek ��z�c�lerinde tak�lmas� durumu (�almamas�) `HTML5 Audio` motoruna ge�irilerek kesin olarak ��z�ld�.
+### Hata Düzeltmeleri:
+- newmotd1/2 Ses Efektleri: Oyun bittiğinde/mod kilidi açıldığında çalan bazı ses dosyalarının (newmotd1 ve newmotd2) tarayıcıların bellek çözücülerinde takılması durumu (çalmaması) `HTML5 Audio` motoruna geçirilerek kesin olarak çözüldü.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -568,9 +559,9 @@ Yeni Ozellikler:
 
 [v0.97.1.7] - 2026-04-18
 
-### Hata D�zeltmeleri:
-- Ba�lama Sesleri Sorunu: Ba�lama paketi al�nd���nda notalar�n �almamas�na sebep olan dosya yolu uyu�mazl��� giderildi.
-- Oyun Bitti�inde �alan M�zik: Oyun bitti�inde �alan "Oyun bitti" (Game Over) ambiyans sesi sonsuz d�ng�de �al�yordu; d�zeltilerek sadece 1 kere �almas� sa�land�. 
+### Hata Düzeltmeleri:
+- Bağlama Sesleri Sorunu: Bağlama paketi alındığında notaların çalmamasına sebep olan dosya yolu uyuşmazlığı giderildi.
+- Oyun Bittiğinde Çalan Müzik: Oyun bittiğinde çalan "Oyun bitti" (Game Over) ambiyans sesi sonsuz döngüde çalıyordu; düzeltilerek sadece 1 kere çalması sağlandı. 
 
 [v0.97.4.45] - 26.05.2026
 
@@ -580,10 +571,10 @@ Yeni Ozellikler:
 
 [v0.97.1.6] - 2026-04-18
 
-### Eklenenler / De�i�tirilenler:
-- Ba�lama Ses Paketi: Ma�azaya 500 jetona sat�n al�nabilen Ba�lama Ses Paketi eklendi! Sat�n ald�ktan sonra ayn� yerden kapat�l�p/etkinle�tirilebilir.
-- Ba�lama Ses Paketi aktifken Oyun i�erisindeki piyano sesleri otomatik olarak ba�lama sesleriyle de�i�ecektir.
-- Ayr�ca Kay�p Notalar Hikaye modundaki notalar da dinamik olarak ba�lama sesleriyle de�i�ecektir. Notalar� ba�lama t�n�lar�yla bulmay� deneyebilirsiniz!
+### Eklenenler / Değiştirilenler:
+- Bağlama Ses Paketi: Mağazaya 500 jetona satın alınabilen Bağlama Ses Paketi eklendi! Satın aldıktan sonra aynı yerden kapatılıp/etkinleştirilebilir.
+- Bağlama Ses Paketi aktifken Oyun içerisindeki piyano sesleri otomatik olarak bağlama sesleriyle değişecektir.
+- Ayrıca Kayıp Notalar Hikaye modundaki notalar da dinamik olarak bağlama sesleriyle değişecektir. Notaları bağlama tınılarıyla bulmayı deneyebilirsiniz!
 
 [v0.97.4.45] - 26.05.2026
 
@@ -593,10 +584,10 @@ Yeni Ozellikler:
 
 [v0.97.1.5] - 2026-04-18
 
-### D�zeltmeler ve �yile�tirmeler (Eri�ilebilirlik):
-- Oyuncu Se�enekleri Okuma Hatas� (Sosyal Sekme): Sosyal (Oyuncu) sekmesine girildi�inde yukar�/a�a�� ok tu�lar�n�n oyuncular� gezinmekte pasif kalmas�na sebep olan "Odak Kilitlenmesi" hatas� d�zeltildi.
-- Art�k Sosyal men�s�ndeyken sa� veya alt oklara basarak oyuncular aras� sorunsuz ge�i� yapabilir ve t�klad���n�zda a��lan Profil men�s�nde ok tu�lar�yla (Sustur/PM/�ptal) se�eneklerini hatas�z okuyabilirsiniz. 
-- Ayn� sistemle beraber Profil men�s�ne girildi�inde kullan�c� ad� ve istatistiklerin ekrana do�rudan anons edilmesi/okunmas� mekanizmas� eklendi.
+### Düzeltmeler ve İyileştirmeler (Erişilebilirlik):
+- Oyuncu Seçenekleri Okuma Hatası (Sosyal Sekme): Sosyal (Oyuncu) sekmesine girildiğinde yukarı/aşağı ok tuşlarının oyuncuları gezinmekte pasif kalmasına sebep olan "Odak Kilitlenmesi" hatası düzeltildi.
+- Artık Sosyal menüsündeyken sağ veya alt oklara basarak oyuncular arası sorunsuz geçiş yapabilir ve tıkladığınızda açılan Profil menüsünde ok tuşlarıyla (Sustur/PM/İptal) seçeneklerini hatasız okuyabilirsiniz. 
+- Aynı sistemle beraber Profil menüsüne girildiğinde kullanıcı adı ve istatistiklerin ekrana doğrudan anons edilmesi/okunması mekanizması eklendi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -606,8 +597,8 @@ Yeni Ozellikler:
 
 [v0.97.1.4] - 2026-04-17
 
-### Eklenenler / De�i�tirilenler:
-- Men� Ses Efektleri Yenilendi: Ana men� dola��m�nda ve alt men� butonlar�nda (t�klamalar i�in) `menuenter17.ogg` ve geri d�n�� ile kapatma i�levleri i�in `menuclose.ogg` oyun sistemine entegre edildi, eski `clickSound` tan�mlamalar� tamamen yenilendi.
+### Eklenenler / Değiştirilenler:
+- Menü Ses Efektleri Yenilendi: Ana menü dolaşımında ve alt menü butonlarında (tıklamalar için) `menuenter17.ogg` ve geri dönüş ile kapatma işlevleri için `menuclose.ogg` oyun sistemine entegre edildi, eski `clickSound` tanımlamaları tamamen yenilendi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -617,8 +608,8 @@ Yeni Ozellikler:
 
 [v0.97.0.2] - Hotfix 2
 
-### D�zeltmeler:
-- Ayarlar men�s�nde ses ve tema ��eleri �zerindeyken yukar� ve a�a�� oklar�n de�er de�i�tirmesi tamamen engellendi ve sadece gezinme ama�l� kullan�lmas� sa�land�. De�erler sadece sa� ve sol oklarla de�i�tirilebilecek.
+### Düzeltmeler:
+- Ayarlar menüsünde ses ve tema öğeleri üzerindeyken yukarı ve aşağı okların değer değiştirmesi tamamen engellendi ve sadece gezinme amaçlı kullanılması sağlandı. Değerler sadece sağ ve sol oklarla değiştirilebilecek.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -628,8 +619,8 @@ Yeni Ozellikler:
 
 [v0.97.0.1] - Hotfix
 
-### D�zeltmeler:
-- Ayarlar men�s�nde �zel tu� dola��m mant��� aktif edildi. ��eler aras� (Yukar�/A�a��), ayar de�i�tirmek (Sol/Sa� ok).
+### Düzeltmeler:
+- Ayarlar menüsünde özel tuş dolaşım mantığı aktif edildi. Öğeler arası (Yukarı/Aşağı), ayar değiştirmek (Sol/Sağ ok).
 
 [v0.97.4.45] - 26.05.2026
 
@@ -639,11 +630,11 @@ Yeni Ozellikler:
 
 [v0.97.0] - 2026-04-14
 
-### Eklenenler / De�i�tirilenler:
-- Geli�mi� Ayarlar Men�s�: M�zik kapatma, m�zik ve oyun (efekt) ses d�zeyi ile ba�lang��taki uzun logoyu atlama eklendi.
-- 7 Yeni Tema: Oyuncular�n karanl�k mod, y�ksek kontrast ayd�nl�k mod, okyanus, orman, hacker, retro ve g�n bat�m� gibi renk �emalar� aras�nda ge�i� yapabilece�i �zellik kodland�.
-- Klavye Sekme K�sayollar� (Tab Logic): Men�ler aras� (Ana Men�, Sosyal, Profil) ge�i�ler i�in bilgisayar versiyonunda `Alt + 1`, `Alt + 2` ve `Alt + 3` eklendi.
-- Bo� Sekme Uyar�lar�: Sosyal ve �statistik profillerinde listelenecek eleman olmad���nda beliren eri�ilebilir uyar� mesajlar� yerle�tirildi.
+### Eklenenler / Değiştirilenler:
+- Gelişmiş Ayarlar Menüsü: Müzik kapatma, müzik ve oyun (efekt) ses düzeyi ile başlangıçtaki uzun logoyu atlama eklendi.
+- 7 Yeni Tema: Oyuncuların karanlık mod, yüksek kontrast aydınlık mod, okyanus, orman, hacker, retro ve gün batımı gibi renk şemaları arasında geçiş yapabileceği özellik kodlandı.
+- Klavye Sekme Kısayolları (Tab Logic): Menüler arası (Ana Menü, Sosyal, Profil) geçişler için bilgisayar versiyonunda `Alt + 1`, `Alt + 2` ve `Alt + 3` eklendi.
+- Boş Sekme Uyarıları: Sosyal ve İstatistik profillerinde listelenecek eleman olmadığında beliren erişilebilir uyarı mesajları yerleştirildi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -653,13 +644,13 @@ Yeni Ozellikler:
 
 [v0.96.4] - 2026-03-24
 
-### Yenilikler ve D�zeltmeler:
-- Da� Haritas� Arka Plan M�zi�i: Kay�p Notalar modunda notalar� ararken karl� da�da esen r�zgara e�lik edecek yeni bir m�zik (`music272.ogg`) %40 ses d�zeyinde arka plana eklendi.
-- �al��mayan ��k�� Butonu (Oyunu Bitir): Oyun s�ras�nda veya oyun bitti�inde ekrana gelen "Oyunu Bitir" ve mobil "��k��" butonlar�n�n hi�bir tepki vermemesine neden olan ba�lant� hatas� (kay�p dinleyici) giderildi; butonlar art�k oyunu temiz bir �ekilde sonland�r�p ana men�ye d�nmenizi sa�l�yor.
-- Kay�p Notalar Mobil Etkile�imi: Art�k mobil cihazlarda Kay�p Notalar modundayken (Da�a ��k�ld���nda veya piyanoya d�n�ld���nde) ekrana iki parma��n�zla ayn� anda dokunarak klavyedeki "F" tu�unun g�revini yapabilir, yerdeki notalar� p�r�zs�zce toplayabilirsiniz.
-- Hikaye Okuma �yile�tirmesi: Hikaye modundayken ekrana t�klayarak (bilgisayarda �ift t�klayarak) o anki metnin veya mevcut koordinat�n�z�n yeniden okunmas� sa�land�.
-- Yerdeki Notalar� Hissetme: Da� haritas�nda y�r�rken (sol-sa� oklarla), o an �zerinde bulundu�unuz koordinatta bir nota varsa ekstra bir tu�a basman�za gerek kalmadan "Aya��na sert bir �ey tak�ld�" uyar�s� do�rudan konumunuza eklendi.
-- S�r�m Okuma Hatas� (1.0 Beta Bug): �n bellekte kalan ve eski g�ncelleme dosyalar�ndan �ekilen hatal� "Versiyon 1.0.1 Beta" anonsu giderildi, oyunun 0.96.4 olan as�l s�r�m� ekran okuyucuya do�rudan tan�t�ld�.
+### Yenilikler ve Düzeltmeler:
+- Dağ Haritası Arka Plan Müziği: Kayıp Notalar modunda notaları ararken karlı dağda esen rüzgara eşlik edecek yeni bir müzik (`music272.ogg`) %40 ses düzeyinde arka plana eklendi.
+- Çalışmayan Çıkış Butonu (Oyunu Bitir): Oyun sırasında veya oyun bittiğinde ekrana gelen "Oyunu Bitir" ve mobil "Çıkış" butonlarının hiçbir tepki vermemesine neden olan bağlantı hatası (kayıp dinleyici) giderildi; butonlar artık oyunu temiz bir şekilde sonlandırıp ana menüye dönmenizi sağlıyor.
+- Kayıp Notalar Mobil Etkileşimi: Artık mobil cihazlarda Kayıp Notalar modundayken (Dağa çıkıldığında veya piyanoya dönüldüğünde) ekrana iki parmağınızla aynı anda dokunarak klavyedeki "F" tuşunun görevini yapabilir, yerdeki notaları pürüzsüzce toplayabilirsiniz.
+- Hikaye Okuma İyileştirmesi: Hikaye modundayken ekrana tıklayarak (bilgisayarda çift tıklayarak) o anki metnin veya mevcut koordinatınızın yeniden okunması sağlandı.
+- Yerdeki Notaları Hissetme: Dağ haritasında yürürken (sol-sağ oklarla), o an üzerinde bulunduğunuz koordinatta bir nota varsa ekstra bir tuşa basmanıza gerek kalmadan "Ayağına sert bir şey takıldı" uyarısı doğrudan konumunuza eklendi.
+- Sürüm Okuma Hatası (1.0 Beta Bug): Ön bellekte kalan ve eski güncelleme dosyalarından çekilen hatalı "Versiyon 1.0.1 Beta" anonsu giderildi, oyunun 0.96.4 olan asıl sürümü ekran okuyucuya doğrudan tanıtıldı.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -669,9 +660,9 @@ Yeni Ozellikler:
 
 [v0.94.6] - 2026-03-24
 
-### D�zeltilen Hatalar ve Sistem G�ncellemeleri:
-- Otomatik G�ncelleme (Auto-Update) Sistemi Onar�ld�: Yeni bir g�ncelleme geldi�inde aray�z de�i�ikli�i esnas�nda `TypeError` f�rlatarak oyuncuyu bozuk bir men�de kilitleyen kritik bir mant�k hatas� (`switchMenu` metoduna element yerine metin g�nderilmesi) kal�c� olarak onar�ld�.
-- Gizli G�ncellemelerin Kaybolmas�: Oyuncu aktif olarak hikaye veya oyun modundayken gelen g�ncellemelerin sessizce iptal edildikten sonra bir daha asla sorulmamas�na (oyuncunun eski s�r�m kodlarla oynamaya devam etmesine) neden olan �ok �nemli bir s�r�m denetimi hatas� (State Logic) d�zeltildi.
+### Düzeltilen Hatalar ve Sistem Güncellemeleri:
+- Otomatik Güncelleme (Auto-Update) Sistemi Onarıldı: Yeni bir güncelleme geldiğinde arayüz değişikliği esnasında `TypeError` fırlatarak oyuncuyu bozuk bir menüde kilitleyen kritik bir mantık hatası (`switchMenu` metoduna element yerine metin gönderilmesi) kalıcı olarak onarıldı.
+- Gizli Güncellemelerin Kaybolması: Oyuncu aktif olarak hikaye veya oyun modundayken gelen güncellemelerin sessizce iptal edildikten sonra bir daha asla sorulmamasına (oyuncunun eski sürüm kodlarla oynamaya devam etmesine) neden olan çok önemli bir sürüm denetimi hatası (State Logic) düzeltildi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -681,10 +672,10 @@ Yeni Ozellikler:
 
 [v0.94.5] - 2026-03-23
 
-### D�zeltilen Hatalar ve Sistem G�ncellemeleri:
-- Giri� Ekran� (Intro) Eri�ilebilirli�i: Ekran okuyucular�n (NVDA) oyunun ba�lang�c�nda anonslara istenmeyen "b�l�m" kelimesini eklemesine sebep olan HTML etiketleri (`role="none"`) ile susturuldu.
-- Oyun Ba�lang�� S�resi: Oyunun ba�lang�� geri say�m s�resi 5 saniyeden 3 saniyeye geri �ekildi ve ekran okuyucunun 3 saniye okumas� sa�land�.
-- Cache Temizli�i: Versiyon 0.94.5'e g�ncellendi.
+### Düzeltilen Hatalar ve Sistem Güncellemeleri:
+- Giriş Ekranı (Intro) Erişilebilirliği: Ekran okuyucuların (NVDA) oyunun başlangıcında anonslara istenmeyen "bölüm" kelimesini eklemesine sebep olan HTML etiketleri (`role="none"`) ile susturuldu.
+- Oyun Başlangıç Süresi: Oyunun başlangıç geri sayım süresi 5 saniyeden 3 saniyeye geri çekildi ve ekran okuyucunun 3 saniye okuması sağlandı.
+- Cache Temizliği: Versiyon 0.94.5'e güncellendi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -693,15 +684,15 @@ Yeni Ozellikler:
 - Guvenlik Katmani: Ana sayfa altyapisina dis mudahaleleri onlemek icin XSS ve Clickjacking guvenlik kalkanlari eklendi.
 
 [v0.94.4] - 2026-03-23
-- Zorunlu G�ncelleme D�ng�s� ��z�m�: Yeni bir s�r�m geldi�inde ekrana ��kan "Y�KLE (SAYFAYI YEN�LE)" butonunun hi�bir i�lem yapmay�p oyuncuyu g�ncelleme men�s�ne hapsetmesine neden olan kritik dinleyici hatas� (Event Listener Bug) tamir edildi.
-- Mobil Hikaye Modu Eri�ilebilirli�i: Kay�p Notalar modunda devre d��� b�rak�lan nota tu�lar�n�n (�rne�in G, A, B tu�lar�) ekran okuyucular taraf�ndan hala eri�ilebilir ve t�klanabilir g�r�nmesi sorunu, kal�c� `disabled` komutlar�yla a��ld� ve ekran okuyucudan tamamen gizlendi.
+- Zorunlu Güncelleme Döngüsü Çözümü: Yeni bir sürüm geldiğinde ekrana çıkan "YÜKLE (SAYFAYI YENİLE)" butonunun hiçbir işlem yapmayıp oyuncuyu güncelleme menüsüne hapsetmesine neden olan kritik dinleyici hatası (Event Listener Bug) tamir edildi.
+- Mobil Hikaye Modu Erişilebilirliği: Kayıp Notalar modunda devre dışı bırakılan nota tuşlarının (örneğin G, A, B tuşları) ekran okuyucular tarafından hala erişilebilir ve tıklanabilir görünmesi sorunu, kalıcı `disabled` komutlarıyla aşıldı ve ekran okuyucudan tamamen gizlendi.
 
 [v0.94.3] - 2026-03-23
 
-### D�zeltilen Hatalar ve Sistem G�ncellemeleri:
-- Beyaz Ekran ��z�m�: �nternet yava�l���nda veya taray�c� eklentilerinden �t�r� oyunun ba�lang�� s�ras�nda bembeyaz / bo� bir ekranda as�l� kalmas�na yol a�an (TCP Parsing Block) a��r altyap� sorunu saniyeler i�inde �izim yap�labilecek �ekilde ��z�ld�. Oyun art�k internetsizken bile 0. saniyede ekran� y�klemeyi garanti ediyor.
-- S�r�kleyici Lobi Bekleme Odas� (Immersion): Bota veya ger�ek rakibe kar�� bir e�le�tirme bulundu�unda sizi haz�rl�ks�zca direkt 60 saniyelik sava� alan�na f�rlatan hantal sistem de�i�tirildi. Art�k odaya rahat�a girebilmeniz ve sandalyenize / oda��n�za yerle�meniz i�in sesli yan�t destekli uyar�larla beraber tam 10 saniyelik bir "Lobi Bekleme S�resi" eklendi. Ayr�ca yapay zekan�n (Bot Mode) 15 saniyelik organik bir aranma s�resi sim�le etmesi sa�land�.
-- S�f�r ��kme (Zero-Crash) G�venlik Protokol�: �evrimi�i oyun modundaki (�zellikle bot sistemi ve h�zl� ��k��larda) yar��mac� ba�lant� kopmalar�n�n; men�leri kitlemesine, null (bo�) veritaban� kirlili�i yapmas�na, "Hayalet Bot" �retmesine veya ayn� odaya �ift �d�l da��tmas�na (Double Reward Glitch) mahal veren toplamda 6 adet siber a��k, ��kme koruyucu asenkron z�rhlarla (Try-Catch / Async Locks) tam olarak kapat�ld�.
+### Düzeltilen Hatalar ve Sistem Güncellemeleri:
+- Beyaz Ekran Çözümü: İnternet yavaşlığında veya tarayıcı eklentilerinden ötürü oyunun başlangıç sırasında bembeyaz / boş bir ekranda asılı kalmasına yol açan (TCP Parsing Block) ağır altyapı sorunu saniyeler içinde çizim yapılabilecek şekilde çözüldü. Oyun artık internetsizken bile 0. saniyede ekranı yüklemeyi garanti ediyor.
+- Sürükleyici Lobi Bekleme Odası (Immersion): Bota veya gerçek rakibe karşı bir eşleştirme bulunduğunda sizi hazırlıksızca direkt 60 saniyelik savaş alanına fırlatan hantal sistem değiştirildi. Artık odaya rahatça girebilmeniz ve sandalyenize / odağınıza yerleşmeniz için sesli yanıt destekli uyarılarla beraber tam 10 saniyelik bir "Lobi Bekleme Süresi" eklendi. Ayrıca yapay zekanın (Bot Mode) 15 saniyelik organik bir aranma süresi simüle etmesi sağlandı.
+- Sıfır Çökme (Zero-Crash) Güvenlik Protokolü: Çevrimiçi oyun modundaki (özellikle bot sistemi ve hızlı çıkışlarda) yarışmacı bağlantı kopmalarının; menüleri kitlemesine, null (boş) veritabanı kirliliği yapmasına, "Hayalet Bot" üretmesine veya aynı odaya çift ödül dağıtmasına (Double Reward Glitch) mahal veren toplamda 6 adet siber açık, çökme koruyucu asenkron zırhlarla (Try-Catch / Async Locks) tam olarak kapatıldı.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -711,11 +702,11 @@ Yeni Ozellikler:
 
 [v0.94.0] - 2026-03-22
 
-### Eklenenler / De�i�tirilenler:
-- PvP (Birebir Rakiple Oyna) Modu: Oyuna ayn� anda iki ki�inin e�le�erek 60 saniyelik bir h�z yar���na girebildi�i yepyeni bir �ok oyunculu mod eklendi! Her tur, do�ru notalar� bilgisunucuya (Firebase) ilk g�nderen ki�inin puan� kapt��� kat� bir i�lem (Transaction) kilidiyle s�slendi. Her iki cepheye ayn� notalar aktar�larak en adil yar�� sa�land�.
-- PvE (Bota Kar�� Oyna) Modu: Rakip bulamayanlar veya pratik yapmak isteyenler i�in kendilerine has bir hata pay�na ve insani tepki s�relerine (ortalama zeka) sahip, tamamen otonom bir Yapay Zeka Botu kodland�.
-- Oyun Sonu Ganimet Sistemi: Birebir modda s�resi dolup galip gelen oyunculara art�k rastgele 100 Jeton, 2 Zaman Korumas� veya 2 Hata Korumas� veren dev bir kasa hediye edilecek. Kaybeden veya berabere kalan oyuncular da unutulmad�; 20 Jeton teselli �d�l�ne ba�land�.
-- Kusursuz �zolasyon: Her ne kadar rakiplere zorunlu olarak ayn� notalar dinletilse de, oyuncular internet �zerinden birbirinin piyano tu�lama seslerini asla duyamaz. Sadece sistemin anl�k "Puan senin!" veya "Ge� kald�n, rakip ald�!" hakem bildirimleri �zerinden kusursuz bir rekabet heyecan� ya�an�r.
+### Eklenenler / Değiştirilenler:
+- PvP (Birebir Rakiple Oyna) Modu: Oyuna aynı anda iki kişinin eşleşerek 60 saniyelik bir hız yarışına girebildiği yepyeni bir çok oyunculu mod eklendi! Her tur, doğru notaları bilgisunucuya (Firebase) ilk gönderen kişinin puanı kaptığı katı bir işlem (Transaction) kilidiyle süslendi. Her iki cepheye aynı notalar aktarılarak en adil yarış sağlandı.
+- PvE (Bota Karşı Oyna) Modu: Rakip bulamayanlar veya pratik yapmak isteyenler için kendilerine has bir hata payına ve insani tepki sürelerine (ortalama zeka) sahip, tamamen otonom bir Yapay Zeka Botu kodlandı.
+- Oyun Sonu Ganimet Sistemi: Birebir modda süresi dolup galip gelen oyunculara artık rastgele 100 Jeton, 2 Zaman Koruması veya 2 Hata Koruması veren dev bir kasa hediye edilecek. Kaybeden veya berabere kalan oyuncular da unutulmadı; 20 Jeton teselli ödülüne bağlandı.
+- Kusursuz İzolasyon: Her ne kadar rakiplere zorunlu olarak aynı notalar dinletilse de, oyuncular internet üzerinden birbirinin piyano tuşlama seslerini asla duyamaz. Sadece sistemin anlık "Puan senin!" veya "Geç kaldın, rakip aldı!" hakem bildirimleri üzerinden kusursuz bir rekabet heyecanı yaşanır.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -725,11 +716,11 @@ Yeni Ozellikler:
 
 [v0.93.1] - 2026-03-22
 
-### Eklenenler / De�i�tirilenler:
-- Zorluk Men�s� G�stergeleri: Modlar�n �zerine tamamlan�p tamamlanmad���, tamamlanmad�ysa kazanmak i�in ka� tur s�rece�i bilgisi yaz�yla ve ekran okuyucuyla okunacak �ekilde eklendi.
-- NVDA Kalkan�: Taray�c�y� rastgele (Browse) g�z atma kipine ge�iren hatal� aria tan�mlar� temizlendi, oyunun klavye yakalay�c� yap�s�n� korumak i�in sadece Odak kipiyle (Application mode) �al��acak �ekilde zorland�.
-- Odakl� Okumalar: Motivasyon s�zleri (+X saniye) ile S ve T tu�lar�ndaki oyun i�i ekran okumalar� (S�re, Tur) normal canl� okuma alan�ndan al�narak `forceFocus` ile gizli bir diva odaklat�ld�. NVDA'n�n s�zleri ba�ka i�lemle yutmadan kesin okumas� garantilendi.
-- Ek S�re Bonusu: Bir tur do�ru bilindi�inde kazan�lan ek s�relere +5 saniye art�� sa�land�. (�rn: 3 nota bilindi�inde 5 sn hediye edilirken, art�k 10 sn hediye edilecek.)
+### Eklenenler / Değiştirilenler:
+- Zorluk Menüsü Göstergeleri: Modların üzerine tamamlanıp tamamlanmadığı, tamamlanmadıysa kazanmak için kaç tur süreceği bilgisi yazıyla ve ekran okuyucuyla okunacak şekilde eklendi.
+- NVDA Kalkanı: Tarayıcıyı rastgele (Browse) göz atma kipine geçiren hatalı aria tanımları temizlendi, oyunun klavye yakalayıcı yapısını korumak için sadece Odak kipiyle (Application mode) çalışacak şekilde zorlandı.
+- Odaklı Okumalar: Motivasyon sözleri (+X saniye) ile S ve T tuşlarındaki oyun içi ekran okumaları (Süre, Tur) normal canlı okuma alanından alınarak `forceFocus` ile gizli bir diva odaklatıldı. NVDA'nın sözleri başka işlemle yutmadan kesin okuması garantilendi.
+- Ek Süre Bonusu: Bir tur doğru bilindiğinde kazanılan ek sürelere +5 saniye artış sağlandı. (Örn: 3 nota bilindiğinde 5 sn hediye edilirken, artık 10 sn hediye edilecek.)
 
 [v0.97.4.45] - 26.05.2026
 
@@ -739,12 +730,12 @@ Yeni Ozellikler:
 
 [v0.92.0] - 2026-03-22
 
-### Eklenenler / De�i�tirilenler:
-- Zorunlu G�ncelleme Ekran� Revizyonu: Vah�i uyar�lara neden olan y�k�c� alert ekran� iptal edilip yerine eri�ilebilir "Zorunlu G�ncelleme" diyalog penceresi eklendi.
-- Yama Notlar� Men�s�: G�ncelleme ekran�ndan sonra ��kar�lan Yama Notlar� diyalog ekran� NVDA uyumlu standart okuma alan�na sahip yap�ld�.
-- Ok Tu�lar�yla Okuma: Hikaye, Al��t�rma, G�ncelleme ve Yama Notlar� ekranlar�nda kullan�c� sa�, sol, a�a��, yukar� oklara bast���nda mesaj� ba�tan okuyacak NVDA destekli k�sayollar eklendi. 
-- Enter Onay�: Sistemsel diyalog ekranlar�nda butona odaklanmadan, direkt Enter tu�una basarak devam etme �zelli�i oyuna kazand�r�ld�.
-- Mobil Oyun Sonu Ar�nmas�: Oyun biti� ekran�nda ��kan i�levsiz butonlar kald�r�larak mobil kullan�c�lar i�in direkt ��k��/Bitir butonu �ne ��kar�ld�.
+### Eklenenler / Değiştirilenler:
+- Zorunlu Güncelleme Ekranı Revizyonu: Vahşi uyarılara neden olan yıkıcı alert ekranı iptal edilip yerine erişilebilir "Zorunlu Güncelleme" diyalog penceresi eklendi.
+- Yama Notları Menüsü: Güncelleme ekranından sonra çıkarılan Yama Notları diyalog ekranı NVDA uyumlu standart okuma alanına sahip yapıldı.
+- Ok Tuşlarıyla Okuma: Hikaye, Alıştırma, Güncelleme ve Yama Notları ekranlarında kullanıcı sağ, sol, aşağı, yukarı oklara bastığında mesajı baştan okuyacak NVDA destekli kısayollar eklendi. 
+- Enter Onayı: Sistemsel diyalog ekranlarında butona odaklanmadan, direkt Enter tuşuna basarak devam etme özelliği oyuna kazandırıldı.
+- Mobil Oyun Sonu Arınması: Oyun bitiş ekranında çıkan işlevsiz butonlar kaldırılarak mobil kullanıcılar için direkt Çıkış/Bitir butonu öne çıkarıldı.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -754,8 +745,8 @@ Yeni Ozellikler:
 
 [v0.91.0] - 2026-03-21
 
-### Eklenenler / De�i�tirilenler:
-- Yeni s�r�m numaraland�rma sistemi ba�lat�ld�. Bundan sonraki t�m s�r�mler "ara s�r�m" (0.91.x serisi vb.) olarak yay�nlanacakt�r.
+### Eklenenler / Değiştirilenler:
+- Yeni sürüm numaralandırma sistemi başlatıldı. Bundan sonraki tüm sürümler "ara sürüm" (0.91.x serisi vb.) olarak yayınlanacaktır.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -765,13 +756,13 @@ Yeni Ozellikler:
 
 [v1.21] - 2026-03-20
 
-### Eklenenler / De�i�tirilenler:
-- CANLI SOHBET ER�Ş�LEB�L�RL�K (NVDA/Mobil) YAMASI:
-  - Sohbet kutusu kapal� olsa dahi ekran okuyucunun (NVDA vb.) gelen yeni mesajlar�, sisteme girenleri ve ��kanlar� an�nda okuyabilmesi i�in arka plana gizli bir spiker (`sr-chat-reader`) atand�.
-  - Yeni mesajlarda sesli uyar� verebilmesi i�in sisteme `chat12.ogg` ses efekti eklendi ve mesajlar "[�sim]: [Mesaj]" format�nda anons edilecek �ekilde kodland�.
-  - PC NVDA ve Mobil Ekran Okuyucular�n�n farkl� metin okuma tepkileri verdikleri ("Bo�" okuma veya "Sessiz" kalma problemleri) giderilerek her iki platformda da (innerText ve textContent payla�t�r�lmas�yla) kusursuz �al��acak melez bir anons altyap�s� geli�tirildi.
-  - PC NVDA'n�n HTML'deki `.sr-only` s�n�f� i�indeki "clip" �zelli�inden dolay� canl� elementleri t�mden atlamas�/g�rmezden gelmesi hatas� tespit edildi ve standart d��� `clip` kullan�m� engellenerek an�nda odak okumas� (senkron odak) sa�land�.
-  - Oyundan ��k�p geri d�n�ld���nde ayn� isimle var olabilmeyi sa�layan kal�c� isim haf�zas� (`localStorage`) eklendi. Her giri�te takma ad sorma zahmeti ortadan kalkt�.
+### Eklenenler / Değiştirilenler:
+- CANLI SOHBET ERİÅİLEBİLİRLİK (NVDA/Mobil) YAMASI:
+  - Sohbet kutusu kapalı olsa dahi ekran okuyucunun (NVDA vb.) gelen yeni mesajları, sisteme girenleri ve çıkanları anında okuyabilmesi için arka plana gizli bir spiker (`sr-chat-reader`) atandı.
+  - Yeni mesajlarda sesli uyarı verebilmesi için sisteme `chat12.ogg` ses efekti eklendi ve mesajlar "[İsim]: [Mesaj]" formatında anons edilecek şekilde kodlandı.
+  - PC NVDA ve Mobil Ekran Okuyucularının farklı metin okuma tepkileri verdikleri ("Boş" okuma veya "Sessiz" kalma problemleri) giderilerek her iki platformda da (innerText ve textContent paylaştırılmasıyla) kusursuz çalışacak melez bir anons altyapısı geliştirildi.
+  - PC NVDA'nın HTML'deki `.sr-only` sınıfı içindeki "clip" özelliğinden dolayı canlı elementleri tümden atlaması/görmezden gelmesi hatası tespit edildi ve standart dışı `clip` kullanımı engellenerek anında odak okuması (senkron odak) sağlandı.
+  - Oyundan çıkıp geri dönüldüğünde aynı isimle var olabilmeyi sağlayan kalıcı isim hafızası (`localStorage`) eklendi. Her girişte takma ad sorma zahmeti ortadan kalktı.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -781,9 +772,9 @@ Yeni Ozellikler:
 
 [v1.20] - 2026-03-20
 
-### Eklenenler / De�i�tirilenler:
-- Sohbet sunucusu tamamen temizlendi�inde (bo� iken) "Bu sohbet kutusunda hi� mesaj yok. �lk mesaj�n�z� g�ndermek i�in g�zel bir zaman." �eklinde ekrana kibar bir sistem mesaj� basan ve ekran okuyucuyla okunan yeni koruma eklendi.
-- Sohbetten mesaj g�nderildi�i an sohbet penceresinin otomatik olarak kapan�p odaklaman�n tekrar oyuna ge�mesi (Mobil oyun h�z� optimizasyonu) tamamland�.
+### Eklenenler / Değiştirilenler:
+- Sohbet sunucusu tamamen temizlendiğinde (boş iken) "Bu sohbet kutusunda hiç mesaj yok. İlk mesajınızı göndermek için güzel bir zaman." şeklinde ekrana kibar bir sistem mesajı basan ve ekran okuyucuyla okunan yeni koruma eklendi.
+- Sohbetten mesaj gönderildiği an sohbet penceresinin otomatik olarak kapanıp odaklamanın tekrar oyuna geçmesi (Mobil oyun hızı optimizasyonu) tamamlandı.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -793,14 +784,14 @@ Yeni Ozellikler:
 
 [v1.17] - 2026-03-20
 
-### Eklenenler / De�i�tirilenler:
-- WHATSAPP TASARIM G�NCELLEMES� (Canl� Sohbet): Canl� sohbet penceresi %100 WhatsApp Web (Karanl�k Mod) aray�z�ne benzetildi.
-  - Sizin g�nderdi�iniz mesajlar (Benim Mesajlar�m) ekran�n sa� taraf�na Ac� Ye�il renkli konu�ma balonlar� (Bubble) ile yasland�.
-  - Di�er kullan�c�lar�n mesajlar� ekran�n sol taraf�nda Koyu Gri balonlarla listelenecek �ekilde ayr��t�r�ld�.
-  - Sisteme giren/��kanlar�n (�rn: Misafir �evrimd��� oldu) mesajlar�, ortalanm�� k���k "hap" g�r�n�m� ile modernle�tirildi.
-  - Her konu�ma balonunun sa� alt k��esine efsanevi ince WhatsApp zaman damgas� (`14:35`) oturtuldu. Orijinal G�nderen �simleri (Nickname) yine ayn� formatta balona eklendi.
-  - Alt k�s�mdaki "G�nder" butonu yuvarlak WhatsApp u�a�� (➤) ikonuna d�n��t�r�ld� ve yazma �ubu�u ��k bir elips haline getirildi.
-  - T�m bu g�rsel harikalara ra�men, NVDA (Ekran Okuyucu) deneyimi tamamen korundu. G�rme engelli oyuncular i�in g�rseldeki "sa�-sol" yerle�imleri atlanacak ve saf, eksiksiz, p�r�zs�z metin okumas� Gizli Etiketler (aria-hidden ve sr-only) hileleriyle sunulmaya devam edilecek!
+### Eklenenler / Değiştirilenler:
+- WHATSAPP TASARIM GÜNCELLEMESİ (Canlı Sohbet): Canlı sohbet penceresi %100 WhatsApp Web (Karanlık Mod) arayüzüne benzetildi.
+  - Sizin gönderdiğiniz mesajlar (Benim Mesajlarım) ekranın sağ tarafına Acı Yeşil renkli konuşma balonları (Bubble) ile yaslandı.
+  - Diğer kullanıcıların mesajları ekranın sol tarafında Koyu Gri balonlarla listelenecek şekilde ayrıştırıldı.
+  - Sisteme giren/çıkanların (Örn: Misafir çevrimdışı oldu) mesajları, ortalanmış küçük "hap" görünümü ile modernleştirildi.
+  - Her konuşma balonunun sağ alt köşesine efsanevi ince WhatsApp zaman damgası (`14:35`) oturtuldu. Orijinal Gönderen İsimleri (Nickname) yine aynı formatta balona eklendi.
+  - Alt kısımdaki "Gönder" butonu yuvarlak WhatsApp uçağı (➤) ikonuna dönüştürüldü ve yazma çubuğu şık bir elips haline getirildi.
+  - Tüm bu görsel harikalara rağmen, NVDA (Ekran Okuyucu) deneyimi tamamen korundu. Görme engelli oyuncular için görseldeki "sağ-sol" yerleşimleri atlanacak ve saf, eksiksiz, pürüzsüz metin okuması Gizli Etiketler (aria-hidden ve sr-only) hileleriyle sunulmaya devam edilecek!
 
 [v0.97.4.45] - 26.05.2026
 
@@ -810,12 +801,12 @@ Yeni Ozellikler:
 
 [v1.15] - 2026-03-20
 
-### Eklenenler / De�i�tirilenler:
-- CANLI SOHBET HATA AYIKLAMASI VE G�VENL�K YAMASI:
-  - Kendi g�nderdi�iniz yeni mesajlarda (hen�z Firebase'e ula�madan �nceki mili-saniyelerde) saatin ge�ici olarak `[NaN:NaN]` gibi hatal� g�r�nmesine neden olan "Optimistic Render" hatas� cihaz�n yerel saatine ba�vurularak onar�ld�.
-  - G�nder tu�una bas�ld���nda "Takma Ad" veya "Mesaj" kutusu bo� ise sistemin sessiz kalmas� hatas� d�zeltildi; art�k NVDA e�li�inde "L�tfen takma ad/mesaj girin" uyar�s� okunacak ve imle� oraya otomatik odaklanacak.
-  - Di�er oyuncular� kand�rmak amac�yla takma ad� "Sistem" yaparak odaya sahte giri�/��k�� bildirimleri yollama a���� (Impersonation) tespit edilerek engellendi.
-  - �zolasyon (Modal Leak) Tamamland�: Sadece yaz� yazarken de�il, sohbet ekran� a��k kald��� t�m anlar boyunca klavyedeki harf ve bo�luk tu�lar�n�n oyun i�erisindeki nota seslerini/k�sayollar� (S, T, M, Enter) tetiklemesi kesin olarak bloke edildi! Sohbet a��kken sadece Sohbet kullanabilirsiniz.
+### Eklenenler / Değiştirilenler:
+- CANLI SOHBET HATA AYIKLAMASI VE GÜVENLİK YAMASI:
+  - Kendi gönderdiğiniz yeni mesajlarda (henüz Firebase'e ulaşmadan önceki mili-saniyelerde) saatin geçici olarak `[NaN:NaN]` gibi hatalı görünmesine neden olan "Optimistic Render" hatası cihazın yerel saatine başvurularak onarıldı.
+  - Gönder tuşuna basıldığında "Takma Ad" veya "Mesaj" kutusu boş ise sistemin sessiz kalması hatası düzeltildi; artık NVDA eşliğinde "Lütfen takma ad/mesaj girin" uyarısı okunacak ve imleç oraya otomatik odaklanacak.
+  - Diğer oyuncuları kandırmak amacıyla takma adı "Sistem" yaparak odaya sahte giriş/çıkış bildirimleri yollama açığı (Impersonation) tespit edilerek engellendi.
+  - İzolasyon (Modal Leak) Tamamlandı: Sadece yazı yazarken değil, sohbet ekranı açık kaldığı tüm anlar boyunca klavyedeki harf ve boşluk tuşlarının oyun içerisindeki nota seslerini/kısayolları (S, T, M, Enter) tetiklemesi kesin olarak bloke edildi! Sohbet açıkken sadece Sohbet kullanabilirsiniz.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -825,12 +816,12 @@ Yeni Ozellikler:
 
 [v1.14] - 2026-03-20
 
-### Eklenenler / De�i�tirilenler:
-- MESAJ GE�M�Ş� VE SAAT ET�KETLER� (Live Chat): Sohbet penceresinin �nceki mesajlar� (mesaj ge�mi�ini) g�stermemesi hatas� b�t�n�yle giderildi.
-  - Firebase veritaban�ndan mesaj �ekimi optimize edildi (Index filtreleri rahatlat�ld�); art�k 7'den 70'e herkes sohbete girdi�inde en g�ncel 50 mesaj� g�rebilecek.
-  - B�t�n mesajlar�n �n k�sm�na orijinal g�nderilme zaman� (`[14:35]` format�nda) damgaland�. Ekran okuyucu bu saati ve hemen ard�ndan takma ad� do�al bir h�zda aktaracak.
-  - Sohbet (Nokta tu�u ile) a��ld���nda ge�mi�in siyah ekranda gizli kalmas� (Scroll kaymas�n�n tepede kalmas�) problemi ��z�ld�. Aray�z a��ld��� an en yeni (en alttaki) mesaja an�nda fiziksel olarak kayd�r�lacak.
-  - K�sayol iyile�tirmesi: Nokta (.) tu�u art�k sadece sohbeti g�venle "a�mak" i�in �zel olarak kodland�. Kapatmak veya iptal etmek i�in sisteme resmi "ESC (Escape)" k�sayolu tan�mland�. Ayr�ca sohbet i�erisine oyun komutlar�n�n s�zmas� (Harf k�sayollar�) kilitlendi.
+### Eklenenler / Değiştirilenler:
+- MESAJ GEÇMİÅİ VE SAAT ETİKETLERİ (Live Chat): Sohbet penceresinin önceki mesajları (mesaj geçmişini) göstermemesi hatası bütünüyle giderildi.
+  - Firebase veritabanından mesaj çekimi optimize edildi (Index filtreleri rahatlatıldı); artık 7'den 70'e herkes sohbete girdiğinde en güncel 50 mesajı görebilecek.
+  - Bütün mesajların ön kısmına orijinal gönderilme zamanı (`[14:35]` formatında) damgalandı. Ekran okuyucu bu saati ve hemen ardından takma adı doğal bir hızda aktaracak.
+  - Sohbet (Nokta tuşu ile) açıldığında geçmişin siyah ekranda gizli kalması (Scroll kaymasının tepede kalması) problemi çözüldü. Arayüz açıldığı an en yeni (en alttaki) mesaja anında fiziksel olarak kaydırılacak.
+  - Kısayol iyileştirmesi: Nokta (.) tuşu artık sadece sohbeti güvenle "açmak" için özel olarak kodlandı. Kapatmak veya iptal etmek için sisteme resmi "ESC (Escape)" kısayolu tanımlandı. Ayrıca sohbet içerisine oyun komutlarının sızması (Harf kısayolları) kilitlendi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -840,13 +831,13 @@ Yeni Ozellikler:
 
 [v1.13] - 2026-03-20
 
-### Eklenenler / De�i�tirilenler:
-- S�STEME G�R�Ş B�LD�R�MLER� (Presence): Canl� Sohbete kat�lan veya ayr�lan oyuncular� anl�k tespit edip NVDA e�li�inde odaya f�s�ldayan geli�mi� bir "Durum" altyap�s� eklendi.
-  - Sohbet ilk kez a��ld���nda (Nokta tu�u ile) odaya tek seferlik "👋 Misafir sohbete kat�ld�." �eklinde kar��lama bildirimi d��ecek.
-  - Odan�n sekmesini kapatan, oyundan veya internetten kopan oyuncular otomatik tespit edilecek ve "🚶 Misafir �evrimd��� oldu." mesaj� verilecek. (Firebase Smart onDisconnect Hooks).
-  - Takma Ad girip mesaj g�nderen oyuncular�n bu ��k�� (kopma) kancalar� an�nda iptal edilerek, "🚶 [Kullan�c�Ad�] �evrimd��� oldu." format�nda yeni isimlerine dinamik olarak aktar�lacak / g�ncellenecek.
-  - Odaya yollanan bu sistem mesajlar� normal kullan�c� mesajlar�ndan ayr�ls�n diye, hafif sar�ms�, italik, kesikli kutu bar�nd�ran okunakl� `.system-message` tasar�m�yla bezendi.
-  - Ayr�ca `version.json` okumas�nda meydana gelen ge�ersiz karakter hatas� (Blank Screen / Bo� Ekran ��kmesi) ASCII kodlamas�yla kal�c� olarak onar�ld�.
+### Eklenenler / Değiştirilenler:
+- SİSTEME GİRİÅ BİLDİRİMLERİ (Presence): Canlı Sohbete katılan veya ayrılan oyuncuları anlık tespit edip NVDA eşliğinde odaya fısıldayan gelişmiş bir "Durum" altyapısı eklendi.
+  - Sohbet ilk kez açıldığında (Nokta tuşu ile) odaya tek seferlik "👋 Misafir sohbete katıldı." şeklinde karşılama bildirimi düşecek.
+  - Odanın sekmesini kapatan, oyundan veya internetten kopan oyuncular otomatik tespit edilecek ve "🚶 Misafir çevrimdışı oldu." mesajı verilecek. (Firebase Smart onDisconnect Hooks).
+  - Takma Ad girip mesaj gönderen oyuncuların bu çıkış (kopma) kancaları anında iptal edilerek, "🚶 [KullanıcıAdı] çevrimdışı oldu." formatında yeni isimlerine dinamik olarak aktarılacak / güncellenecek.
+  - Odaya yollanan bu sistem mesajları normal kullanıcı mesajlarından ayrılsın diye, hafif sarımsı, italik, kesikli kutu barındıran okunaklı `.system-message` tasarımıyla bezendi.
+  - Ayrıca `version.json` okumasında meydana gelen geçersiz karakter hatası (Blank Screen / Boş Ekran Çökmesi) ASCII kodlamasıyla kalıcı olarak onarıldı.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -856,11 +847,11 @@ Yeni Ozellikler:
 
 [v1.12] - 2026-03-20
 
-### Eklenenler / De�i�tirilenler:
-- CANLI SOHBET S�STEM� (Live Chat): Oyuna 7'den 70'e herkesin �ifresiz ba�lanabilece�i "Canl� Sohbet" aray�z� eklendi.
-  - Eri�ilebilirlik: Giri� alanlar�na �zel `aria-label` eklendi, sohbet ak���na `aria-live` entegre edilerek NVDA'n�n yeni mesajlar� an�nda "�sim: Mesaj" format�nda do�al okumas� sa�land�. Yaz��ma penceresi a��kken Tab tu�u (dola��m) k�s�tlamas� kald�r�ld�.
-  - Klavye K�sayollar�: Sohbet penceresini h�zl�ca a��p kapatmak i�in Nokta (`.`) k�sayolu atand�. Yaz� yazarken kazara kapanmas�na engel olacak g�venlik kalkan� kuruldu.
-  - Firebase Entegrasyonu: Ger�ek zamanl� (Realtime) mesajla�ma veritaban� ba�ar�yla aktifle�ti. Sadece ge�mi�teki son 50 aktif mesaj� bellekte tutan, zararl� komutlara (XSS) kar�� �zel temizleme filtresine (`escapeHTML`) sahip kesintisiz bir bulut altyap�s� yaz�ld�.
+### Eklenenler / Değiştirilenler:
+- CANLI SOHBET SİSTEMİ (Live Chat): Oyuna 7'den 70'e herkesin kayıtsız bağlanabileceği "Canlı Sohbet" arayüzü eklendi.
+  - Erişilebilirlik: Giriş alanlarına özel `aria-label` eklendi, sohbet akışına `aria-live` entegre edilerek NVDA'nın yeni mesajları anında "İsim: Mesaj" formatında doğal okuması sağlandı. Yazışma penceresi açıkken Tab tuşu (dolaşım) kısıtlaması kaldırıldı.
+  - Klavye Kısayolları: Sohbet penceresini hızlıca açıp kapatmak için Nokta (`.`) kısayolu atandı. Yazı yazarken kazara kapanmasına engel olacak güvenlik kalkanı kuruldu.
+  - Firebase Entegrasyonu: Gerçek zamanlı (Realtime) mesajlaşma veritabanı başarıyla aktifleşti. Sadece geçmişteki son 50 aktif mesajı bellekte tutan, zararlı komutlara (XSS) karşı özel temizleme filtresine (`escapeHTML`) sahip kesintisiz bir bulut altyapısı yazıldı.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -870,8 +861,8 @@ Yeni Ozellikler:
 
 [v1.11] - 2026-03-20
 
-### Eklenenler / De�i�tirilenler:
-- MOB�L ER�Ş�LEB�L�RL�K (Piyano Tu�lar�) G�NCELLEMES�: Mobil cihazlarda (telefonlarda) yer alan oyun i�i piyano tu�lar�n�n ve "��k��" butonunun, ekran okuyucu programlar� devredeyken �al��mamas� sorunu giderildi. Ekran okuyucular�n yapay t�klamalar�n� (`click`) g�venle alg�layacak �ekilde yenilendi.
+### Eklenenler / Değiştirilenler:
+- MOBİL ERİÅİLEBİLİRLİK (Piyano Tuşları) GÜNCELLEMESİ: Mobil cihazlarda (telefonlarda) yer alan oyun içi piyano tuşlarının ve "Çıkış" butonunun, ekran okuyucu programları devredeyken çalışmaması sorunu giderildi. Ekran okuyucuların yapay tıklamalarını (`click`) güvenle algılayacak şekilde yenilendi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -881,9 +872,9 @@ Yeni Ozellikler:
 
 [v1.10] - 2026-03-20
 
-### Eklenenler / De�i�tirilenler:
-- YARDIM K�T�PHANES� (yardim.js) D�ZELTMELER�:
-  - Ana oyun i�erisinde puan kazand�k�a tetiklenmesi gereken motivasyon s�zlerinin ("Harika gidi�at", "M�thi�sin") hi�bir zaman okunmamas�na sebep olan �ok b�y�k bir "Kapsam" (Local Scope) hatas� onar�ld�. `yardim.js` i�erisine yaz�lm�� metin listeleri (Array'ler) kapal� bir sistem (`const`) olarak tan�mland��� i�in ana oyun kodu bunlar� g�remiyordu ve bo� metin �ekiyordu. T�m mesaj listeleri `window` objesine ba�lanarak oyundaki di�er t�m JS dosyalar�n�n rahat�a ula�abilece�i genel (Global) bir yap�ya kavu�turuldu.
+### Eklenenler / Değiştirilenler:
+- YARDIM KÜTÜPHANESİ (yardim.js) DÜZELTMELERİ:
+  - Ana oyun içerisinde puan kazandıkça tetiklenmesi gereken motivasyon sözlerinin ("Harika gidişat", "Müthişsin") hiçbir zaman okunmamasına sebep olan çok büyük bir "Kapsam" (Local Scope) hatası onarıldı. `yardim.js` içerisine yazılmış metin listeleri (Array'ler) kapalı bir sistem (`const`) olarak tanımlandığı için ana oyun kodu bunları göremiyordu ve boş metin çekiyordu. Tüm mesaj listeleri `window` objesine bağlanarak oyundaki diğer tüm JS dosyalarının rahatça ulaşabileceği genel (Global) bir yapıya kavuşturuldu.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -893,10 +884,10 @@ Yeni Ozellikler:
 
 [v1.9] - 2026-03-20
 
-### Eklenenler / De�i�tirilenler:
-- MOB�L G�R�N�M (Piyano) D�ZELTMELER�: Mobil ekranlarda tu�lar�n kaybolmas� ve bas�lmamas� sorunu iki farkl� kanaldan ��z�ld�:
-  - CSS G�r�nmezlik Hatas�: `style.css` dosyas�nda yanl��l�kla i� i�e ge�irilmi� (CSS Nesting Syntax Error) baz� etiketler nedeniyle Safari vb. mobil taray�c�larda tasar�m dosyas�n�n ��kerek ekran� karartmas� / piyano tu�lar�n� saklamas� hatas� tamir edildi.
-  - Oyun Motoru Tepkisizli�i: Ekranda beliren mobil piyano tu�lar�na (C, D, E...) bas�ld���nda ana oyun motoruna sinyal gitmesini sa�layan t�klama/dokunma dinleyicilerinin (event listener) eksik oldu�u fark edildi. `game.js` i�erisine dokunmatik ekranlara �zel bir tetikleyici eklendi. Art�k ekrandaki tu�lara bas�ld���nda klavye kullan�yormu�sunuz gibi notalar do�rudan veritaban�na ve oyuna i�lenecek.
+### Eklenenler / Değiştirilenler:
+- MOBİL GÖRÜNÜM (Piyano) DÜZELTMELERİ: Mobil ekranlarda tuşların kaybolması ve basılmaması sorunu iki farklı kanaldan çözüldü:
+  - CSS Görünmezlik Hatası: `style.css` dosyasında yanlışlıkla iç içe geçirilmiş (CSS Nesting Syntax Error) bazı etiketler nedeniyle Safari vb. mobil tarayıcılarda tasarım dosyasının çökerek ekranı karartması / piyano tuşlarını saklaması hatası tamir edildi.
+  - Oyun Motoru Tepkisizliği: Ekranda beliren mobil piyano tuşlarına (C, D, E...) basıldığında ana oyun motoruna sinyal gitmesini sağlayan tıklama/dokunma dinleyicilerinin (event listener) eksik olduğu fark edildi. `game.js` içerisine dokunmatik ekranlara özel bir tetikleyici eklendi. Artık ekrandaki tuşlara basıldığında klavye kullanıyormuşsunuz gibi notalar doğrudan veritabanına ve oyuna işlenecek.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -906,11 +897,11 @@ Yeni Ozellikler:
 
 [v1.8] - 2026-03-19
 
-### Eklenenler / De�i�tirilenler:
-- KARŞILAMA (Intro) EKRANI MANTIK D�ZELTMES�: Mod�l ayr��t�rma a�amas�nda bozulan ilk giri� ekran� etkile�imi d�zeltildi ve as�l planlanan iki a�amal� yap�ya kavu�turuldu:
-  - Oyun �lk A��ld���nda: Yap�mc� imzas� ("Bu oyun... �mit Ekrem Mikyas taraf�ndan...") g�r�n�r ve okunur durumunda bekler. T�klama ile an�nda logoya ge�i� yapmas� (skiplenmesi) hatas� �nlendi.
-  - 1. T�klamada (veya Enter): Versiyon uyar�s� ekranda belirir ve ekran okuyucuya "Versiyon 1.x" bilgisi okunur, ikinci t�klamada logoya ge�ilece�i haberi verilir.
-  - 2. T�klamada (veya Enter): Yap�mc� metni silinerek Haf�zana G�ven logosu ve intro sesi devreye girer, ard�ndan ana men�ye gidilir.
+### Eklenenler / Değiştirilenler:
+- KARÅILAMA (Intro) EKRANI MANTIK DÜZELTMESİ: Modül ayrıştırma aşamasında bozulan ilk giriş ekranı etkileşimi düzeltildi ve asıl planlanan iki aşamalı yapıya kavuşturuldu:
+  - Oyun İlk Açıldığında: Yapımcı imzası ("Bu oyun... Ümit Ekrem Mikyas tarafından...") görünür ve okunur durumunda bekler. Tıklama ile anında logoya geçiş yapması (skiplenmesi) hatası önlendi.
+  - 1. Tıklamada (veya Enter): Versiyon uyarısı ekranda belirir ve ekran okuyucuya "Versiyon 1.x" bilgisi okunur, ikinci tıklamada logoya geçileceği haberi verilir.
+  - 2. Tıklamada (veya Enter): Yapımcı metni silinerek Hafızana Güven logosu ve intro sesi devreye girer, ardından ana menüye gidilir.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -920,11 +911,11 @@ Yeni Ozellikler:
 
 [v1.7] - 2026-03-19
 
-### Eklenenler / De�i�tirilenler:
-- OYUN MOTORU (game.js) D�ZELTMELER�:
-  - Zaman bitimine do�ru �alan stresli 20 saniye uyar� sesinin (`secons2Sound`), oyuncu "��k��" butonuna bas�p oyunu aniden terk etti�inde durmay�p arkada �almaya devam etmesine neden olan kod ak�nt�s� hatas� (Memory/Audio Leak) onar�ld�.
-  - Mobil cihazlarda bilgisayar oynad�ktan 2.5 saniye sonra ekrana d��en "Tekrar Dinle" butonuna t�kland���nda hi�bir tepki vermemesine neden olan eksik kodlama eklendi. Mobil kullan�c�lar da klavye ("bo�luk" tu�u) kullanan donan�mlarla ayn� �ekilde diziyi -1 saniye cezas�yla tekrar �ald�rabilecek.
-  - "Kay�p Notalar" modu ile oynarken UI taraf�nda tur uzunlu�unun hesaplanamamas� ve `undefined` g�ndermesi hatas� d�zeltildi.
+### Eklenenler / Değiştirilenler:
+- OYUN MOTORU (game.js) DÜZELTMELERİ:
+  - Zaman bitimine doğru çalan stresli 20 saniye uyarı sesinin (`secons2Sound`), oyuncu "Çıkış" butonuna basıp oyunu aniden terk ettiğinde durmayıp arkada çalmaya devam etmesine neden olan kod akıntısı hatası (Memory/Audio Leak) onarıldı.
+  - Mobil cihazlarda bilgisayar oynadıktan 2.5 saniye sonra ekrana düşen "Tekrar Dinle" butonuna tıklandığında hiçbir tepki vermemesine neden olan eksik kodlama eklendi. Mobil kullanıcılar da klavye ("boşluk" tuşu) kullanan donanımlarla aynı şekilde diziyi -1 saniye cezasıyla tekrar çaldırabilecek.
+  - "Kayıp Notalar" modu ile oynarken UI tarafında tur uzunluğunun hesaplanamaması ve `undefined` göndermesi hatası düzeltildi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -934,10 +925,10 @@ Yeni Ozellikler:
 
 [v1.6] - 2026-03-19
 
-### Eklenenler / De�i�tirilenler:
-- SES S�STEM� (Audio) D�ZELTMELER�:
-  - Mobil taray�c�larda men� seslerinin ("Hover" ve "T�k") ayn� anda �st �ste binmesini engelleyen koruman�n, kod �al��ma s�ras� (isMobileDevice) y�z�nden devre d��� kalmas� hatas� giderildi. Art�k mobil cihazlarda men� gezintisi ses spam� yaratmayacak.
-  - Eve girme evresindeki ses dosyas� atan�rken yanl��l�kla yaz�lm�� olan Hint (Devanagari) k�kenli klavye kodlamas� (`window.enterHouse साउंड`) d�zeltilerek evrensel JS kod standartlar�na (`window.enterHouseSound`) getirildi. Olas� taray�c� ��kmeleri �nlendi.
+### Eklenenler / Değiştirilenler:
+- SES SİSTEMİ (Audio) DÜZELTMELERİ:
+  - Mobil tarayıcılarda menü seslerinin ("Hover" ve "Tık") aynı anda üst üste binmesini engelleyen korumanın, kod çalışma sırası (isMobileDevice) yüzünden devre dışı kalması hatası giderildi. Artık mobil cihazlarda menü gezintisi ses spamı yaratmayacak.
+  - Eve girme evresindeki ses dosyası atanırken yanlışlıkla yazılmış olan Hint (Devanagari) kökenli klavye kodlaması (`window.enterHouse à¤¸à¤¾à¤‰à¤‚à¤¡`) düzeltilerek evrensel JS kod standartlarına (`window.enterHouseSound`) getirildi. Olası tarayıcı çökmeleri önlendi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -947,11 +938,11 @@ Yeni Ozellikler:
 
 [v1.5] - 2026-03-19
 
-### Eklenenler / De�i�tirilenler:
-- �ALIŞMAYAN Y�NLEND�RME BUTONLARININ ONARIMI: Oyunda "Devam Et" i�levine kar��l�k gelen butonlar�n i�levleri onar�ld�.
-  - Ana men�deki "Kay�tl� Oyundan Devam Et" butonuna t�kland���nda uyar� verici bir ses ve mesaj okumas� eklendi.
-  - Mobil cihazlardaki men� alt� "Devam Et (Enter)" sanal butonuna klavyedeki "Enter" bas���n� sim�le edecek i�lev atand�.
-  - Sunucu mesaj�nda/G�ncelleme notlar�nda yer alan "Anlad�m, Devam Et" butonunun pencereyi kapatarak ana men�ye aktarma i�levi d�zeltildi.
+### Eklenenler / Değiştirilenler:
+- ÇALIÅMAYAN YÖNLENDİRME BUTONLARININ ONARIMI: Oyunda "Devam Et" işlevine karşılık gelen butonların işlevleri onarıldı.
+  - Ana menüdeki "Kayıtlı Oyundan Devam Et" butonuna tıklandığında uyarı verici bir ses ve mesaj okuması eklendi.
+  - Mobil cihazlardaki menü altı "Devam Et (Enter)" sanal butonuna klavyedeki "Enter" basışını simüle edecek işlev atandı.
+  - Sunucu mesajında/Güncelleme notlarında yer alan "Anladım, Devam Et" butonunun pencereyi kapatarak ana menüye aktarma işlevi düzeltildi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -961,12 +952,12 @@ Yeni Ozellikler:
 
 [v1.4] - 2026-03-19
 
-### Eklenenler / De�i�tirilenler:
-- �ALIŞMAYAN BUTONLARIN ONARIMI (Bug Fix): Mod�l par�alanmas� i�lemi s�ras�nda atlanan/silinen men� butonlar�n�n i�levleri geri getirildi.
-  - "Ma�aza", "Ba�ar�lar", "Geri Bildirim" butonlar� t�klanabilir hale getirildi ve kendi sayfalar�n� a�malar� sa�land�.
-  - Ma�aza i�erisindeki al��veri� butonlar�na (Hata Korumas� Sat�n Al ve Zaman Korumas� Sat�n Al) yetersiz bakiye ve ba�ar�l� sat�n alma logic'leri eklendi.
-  - Geri bildirim sayfas�ndaki "G�nder" butonunun HTML formuyla olan ba�� kopuk oldu�u i�in form g�nderememesi hatas� giderildi. 
-- ARIA/ER�Ş�LEB�L�RL�K G�NCELLEMELER�: Skor tablosu veya oyunda tamamlanan modlara g�re kilit a��l�m� olan "Zorluk Se�imi" panelindeki butonlar�n (�rn: Orta veya Zor Mod), kilitli veya a��lm�� durumlar�n�n ekran okuyucuya do�ru iletilmemesi ve g�rsel olarak aktifle�memesi hatas� (`updateDifficultyMenuLocks` eksikli�i) tamamen ��z�mlendi.
+### Eklenenler / Değiştirilenler:
+- ÇALIÅMAYAN BUTONLARIN ONARIMI (Bug Fix): Modül parçalanması işlemi sırasında atlanan/silinen menü butonlarının işlevleri geri getirildi.
+  - "Mağaza", "Başarılar", "Geri Bildirim" butonları tıklanabilir hale getirildi ve kendi sayfalarını açmaları sağlandı.
+  - Mağaza içerisindeki alışveriş butonlarına (Hata Koruması Satın Al ve Zaman Koruması Satın Al) yetersiz bakiye ve başarılı satın alma logic'leri eklendi.
+  - Geri bildirim sayfasındaki "Gönder" butonunun HTML formuyla olan bağı kopuk olduğu için form gönderememesi hatası giderildi. 
+- ARIA/ERİÅİLEBİLİRLİK GÜNCELLEMELERİ: Skor tablosu veya oyunda tamamlanan modlara göre kilit açılımı olan "Zorluk Seçimi" panelindeki butonların (Örn: Orta veya Zor Mod), kilitli veya açılmış durumlarının ekran okuyucuya doğru iletilmemesi ve görsel olarak aktifleşmemesi hatası (`updateDifficultyMenuLocks` eksikliği) tamamen çözümlendi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -976,8 +967,8 @@ Yeni Ozellikler:
 
 [v1.3] - 2026-03-19
 
-### Eklenenler / De�i�tirilenler:
-- HATA G�DERMES� (Bug Fix): Mod�llerin par�alanmas� s�ras�nda kaybolan ve ana men�lerde ok tu�lar�yla gezinmeyi sa�layan klavye mant��� onar�ld�. Bu sayede S, T ve Bo�luk gibi oyun i�i k�sayollar yeniden i�levsel hale getirildi. Ayr�ca, kullan�c� etkile�imi eksikli�i y�z�nden tetiklenemeyen seslerin (m�zik ve efektler) �al��mama sorunu tamamen ��z�ld�.
+### Eklenenler / Değiştirilenler:
+- HATA GİDERMESİ (Bug Fix): Modüllerin parçalanması sırasında kaybolan ve ana menülerde ok tuşlarıyla gezinmeyi sağlayan klavye mantığı onarıldı. Bu sayede S, T ve Boşluk gibi oyun içi kısayollar yeniden işlevsel hale getirildi. Ayrıca, kullanıcı etkileşimi eksikliği yüzünden tetiklenemeyen seslerin (müzik ve efektler) çalışmama sorunu tamamen çözüldü.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -987,15 +978,15 @@ Yeni Ozellikler:
 
 [v1.2] - 2026-03-18
 
-### Eklenenler / De�i�tirilenler:
-- Ana men�ye 'Geri Bildirim' butonu ve bildirim men�s� eklendi, Google Form g�nderimi aktifle�tirildi.
-- Geri Bildirim men�s� bilgisayarlar i�in Modal (Diyalog) g�r�n�m�ne kavu�turuldu.
-- OTOMAT�K SUNUCU MESAJI S�STEM�: push_update dosyas�yla at�lan Github commit g�ncellemelerinin oyun giri�ine (Intro arkas�na) oyuncuya g�sterilecek bir Modal (Diyalog) bilgilendirme penceresi eklendi! 
-- Oyuncu gelen yeni g�ncellemelerin veya �zelliklerin bilgisini ilk giri�inde (Ana Men�ye d��meden �nce) ekran okuyucusu e�li�inde duyacak / g�recek ve "Devam Et" dedi�inde cihaz�na kaydederek o versiyon i�in bir daha bu uyar�y� g�rmeyecektir.
-- ZORUNLU G�NCELLEME D�ZELTMES� (Hard Cache Fix): Oyuna gelen g�ncellemelerin veya engellenen s�r�mlerin, taray�c�da �nbellekte (cache) tak�l� kalan eski dosyalar y�z�nden okunamamas� ve eski s�r�mle oyuna devam edilebilmesi hatas� tamamen ��z�lm��t�r! Art�k sistem s�r�m� `index.html` �zerinden hardcode �ekilde denetliyor ve yeni s�r�m� an�nda belirleyerek k�r�lmaz bir sayfa yenileme ekran� ��kart�yor.
-- HATA G�DERMES� (Bug Fix): Geri Bildirim men�s�n� a�an ana ekrandaki butona bas�ld���nda arka planda men� ge�i� sisteminin (switchMenu) ��kmesine neden olan bir mant�k hatas� giderildi, form art�k p�r�zs�zce a��l�yor.
-- ER�Ş�LEB�L�RL�K (Uyumluluk): NVDA ve benzeri ekran okuyucularda "G�z Atma (Browse) Modu"nun oyunun klavye mekani�ini bozmas�/zorla�t�rmas� �zerine HTML ana yap�s�na (body) `role="application"` tan�mlamas� yap�larak, ekran okuyucunun zorunlu olarak s�rekli "Odak (Focus) Kipi"nde �al��mas� sa�land�. 
-- YAZIM DETAYLARI / KARAKTER D�ZELTMELER�: Oyun i�erisindeki ekran okuyucu asistan (Yard�m.js) metinlerindeki t�m kaym��, bozulmu� T�rk�e yap�lar� (�rn: \uFFFD hatas�) UTF-8 olarak d�zeltildi. Ayr�ca yaz�l�m bazl� "ent�ra, i�i, param par�a" gibi hatal� ifadeler tamamen "Enter'a, iyi, parampar�a" �eklinde TDK'ya ve sisteme uygun olarak temizlendi.
+### Eklenenler / Değiştirilenler:
+- Ana menüye 'Geri Bildirim' butonu ve bildirim menüsü eklendi, Google Form gönderimi aktifleştirildi.
+- Geri Bildirim menüsü bilgisayarlar için Modal (Diyalog) görünümüne kavuşturuldu.
+- OTOMATİK SUNUCU MESAJI SİSTEMİ: push_update dosyasıyla atılan Github commit güncellemelerinin oyun girişine (Intro arkasına) oyuncuya gösterilecek bir Modal (Diyalog) bilgilendirme penceresi eklendi! 
+- Oyuncu gelen yeni güncellemelerin veya özelliklerin bilgisini ilk girişinde (Ana Menüye düşmeden önce) ekran okuyucusu eşliğinde duyacak / görecek ve "Devam Et" dediğinde cihazına kaydederek o versiyon için bir daha bu uyarıyı görmeyecektir.
+- ZORUNLU GÜNCELLEME DÜZELTMESİ (Hard Cache Fix): Oyuna gelen güncellemelerin veya engellenen sürümlerin, tarayıcıda önbellekte (cache) takılı kalan eski dosyalar yüzünden okunamaması ve eski sürümle oyuna devam edilebilmesi hatası tamamen çözülmüştür! Artık sistem sürümü `index.html` üzerinden hardcode şekilde denetliyor ve yeni sürümü anında belirleyerek kırılmaz bir sayfa yenileme ekranı çıkartıyor.
+- HATA GİDERMESİ (Bug Fix): Geri Bildirim menüsünü açan ana ekrandaki butona basıldığında arka planda menü geçiş sisteminin (switchMenu) çökmesine neden olan bir mantık hatası giderildi, form artık pürüzsüzce açılıyor.
+- ERİÅİLEBİLİRLİK (Uyumluluk): NVDA ve benzeri ekran okuyucularda "Göz Atma (Browse) Modu"nun oyunun klavye mekaniğini bozması/zorlaştırması üzerine HTML ana yapısına (body) `role="application"` tanımlaması yapılarak, ekran okuyucunun zorunlu olarak sürekli "Odak (Focus) Kipi"nde çalışması sağlandı. 
+- YAZIM DETAYLARI / KARAKTER DÜZELTMELERİ: Oyun içerisindeki ekran okuyucu asistan (Yardım.js) metinlerindeki tüm kaymış, bozulmuş Türkçe yapıları (Örn: \uFFFD hatası) UTF-8 olarak düzeltildi. Ayrıca yazılım bazlı "entıra, iği, param parça" gibi hatalı ifadeler tamamen "Enter'a, iyi, paramparça" şeklinde TDK'ya ve sisteme uygun olarak temizlendi.
 
 [v0.97.4.45] - 26.05.2026
 
@@ -1005,13 +996,13 @@ Yeni Ozellikler:
 
 [v1.0.1 Beta] - 2026-03-11
 
-### Eklenenler / De�i�tirilenler:
-- Ana men� ses navigasyon sistemi tamamen yenilendi.
-- 3D Ses Da��l�m� (Stereo Panner): Men� seslerinin soldan sa�a do�ru bir yolculuk yapmas� sa�land�. Men�n�n ilk butonunda sadece sol hoparl�rden, alt seviyelere do�ru inildik�e sol ve sa� ve en sonda sadece sa� hoparl�r y�nde ses vermesi sa�land�.  (Not: Bu efekt Web Audio API g�venlik �nlemleri gere�i file:// protok�l�nde �al��maz hale getirilmi�tir, sadece sunucu �zerinde �al���r.)
-- Ana Men� Navigasyon Tu�lar�: Men�deki butonlar aras� dola��mlar i�in yukar�-a�a�� (ArrowUp ve ArrowDown) yerine art�k sol-sa� (ArrowLeft ve ArrowRight) ok tu�lar� tan�mlanm��t�r. 
-- M�zik Ses Kontrol� (Volume): PageUp ve PageDown tu�lar�yla ayarlanan as�l men� arka plan m�zi�i ses art��/azalma ivmesi %10 (0.1)'luk hacimler yerine %1 (0.01)'lik kademelere ayarland�. 
-- Ses Spam Korumas�: Sadece PageUp ve PageDown harici di�er tu�larda bas�l� tutma engellendi, tekil at�� yap�lmas� sa�land�. Sesi tamamen k�smak/art�rmak i�in bas�l� tutulabilir. 
-- Telefon (Web Audio Mobile Touchstart) i�in yaz�lan ek olaylar geri �ekilerek kod stabil masa�st� s�r�m�ne indirgendi. 
+### Eklenenler / Değiştirilenler:
+- Ana menü ses navigasyon sistemi tamamen yenilendi.
+- 3D Ses Dağılımı (Stereo Panner): Menü seslerinin soldan sağa doğru bir yolculuk yapması sağlandı. Menünün ilk butonunda sadece sol hoparlörden, alt seviyelere doğru inildikçe sol ve sağ ve en sonda sadece sağ hoparlör yönde ses vermesi sağlandı.  (Not: Bu efekt Web Audio API güvenlik önlemleri gereği file:// protokülünde çalışmaz hale getirilmiştir, sadece sunucu üzerinde çalışır.)
+- Ana Menü Navigasyon Tuşları: Menüdeki butonlar arası dolaşımlar için yukarı-aşağı (ArrowUp ve ArrowDown) yerine artık sol-sağ (ArrowLeft ve ArrowRight) ok tuşları tanımlanmıştır. 
+- Müzik Ses Kontrolü (Volume): PageUp ve PageDown tuşlarıyla ayarlanan asıl menü arka plan müziği ses artış/azalma ivmesi %10 (0.1)'luk hacimler yerine %1 (0.01)'lik kademelere ayarlandı. 
+- Ses Spam Koruması: Sadece PageUp ve PageDown harici diğer tuşlarda basılı tutma engellendi, tekil atış yapılması sağlandı. Sesi tamamen kısmak/artırmak için basılı tutulabilir. 
+- Telefon (Web Audio Mobile Touchstart) için yazılan ek olaylar geri çekilerek kod stabil masaüstü sürümüne indirgendi. 
 
 [v0.97.4.45] - 26.05.2026
 
@@ -1019,17 +1010,13 @@ Yeni Ozellikler:
 - Yeni Basarim Eklendi: Sadik Oyuncu. 3 gun boyunca hic Seri Dondurma kullanmadan oyuna girerek bu basarimi kazanabilirsiniz.
 - Guvenlik Katmani: Ana sayfa altyapisina dis mudahaleleri onlemek icin XSS ve Clickjacking guvenlik kalkanlari eklendi.
 
- [ v 0 . 9 7 . 4 . 4 1 ]   -   2 5 . 0 5 . 2 0 2 6 
- 
- Y e n i   O z e l l i k l e r   v e   H a t a   O n a r i m l a r i : 
- -   H a t a   A y i k l a m a   ( D e b u g )   M o d u   a k t i f   e d i l d i   ( C t r l + S h i f t + D ) . 
- -   S t o r y   m o d u n d a k i   s e s l e r i n   d i g e r   m o d l a r i   b o z m a s i   ( G l o b a l   V o l u m e )   h a t a s i   g i d e r i l d i . 
- -   E k r a n   o k u y u c u   u z u n   b i l d i r i m   k e s i l m e   h a t a s i   o n a r i l d i . 
- -   T a r a y i c i   p e r f o r m a n s i n i   e t k i l e y e n   M e m o r y   L e a k   h a t a l a r i   t e m i z l e n d i . 
- - - - - - - - - - - - - - - - - - - - - - - - - - - 
- 
- 
+[v0.97.4.41] - 25.05.2026
 
+Yeni Ozellikler ve Hata Onarimlari:
+- Hata Ayiklama (Debug) Modu aktif edildi (Ctrl+Shift+D).
+- Story modundaki seslerin diger modlari bozmasi (Global Volume) hatasi giderildi.
+- Ekran okuyucu uzun bildirim kesilme hatasi onarildi.
+- Tarayici performansini etkileyen Memory Leak hatalari temizlendi.
+--------------------------
 
-
-
+ਊਊ

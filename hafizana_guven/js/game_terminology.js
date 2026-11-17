@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     const btnTerminologyMain = document.getElementById('btn-terminology-main');
     const terminologyCategoriesContainer = document.getElementById('terminology-categories-container');
     const terminologyCategoriesBackBtn = document.getElementById('terminology-categories-back-btn');
@@ -93,9 +93,9 @@
     // Category Button Click Listeners
     const categoryButtons = document.querySelectorAll('.btn-category');
     categoryButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', () => {
             if (window.menuEnterSound) window.menuEnterSound.play();
-            currentCategoryFilter = e.target.getAttribute('data-category');
+            currentCategoryFilter = btn.getAttribute('data-category') || "Tümü";
             renderTerminology();
             
             // Set header title based on category
@@ -124,6 +124,8 @@
         });
     }
 
+    let seenLearnTermsSession = new Set();
+
     function showLearningCard(index) {
         if (!filteredMusicTerminology || filteredMusicTerminology.length === 0) return;
         
@@ -131,6 +133,13 @@
         learningCardTerm.textContent = item.term;
         learningCardMeaning.textContent = item.meaning;
         learningCardCategory.textContent = `Kategori: ${item.category}`;
+
+        if (item && item.term && !seenLearnTermsSession.has(item.term)) {
+            seenLearnTermsSession.add(item.term);
+            let learnCount = (parseInt(localStorage.getItem('hafizaGuvenTermLearnCount'), 10) || 0) + 1;
+            localStorage.setItem('hafizaGuvenTermLearnCount', learnCount);
+            if (window.checkAllAchievements) window.checkAllAchievements();
+        }
 
         // Screen reader announcement
         const announcement = `${item.term}. Anlamı: ${item.meaning}.`;
@@ -215,6 +224,8 @@
     let openedCardsCount = 0;
     let selectedCards = [];
     let matchedPairs = 0;
+    let examMistakes = 0;
+    let consecutiveWrongMatches = 0;
 
     if (btnTerminologyExam && terminologyExamContainer) {
         btnTerminologyExam.addEventListener('click', () => {
@@ -249,6 +260,8 @@
         openedCardsCount = 0;
         selectedCards = [];
         matchedPairs = 0;
+        examMistakes = 0;
+        consecutiveWrongMatches = 0;
         examFeedbackEl.textContent = "";
         examStatusBar.textContent = "Kartları açarak ezberleyin...";
         btnTerminologyReady.style.display = 'none';
@@ -362,6 +375,7 @@
 
         if (c1.id === c2.id && c1.type !== c2.type) {
             // Match!
+            consecutiveWrongMatches = 0;
             examFeedbackEl.textContent = "Doğru Eşleşme!";
             examFeedbackEl.style.color = '#2a9d8f';
             if (window.successSound) window.successSound.play();
@@ -377,6 +391,11 @@
                 
                 if (matchedPairs === 4) {
                     examStatusBar.textContent = "Tebrikler! Tüm kartları eşleştirdiniz.";
+                    if (examMistakes === 0) {
+                        let fullCnt = (parseInt(localStorage.getItem('hafizaGuvenTermFullScore'), 10) || 0) + 1;
+                        localStorage.setItem('hafizaGuvenTermFullScore', fullCnt);
+                        if (window.checkAllAchievements) window.checkAllAchievements();
+                    }
                     if (window.successSound) window.successSound.play();
                     if (window.announceToScreenReader) window.announceToScreenReader("Tebrikler, oyunu başarıyla tamamladınız.");
                     setTimeout(() => {
@@ -387,9 +406,15 @@
 
         } else {
             // Wrong
+            examMistakes++;
+            consecutiveWrongMatches++;
+            if (consecutiveWrongMatches >= 3) {
+                localStorage.setItem('ach_secret_clumsy', 'true');
+                if (window.checkAllAchievements) window.checkAllAchievements();
+            }
             examFeedbackEl.textContent = "Yanlış Eşleşme!";
             examFeedbackEl.style.color = '#e76f51';
-            if (window.errorSound) window.errorSound.play();
+            if (window.wrongSound) window.wrongSound.play();
             if (window.announceToScreenReader) window.announceToScreenReader("Yanlış eşleşme. Kartlar kapanıyor.");
             
             setTimeout(() => {

@@ -1,4 +1,4 @@
-﻿// --- CANLI SOHBET SİSTEMİ ARAYÜZ MANTIÃ„ÂI ---
+// --- CANLI SOHBET SİSTEMİ ARAYÜZ MANTIĞI ---
 window.isChatOpen = false;
 
 // --- ANLIK BİLDİRİM (TOAST) FONKSİYONU ---
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: false });
 });
 
-// --- CANLI SOHBET SİSTEMİ VERİTABANI (FİREBASE) MANTIÃ„ÂI ---
+// --- CANLI SOHBET SİSTEMİ VERİTABANI (FİREBASE) MANTIĞI ---
 document.addEventListener('DOMContentLoaded', () => {
     const chatNicknameInput = document.getElementById('chat-nickname');
     const chatMessageInput = document.getElementById('chat-message-input');
@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     addLocalSystemMessage("DİKKAT: Global Wipe (Küresel Sıfırlama) Komutu çalıştırıldı! Tüm oyuncuların istatistikleri ve Firebase bulut yedekleri siliniyor...");
                 }
             } else if (command === '/saat' || command === '/zaman') {
-                addLocalSystemMessage("Ã…Âu anki cihaz saati: " + new Date().toLocaleTimeString('tr-TR'));
+                addLocalSystemMessage("Şu anki cihaz saati: " + new Date().toLocaleTimeString('tr-TR'));
             } else if (command === '/jeton' || command === '/bakiye') {
                 const totalTokensLocal = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 addLocalSystemMessage(`Cüzdanınızdaki mevcut bakiye: ${totalTokensLocal} jeton.`);
@@ -382,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         if (fb.nickname && fb.nickname.toLowerCase() === currentUser.toLowerCase()) {
                                             count++;
                                             biletFound = true;
-                                            addLocalSystemMessage(`Bilet #${count} | Durum: Geliştiriciye ulaştı, inceleniyor âÂÂ³ | Ã…Âikayetiniz: ${fb.message}`);
+                                            addLocalSystemMessage(`Bilet #${count} | Durum: Geliştiriciye ulaştı, inceleniyor ⏳ | Şikayetiniz: ${fb.message}`);
                                         }
                                     });
                                 }
@@ -396,13 +396,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                             let biletData = child.val();
                                             let mesaj = typeof biletData === 'string' ? biletData : (biletData.message || biletData.mesaj || "Tanımsız");
                                             
-                                            addLocalSystemMessage(`Bilet #${count} | Durum: Çözüldü âÅ“â€¦ (Otomatik silindi) | Geliştirici Yanıtı: ${mesaj}`);
+                                            addLocalSystemMessage(`Bilet #${count} | Durum: Çözüldü ✅ (Otomatik silindi) | Geliştirici Yanıtı: ${mesaj}`);
                                             child.ref.remove(); // Okunduğu için sil
                                         });
                                     }
                                     
                                     if (!biletFound) {
-                                        addLocalSystemMessage("Ã…Âu anda adınıza tanımlı açık veya yeni çözülmüş hiçbir bilet bulunamadı.");
+                                        addLocalSystemMessage("Şu anda adınıza tanımlı açık veya yeni çözülmüş hiçbir bilet bulunamadı.");
                                     } else {
                                         addLocalSystemMessage(`Toplam ${count} adet bilet-kayıt listelendi.`);
                                     }
@@ -595,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
             li.id = 'empty-chat-warning';
             li.classList.add('system-message');
             const srText = `<span style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Sistem mesajı: Bu sohbet kutusunda hiç mesaj yok. İlk mesajınızı göndermek için güzel bir zaman.</span>`;
-            li.innerHTML = `${srText}<div class="wp-bubble" aria-hidden="true" style="opacity: 0.8;">Bu sohbet kutusunda hiç mesaj yok.<br>İlk mesajınızı göndermek için güzel bir zaman. ğÅ¸â€˜â€¹</div>`;
+            li.innerHTML = `${srText}<div class="wp-bubble" aria-hidden="true" style="opacity: 0.8;">Bu sohbet kutusunda hiç mesaj yok.<br>İlk mesajınızı göndermek için güzel bir zaman. 👋</div>`;
             chatMessagesList.appendChild(li);
         }
     });
@@ -726,7 +726,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- GÖREV 1 Kaldırıldı (Tab yönetimi game.js'deki exception'lar ile yapılıyor) ---
 
-// --- ÖZEL MESAJLAÃ…ÂMA (PRIVATE CHAT) VE KULLANICI İÃ…ÂLEM MENÜSÜ ---
+// --- ÖZEL MESAJLAŞMA (PRIVATE CHAT) VE KULLANICI İŞLEM MENÜSÜ ---
 document.addEventListener('DOMContentLoaded', () => {
     const actionModal = document.getElementById('social-action-modal');
     const actionTitle = document.getElementById('social-action-title');
@@ -1002,7 +1002,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!window.isPrivateChatOpen || currentPrivateRecipient !== notif.from) {
                         if (window.startAdminAlert) window.startAdminAlert('message');
                         if (window.chatReceiveSound) window.chatReceiveSound.play();
-                        if (window.showToastNotification) window.showToastNotification(`ğÅ¸â€™Â¬ ${notif.from} size bir özel mesaj gönderdi.`);
+                        if (window.showToastNotification) window.showToastNotification(`💬 ${notif.from} size bir özel mesaj gönderdi.`);
                         if (window.announceToScreenReader) window.announceToScreenReader(`${notif.from} kullanıcısından yeni bir özel mesajınız var. Sosyal sekmesinden veya ona tıklayarak ulaşabilirsiniz.`);
                     }
                 }
@@ -1044,7 +1044,7 @@ window.addEventListener('online', () => {
     }
 });
 
-// --- NVDA İÇİN MESAJ KUYRUÃ„ÂU SİSTEMİ ---
+// --- NVDA İÇİN MESAJ KUYRUĞU SİSTEMİ ---
 if (!window.orijinalAnnounce) {
     window.orijinalAnnounce = window.announceToScreenReader;
     window.srMesajKuyrugu = [];

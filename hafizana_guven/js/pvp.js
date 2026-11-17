@@ -1,4 +1,4 @@
-﻿// pvp.js - 1v1 Çok Oyunculu Eşleştirme ve Oyun Motoru
+// pvp.js - 1v1 Çok Oyunculu Eşleştirme ve Oyun Motoru
 
 window.PvP = {
     matchId: null,
@@ -174,7 +174,7 @@ window.PvP = {
         });
     },
 
-    // MAÇI BAÅLAT BUTONU (Sadece Host basabilir)
+    // MAÇI BAŞLAT BUTONU (Sadece Host basabilir)
     startMatchManually: function() {
         if (!this.isHost || !this.matchId) return;
         
@@ -284,7 +284,7 @@ window.PvP = {
                 updates['status'] = 'waiting_for_client'; // Hala beklemedeyiz, host başlatacak
 
                 return matchNode.update(updates).then(() => {
-                    // İÅLEM BAÅARILI!
+                    // İŞLEM BAŞARILI!
                     // Not: pvp_queue'dan silmiyoruz ki 2., 3. kişiler de girebilsin. Host başlatırken silecek.
 
                     this.isSearching = false;
@@ -443,8 +443,12 @@ window.PvP = {
         }
 
         if (this.matchRef && !this.isBotMode) this.matchRef.off();
+        if (this.isHost && this.roomCode && !this.isBotMode) window.db.ref('pvp_queue/' + this.roomCode).remove();
         if (this.myQueueId && !this.isBotMode) window.db.ref('pvp_queue/' + this.myQueueId).remove();
 
+        this.roomCode = null;
+        this.fullSequence = null;
+        this.currentPvPTurn = 0;
         this.isBotMode = false;
         this.matchStarted = false;
 
@@ -528,7 +532,7 @@ window.PvP = {
         }, 3000);
     },
 
-    // BOTA KARÅI OYNA (YAPAY ZEKA) BAÅLANGICI
+    // BOTA KARŞI OYNA (YAPAY ZEKA) BAŞLANGICI
     startBotMatch: function () {
         let deviceId = localStorage.getItem('hafizaGuvenDeviceId') || 'guest_' + Date.now();
         let myName = window.currentChatUser || localStorage.getItem('chatUsername') || "Sen";
@@ -555,7 +559,7 @@ window.PvP = {
         let waitTime = Math.floor(Math.random() * 4000) + 12000;
 
         this.botQueueTimer = setTimeout(() => {
-            if (!this.isSearching) return; // Kullanıcı beklerken odayı terkettiyse işlemi kes
+            if (!this.isSearching) return; // Kullanıcı beklerken odayı terk ettiyse işlemi kes
 
             this.isSearching = false;
             this.matchId = 'bot_match_' + deviceId + '_' + Date.now();
@@ -588,7 +592,7 @@ window.PvP = {
 
             // %15 İhtimalle Bot Hata Yapar (Kafası Karışır / Yavaşlar)
             if (Math.random() < 0.15) {
-                // Åaşkınlık yaşasın, puanı alamasın, ancak bir süre sonra toparlanıp sonraki tura geçsin.
+                // Şaşkınlık yaşasın, puanı alamasın, ancak bir süre sonra toparlanıp sonraki tura geçsin.
                 setTimeout(() => { if (window.gameIsActive) this.simulateBotTurn(turnIndex + 1); }, 2500);
                 return;
             }
@@ -622,6 +626,8 @@ window.PvP = {
         window.isComputerPlaying = true;
         window.gameSequence = [];
         window.playerSequence = [];
+        this.fullSequence = null;
+        this.currentPvPTurn = 0;
         this.matchStarted = true;
 
         if (window.bgMusic && window.bgMusic.playing()) {
@@ -948,6 +954,7 @@ window.PvP = {
             msg += `Teselli Ödülü: ${reward} Hafıza Jetonu kazandın.`;
         }
 
+        if (window.checkAllAchievements) window.checkAllAchievements();
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
 
         setTimeout(() => {
@@ -956,12 +963,15 @@ window.PvP = {
 
             if (window.endMainGame) window.endMainGame(true, isWinner, false);
 
-            // Veritabanı Åişmesini (Database Spam) Engellemek İçin Bot Maçlarını Sil
+            // Veritabanı Şişmesini (Database Spam) Engellemek İçin Bot Maçlarını Sil
             if (this.isBotMode && this.matchId) {
                 window.db.ref('matches/' + this.matchId).remove();
             }
 
             this.matchId = null; // Sıfırla
+            this.roomCode = null;
+            this.fullSequence = null;
+            this.currentPvPTurn = 0;
             this.isBotMode = false;
             this.gameEndingBlock = false;
             this.matchStarted = false;

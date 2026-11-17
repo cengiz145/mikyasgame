@@ -1,4 +1,4 @@
-﻿// game.js - Ana Oyun Döngüsü ve Motor İşlevleri
+// game.js - Ana Oyun Döngüsü ve Motor İşlevleri
 
 window.hgfzZamanlayici = {
     timeouts: new Set(),
@@ -35,21 +35,20 @@ window.sEscapeHTML = function(str) {
 };
 
 
-window.DEBUG_MODE = true;
-try { localStorage.setItem('hafizaGuvenDebugMode', 'true'); } catch(e) {}
+window.DEBUG_MODE = localStorage.getItem('hafizaGuvenDebugMode') === 'true';
 
 // Hata Ayıklama & Teşhis Yardımcısı
 window.hataAyiklama = {
     aktif: true,
     durum: function() {
         const rapor = {
-            surum: window.UYGULAMA_SURUMU || "0.98.0.1",
+            surum: window.UYGULAMA_SURUMU || "0.98.1.5",
             jetonlar: localStorage.getItem('hafizaGuvenTotalTokens') || "0",
             xp: localStorage.getItem('hafizaGuvenXP') || "0",
             rutbe: localStorage.getItem('hafizaGuvenRank') || "Çaylak",
             hataKorumasi: localStorage.getItem('hafizaGuvenHataKorumasi') || "0",
             zamanKorumasi: localStorage.getItem('hafizaGuvenZamanKorumasi') || "0",
-            seciliEnstruman: localStorage.getItem('hafizaGuvenSelectedInstrument') || "Piyano (Varsayılan)",
+            seciliEnstruman: localStorage.getItem('hafizaGuvenInstrument') || "piano",
             acikBasarimSayisi: Object.keys(JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || '{}')).length,
             toplamBasarimSayisi: window.achievementsList ? window.achievementsList.length : 0,
             sesDurumu: (typeof Howler !== 'undefined') ? "Howler.js Aktif" : "Howler.js Yüklenmedi"
@@ -584,8 +583,8 @@ window.startMainGame = function (difficulty = 'easy') {
 
                 if (window.gameTimer <= 0) {
                     let zkLocal = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
-                  window.hgShieldUsed = true;
                     if (zkLocal > 0) {
+                        window.hgShieldUsed = true;
                         zkLocal--;
                         window.gameTimer = 15;
                         window.hasWarned20 = false;
@@ -704,6 +703,7 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
     window.gameIsActive = false;
     if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
     clearInterval(window.gameInterval);
+    if (window.rhythmState && window.rhythmState.intervalId) clearInterval(window.rhythmState.intervalId);
     if (window.mobileExitBtnTimeout) clearTimeout(window.mobileExitBtnTimeout);
     if (window.replayBtnTimeout) clearTimeout(window.replayBtnTimeout);
 
@@ -793,8 +793,10 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
             window.gameModes[window.activeDifficulty].completionCount += 1;
         }
         
-        let ts = parseInt(localStorage.getItem('hafizaGuvenLifetimeScore')) || 0;
-        ts += window.score;
+        let ts = parseInt(localStorage.getItem('hafizaGuvenLifetimeScore'), 10);
+        if (isNaN(ts) || ts < 0) ts = 0;
+        let gainedScore = Number(window.sessionTokens) || (Number(window.gameScore) * 10) || 0;
+        ts += gainedScore;
         localStorage.setItem('hafizaGuvenLifetimeScore', ts);
 
         if (window.gameMistakes === 0) {
@@ -816,12 +818,12 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
         baseMessage = `Oyundan çıkıldı.`;
     }
 
-    endMessage = `${baseMessage} Bu oyunda toplam ${window.sessionTokens} jeton kazandınız${eventMessage}. Toplam jetonunuz ${totalTokens}. Ana menüye dönmek için entır tuşuna basın.`;
+    endMessage = `${baseMessage} Bu oyunda toplam ${window.sessionTokens} jeton kazandınız${eventMessage}. Toplam jetonunuz ${totalTokens}. Ana menüye dönmek için Enter tuşuna basın.`;
 
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
         gameStatus.style.display = 'block';
-        gameStatus.textContent = endMessage;
+        gameStatus.textContent = window.localizeText ? window.localizeText(endMessage) : endMessage;
     }
 
     if (window.sessionTokens > 0) {
@@ -1006,12 +1008,13 @@ window.handleGameInput = function (key) {
 
         let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
         if (hk > 0) {
+            window.hgShieldUsed = true;
             hk--;
             localStorage.setItem('hafizaGuvenHataKorumasi', hk);
 
             if (window.wrongSound) window.wrongSound.play();
             const gameStatus = document.getElementById('game-status-text');
-            if (gameStatus) gameStatus.textContent = "Hata koruması kullanıldı! Ceza Yok. Dizi tekrar çalınıyor.";
+            if (gameStatus) gameStatus.textContent = "Hata koruması kullanıldı! Ceza yok. Dizi tekrar çalınıyor.";
 
             if (window.announceToScreenReader) window.announceToScreenReader("Hata koruması kullanıldı! Hak veya süre kaybı yok. Tekrar deniyoruz.");
             window.playerInputIndex = 0;
@@ -1024,11 +1027,13 @@ window.handleGameInput = function (key) {
             if (window.wrongSound) window.wrongSound.play();
             window.gameTimer -= 5;
             window.gameMistakes += 1;
+            let totalMistakesAll = (parseInt(localStorage.getItem('hafizaGuvenTotalMistakesAllTime'), 10) || 0) + 1;
+            localStorage.setItem('hafizaGuvenTotalMistakesAllTime', totalMistakesAll);
             window.hgConsecutiveMistakes = (window.hgConsecutiveMistakes || 0) + 1;
             if (window.hgConsecutiveMistakes >= 3) {
                 localStorage.setItem('ach_secret_clumsy', 'true');
-                if (window.checkAllAchievements) window.checkAllAchievements();
             }
+            if (window.checkAllAchievements) window.checkAllAchievements();
             window.updateGameUI();
 
             const gameStatus = document.getElementById('game-status-text');
@@ -1038,6 +1043,7 @@ window.handleGameInput = function (key) {
             if (window.gameTimer <= 0) {
                 let zkLocal = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
                 if (zkLocal > 0) {
+                    window.hgShieldUsed = true;
                     zkLocal--;
                     window.gameTimer = 15;
                     window.hasWarned20 = false;
@@ -1253,15 +1259,6 @@ window.handlePracticeInput = function(key) {
         mobileReplayBtn.addEventListener('click', () => {
             if (window.gameIsActive && !window.isComputerPlaying && window.gameSequence.length > 0) {
                 if (window.announceToScreenReader) window.announceToScreenReader("Dizi tekrar ediliyor. Saniye eksi bir.");
-                if (isUserExit) {
-                    if (window.gameBGM && window.gameBGM.playing()) window.gameBGM.stop();
-                    window.updateGameUI();
-                    // Oyuncu kendi çıkarsa Ana Menü müziğini geri başlat
-                    if (window.bgMusic && !window.bgMusic.playing()) {
-                        window.bgMusic.play();
-                    }
-                    return;
-                }
                 window.gameTimer = Math.max(0, window.gameTimer - 1);
                 window.updateGameUI();
                 window.playerInputIndex = 0;
@@ -1851,6 +1848,7 @@ window.rhythmState = {
     bpm: 60,
     level: 1,
     successes: 0,
+    mistakes: 0,
     sequence: [],
     playerIndex: 0,
     beatsPerMeasure: 4,
@@ -1859,15 +1857,65 @@ window.rhythmState = {
     intervalId: null
 };
 
+window.updateRhythmHUD = function() {
+    const scoreDisplay = document.getElementById('game-score-display');
+    const timerDisplay = document.getElementById('game-timer-display');
+    const livesDisplay = document.getElementById('game-lives-display');
+    if (scoreDisplay) scoreDisplay.textContent = `Seviye: ${window.rhythmState.level}`;
+    if (timerDisplay) timerDisplay.textContent = `BPM: ${window.rhythmState.bpm}`;
+    if (livesDisplay) livesDisplay.textContent = `Hak: ${Math.max(0, 3 - (window.rhythmState.mistakes || 0))}`;
+};
+
 window.startRhythmMode = function() {
     window.activeDifficulty = 'rhythm_mode';
+    window.isStarted = true;
+    window.isStarting = false;
+    window.isGameEnding = false;
     window.gameIsActive = true;
     window.isComputerPlaying = true;
     window.gameTimer = 0; // Heartbeat Monitor'u devre dışı bırakmak için
+    window.sessionTokens = 0;
+    window.gameScore = 0;
+    window.gameMistakes = 0;
+
+    if (window.rhythmState.intervalId) {
+        clearInterval(window.rhythmState.intervalId);
+        window.rhythmState.intervalId = null;
+    }
+    window.rhythmState.bpm = 60;
+    window.rhythmState.level = 1;
+    window.rhythmState.successes = 0;
+    window.rhythmState.mistakes = 0;
+    window.rhythmState.sequence = [];
+    window.rhythmState.playerIndex = 0;
     
     if (window.bgMusic && window.bgMusic.playing()) {
         window.bgMusic.pause();
     }
+    if (window.music60Sound && window.music60Sound.playing()) {
+        window.music60Sound.stop();
+    }
+
+    const mobileReplay = document.getElementById('mobile-replay-btn');
+    if (mobileReplay) mobileReplay.style.display = 'none';
+
+    const mobileExitBtn = document.getElementById('mobile-game-back-btn');
+    if (mobileExitBtn) {
+        mobileExitBtn.style.display = 'none';
+        mobileExitBtn.setAttribute('aria-hidden', 'true');
+    }
+    if (window.mobileExitBtnTimeout) clearTimeout(window.mobileExitBtnTimeout);
+    window.mobileExitBtnTimeout = window.hgfzZamanlayici.setTimeout(() => {
+        if (window.currentActiveMenu === 'game' && window.gameIsActive) {
+            if (mobileExitBtn) {
+                mobileExitBtn.style.display = 'block';
+                mobileExitBtn.removeAttribute('aria-hidden');
+            }
+        }
+    }, 10000);
+
+    window.updateRhythmHUD();
+    if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
     
     window.playRhythmComputerTurn();
 };
@@ -1946,6 +1994,7 @@ window.playRhythmComputerTurn = function() {
     }
     
     window.rhythmState.tickMap = tickToNoteMap;
+    if (window.updateRhythmHUD) window.updateRhythmHUD();
     
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
@@ -1988,7 +2037,11 @@ window.rhythmPlayerFailed = function(reason) {
     const gameStatus = document.getElementById('game-status-text');
     
     if (window.wrongSound) window.wrongSound.play();
-    window.rhythmState.mistakes++;
+    window.rhythmState.mistakes = (window.rhythmState.mistakes || 0) + 1;
+    let totalMistakesAll = (parseInt(localStorage.getItem('hafizaGuvenTotalMistakesAllTime'), 10) || 0) + 1;
+    localStorage.setItem('hafizaGuvenTotalMistakesAllTime', totalMistakesAll);
+    if (window.checkAllAchievements) window.checkAllAchievements();
+    if (window.updateRhythmHUD) window.updateRhythmHUD();
     
     if (window.rhythmState.mistakes >= 3) {
         let completedLevels = window.rhythmState.level - 1;
@@ -2000,7 +2053,7 @@ window.rhythmPlayerFailed = function(reason) {
         if (window.announceToScreenReader) window.announceToScreenReader(reason + ` Kalan hakkınız ${3 - window.rhythmState.mistakes}.`);
         
         // Hata yaptiginda durumu gormesi ve hazirlanmasi icin 1.5 saniye bekle
-        setTimeout(() => { window.playRhythmComputerTurn(); }, 1500);
+        setTimeout(() => { if (window.gameIsActive) window.playRhythmComputerTurn(); }, 1500);
     }
 };
 
@@ -2020,7 +2073,9 @@ window.rhythmPlayerSucceeded = function() {
             window.gameModes.rhythm_mode.completionCount = window.rhythmState.level;
             try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e){}
         }
+        if (window.checkAllAchievements) window.checkAllAchievements();
     }
+    if (window.updateRhythmHUD) window.updateRhythmHUD();
     
     // Aninda siradaki bilgisayar turn'unu baslat, bekleme yok!
     window.playRhythmComputerTurn();
