@@ -3799,11 +3799,17 @@ const Game = {
             canAccelerate = false;
         }
 
-        // Kapılar, rampa veya imdat çekiliyken gaza basılırsa sürücüye sesli ikaz ver
+        // Kapılar, rampa veya imdat çekiliyken gaza basılırsa sürücüye sesli ikaz ver + Akıllı Yolcu Farkındalığı!
         if (!canAccelerate && (this.keys.w || this.keys.arrowup)) {
             const now = performance.now();
             if (!this.lastInterlockWarnTime || now - this.lastInterlockWarnTime > 3500) {
                 this.lastInterlockWarnTime = now;
+                const lockType = (this.frontDoorOpen || this.rearDoorOpen)
+                    ? 'doors'
+                    : (this.isRampDeployed ? 'ramp' : (this.isHandbrakeOn ? 'handbrake' : 'luggage'));
+                const humanHandled = (lockType !== 'luggage' && typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onInterlockGasAttempt === 'function')
+                    ? window.HumanNpcVoices.onInterlockGasAttempt(lockType, this.passengersOnBoard)
+                    : false;
                 const reason = (this.frontDoorOpen || this.rearDoorOpen) 
                     ? "Kapılar açıkken emniyet kilidi devrededir, gaz verilemez."
                     : (this.isRampDeployed
@@ -3811,7 +3817,7 @@ const Game = {
                         : (this.isHandbrakeOn
                             ? "İmdat park freni çekili. Kalkış yapmak için Shift ve Boşluk tuşlarına basarak imdatı indiriniz."
                             : "Bagaj kapakları açıkken gaz verilemez."));
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(reason);
+                if (!humanHandled && typeof audio !== 'undefined' && audio.speak) audio.speak(reason);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛑 Emniyet Kilidi: " + reason, "warning");
             }
         }
@@ -3828,7 +3834,10 @@ const Game = {
                     const now = performance.now();
                     if (!this.lastEngineOffWarnTime || now - this.lastEngineOffWarnTime > 4000) {
                         this.lastEngineOffWarnTime = now;
-                        if (typeof audio.speak === 'function') audio.speak("Motor kapalı. Boşluk tuşuna basarak motoru çalıştırınız.");
+                        const humanEngineWarn = (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onInterlockGasAttempt === 'function')
+                            ? window.HumanNpcVoices.onInterlockGasAttempt('engine_off', this.passengersOnBoard)
+                            : false;
+                        if (!humanEngineWarn && typeof audio.speak === 'function') audio.speak("Motor kapalı. Boşluk tuşuna basarak motoru çalıştırınız.");
                     }
                 }
             } else {
@@ -4326,7 +4335,10 @@ const Game = {
                         audio.stopEngine();
                     }
                     const stallMsg = "Yakıtınız tamamen tükendi! Motor durdu. İlerlemek için Tesis (J) menüsünden veya çekici yardımıyla yakıt alınız.";
-                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(stallMsg);
+                    const humanFuelRage = (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onOutOfFuelStall === 'function')
+                        ? window.HumanNpcVoices.onOutOfFuelStall(this.passengersOnBoard)
+                        : false;
+                    if (!humanFuelRage && typeof audio !== 'undefined' && audio.speak) audio.speak(stallMsg);
                     if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⚠️ Yakıt Bitti! Motor Durdu", "error");
                 }
             } // 3D Ses uzayı için ilerleme kaydı
@@ -5176,7 +5188,9 @@ const Game = {
         if (isFinalStop) {
             setTimeout(() => {
                 const goodbyeMsg = "Yolcular: 'Eline sağlık kaptan, çok rahat bir seferdi. Hayırlı günler.'";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(goodbyeMsg);
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.canSpeakInCabin())) {
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(goodbyeMsg);
+                }
                 if (window.voiceAssistant && window.voiceAssistant.isCopilotEnabled) {
                     setTimeout(() => {
                         if (typeof audio !== 'undefined' && audio.speak) {
@@ -5187,16 +5201,18 @@ const Game = {
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("👋 " + goodbyeMsg, "info");
             }, 1200);
         } else if (this.clockMinutes >= 390 && this.clockMinutes <= 510) {
-            // Sabah 06:30 - 08:30 arası
-            const morningGreetings = [
-                "Günaydın kaptanım, hayırlı işler.",
-                "Kolay gelsin kaptan, hayırlı sabahlar.",
-                "Günaydın, iyi görevler kaptan."
-            ];
-            const randGreet = morningGreetings[Math.floor(Math.random() * morningGreetings.length)];
-            setTimeout(() => {
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(randGreet);
-            }, 800);
+            // Sabah 06:30 - 08:30 arası (Canlı insan sesi aktifse robotik TTS susar, gerçek insan günaydın der!)
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.canSpeakInCabin())) {
+                const morningGreetings = [
+                    "Günaydın kaptanım, hayırlı işler.",
+                    "Kolay gelsin kaptan, hayırlı sabahlar.",
+                    "Günaydın, iyi görevler kaptan."
+                ];
+                const randGreet = morningGreetings[Math.floor(Math.random() * morningGreetings.length)];
+                setTimeout(() => {
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(randGreet);
+                }, 800);
+            }
         }
 
         // stopData ve isFinalStop fonksiyon başında güvenle tanımlandı
@@ -5281,14 +5297,27 @@ const Game = {
             }
         }
         if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.syncStopArrival === 'function') {
-            window.HumanNpcVoices.syncStopArrival(alighting, this.passengersOnBoard, arrivalDelta);
+            window.HumanNpcVoices.syncStopArrival(alighting, this.passengersOnBoard, arrivalDelta, this.currentStopIndex, stopData ? stopData.name : '');
         }
         
-        // Tekerlekli sandalye yolcusu uyarısı
+        // Tekerlekli sandalye yolcusu uyarısı (Gerçek İnsan Sesli!)
         if (this.hasWheelchairPassengerAtStop) {
             const rampNotice = "Durağa yanaştınız. Durakta tekerlekli sandalyeli yolcu bekliyor. Rampayı açmak için U tuşuna basınız.";
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak(rampNotice);
+            const humanWheelchair = (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onWheelchairWaitingAtStop === 'function')
+                ? setTimeout(() => { if (!this.isDriving && !this.isRampDeployed) window.HumanNpcVoices.onWheelchairWaitingAtStop(); }, 1800)
+                : null;
+            if (!humanWheelchair && typeof audio !== 'undefined' && audio.speak) audio.speak(rampNotice);
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(rampNotice);
+        }
+
+        // Yağmurlu / Karlı havada durakta bekleyen yolculara ön kapıyı açmayı geciktirirsen dışarıdan cama vurup seslenirler!
+        if (this.rainDoorWaitTimer) clearTimeout(this.rainDoorWaitTimer);
+        if (!isTrainingEmpty && !isFinalStop && waiting > 0 && (this.weather === 'rainy' || this.weather === 'snowy')) {
+            this.rainDoorWaitTimer = setTimeout(() => {
+                if (!this.isDriving && !this.frontDoorOpen && typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onRainStopWaitingForDoor === 'function') {
+                    window.HumanNpcVoices.onRainStopWaitingForDoor();
+                }
+            }, 6200);
         }
 
         this.rampXPAwardedThisStop = false;

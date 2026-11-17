@@ -1272,6 +1272,42 @@ const SoundGallery = {
             specs: "ElevenLabs v4 Gözünden Yaş Gelerek Kahkaha Krizi + Q İkaz Tepkisi",
             desc: "Telefonda arkadaşına kapıya sıkışan çantayı anlatırken nefesi kesilip katıla katıla gülen yolcu (Seferde Q tuşuyla susturulunca gülmesini zor tutarak telefonu kapatır!).",
             playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playWheezeLaughPhoneDrama) window.HumanNpcVoices.playWheezeLaughPhoneDrama("f", true); }
+        },
+        {
+            id: "human_deniz_wheeze_laugh",
+            category: "human",
+            icon: "🤣",
+            title: "Atarlı Mahalle Ablası Deniz Katıla Katıla Kahkaha Krizi ('Pazar Arabası Fırladı!')",
+            specs: "rude_traffic_f1 Karakteri Deniz'in Dalağı Şişerek Kahkaha Atışı!",
+            desc: "Kırmızı ışıkta bağıran o meşhur atarlı ablanın telefonda koca herifin pazar arabasıyla yere kapaklanışını anlatırken karnına kramp girerek gülme krizi!",
+            playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playWheezeLaughPhoneDrama) window.HumanNpcVoices.playWheezeLaughPhoneDrama("deniz", true); }
+        },
+        {
+            id: "human_deniz_shutup_laugh",
+            category: "human",
+            icon: "🤭",
+            title: "Atarlı Mahalle Ablası Q İkaz Anonsu Sonrası Gülmesini Zor Tutuyor!",
+            specs: "Deniz Karakteri Kıkırdayarak Telefon Kapatma (deniz_shutup_laugh.mp3)",
+            desc: "Şoför Q tuşuyla ikaz anonsu geçince gülmesini tutamayıp 'Ay tamam be yemeyin adamı sustuk işte, kız kapat otobüsten atacak şimdi beni hahaha!' deyişi.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("deniz_shutup_laugh.mp3", { pan: 0.42, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_smart_fuel_overheat",
+            category: "human",
+            icon: "⛽",
+            title: "Akıllı Mekanik Farkındalık: Mazot Bitip Yolda Kalma & Motor Hararet Kokusu",
+            specs: "Canlı Motor Termodinamiği (105°C+) ve Yakıt Deposu Algılayıcısı",
+            desc: "Mazota bakmadan çıkıp yolda kaldığınızda veya motor hararet yapıp arka koltukların altı ısındığında yolcular durumu anında anlar!",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("smart_out_of_fuel.mp3", { pan: -0.35, volume: 1.0, force: true, interrupt: true, onend: () => { setTimeout(() => window.HumanNpcVoices.playClip("smart_engine_overheat.mp3", { pan: 0.52, volume: 0.96, force: true }), 350); } }); } }
+        },
+        {
+            id: "human_smart_rain_interlock",
+            category: "human",
+            icon: "🌧️",
+            title: "Akıllı Durak Zekası: Yağmurda Kapı Bekletme & Açık Rampa Uyarısı",
+            specs: "Hava Durumu + Engelli Rampası / El Freni / Kapı Kilidi Algılayıcısı",
+            desc: "Yağmurda durakta kapıyı açmayı geciktirirseniz veya rampayı/el frenini açık unutarak gaza basarsanız yolcular neyi unuttuğunuzu nokta atışı söyler!",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("smart_rain_open_door.mp3", { pan: 0.65, volume: 1.0, force: true, interrupt: true, onend: () => { setTimeout(() => window.HumanNpcVoices.playClip("smart_ramp_open_warn.mp3", { pan: 0.45, volume: 0.96, force: true }), 350); } }); } }
         }
     ],
 

@@ -279,12 +279,15 @@
                 game.busDamage.health = Math.max(0, (game.busDamage.health || 100) - (0.08 * chipWearMult * deltaTime));
             }
 
-            // Aşırı Hararet İkazı (106°C ve üzeri)
+            // Aşırı Hararet İkazı (105°C ve üzeri -> En arka koltuktaki yolcular yanık/sıcaklık hisseder!)
             const now = Date.now();
-            if (game.engineCoolantTemp >= 106.0 && (now - this.lastHighTempWarningTime > 15000)) {
+            if (game.engineCoolantTemp >= 105.0 && (now - this.lastHighTempWarningTime > 15000)) {
                 this.lastHighTempWarningTime = now;
                 const warnMsg = `Dikkat! Motor harareti ${Math.round(game.engineCoolantTemp)} dereceye ulaştı! Vitesi düşürün veya aracı rölantide soğutun.`;
-                if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(warnMsg);
+                const humanOverheat = (typeof window !== 'undefined' && window.HumanNpcVoices && typeof window.HumanNpcVoices.onEngineOverheatCabin === 'function')
+                    ? window.HumanNpcVoices.onEngineOverheatCabin(game.passengersOnBoard)
+                    : false;
+                if (!humanOverheat && typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(warnMsg);
                 if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("🚨 " + warnMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🚨 Yüksek Hararet İkazı (" + Math.round(game.engineCoolantTemp) + "°C)", "error");
             }
