@@ -549,16 +549,25 @@
                 clusteredCurves.push(this._finalizeCurveCluster(currentCluster, totalDistanceMeters, context));
             }
 
-            // Çok yakın veya zayıf olanları filtrele, maksimum 4-5 ana viraj seç
-            const validCurves = clusteredCurves.filter(c => c && c.distance > 80 && c.distance < totalDistanceMeters - 120);
+            // Çok yakın veya zayıf olanları filtrele; ardışık virajlar arasında en az 380m mesafe bırak ki yollar üst üste binmesin!
+            const rawValid = clusteredCurves.filter(c => c && c.distance > 180 && c.distance < totalDistanceMeters - 180);
+            rawValid.sort((a, b) => b.distance - a.distance);
 
-            if (validCurves.length === 0) {
-                return this.getCurvatureForCorridor(context.city, context.routeData, totalDistanceMeters, context);
+            const spacedCurves = [];
+            const maxAllowed = Math.min(3, Math.max(1, Math.floor(totalDistanceMeters / 700)));
+            for (let k = 0; k < rawValid.length && spacedCurves.length < maxAllowed; k++) {
+                const cand = rawValid[k];
+                const prevAdded = spacedCurves.length > 0 ? spacedCurves[spacedCurves.length - 1] : null;
+                if (!prevAdded || (prevAdded.distance - cand.distance) >= 380) {
+                    spacedCurves.push(cand);
+                }
             }
 
-            // Büyükten küçüğe sırala (game.js standardı: distance azaldıkça viraja yaklaşılır)
-            validCurves.sort((a, b) => b.distance - a.distance);
-            return validCurves.slice(0, 5);
+            if (spacedCurves.length === 0) {
+                return [];
+            }
+
+            return spacedCurves;
         },
 
         _finalizeCurveCluster: function(cluster, totalRouteDist, context) {
@@ -665,68 +674,110 @@
         },
 
         _findMatchingPass: function(lat, lon, context) {
-            // Şehir bazlı veya koridor adı bazlı kontrol
-            const city = (context && context.city) ? context.city.toLowerCase() : "";
-            const routeName = (context && context.routeData && context.routeData.name) ? context.routeData.name.toLowerCase() : "";
+            // Ünlü dağ geçitleri ve uçurum virajları YALNIZCA gerçekten o koridordan geçiliyorsa tetiklenir!
+            // Şehir içi cadde ve mahalle hatlarında "Uçmakdere Uçurum Virajları" vb. yanlış eşleşmeleri kesinlikle engeller.
+            const routeData = (context && context.routeData) ? context.routeData : null;
+            const routeName = routeData && routeData.name ? String(routeData.name).toLowerCase() : "";
+            const curStopName = (context && context.currentStop && context.currentStop.name) ? String(context.currentStop.name).toLowerCase() : "";
+            const prevStopName = (context && context.prevStop && context.prevStop.name) ? String(context.prevStop.name).toLowerCase() : "";
+            const combined = (routeName + " " + curStopName + " " + prevStopName);
+
+            const passKeywords = {
+                'bolu_dagi_s': ['bolu dağı', 'bolu tüneli', 'kaynaşlı', 'abant'],
+                'ganos_ucmakdere': ['uçmakdere', 'ganos', 'yeniköy yamaç'],
+                'istranca_orman': ['istranca', 'kıyıköy', 'vize', 'demirköy', 'yıldız dağları'],
+                'hereke_korfez': ['hereke', 'dilovası'],
+                'geyve_bogazi': ['geyve', 'pamukova', 'bilecik boğazı'],
+                'supurgelik_gecidi': ['süpürgelik', 'orhangazi'],
+                'derebasi_virajlari': ['derebaşı', 'soğanlı geçidi', 'd-915'],
+                'zigana_gecidi': ['zigana', 'torul', 'maçka']
+            };
 
             for (let pass of TURKEY_HIGHWAY_CURVES) {
-                const matchProvince = pass.provinces.some(p => p.toLowerCase() === city);
-                const matchName = routeName.includes(pass.id) || routeName.includes(pass.name.toLowerCase());
-                if (matchProvince || matchName) {
+                const pId = pass.id || '';
+                const pNameLow = String(pass.name || '').toLowerCase();
+                if (combined.includes(pId.replace(/_/g, ' ')) || combined.includes(pNameLow)) {
                     return pass;
+                }
+                const kwList = passKeywords[pId];
+                if (kwList && kwList.some(kw => combined.includes(kw))) {
+                    return pass;
+                }
+                // Diğer dağ geçitleri yalnızca şehirlerarası/dağ görevlerinde kendi özel geçit adı geçiyorsa eşleşir
+                if (!kwList && routeData && (routeData.isIntercity || (routeData.licenseLevel && routeData.licenseLevel >= 7))) {
+                    const firstWord = pNameLow.split(/\s+/)[0];
+                    if (firstWord && firstWord.length >= 5 && combined.includes(firstWord)) {
+                        return pass;
+                    }
                 }
             }
             return null;
         },
 
         _generateRealisticTurkishCurveName: function(context, dirText, advisorySpeed) {
-            const city = (context && context.city) ? context.city : "Karayolu";
-            const highwayPrefix = (advisorySpeed <= 40) ? "Dağ Rampası" : (advisorySpeed <= 55) ? "Devlet Karayolu" : "Ekspres Yolu";
-            return city + " " + highwayPrefix + " " + dirText;
+            const curStop = (context && context.currentStop && context.currentStop.name) ? String(context.currentStop.name) : "";
+            const routeData = (context && context.routeData) ? context.routeData : null;
+            const district = (routeData && routeData.district && routeData.district !== 'all') ? routeData.district : ((context && context.city) ? context.city : " Bulvar");
+            if (curStop) {
+                const shortStop = curStop.length > 28 ? curStop.substring(0, 28).trim() : curStop;
+                return shortStop + " Yaklaşımı (" + dirText + ")";
+            }
+            const roadKind = (routeData && routeData.isIntercity)
+                ? "Karayolu"
+                : ((advisorySpeed <= 45) ? "Cadde Kavşağı" : "Bulvarı");
+            return district + " " + roadKind + " (" + dirText + ")";
         },
 
         /**
-         * OSRM çevrimdışı olduğunda veya hiyerarşik modda Türkiye'nin gerçek coğrafyasına
-         * uygun otantik virajlar üretir.
+         * OSRM çevrimdışı olduğunda veya hiyerarşik modda güzergâha uygun temiz, çakışmasız viraj üretir.
          */
-        getCurvatureForCorridor: function(city = "Tekirdağ", routeData = null, legDistance = 2500, context = {}) {
-            const cityName = city || "Tekirdağ";
-            let matchedPass = TURKEY_HIGHWAY_CURVES.find(p => p.provinces.includes(cityName));
-            
-            if (!matchedPass) {
-                // Bölgesel yedek geçit
-                matchedPass = TURKEY_HIGHWAY_CURVES[Math.floor(Math.random() * TURKEY_HIGHWAY_CURVES.length)];
-            }
+        getCurvatureForCorridor: function(city = "Tekirdağ", routeData = null, legDistance = 1200, context = {}) {
+            const safeDist = Math.max(600, Number(legDistance) || 1200);
+            const fullCtx = Object.assign({}, context || {}, { city: city || "Tekirdağ", routeData: routeData });
+            const matchedPass = this._findMatchingPass(null, null, fullCtx);
 
             const turns = [];
-            const numTurns = Math.min(3, Math.max(1, Math.floor(legDistance / 900)));
-            let currentDist = legDistance;
+            // Kısa şehir içi durak aralarında en fazla 1 viraj, uzun koridorlarda en fazla 2 viraj (birbirine asla girmez!)
+            const numTurns = safeDist >= 2200 ? 2 : (safeDist >= 850 ? 1 : 0);
+            if (numTurns === 0) return turns;
+
+            const stepSpan = Math.floor((safeDist - 320) / (numTurns + 1));
 
             for (let i = 0; i < numTurns; i++) {
-                currentDist -= (450 + Math.random() * 400);
-                if (currentDist > 150) {
-                    const isRight = (i % 2 === 0);
-                    const dirText = isRight ? "sert sağa viraj" : "sert sola viraj";
-                    const radius = matchedPass ? matchedPass.radius : 75;
+                const turnRemainingDist = Math.max(220, safeDist - ((i + 1) * Math.max(380, stepSpan)));
+                if (turnRemainingDist > 200 && turnRemainingDist < safeDist - 180) {
+                    const seed = (context && typeof context.stopIndex === 'number') ? (context.stopIndex + i) : i;
+                    const isRight = (seed % 2 === 0);
+                    const dirText = matchedPass
+                        ? (isRight ? "sert sağa viraj" : "sert sola viraj")
+                        : (isRight ? "sağa cadde dönüşü" : "sola cadde dönüşü");
+                    const radius = matchedPass ? matchedPass.radius : 115;
                     const advisorySpeed = matchedPass ? matchedPass.advisorySpeed : 50;
-                    const curveIntensity = matchedPass ? matchedPass.intensity : 28;
-                    const curveName = matchedPass.name + " - " + (i + 1) + ". Kısım" + (dirText ? " (" + dirText + ")" : "");
+                    const curveIntensity = matchedPass ? matchedPass.intensity : 20;
+                    const curveName = matchedPass
+                        ? (matchedPass.name + " (" + dirText + ")")
+                        : this._generateRealisticTurkishCurveName(fullCtx, dirText, advisorySpeed);
+
+                    const leadDist = safeDist - turnRemainingDist;
+                    const milestones = [500, 250].filter(m => m < (leadDist - 50));
+                    milestones.push(0); // 0 = "Şimdi dönün" her zaman garantili!
+                    milestones.sort((a, b) => b - a);
 
                     turns.push({
-                        distance: currentDist,
+                        distance: turnRemainingDist,
                         name: curveName,
                         direction: dirText,
                         isRight: isRight,
                         radius: radius,
                         curveIntensity: curveIntensity,
                         advisorySpeed: advisorySpeed,
-                        requiredProgress: 95,
+                        requiredProgress: matchedPass ? 95 : 75,
                         currentProgress: 0,
-                        curveType: matchedPass ? matchedPass.curveType : 'orta_viraj',
-                        passSign: matchedPass ? matchedPass.passSign : ("⚠️ " + curveName.toUpperCase()),
-                        speechWarning: matchedPass ? matchedPass.speechWarning : (curveName + ". Tavsiye edilen hız " + advisorySpeed + " km/s."),
+                        curveType: matchedPass ? matchedPass.curveType : 'tatli_viraj',
+                        passSign: matchedPass ? matchedPass.passSign : ("↪️ " + curveName.toUpperCase() + " [" + advisorySpeed + " km/s]"),
+                        speechWarning: matchedPass ? matchedPass.speechWarning : ("Şimdi " + dirText + ". Tavsiye edilen hız " + advisorySpeed + " kilometre."),
                         pan: isRight ? 0.70 : -0.70,
-                        milestones: [500, 250, 0].filter(m => m < (legDistance - currentDist - 40)),
+                        milestones: milestones,
                         state: "approaching",
                         lastWarningTime: 0,
                         isRealTurkeyCurve: true
@@ -779,21 +830,20 @@
             let bodyRollDeg = rollDirection * Math.min(11, gForce * 16);
 
             // Direksiyonla virajı karşılama (counter-steer dengesi)
-            // Eğer sürücü doğru yöne direksiyon kırıyorsa savrulma hafifler
             let screechIntensity = 0;
             let comfortImpact = 0;
             let passengerState = 'normal';
 
             if (gForce > 0.45 || overspeedKmh > 22) {
                 screechIntensity = Math.min(1.0, (gForce - 0.45) * 2.5 + (overspeedKmh / 35));
-                comfortImpact = -1.2; // Konfor düşüşü
+                comfortImpact = -1.2;
                 passengerState = 'panic';
             } else if (gForce > 0.28 || overspeedKmh > 12) {
                 screechIntensity = 0.25;
                 comfortImpact = -0.4;
                 passengerState = 'murmur';
             } else if (speedKmh > 15 && overspeedKmh === 0) {
-                comfortImpact = 0.1; // Virajı temiz aldığı için ufak konfor ödülü
+                comfortImpact = 0.1;
                 passengerState = 'satisfied';
             }
 
@@ -809,88 +859,106 @@
         },
 
         /**
-         * GTFS veya Durak GPS koordinat dizisinden gerçek virajları ve dönüş açılarını çıkarır
+         * GTFS veya Durak GPS koordinat dizisinden YALNIZCA aktif durak etabının gerçek dönüş açısını çıkarır
+         * (Tüm hattın 50 durağını tek etaba yığıp yolları birbirine sokmaz!)
          */
-        extractCurvesFromStopCoordinates: function(stops, totalDistMeters = 2500, context = {}) {
+        extractCurvesFromStopCoordinates: function(stops, totalDistMeters = 1200, context = {}) {
+            const safeDist = Math.max(600, Number(totalDistMeters) || 1200);
             if (!stops || stops.length < 3) {
-                return this.getCurvatureForCorridor(context.city || "Tekirdağ", context.routeData, totalDistMeters, context);
+                return this.getCurvatureForCorridor(context.city || "Tekirdağ", context.routeData, safeDist, context);
             }
 
-            const validStops = stops.filter(s => (s.lat || s.stop_lat) && (s.lon || s.stop_lon));
-            if (validStops.length < 3) {
-                return this.getCurvatureForCorridor(context.city || "Tekirdağ", context.routeData, totalDistMeters, context);
+            // Sadece şu anki durak etabının (prev -> current -> next) açısını analiz et
+            let targetIdx = (context && typeof context.stopIndex === 'number') ? context.stopIndex : -1;
+            if (targetIdx < 0 && context && context.currentStop) {
+                targetIdx = stops.findIndex(s => s && s.name === context.currentStop.name);
+            }
+            if (targetIdx <= 0 || targetIdx >= stops.length - 1) {
+                targetIdx = 1;
             }
 
-            const extracted = [];
-            for (let i = 1; i < validStops.length - 1; i++) {
-                const sPrev = validStops[i - 1];
-                const sCur = validStops[i];
-                const sNext = validStops[i + 1];
+            const sPrev = stops[targetIdx - 1];
+            const sCur = stops[targetIdx];
+            const sNext = stops[targetIdx + 1];
 
-                const lat0 = sPrev.lat || sPrev.stop_lat;
-                const lon0 = sPrev.lon || sPrev.stop_lon;
-                const lat1 = sCur.lat || sCur.stop_lat;
-                const lon1 = sCur.lon || sCur.stop_lon;
-                const lat2 = sNext.lat || sNext.stop_lat;
-                const lon2 = sNext.lon || sNext.stop_lon;
+            const lat0 = sPrev && (sPrev.lat || sPrev.stop_lat);
+            const lon0 = sPrev && (sPrev.lon || sPrev.stop_lon);
+            const lat1 = sCur && (sCur.lat || sCur.stop_lat);
+            const lon1 = sCur && (sCur.lon || sCur.stop_lon);
+            const lat2 = sNext && (sNext.lat || sNext.stop_lat);
+            const lon2 = sNext && (sNext.lon || sNext.stop_lon);
 
-                // Bearing 1 ve Bearing 2
-                const y1 = Math.sin((lon1 - lon0) * Math.PI / 180) * Math.cos(lat1 * Math.PI / 180);
-                const x1 = Math.cos(lat0 * Math.PI / 180) * Math.sin(lat1 * Math.PI / 180) -
-                           Math.sin(lat0 * Math.PI / 180) * Math.cos(lat1 * Math.PI / 180) * Math.cos((lon1 - lon0) * Math.PI / 180);
-                const b1 = (Math.atan2(y1, x1) * 180 / Math.PI + 360) % 360;
-
-                const y2 = Math.sin((lon2 - lon1) * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180);
-                const x2 = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
-                           Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos((lon2 - lon1) * Math.PI / 180);
-                const b2 = (Math.atan2(y2, x2) * 180 / Math.PI + 360) % 360;
-
-                let diff = b2 - b1;
-                while (diff < -180) diff += 360;
-                while (diff > 180) diff -= 360;
-
-                const absAngle = Math.abs(diff);
-                if (absAngle >= 25) {
-                    const isRight = diff > 0;
-                    let advSpeed = 45;
-                    let intensity = 25;
-                    let typeName = isRight ? "Sağa Dönüş" : "Sola Dönüş";
-
-                    if (absAngle >= 80) {
-                        advSpeed = 30;
-                        intensity = 40;
-                        typeName = isRight ? "90 Derece Sert Sağa Dönüş" : "90 Derece Sert Sola Dönüş";
-                    } else if (absAngle >= 50) {
-                        advSpeed = 38;
-                        intensity = 32;
-                        typeName = isRight ? "Kavisli Sağa Viraj" : "Kavisli Sola Viraj";
-                    }
-
-                    const triggerDist = Math.round(totalDistMeters * (i / validStops.length));
-                    extracted.push({
-                        id: `gtfs_turn_${i}_${sCur.name || 'durak'}`,
-                        name: `${sCur.name || 'Kavşak'} ${typeName}`,
-                        direction: isRight ? "sağa" : "sola",
-                        isRight: isRight,
-                        advisorySpeed: advSpeed,
-                        curveIntensity: intensity,
-                        requiredProgress: 100,
-                        currentProgress: 0,
-                        state: "approaching",
-                        milestones: [300, 100, 0],
-                        lastWarningTime: 0,
-                        isRealTurkeyCurve: true,
-                        pan: isRight ? 0.70 : -0.70,
-                        speechWarning: `${typeName}. Tavsiye edilen hız ${advSpeed} kilometre.`,
-                        passSign: `📐 ${typeName} [${advSpeed} km/s]`
-                    });
-                }
+            if (!lat0 || !lon0 || !lat1 || !lon1 || !lat2 || !lon2) {
+                return this.getCurvatureForCorridor(context.city || "Tekirdağ", context.routeData, safeDist, context);
             }
 
-            if (extracted.length === 0) {
-                return this.getCurvatureForCorridor(context.city || "Tekirdağ", context.routeData, totalDistMeters, context);
+            const y1 = Math.sin((lon1 - lon0) * Math.PI / 180) * Math.cos(lat1 * Math.PI / 180);
+            const x1 = Math.cos(lat0 * Math.PI / 180) * Math.sin(lat1 * Math.PI / 180) -
+                       Math.sin(lat0 * Math.PI / 180) * Math.cos(lat1 * Math.PI / 180) * Math.cos((lon1 - lon0) * Math.PI / 180);
+            const b1 = (Math.atan2(y1, x1) * 180 / Math.PI + 360) % 360;
+
+            const y2 = Math.sin((lon2 - lon1) * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180);
+            const x2 = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
+                       Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos((lon2 - lon1) * Math.PI / 180);
+            const b2 = (Math.atan2(y2, x2) * 180 / Math.PI + 360) % 360;
+
+            let diff = b2 - b1;
+            while (diff < -180) diff += 360;
+            while (diff > 180) diff -= 360;
+
+            const absAngle = Math.abs(diff);
+            if (absAngle < 22) {
+                // Düz cadde etabı: gereksiz viraj uydurma, yolu temiz ve düz bırak
+                return [];
             }
-            return extracted;
+
+            const isRight = diff > 0;
+            let advSpeed = 50;
+            let intensity = 22;
+            let radius = 110;
+            let typeName = isRight ? "Sağa Cadde Dönüşü" : "Sola Cadde Dönüşü";
+
+            if (absAngle >= 80) {
+                advSpeed = 35;
+                intensity = 34;
+                radius = 55;
+                typeName = isRight ? "Kavşaktan Sağa Dönüş" : "Kavşaktan Sola Dönüş";
+            } else if (absAngle >= 45) {
+                advSpeed = 42;
+                intensity = 28;
+                radius = 80;
+                typeName = isRight ? "Kavisli Sağa Viraj" : "Kavisli Sola Viraj";
+            }
+
+            // Virajı etabın ortasına (~%45 kalan mesafe) yerleştir, durağa çok yakın olmasın
+            const triggerDist = Math.max(240, Math.min(safeDist - 220, Math.round(safeDist * 0.45)));
+            const leadDist = safeDist - triggerDist;
+            const milestones = [500, 250].filter(m => m < (leadDist - 50));
+            milestones.push(0);
+            milestones.sort((a, b) => b - a);
+
+            const stopLabel = (sCur && sCur.name) ? sCur.name : "Kavşak";
+
+            return [{
+                id: `gtfs_turn_${targetIdx}`,
+                distance: triggerDist,
+                name: `${stopLabel} ${typeName}`,
+                direction: isRight ? "sağa" : "sola",
+                isRight: isRight,
+                angleDelta: diff,
+                radius: radius,
+                advisorySpeed: advSpeed,
+                curveIntensity: intensity,
+                requiredProgress: 80,
+                currentProgress: 0,
+                state: "approaching",
+                milestones: milestones,
+                lastWarningTime: 0,
+                isRealTurkeyCurve: true,
+                pan: isRight ? 0.70 : -0.70,
+                speechWarning: `Şimdi ${isRight ? 'sağa' : 'sola'} dönün. Tavsiye edilen hız ${advSpeed} kilometre.`,
+                passSign: `📐 ${stopLabel.toUpperCase()} - ${typeName.toUpperCase()} [${advSpeed} km/s]`
+            }];
         },
 
         /**

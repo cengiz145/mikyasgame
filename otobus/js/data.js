@@ -12477,92 +12477,203 @@ let routesData = {};
 if (typeof window !== "undefined") window.routesData = routesData;
 if (typeof globalThis !== "undefined") globalThis.routesData = routesData;
 
+function setRouteAlias(aliasKey, routeObj) {
+    if (!aliasKey || !routeObj || typeof routesData === 'undefined') return;
+    if (routesData[aliasKey] === routeObj) return;
+    try {
+        Object.defineProperty(routesData, aliasKey, {
+            value: routeObj,
+            enumerable: false,
+            configurable: true,
+            writable: true
+        });
+    } catch (e) {
+        routesData[aliasKey] = routeObj;
+    }
+}
+
 // TEKİRDAĞ 11 İLÇE EKSİKSİZ BAĞLANTI AĞI (18 EKSPRES & BÖLGE HATTI)
 if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
     ilceRotalari["Tekirdağ"].forEach(r => {
         if (r && r.id && typeof routesData !== 'undefined') {
+            if (Array.isArray(r.stops) && r.stops.length > 0) {
+                if (!r.startStop) r.startStop = r.stops[0].name;
+                if (!r.endStop) r.endStop = r.stops[r.stops.length - 1].name;
+            }
             routesData[r.id] = r;
-            if (r.hatNo) routesData["hat_" + r.hatNo.toLowerCase().replace(/[^a-z0-9]/g, '_')] = r;
+            if (r.hatNo) {
+                const cleanAlias = "hat_" + r.hatNo.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                if (cleanAlias !== r.id) setRouteAlias(cleanAlias, r);
+            }
         }
     });
 }
 
-
-// Geriye dönük rota kimliği uyumluluğu (Alias desteği)
+// Geriye dönük rota kimliği uyumluluğu (Tekil & Kopyasız Alias desteği)
 if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
     const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26" || r.hatNo === "226");
-    if (r26) {
-        // Sadece routesData alias haritalamasi yapilir, ilceRotalari listesine cift kopya eklenmez
-        if (typeof routesData !== 'undefined') {
-            const r35 = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_35_saray_ici");
-            if (r35) {
-                routesData["hat_35_saray_ici"] = r35;
-                routesData["hat_35"] = r35;
-            }
-            const rSaray = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_saray_ekspres");
-            if (rSaray) routesData["hat_saray_ekspres"] = rSaray;
-            routesData["hat_226_suleymanpasa_saray"] = r26;
-            routesData["hat_26_suleymanpasa_saray"] = r26;
-            routesData["hat_226_suleymanpasa_velimese"] = r26;
-            routesData["hat_26_suleymanpasa_velimese"] = r26;
-            routesData["hat_226"] = r26;
-            routesData["hat_26"] = r26;
+    if (r26 && typeof routesData !== 'undefined') {
+        const r35 = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_35_saray_ici");
+        if (r35) {
+            setRouteAlias("hat_35_saray_ici", r35);
+            setRouteAlias("hat_35", r35);
         }
+        const rSaray = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_saray_ekspres");
+        if (rSaray) setRouteAlias("hat_saray_ekspres", rSaray);
+        setRouteAlias("hat_226_suleymanpasa_saray", r26);
+        setRouteAlias("hat_26_suleymanpasa_saray", r26);
+        setRouteAlias("hat_226_suleymanpasa_velimese", r26);
+        setRouteAlias("hat_26_suleymanpasa_velimese", r26);
+        setRouteAlias("hat_226", r26);
+        setRouteAlias("hat_26", r26);
     }
 }
 
 /* TEKULAŞ_ALL_LINES_INTEGRATION */
-// TEKİRDAĞ TEKULAŞ 183 HAT VE 3.913 GERÇEK DURAK ENTEGRASYONU
+// TEKİRDAĞ TEKULAŞ HAT VE DURAK VERİTABANI TEMİZLEME & İLÇE DOĞRULAMA MOTORU
 if (typeof window !== 'undefined' && window.tekulasHatVeritabani && Array.isArray(window.tekulasHatVeritabani)) {
+    // 1. Bozuk / yer tutucu ("İLK DURAK ➔ SON DURAK") GTFS kayıtlarını ayıkla ve ilçeleri düzelt
+    const cleanedTekulas = [];
+    window.tekulasHatVeritabani.forEach(route => {
+        if (!route || !Array.isArray(route.stops) || route.stops.length < 2) return;
+        const s0 = String(route.startStop || (route.stops[0] && route.stops[0].name) || '').trim();
+        const sEnd = String(route.endStop || (route.stops[route.stops.length - 1] && route.stops[route.stops.length - 1].name) || '').trim();
+        if (/^(İLK DURAK|SON DURAK)$/i.test(s0) || /^(İLK DURAK|SON DURAK)$/i.test(sEnd)) return;
+        if (route.stops.length <= 2 && s0 && s0 === sEnd) return;
+
+        // Yanlış sınıflandırılmış hatların gerçek ilçelerini ata
+        const id = route.id || '';
+        const rawUp = String((route.rawName || '') + ' ' + (route.name || '')).toUpperCase();
+
+        if (id.startsWith('tekulas_32_18t')) {
+            route.district = 'Çorlu';
+            route.originDistrict = 'Çorlu';
+            route.destDistrict = 'Çorlu';
+            route.isDistrict = false;
+            route.isCity = true;
+        } else if (id.startsWith('tekulas_44_44')) {
+            route.district = 'Marmaraereğlisi';
+            route.originDistrict = 'Marmaraereğlisi';
+            route.destDistrict = 'Marmaraereğlisi';
+            route.isDistrict = false;
+            route.isCity = true;
+        } else if (id.startsWith('tekulas_146_33a')) {
+            route.district = 'Çerkezköy';
+            route.originDistrict = 'Çerkezköy';
+            route.destDistrict = 'Çerkezköy';
+            route.isDistrict = false;
+            route.isCity = true;
+        } else if (id.startsWith('tekulas_42_42')) {
+            route.district = 'İlçeler Arası';
+            route.originDistrict = route.isReturn ? 'Süleymanpaşa' : 'Marmaraereğlisi';
+            route.destDistrict = route.isReturn ? 'Marmaraereğlisi' : 'Süleymanpaşa';
+            route.isDistrict = true;
+            route.isCity = false;
+        } else if (id.startsWith('tekulas_148_28_corlu') || id.startsWith('tekulas_36_36')) {
+            route.district = 'İlçeler Arası';
+            route.originDistrict = route.isReturn ? 'Süleymanpaşa' : 'Çorlu';
+            route.destDistrict = route.isReturn ? 'Çorlu' : 'Süleymanpaşa';
+            route.isDistrict = true;
+            route.isCity = false;
+        } else if (id.startsWith('tekulas_38_22')) {
+            route.district = 'İlçeler Arası';
+            route.originDistrict = route.isReturn ? 'Muratlı' : 'Çorlu';
+            route.destDistrict = route.isReturn ? 'Çorlu' : 'Muratlı';
+            route.isDistrict = true;
+            route.isCity = false;
+        } else if (id.startsWith('tekulas_47_47')) {
+            route.district = 'İlçeler Arası';
+            route.originDistrict = route.isReturn ? 'Çorlu' : 'Saray';
+            route.destDistrict = route.isReturn ? 'Saray' : 'Çorlu';
+            route.isDistrict = true;
+            route.isCity = false;
+        } else if (id.startsWith('tekulas_50_50')) {
+            route.district = 'İlçeler Arası';
+            route.originDistrict = route.isReturn ? 'Süleymanpaşa' : 'Hayrabolu';
+            route.destDistrict = route.isReturn ? 'Hayrabolu' : 'Süleymanpaşa';
+            route.isDistrict = true;
+            route.isCity = false;
+        } else if (id.startsWith('tekulas_61_83') || id.startsWith('tekulas_115_115')) {
+            route.district = 'İlçeler Arası';
+            route.originDistrict = 'Çorlu';
+            route.destDistrict = 'Marmaraereğlisi';
+            route.isDistrict = true;
+            route.isCity = false;
+        } else if (id.startsWith('tekulas_143_35')) {
+            route.district = 'İlçeler Arası';
+            route.originDistrict = route.isReturn ? 'Malkara' : 'Süleymanpaşa';
+            route.destDistrict = route.isReturn ? 'Süleymanpaşa' : 'Malkara';
+            route.isDistrict = true;
+            route.isCity = false;
+        } else if (route.district === 'Tekirdağ') {
+            route.district = 'Süleymanpaşa';
+            route.originDistrict = 'Süleymanpaşa';
+            route.destDistrict = 'Süleymanpaşa';
+            route.isDistrict = false;
+            route.isCity = true;
+        } else if (rawUp.includes('VELİMEŞE') && !route.isDistrict) {
+            route.originDistrict = route.originDistrict || 'Ergene';
+            route.destDistrict = route.destDistrict || 'Velimeşe';
+        }
+
+        // Gidiş / Dönüş hatlarının isimde net ayrışması (çift kopya karmaşasını önler)
+        if (route.isReturn && route.name && !/\(Dönüş\)/i.test(route.name)) {
+            route.name = route.name + ' (Dönüş)';
+        }
+
+        cleanedTekulas.push(route);
+    });
+
+    window.tekulasHatVeritabani.length = 0;
+    cleanedTekulas.forEach(r => window.tekulasHatVeritabani.push(r));
+
     if (typeof ilceRotalari !== 'undefined') {
         if (!ilceRotalari["Tekirdağ"]) ilceRotalari["Tekirdağ"] = [];
         const existingHatIds = new Set(ilceRotalari["Tekirdağ"].map(r => r.id));
 
         window.tekulasHatVeritabani.forEach(route => {
-            // routesData havuzuna doğrudan ekle
             if (typeof routesData !== 'undefined') {
                 routesData[route.id] = route;
             }
-            // İlçe rotaları listesine ekle
             if (!existingHatIds.has(route.id)) {
                 existingHatIds.add(route.id);
                 ilceRotalari["Tekirdağ"].push(route);
             }
         });
 
-        // İki yönlü senkronizasyon: ilceRotalari'ndaki tüm ekspres ve ilçe hatlarını tekulasHatVeritabani'na da ekle
+        // İki yönlü senkronizasyon: ilceRotalari'ndaki ekspres hatları tekulasHatVeritabani'na tekil ekle
         const existingTekulasIds = new Set(window.tekulasHatVeritabani.map(r => r.id));
         ilceRotalari["Tekirdağ"].forEach(r => {
-            if (!existingTekulasIds.has(r.id)) {
+            if (r && r.id && !existingTekulasIds.has(r.id)) {
                 existingTekulasIds.add(r.id);
                 window.tekulasHatVeritabani.push(r);
             }
         });
 
-        // Geriye dönük rota kimliği uyumluluğu (Alias)
+        // Geriye dönük rota kimliği uyumluluğu (Enumerable olmayan temiz Alias)
         const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26" || r.hatNo === "226");
         if (r26 && typeof routesData !== 'undefined') {
-            routesData["hat_226_suleymanpasa_saray"] = r26;
-            routesData["hat_26_suleymanpasa_saray"] = r26;
-            routesData["hat_226_suleymanpasa_velimese"] = r26;
-            routesData["hat_26_suleymanpasa_velimese"] = r26;
-            routesData["hat_226"] = r26;
-            routesData["hat_26"] = r26;
+            setRouteAlias("hat_226_suleymanpasa_saray", r26);
+            setRouteAlias("hat_26_suleymanpasa_saray", r26);
+            setRouteAlias("hat_226_suleymanpasa_velimese", r26);
+            setRouteAlias("hat_26_suleymanpasa_velimese", r26);
+            setRouteAlias("hat_226", r26);
+            setRouteAlias("hat_26", r26);
         }
         const r48 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "48");
         if (r48 && typeof routesData !== 'undefined') {
-            routesData["hat_48_velimese_corlu"] = r48;
-        const rRing = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_velimese_cetin_ring");
-        if (rRing && typeof routesData !== "undefined") routesData["hat_velimese_cetin_ring"] = rRing;
+            setRouteAlias("hat_48_velimese_corlu", r48);
+            const rRing = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_velimese_cetin_ring");
+            if (rRing) routesData["hat_velimese_cetin_ring"] = rRing;
         }
         const r2_7 = ilceRotalari["Tekirdağ"].find(r => r.id === "tekulas_152_2_7");
         const r2_7_donus = ilceRotalari["Tekirdağ"].find(r => r.id === "tekulas_152_2_7_donus");
         if (r2_7 && typeof routesData !== 'undefined') {
-            routesData["hat_2_7"] = r2_7;
-            routesData["hat_2_7_gidis"] = r2_7;
+            setRouteAlias("hat_2_7", r2_7);
+            setRouteAlias("hat_2_7_gidis", r2_7);
         }
         if (r2_7_donus && typeof routesData !== 'undefined') {
-            routesData["hat_2_7_donus"] = r2_7_donus;
+            setRouteAlias("hat_2_7_donus", r2_7_donus);
         }
     }
 }
@@ -12984,13 +13095,14 @@ const hatVelimeseMahalleRing = {
     id: "hat_velimese_mahalle_ring",
     hatNo: "VM-RING",
     name: "VELİMEŞE MAHALLESİ TAM RİNG (30 DURAK)",
-    destDistrict: "Ergene / Velimeşe",
-    originDistrict: "Ergene / Velimeşe",
-    district: "Ergene / Velimeşe",
+    sehir: "Tekirdağ",
+    destDistrict: "Ergene",
+    originDistrict: "Velimeşe",
+    district: "Velimeşe",
     startStop: "Velimeşe Merkez Meydanı (Atatürk Parkı)",
     endStop: "Velimeşe Fevzi Çakmak Caddesi (Meydan Dönüşü)",
-    isDistrict: true,
-    isCity: false,
+    isDistrict: false,
+    isCity: true,
     isVelimeseLocked: true,
     isHierarchical: true,
     terrain: "asfalt",
@@ -13004,7 +13116,6 @@ const hatVelimeseMahalleRing = {
 };
 
 if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
-    // Eski ring varsa güncelle, yoksa ekle
     const exIdx = ilceRotalari["Tekirdağ"].findIndex(r => r.id === "hat_velimese_mahalle_ring");
     if (exIdx >= 0) {
         ilceRotalari["Tekirdağ"][exIdx] = hatVelimeseMahalleRing;
@@ -13012,9 +13123,14 @@ if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
         ilceRotalari["Tekirdağ"].unshift(hatVelimeseMahalleRing);
     }
 }
+if (typeof window !== 'undefined' && Array.isArray(window.tekulasHatVeritabani)) {
+    if (!window.tekulasHatVeritabani.some(r => r && r.id === "hat_velimese_mahalle_ring")) {
+        window.tekulasHatVeritabani.unshift(hatVelimeseMahalleRing);
+    }
+}
 if (typeof routesData !== 'undefined') {
     routesData["hat_velimese_mahalle_ring"] = hatVelimeseMahalleRing;
-    routesData["hat_velimese_ring_30"] = hatVelimeseMahalleRing;
+    setRouteAlias("hat_velimese_ring_30", hatVelimeseMahalleRing);
 }
 
 if (typeof window !== 'undefined') {

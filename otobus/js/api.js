@@ -87,181 +87,176 @@ function buildDistrictContinuousCircuit(districtName, tekulasDb) {
     let master = [];
     let defaultLineRef = null;
 
-    if (districtName === "Süleymanpaşa" || districtName === "Tekirdağ") {
-        const h1 = tekulasDb.find(r => r.id === 'tekulas_1') || tekulasDb[0];
-        const h18 = tekulasDb.find(r => r.id === 'tekulas_18') || tekulasDb[1];
-        const h17 = tekulasDb.find(r => r.id === 'tekulas_17') || tekulasDb[2];
-        if (h1 && h1.stops) h1.stops.forEach(s => master.push(Object.assign({}, s)));
-        if (h18 && h18.stops) for (let i = 1; i < h18.stops.length; i++) master.push(Object.assign({}, h18.stops[i]));
-        if (h17 && h17.stops) for (let i = 1; i < h17.stops.length; i++) master.push(Object.assign({}, h17.stops[i]));
-        defaultLineRef = h1;
-    } else if (districtName === "Çorlu") {
-        const h1 = tekulasDb.find(r => r.id === 'tekulas_1_1_yesiltepe') || tekulasDb[0];
-        const h2 = tekulasDb.find(r => r.id === 'tekulas_3_2') || tekulasDb[1];
-        if (h1 && h1.stops) h1.stops.forEach(s => master.push(Object.assign({}, s)));
-        if (h2 && h2.stops) for (let i = 1; i < h2.stops.length; i++) master.push(Object.assign({}, h2.stops[i]));
-        defaultLineRef = h1;
-    } else if (districtName === "Çerkezköy") {
-        // Çerkezköy zengin hatlarını birleştir
-        const cLines = tekulasDb.filter(r => r.district === "Çerkezköy" && r.stops && r.stops.length >= 8);
-        if (cLines.length > 0) {
-            cLines.forEach((l, idx) => {
-                const startIdx = idx === 0 ? 0 : 1;
-                for (let i = startIdx; i < l.stops.length; i++) {
-                    master.push(Object.assign({}, l.stops[i]));
-                }
-            });
-            defaultLineRef = cLines[0];
+    const normDist = (!districtName || districtName === "all" || districtName === "Tekirdağ") ? "Süleymanpaşa" : districtName;
+
+    const isValidLocalLine = (r, targetDist) => {
+        if (!r || !Array.isArray(r.stops) || r.stops.length < 3) return false;
+        if (r.isReturn || r.isDistrict) return false;
+        const s0 = String(r.startStop || (r.stops[0] && r.stops[0].name) || '').trim();
+        const sEnd = String(r.endStop || (r.stops[r.stops.length - 1] && r.stops[r.stops.length - 1].name) || '').trim();
+        if (/^(İLK DURAK|SON DURAK)$/i.test(s0) || /^(İLK DURAK|SON DURAK)$/i.test(sEnd)) return false;
+        return r.district === targetDist;
+    };
+
+    const appendStopsCleanly = (stopsArr) => {
+        if (!Array.isArray(stopsArr)) return;
+        stopsArr.forEach(s => {
+            if (!s || !s.name || /^(İLK DURAK|SON DURAK)$/i.test(String(s.name).trim())) return;
+            const last = master.length > 0 ? master[master.length - 1] : null;
+            if (last && String(last.name).trim().toUpperCase() === String(s.name).trim().toUpperCase()) return;
+            master.push(Object.assign({}, s));
+        });
+    };
+
+    if (normDist === "Süleymanpaşa") {
+        // Gerçek Süleymanpaşa hatları: 2/7 (100. Yıl - Hükümet - Köprübaşı - Değirmenaltı - NKÜ - Tepekent), 18 (NKÜ - Şehir Hastanesi), 29 (Yeni Otogar - Altınova)
+        const h2_7 = tekulasDb.find(r => r.id === 'tekulas_152_2_7') || tekulasDb.find(r => isValidLocalLine(r, 'Süleymanpaşa') && r.hatNo === '2/7');
+        const h18 = tekulasDb.find(r => r.id === 'tekulas_175_18') || tekulasDb.find(r => isValidLocalLine(r, 'Süleymanpaşa') && r.hatNo === '18');
+        const h29 = tekulasDb.find(r => r.id === 'tekulas_169_29') || tekulasDb.find(r => isValidLocalLine(r, 'Süleymanpaşa') && r.hatNo === '29');
+        const picked = [h2_7, h18, h29].filter(Boolean);
+        if (picked.length > 0) {
+            picked.forEach(l => appendStopsCleanly(l.stops));
+            defaultLineRef = picked[0];
         } else {
-            const anyCLines = tekulasDb.filter(r => r.district === "Çerkezköy" && r.stops && r.stops.length > 0);
-            anyCLines.forEach(l => l.stops.forEach(s => master.push(Object.assign({}, s))));
-            defaultLineRef = anyCLines[0] || tekulasDb[0];
+            const sulLines = tekulasDb.filter(r => isValidLocalLine(r, 'Süleymanpaşa'));
+            sulLines.slice(0, 3).forEach(l => appendStopsCleanly(l.stops));
+            defaultLineRef = sulLines[0] || { id: "sul_master", name: "Süleymanpaşa Şehir İçi Hatları", district: "Süleymanpaşa", totalKm: 24 };
         }
-    } else if (districtName === "Kapaklı") {
-        const kLines = tekulasDb.filter(r => r.district === "Kapaklı" && r.stops && r.stops.length >= 2);
-        if (kLines.length > 0) {
-            kLines.slice(0, 3).forEach((l, idx) => {
-                if (idx === 0) {
-                    l.stops.forEach(s => master.push(Object.assign({}, s)));
-                } else {
-                    for (let i = 1; i < l.stops.length; i++) master.push(Object.assign({}, l.stops[i]));
-                }
-            });
-            defaultLineRef = kLines[0];
-        }
-    } else if (districtName === "Marmaraereğlisi" || districtName === "Marmara Ereğlisi") {
+    } else if (normDist === "Çorlu") {
+        const h1 = tekulasDb.find(r => r.id === 'tekulas_1_1_yesiltepe') || tekulasDb.find(r => isValidLocalLine(r, 'Çorlu'));
+        const h2 = tekulasDb.find(r => r.id === 'tekulas_3_2') || tekulasDb.filter(r => isValidLocalLine(r, 'Çorlu'))[1];
+        if (h1 && h1.stops) appendStopsCleanly(h1.stops);
+        if (h2 && h2.stops) appendStopsCleanly(h2.stops);
+        defaultLineRef = h1 || { id: "corlu_master", name: "Çorlu Şehir İçi Hatları", district: "Çorlu", totalKm: 22 };
+    } else if (normDist === "Çerkezköy") {
+        const cLines = tekulasDb.filter(r => isValidLocalLine(r, "Çerkezköy") && r.stops.length >= 6);
+        const sourceLines = cLines.length > 0 ? cLines.slice(0, 3) : tekulasDb.filter(r => isValidLocalLine(r, "Çerkezköy"));
+        sourceLines.forEach(l => appendStopsCleanly(l.stops));
+        defaultLineRef = sourceLines[0] || { id: "cerkezkoy_master", name: "Çerkezköy Şehir İçi Hatları", district: "Çerkezköy", totalKm: 18 };
+    } else if (normDist === "Kapaklı") {
+        const kLines = tekulasDb.filter(r => isValidLocalLine(r, "Kapaklı"));
+        kLines.slice(0, 3).forEach(l => appendStopsCleanly(l.stops));
+        defaultLineRef = kLines[0] || { id: "kapakli_master", name: "Kapaklı İlçe İçi Hatları", district: "Kapaklı", totalKm: 16 };
+    } else if (normDist === "Marmaraereğlisi" || normDist === "Marmara Ereğlisi") {
         const meStops = [
-            { name: "MARMARAEREĞLİSİ OTOGARI", lat: 40.9686, lon: 27.9553, gercekMesafeSonraki: 1.2 },
-            { name: "HÜKÜMET KONAĞI & BELEDİYE", lat: 40.9702, lon: 27.9575, gercekMesafeSonraki: 1.0 },
-            { name: "PERİNTHOS ANTİK KENTİ GİRİŞİ", lat: 40.9720, lon: 27.9620, gercekMesafeSonraki: 1.4 },
-            { name: "MARMARAEREĞLİSİ DEVLET HASTANESİ", lat: 40.9745, lon: 27.9680, gercekMesafeSonraki: 2.1 },
-            { name: "ÇEŞMELİ KAVŞAĞI", lat: 40.9780, lon: 27.9750, gercekMesafeSonraki: 2.5 },
-            { name: "D-110 SAHİL YOLU DURAĞI", lat: 40.9750, lon: 27.9820, gercekMesafeSonraki: 2.2 },
-            { name: "KAMELYA CADDESİ & PLAJ", lat: 40.9730, lon: 27.9890, gercekMesafeSonraki: 1.8 },
-            { name: "YENİÇİFTLİK VATAN CADDESİ", lat: 40.9820, lon: 27.9920, gercekMesafeSonraki: 1.3 },
-            { name: "YENİÇİFTLİK BELEDİYE MEYDANI", lat: 40.9850, lon: 27.9950, gercekMesafeSonraki: 1.6 },
-            { name: "YENİÇİFTLİK SAHİL ÇARŞISI", lat: 40.9810, lon: 28.0050, gercekMesafeSonraki: 3.2 },
-            { name: "SULTANKÖY GİRİŞ KAVŞAĞI", lat: 40.9890, lon: 28.0200, gercekMesafeSonraki: 1.9 },
-            { name: "SULTANKÖY MERKEZ MEYDANI", lat: 40.9920, lon: 28.0280, gercekMesafeSonraki: 1.5 },
-            { name: "SULTANKÖY SAHİL & BOTAŞ GİRİŞİ", lat: 40.9950, lon: 28.0350, gercekMesafeSonraki: 1.8 },
-            { name: "MARMARAEREĞLİSİ DÖNÜŞ PERONU", lat: 40.9686, lon: 27.9553, gercekMesafeSonraki: 0.0 }
+            { name: "MARMARAEREĞLİSİ OTOGARI", lat: 40.9686, lon: 27.9553, gercekMesafeSonraki: 1.2, yolTipi: "Asfalt Cadde" },
+            { name: "HÜKÜMET KONAĞI & BELEDİYE", lat: 40.9702, lon: 27.9575, gercekMesafeSonraki: 1.0, yolTipi: "Asfalt Cadde" },
+            { name: "PERİNTHOS ANTİK KENTİ GİRİŞİ", lat: 40.9720, lon: 27.9620, gercekMesafeSonraki: 1.4, yolTipi: "Sahil Şeridi Yolu" },
+            { name: "MARMARAEREĞLİSİ DEVLET HASTANESİ", lat: 40.9745, lon: 27.9680, gercekMesafeSonraki: 2.1, yolTipi: "Asfalt Cadde" },
+            { name: "ÇEŞMELİ KAVŞAĞI", lat: 40.9780, lon: 27.9750, gercekMesafeSonraki: 2.5, yolTipi: "Asfalt Cadde" },
+            { name: "D-110 SAHİL YOLU DURAĞI", lat: 40.9750, lon: 27.9820, gercekMesafeSonraki: 2.2, yolTipi: "Sahil Şeridi Yolu" },
+            { name: "KAMELYA CADDESİ & PLAJ", lat: 40.9730, lon: 27.9890, gercekMesafeSonraki: 1.8, yolTipi: "Sahil Şeridi Yolu" },
+            { name: "YENİÇİFTLİK VATAN CADDESİ", lat: 40.9820, lon: 27.9920, gercekMesafeSonraki: 1.3, yolTipi: "Asfalt Cadde" },
+            { name: "YENİÇİFTLİK BELEDİYE MEYDANI", lat: 40.9850, lon: 27.9950, gercekMesafeSonraki: 1.6, yolTipi: "Asfalt Cadde" },
+            { name: "YENİÇİFTLİK SAHİL ÇARŞISI", lat: 40.9810, lon: 28.0050, gercekMesafeSonraki: 3.2, yolTipi: "Sahil Şeridi Yolu" },
+            { name: "SULTANKÖY GİRİŞ KAVŞAĞI", lat: 40.9890, lon: 28.0200, gercekMesafeSonraki: 1.9, yolTipi: "Asfalt Cadde" },
+            { name: "SULTANKÖY MERKEZ MEYDANI", lat: 40.9920, lon: 28.0280, gercekMesafeSonraki: 1.5, yolTipi: "Asfalt Cadde" },
+            { name: "SULTANKÖY SAHİL & BOTAŞ GİRİŞİ", lat: 40.9950, lon: 28.0350, gercekMesafeSonraki: 1.8, yolTipi: "Sahil Şeridi Yolu" },
+            { name: "MARMARAEREĞLİSİ DÖNÜŞ PERONU", lat: 40.9686, lon: 27.9553, gercekMesafeSonraki: 0.0, yolTipi: "Asfalt Cadde" }
         ];
-        const meLines = tekulasDb.filter(r => (r.district === "Marmaraereğlisi" || (r.name && r.name.toLowerCase().includes("ereğli")) || (r.name && r.name.toLowerCase().includes("eregli"))) && r.stops && r.stops.length >= 2);
-        if (meLines.length > 0) {
-            meLines.forEach((l, idx) => {
-                const startIdx = idx === 0 ? 0 : 1;
-                for (let i = startIdx; i < l.stops.length; i++) master.push(Object.assign({}, l.stops[i]));
-            });
-            defaultLineRef = meLines[0];
-        } else {
-            master = meStops.map(s => Object.assign({}, s));
-            defaultLineRef = { id: "me_master", name: "Marmaraereğlisi Sahil ve Perinthos Seferleri", district: "Marmaraereğlisi", totalKm: 38 };
-        }
-    } else if (districtName === "Ergene" || districtName === "Velimeşe") {
-        const ergStops = [
-            { name: "ERGENE BELEDİYESİ (MARMARACIK MERKEZ)", lat: 41.2281, lon: 27.7028, gercekMesafeSonraki: 1.1 },
-            { name: "MARMARACIK MEYDAN & ÇARŞI", lat: 41.2295, lon: 27.7050, gercekMesafeSonraki: 1.4 },
-            { name: "ERGENE DEVLET HASTANESİ BÖLGESİ", lat: 41.2330, lon: 27.7120, gercekMesafeSonraki: 3.5 },
-            { name: "SAĞLIK MAHALLESİ EDİRNE CADDESİ", lat: 41.2050, lon: 27.7350, gercekMesafeSonraki: 1.2 },
-            { name: "SAĞLIK MAHALLESİ PAZAR YERİ", lat: 41.2020, lon: 27.7380, gercekMesafeSonraki: 1.5 },
-            { name: "YEŞİLTEPE MAHALLESİ MEYDANI", lat: 41.1980, lon: 27.7420, gercekMesafeSonraki: 1.3 },
-            { name: "YEŞİLTEPE ÇARŞI CADDESİ", lat: 41.1950, lon: 27.7460, gercekMesafeSonraki: 4.2 },
-            { name: "VAKIFLAR KAVŞAĞI & SANAYİ", lat: 41.2380, lon: 27.7550, gercekMesafeSonraki: 2.8 },
-            { name: "ULAŞ BELDE MEYDANI", lat: 41.2510, lon: 27.7780, gercekMesafeSonraki: 3.8 },
-            { name: "MİSİNLİ KÖY YOLU AYRIMI", lat: 41.2650, lon: 27.8100, gercekMesafeSonraki: 5.2 },
-            { name: "VELİMEŞE OSB 1. CADDE", lat: 41.2420, lon: 27.8550, gercekMesafeSonraki: 1.6 },
-            { name: "VELİMEŞE TOKİ KONUTLARI", lat: 41.2470, lon: 27.8680, gercekMesafeSonraki: 1.5 },
-            { name: "VELİMEŞE MERKEZ ÇARŞI", lat: 41.2520, lon: 27.8790, gercekMesafeSonraki: 1.2 },
-            { name: "VELİMEŞE TREN İSTASYONU", lat: 41.2540, lon: 27.8820, gercekMesafeSonraki: 0.0 }
-        ];
-        const ergLines = tekulasDb.filter(r => (r.district === "Ergene" || (r.name && (r.name.toLowerCase().includes("ergene") || r.name.toLowerCase().includes("marmaracık") || r.name.toLowerCase().includes("velimeşe")))) && r.stops && r.stops.length >= 2);
-        if (ergLines.length > 0) {
-            ergLines.forEach((l, idx) => {
-                const startIdx = idx === 0 ? 0 : 1;
-                for (let i = startIdx; i < l.stops.length; i++) master.push(Object.assign({}, l.stops[i]));
-            });
-            defaultLineRef = ergLines[0];
+        appendStopsCleanly(meStops);
+        defaultLineRef = { id: "me_master", name: "Marmaraereğlisi Sahil ve Perinthos Seferleri", district: "Marmaraereğlisi", totalKm: 23.5 };
+    } else if (normDist === "Velimeşe") {
+        if (typeof velimeseTumDuraklarListesi !== 'undefined' && Array.isArray(velimeseTumDuraklarListesi) && velimeseTumDuraklarListesi.length >= 10) {
+            appendStopsCleanly(velimeseTumDuraklarListesi);
         } else {
             const velimeseSokaklar = (typeof VelimeseNavigasyon !== 'undefined' && VelimeseNavigasyon.sokaklar)
                 ? VelimeseNavigasyon.sokaklar
                 : ((typeof window !== 'undefined' && window.VelimeseNavigasyon) ? window.VelimeseNavigasyon.sokaklar : []);
-            if (velimeseSokaklar && velimeseSokaklar.length >= 20) {
-                master = velimeseSokaklar.slice(0, 60).map(s => ({
+            if (velimeseSokaklar && velimeseSokaklar.length >= 12) {
+                appendStopsCleanly(velimeseSokaklar.slice(0, 30).map(s => ({
                     name: s.name,
                     lat: s.lat,
                     lon: s.lon,
                     yolTipi: (s.cat === "Sanayi" ? "Asfalt Cadde" : "Mahalle Sokağı")
-                }));
-                defaultLineRef = { id: "ergene_master", name: "Ergene Beldeler ve OSB Seferleri", district: "Ergene", totalKm: 45 };
-            } else {
-                master = ergStops.map(s => Object.assign({}, s));
-                defaultLineRef = { id: "ergene_master", name: "Ergene Beldeler ve OSB Seferleri", district: "Ergene", totalKm: 45 };
+                })));
             }
         }
-    } else if (districtName === "Saray") {
+        defaultLineRef = { id: "velimese_master", name: "Velimeşe Mahalle ve OSB Ring Seferleri", district: "Velimeşe", totalKm: 18 };
+    } else if (normDist === "Ergene") {
+        const ergStops = [
+            { name: "ERGENE BELEDİYESİ (MARMARACIK MERKEZ)", lat: 41.2281, lon: 27.7028, gercekMesafeSonraki: 1.1, yolTipi: "Asfalt Cadde" },
+            { name: "MARMARACIK MEYDAN & ÇARŞI", lat: 41.2295, lon: 27.7050, gercekMesafeSonraki: 1.4, yolTipi: "Asfalt Cadde" },
+            { name: "ERGENE DEVLET HASTANESİ BÖLGESİ", lat: 41.2330, lon: 27.7120, gercekMesafeSonraki: 2.8, yolTipi: "Asfalt Cadde" },
+            { name: "SAĞLIK MAHALLESİ EDİRNE CADDESİ", lat: 41.2050, lon: 27.7350, gercekMesafeSonraki: 1.2, yolTipi: "Asfalt Cadde" },
+            { name: "SAĞLIK MAHALLESİ PAZAR YERİ", lat: 41.2020, lon: 27.7380, gercekMesafeSonraki: 1.5, yolTipi: "Mahalle Sokağı" },
+            { name: "YEŞİLTEPE MAHALLESİ MEYDANI", lat: 41.1980, lon: 27.7420, gercekMesafeSonraki: 1.3, yolTipi: "Asfalt Cadde" },
+            { name: "YEŞİLTEPE ÇARŞI CADDESİ", lat: 41.1950, lon: 27.7460, gercekMesafeSonraki: 3.2, yolTipi: "Asfalt Cadde" },
+            { name: "VAKIFLAR KAVŞAĞI & SANAYİ", lat: 41.2380, lon: 27.7550, gercekMesafeSonraki: 2.4, yolTipi: "Asfalt Cadde" },
+            { name: "ULAŞ BELDE MEYDANI", lat: 41.2510, lon: 27.7780, gercekMesafeSonraki: 3.1, yolTipi: "Asfalt Cadde" },
+            { name: "MİSİNLİ KÖY YOLU AYRIMI", lat: 41.2650, lon: 27.8100, gercekMesafeSonraki: 3.8, yolTipi: "Asfalt Cadde" },
+            { name: "VELİMEŞE OSB 1. CADDE", lat: 41.2420, lon: 27.8550, gercekMesafeSonraki: 1.6, yolTipi: "Asfalt Cadde" },
+            { name: "VELİMEŞE TOKİ KONUTLARI", lat: 41.2470, lon: 27.8680, gercekMesafeSonraki: 1.5, yolTipi: "Asfalt Cadde" },
+            { name: "VELİMEŞE MERKEZ ÇARŞI", lat: 41.2520, lon: 27.8790, gercekMesafeSonraki: 1.2, yolTipi: "Asfalt Cadde" },
+            { name: "VELİMEŞE TREN İSTASYONU", lat: 41.2540, lon: 27.8820, gercekMesafeSonraki: 0.0, yolTipi: "Asfalt Cadde" }
+        ];
+        appendStopsCleanly(ergStops);
+        defaultLineRef = { id: "ergene_master", name: "Ergene Beldeler ve OSB Seferleri", district: "Ergene", totalKm: 26.1 };
+    } else if (normDist === "Saray") {
         const saraySokaklar = (typeof SarayNavigasyon !== 'undefined' && SarayNavigasyon.sokaklar)
             ? SarayNavigasyon.sokaklar
             : ((typeof window !== 'undefined' && window.SarayNavigasyon) ? window.SarayNavigasyon.sokaklar : []);
-        if (saraySokaklar && saraySokaklar.length >= 20) {
-            master = saraySokaklar.map(s => ({
+        if (saraySokaklar && saraySokaklar.length >= 15) {
+            appendStopsCleanly(saraySokaklar.slice(0, 35).map(s => ({
                 name: s.name,
                 lat: s.lat,
                 lon: s.lon,
                 yolTipi: (s.cat === "Sokak" ? "Mahalle Sokağı" : (s.cat === "Köy Yolu" ? "Toprak Yol" : "Asfalt Cadde"))
-            }));
+            })));
         } else {
-            const sLines = tekulasDb.filter(r => r.district === "Saray" && r.stops && r.stops.length >= 5);
-            sLines.forEach(l => l.stops.forEach(s => master.push(Object.assign({}, s))));
+            const sLines = tekulasDb.filter(r => isValidLocalLine(r, "Saray"));
+            sLines.slice(0, 3).forEach(l => appendStopsCleanly(l.stops));
         }
         defaultLineRef = { id: "saray_master", name: "Saray İlçe İçi Seferleri", district: "Saray", totalKm: 18 };
-    } else if (districtName === "Muratlı") {
-        const mLines = tekulasDb.filter(r => (r.district === "Muratlı" || (r.name && r.name.toLowerCase().includes("muratlı"))) && r.stops && r.stops.length >= 2);
-        if (mLines.length > 0) {
-            mLines.forEach(l => {
-                l.stops.forEach(s => master.push(Object.assign({}, s)));
-            });
-            defaultLineRef = mLines[0];
-        }
+    } else if (normDist === "Muratlı") {
+        const mLines = tekulasDb.filter(r => isValidLocalLine(r, "Muratlı"));
+        mLines.slice(0, 3).forEach(l => appendStopsCleanly(l.stops));
         const muratliExtraStops = [
-            { name: "MURATLI TREN GARI", lat: 41.1712, lon: 27.5023, gercekMesafeSonraki: 1.1 },
-            { name: "MURATLI BELEDİYESİ", lat: 41.1725, lon: 27.5045, gercekMesafeSonraki: 0.9 },
-            { name: "ŞEHİT YÜZBAŞI MAYADAĞLI CAD", lat: 41.1741, lon: 27.5068, gercekMesafeSonraki: 1.3 },
-            { name: "MURATLI ÇARŞI MEYDANI", lat: 41.1755, lon: 27.5089, gercekMesafeSonraki: 1.0 },
-            { name: "MURATLI DEVLET HASTANESİ", lat: 41.1780, lon: 27.5120, gercekMesafeSonraki: 1.4 },
-            { name: "MURATLI SANAYİ SİTESİ", lat: 41.1820, lon: 27.5180, gercekMesafeSonraki: 1.8 },
-            { name: "İNANLI ÇEŞMESİ & KÖY YOLU", lat: 41.1860, lon: 27.5240, gercekMesafeSonraki: 2.1 },
-            { name: "AŞAĞISEVİNDİK KAVŞAĞI", lat: 41.1910, lon: 27.5310, gercekMesafeSonraki: 1.7 },
-            { name: "YUKARISEVİNDİK MERKEZ", lat: 41.1960, lon: 27.5380, gercekMesafeSonraki: 2.0 },
-            { name: "MURATLI OTOGARI", lat: 41.1700, lon: 27.5010, gercekMesafeSonraki: 0.0 }
+            { name: "MURATLI TREN GARI", lat: 41.1712, lon: 27.5023, gercekMesafeSonraki: 1.1, yolTipi: "Asfalt Cadde" },
+            { name: "MURATLI BELEDİYESİ", lat: 41.1725, lon: 27.5045, gercekMesafeSonraki: 0.9, yolTipi: "Asfalt Cadde" },
+            { name: "ŞEHİT YÜZBAŞI MAYADAĞLI CAD", lat: 41.1741, lon: 27.5068, gercekMesafeSonraki: 1.3, yolTipi: "Asfalt Cadde" },
+            { name: "MURATLI ÇARŞI MEYDANI", lat: 41.1755, lon: 27.5089, gercekMesafeSonraki: 1.0, yolTipi: "Asfalt Cadde" },
+            { name: "MURATLI DEVLET HASTANESİ", lat: 41.1780, lon: 27.5120, gercekMesafeSonraki: 1.4, yolTipi: "Asfalt Cadde" },
+            { name: "MURATLI SANAYİ SİTESİ", lat: 41.1820, lon: 27.5180, gercekMesafeSonraki: 1.8, yolTipi: "Asfalt Cadde" },
+            { name: "İNANLI ÇEŞMESİ & MESİRE YERİ", lat: 41.1860, lon: 27.5240, gercekMesafeSonraki: 2.1, yolTipi: "Asfalt Cadde" },
+            { name: "AŞAĞISEVİNDİK KAVŞAĞI", lat: 41.1910, lon: 27.5310, gercekMesafeSonraki: 1.7, yolTipi: "Asfalt Cadde" },
+            { name: "YUKARISEVİNDİK MERKEZ", lat: 41.1960, lon: 27.5380, gercekMesafeSonraki: 2.0, yolTipi: "Mahalle Sokağı" },
+            { name: "MURATLI OTOGARI", lat: 41.1700, lon: 27.5010, gercekMesafeSonraki: 0.0, yolTipi: "Asfalt Cadde" }
         ];
         if (master.length < 10) {
-            master = muratliExtraStops.map(s => Object.assign({}, s));
-            defaultLineRef = { id: "muratli_master", name: "Muratlı Şehir İçi ve Tren Garı Seferleri", district: "Muratlı", totalKm: 14 };
+            master = [];
+            appendStopsCleanly(muratliExtraStops);
+            defaultLineRef = { id: "muratli_master", name: "Muratlı Şehir İçi ve Tren Garı Seferleri", district: "Muratlı", totalKm: 13.3 };
+        } else {
+            defaultLineRef = mLines[0];
         }
     } else {
-        const distLines = tekulasDb.filter(r => (r.district === districtName || (r.district && r.district.includes(districtName))) && r.stops && r.stops.length >= 3);
+        // Malkara, Hayrabolu, Şarköy vb. diğer ilçeler için yalnızca o ilçenin temiz gidiş hatları
+        const distLines = tekulasDb.filter(r => isValidLocalLine(r, normDist));
         if (distLines.length > 0) {
-            distLines.forEach((l, lIdx) => {
-                const startIdx = lIdx === 0 ? 0 : 1;
-                for (let i = startIdx; i < l.stops.length; i++) {
-                    master.push(Object.assign({}, l.stops[i]));
-                }
-            });
+            distLines.slice(0, 4).forEach(l => appendStopsCleanly(l.stops));
             defaultLineRef = distLines[0];
         } else {
-            master = tekulasDb[0].stops.map(s => Object.assign({}, s));
-            defaultLineRef = tekulasDb[0];
+            const sulFallback = tekulasDb.find(r => r.id === 'tekulas_152_2_7') || tekulasDb.find(r => isValidLocalLine(r, 'Süleymanpaşa')) || tekulasDb[0];
+            if (sulFallback && sulFallback.stops) appendStopsCleanly(sulFallback.stops);
+            defaultLineRef = sulFallback;
         }
+    }
+
+    if (master.length < 2 && tekulasDb.length > 0) {
+        const safeLine = tekulasDb.find(r => r.id === 'tekulas_152_2_7') || tekulasDb[0];
+        appendStopsCleanly(safeLine.stops);
+        defaultLineRef = safeLine;
     }
 
     const N = master.length;
     for (let i = 0; i < N - 1; i++) {
         if (!master[i].gercekMesafeSonraki || master[i].gercekMesafeSonraki === 0) {
             const d = calculateDistance(master[i].lat, master[i].lon, master[i+1].lat, master[i+1].lon);
-            master[i].gercekMesafeSonraki = Math.max(0.4, Math.round(d * 10) / 10);
+            master[i].gercekMesafeSonraki = Math.min(8.5, Math.max(0.5, Math.round(d * 1.25 * 10) / 10));
         }
     }
-    master[N - 1].gercekMesafeSonraki = 0;
+    if (N > 0) master[N - 1].gercekMesafeSonraki = 0;
 
     // 10 Görevlik Aşamalı ve Kesintisiz Kesitler (Güvenli bölme mantığı)
     let cuts = [];
@@ -296,7 +291,7 @@ function buildDistrictContinuousCircuit(districtName, tekulasDb) {
         const startStop = master[safeStart] ? master[safeStart].name : "Kalkış";
         const endStop = master[safeEnd] ? master[safeEnd].name : "Varış";
         slices.push({
-            name: `${districtName} Etabı ${i + 1}: ${startStop} ➔ ${endStop}`,
+            name: `${normDist} Etabı ${i + 1}: ${startStop} ➔ ${endStop}`,
             start: safeStart,
             end: safeEnd,
             lineRef: defaultLineRef
@@ -511,10 +506,12 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                     }
                     routeTotalKm = Math.round(calcKm * 10) / 10;
                 } else {
-                    found = item.id ? tekulasDb.find(r => r.id === item.id) : null;
-                    if (!found) found = tekulasDb.find(r => r.name.includes(item.kw) || (r.hatNo === item.no && r.name.includes(item.kw)));
-                    if (!found) found = tekulasDb.find(r => r.name.includes(item.kw));
-                    if (!found) found = tekulasDb[taskGlobalIndex % tekulasDb.length];
+                    const validDb = tekulasDb.filter(r => r && Array.isArray(r.stops) && r.stops.length >= 2 && !/^(İLK DURAK|SON DURAK)$/i.test(String(r.startStop || '').trim()));
+                    found = item.id ? validDb.find(r => r.id === item.id) : null;
+                    if (!found) found = validDb.find(r => !r.isReturn && ((r.hatNo === item.no && (r.name || '').includes(item.kw)) || ((r.rawName || '').includes(item.kw))));
+                    if (!found) found = validDb.find(r => !r.isReturn && ((r.name || '').includes(item.kw) || (r.rawName || '').includes(item.kw)));
+                    if (!found) found = validDb.find(r => (r.name || '').includes(item.kw) || (r.rawName || '').includes(item.kw));
+                    if (!found) found = validDb[taskGlobalIndex % Math.max(1, validDb.length)] || tekulasDb[0];
                     routeStops = found.stops;
                     routeTotalKm = found.totalKm;
                 }
@@ -573,7 +570,6 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                     totalKm: routeTotalKm
                 });
 
-                
                 // MİKYAS KAPTANLIK AKADEMİSİ 100 GÖREV ENTEGRASYONU
                 if (typeof CareerMissions !== 'undefined' && CareerMissions.enrichRoute) {
                     CareerMissions.enrichRoute(taskRoute, taskGlobalIndex);
@@ -593,46 +589,53 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                 }
                 routesData[routeId] = taskRoute;
                 if (found && found.id && !found.id.startsWith("career_highway_")) {
-                    routesData[found.id] = found; // Hat id'si ile de erişilebilir
+                    routesData[found.id] = found;
                 }
                 taskGlobalIndex++;
             });
         });
 
-        // Ayrıca tüm TEKULAŞ hatlarını routesData içine ekle
+        // Ayrıca tüm temiz TEKULAŞ hatlarını routesData içine tekil ekle
         tekulasDb.forEach(r => {
-            if (!routesData[r.id]) routesData[r.id] = r;
+            if (r && r.id && !routesData[r.id]) routesData[r.id] = r;
         });
 
-        // Saray Ekspres (62 KM)
-        const rSaray = tekulasDb.find(r => r.id === "hat_saray_ekspres");
-        if (rSaray) {
-            routesData["hat_saray_ekspres"] = rSaray;
-        }
+        const defAlias = (key, val) => {
+            if (!key || !val) return;
+            if (typeof setRouteAlias === 'function') {
+                setRouteAlias(key, val);
+            } else {
+                try {
+                    Object.defineProperty(routesData, key, { value: val, enumerable: false, configurable: true, writable: true });
+                } catch (e) {
+                    routesData[key] = val;
+                }
+            }
+        };
 
-        // Geriye dönük rota kimliği uyumluluğu (Alias desteği)
-        const r26 = tekulasDb.find(r => r.hatNo === "26" || r.name.indexOf("26/SÜLEYMANPASA") !== -1 || r.hatNo === "226");
+        const rSaray = tekulasDb.find(r => r.id === "hat_saray_ekspres");
+        if (rSaray) routesData["hat_saray_ekspres"] = rSaray;
+
+        // Geriye dönük rota kimliği uyumluluğu (Çift listeleme yapmayan gizli Alias desteği)
+        const r26 = tekulasDb.find(r => r.hatNo === "26" || (r.name && r.name.indexOf("26/SÜLEYMANPASA") !== -1) || r.hatNo === "226");
         if (r26) {
-            routesData["hat_226_suleymanpasa_saray"] = r26;
-            routesData["hat_26_suleymanpasa_saray"] = r26;
-            routesData["hat_226_suleymanpasa_velimese"] = r26;
-            routesData["hat_26_suleymanpasa_velimese"] = r26;
-            routesData["hat_226"] = r26;
-            routesData["hat_26"] = r26;
+            defAlias("hat_226_suleymanpasa_saray", r26);
+            defAlias("hat_26_suleymanpasa_saray", r26);
+            defAlias("hat_226_suleymanpasa_velimese", r26);
+            defAlias("hat_26_suleymanpasa_velimese", r26);
+            defAlias("hat_226", r26);
+            defAlias("hat_26", r26);
         }
-        const r48 = tekulasDb.find(r => r.name.indexOf("VELİMEŞE-ÇORLU") !== -1 || r.hatNo === "48");
-        if (r48) {
-            routesData["hat_48_velimese_corlu"] = r48;
-        }
+        const r48 = tekulasDb.find(r => (r.name && r.name.indexOf("VELİMEŞE-ÇORLU") !== -1) || r.hatNo === "48");
+        if (r48) defAlias("hat_48_velimese_corlu", r48);
+
         const r2_7 = tekulasDb.find(r => r.id === "tekulas_152_2_7");
         const r2_7_donus = tekulasDb.find(r => r.id === "tekulas_152_2_7_donus");
         if (r2_7) {
-            routesData["hat_2_7"] = r2_7;
-            routesData["hat_2_7_gidis"] = r2_7;
+            defAlias("hat_2_7", r2_7);
+            defAlias("hat_2_7_gidis", r2_7);
         }
-        if (r2_7_donus) {
-            routesData["hat_2_7_donus"] = r2_7_donus;
-        }
+        if (r2_7_donus) defAlias("hat_2_7_donus", r2_7_donus);
 
         return true;
     }
@@ -644,38 +647,99 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
             return false;
         }
     }
-    let filtered = rawStops.filter(d => d && d.name && d.name !== "İsimsiz Durak");
-    
+
+    // Aynı isimli mükerrer durakları temizle
+    const uniqueByName = new Map();
+    rawStops.forEach(d => {
+        if (d && d.name && d.name !== "İsimsiz Durak") {
+            const key = String(d.name).trim().toUpperCase();
+            if (!uniqueByName.has(key)) uniqueByName.set(key, d);
+        }
+    });
+    let filtered = Array.from(uniqueByName.values());
+
     if (filtered.length < 2) {
         return false;
     }
-    
-    filtered.sort(() => 0.5 - Math.random());
-    
+
+    // COĞRAFİ YAKIN KOMŞU (NEAREST-NEIGHBOR) KORİDOR DİZİLİMİ:
+    // Durakları rastgele karıştırıp şehrin bir ucundan diğer ucuna zikzak çizdirmek yerine,
+    // başlangıç durağından itibaren birbirine en yakın gerçek cadde sırasıyla dizer!
+    const buildCorridorChain = (pool, seedIdx, count) => {
+        const limit = Math.max(2, Math.min(count, pool.length));
+        const used = new Set();
+        const chain = [];
+        let curIdx = ((seedIdx % pool.length) + pool.length) % pool.length;
+        used.add(curIdx);
+        chain.push(pool[curIdx]);
+
+        while (chain.length < limit) {
+            const last = chain[chain.length - 1];
+            let bestIdx = -1;
+            let bestDist = Infinity;
+            for (let j = 0; j < pool.length; j++) {
+                if (used.has(j)) continue;
+                const cand = pool[j];
+                const d = (last.lat && last.lon && cand.lat && cand.lon)
+                    ? calculateDistance(last.lat, last.lon, cand.lat, cand.lon)
+                    : Math.abs(j - curIdx);
+                if (d < bestDist) {
+                    bestDist = d;
+                    bestIdx = j;
+                }
+            }
+            if (bestIdx === -1) break;
+            used.add(bestIdx);
+            chain.push(pool[bestIdx]);
+            curIdx = bestIdx;
+        }
+        return chain;
+    };
+
+    const inferRealisticRoadType = (stopName) => {
+        const nm = String(stopName || '').toLocaleLowerCase('tr-TR');
+        if (nm.includes("otoyol") || nm.includes("gişe") || nm.includes("otogar") || nm.includes("terminal") || nm.includes("havalimanı") || nm.includes("köprü")) {
+            return "Otoyol & Karayolu";
+        }
+        if (nm.includes("sahil") || nm.includes("iskele") || nm.includes("rıhtım") || nm.includes("plaj") || nm.includes("liman") || nm.includes("kordon") || nm.includes("yalı")) {
+            return "Sahil Şeridi Yolu";
+        }
+        if (nm.includes("köy yolu") || nm.includes("yayla yolu") || nm.includes("mezra")) {
+            return "Toprak Yol";
+        }
+        if (nm.includes("sokak") || nm.includes("sokağı")) {
+            return "Mahalle Sokağı";
+        }
+        return "Asfalt Cadde";
+    };
+
     const buildRoute = (id, taskIndex, licenseLvl, taskNum, stopCount, color, isReturn, prevRouteStops, isTraining) => {
         let selected = [];
-        
+
         if (isReturn && prevRouteStops && prevRouteStops.length >= 2) {
             selected = prevRouteStops.slice().reverse().map(s => ({
                 lat: s.lat, lon: s.lon, name: s.name
             }));
         } else {
-            const shuffledFiltered = [...filtered].sort(() => 0.5 - Math.random());
-            const limit = Math.max(2, Math.min(stopCount, shuffledFiltered.length));
-            for (let i = 0; i < limit; i++) {
-                selected.push(shuffledFiltered[i]);
-            }
+            selected = buildCorridorChain(filtered, taskIndex * 2, stopCount);
         }
 
         while (selected.length < 2) {
-            const cityPool = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName]) 
-                ? varsayilanSehirDuraklari[cityName] 
-                : (typeof varsayilanSehirDuraklari !== 'undefined' ? varsayilanSehirDuraklari["Tekirdağ"] : []);
+            const cityPool = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName])
+                ? varsayilanSehirDuraklari[cityName]
+                : [];
             if (cityPool.length > 0) {
                 const pick = cityPool[selected.length % cityPool.length];
                 selected.push({ name: pick.name, lat: pick.lat, lon: pick.lon });
             } else {
-                selected.push({ name: (cityName === "Tekirdağ" ? "Süleymanpaşa Otogar" : cityName + " Otogar"), lat: 40.9833, lon: 27.5167 });
+                const cCoords = (typeof sehirRotalari !== 'undefined' && sehirRotalari[cityName] && sehirRotalari[cityName].coordinates)
+                    ? sehirRotalari[cityName].coordinates
+                    : { lat: 39.9208, lon: 32.8541 };
+                selected.push({
+                    name: selected.length === 0 ? (cityName + " Merkez Meydanı") : (cityName + " Şehirlerarası Otogar"),
+                    lat: cCoords.lat + (selected.length * 0.012),
+                    lon: cCoords.lon + (selected.length * 0.012)
+                });
             }
         }
 
@@ -684,8 +748,7 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
         const intermediateStops = selected.slice(1, -1).map(s => s.name);
         const totalStops = selected.length;
         const directionLabel = isReturn ? "(Dönüş)" : "(Gidiş)";
-        const licName = licenseLvl === 1 ? "1. Sınıf Stajyer" : (licenseLvl === 2 ? "2. Sınıf Kıyı Kaptanı" : (licenseLvl === 3 ? "3. Sınıf Metropol Kaptanı" : "Kıdemli Kaptan"));
-        
+
         let title = "";
         if (isTraining) {
             title = "Görev " + taskNum + " (Eğitim): " + startStop + " ➔ " + endStop;
@@ -695,27 +758,22 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
             title = "Görev " + taskNum + " " + directionLabel + ": " + startStop + " ➔ " + endStop;
         }
 
-        let intermediateSummary = intermediateStops.length > 0 
-            ? "Durulacak ara duraklar: " + intermediateStops.join(", ") + ". " 
+        let intermediateSummary = intermediateStops.length > 0
+            ? "Durulacak ara duraklar: " + intermediateStops.join(", ") + ". "
             : "Ara durak yok, doğrudan varış durağına sürüş. ";
 
-        let desc = isTraining 
-            ? "Kalkış: " + startStop + " ➔ Varış: " + endStop + ". Sadece güzergahı öğrenmek için yolcusuz eğitim sürüşüdür. İki durak arası ilerleyin." 
+        let desc = isTraining
+            ? "Kalkış: " + startStop + " ➔ Varış: " + endStop + ". Sadece güzergahı öğrenmek için yolcusuz eğitim sürüşüdür. İki durak arası ilerleyin."
             : "Kalkış: " + startStop + " ➔ Varış: " + endStop + ". " + intermediateSummary + "Toplam " + totalStops + " durak.";
 
         // FORMÜLSEL GÖREV ADIMLARI
         const formulaSteps = [];
-        let fStep1 = "1. Adım: " + startStop + " durağından " + (isTraining ? "yolcu almadan hareket edin." : "bekleyen yolcuları alarak hareket edin.");
-        formulaSteps.push(fStep1);
-
+        formulaSteps.push("1. Adım: " + startStop + " durağından " + (isTraining ? "yolcu almadan hareket edin." : "bekleyen yolcuları alarak hareket edin."));
         for (let sIdx = 1; sIdx < selected.length - 1; sIdx++) {
-            let fStep = (sIdx + 1) + ". Adım: Sonra " + selected[sIdx].name + " durağına gidin; " + (isTraining ? "yolcu almadan devam edin." : "yolcuları indirin ve bekleyen yolcuları alıp devam edin.");
-            formulaSteps.push(fStep);
+            formulaSteps.push((sIdx + 1) + ". Adım: Sonra " + selected[sIdx].name + " durağına gidin; " + (isTraining ? "yolcu almadan devam edin." : "yolcuları indirin ve bekleyen yolcuları alıp devam edin."));
         }
-
         if (selected.length > 1) {
-            let fLast = totalStops + ". Adım (Hedef Son Durak): Sonra " + endStop + " durağına gidin; " + (isTraining ? "durakta durup eğitimi tamamlayın." : "tüm yolcuları indirin ve görevi tamamlayın.");
-            formulaSteps.push(fLast);
+            formulaSteps.push(totalStops + ". Adım (Hedef Son Durak): Sonra " + endStop + " durağına gidin; " + (isTraining ? "durakta durup eğitimi tamamlayın." : "tüm yolcuları indirin ve görevi tamamlayın."));
         }
 
         let detailedInstructions = [
@@ -735,31 +793,27 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
 
         let kumulatifMesafe = 0;
         const processedStops = [];
-        
+        const yolcuTipleri = ["Sivil", "Öğrenci", "Karışık", "Yaşlı"];
+
         for (let i = 0; i < selected.length; i++) {
             let mesafe = 0;
             if (i < selected.length - 1) {
                 let gercekKusUcusu = calculateDistance(selected[i].lat, selected[i].lon, selected[i+1].lat, selected[i+1].lon);
-                // Gerçek karayolu kıvrım katsayısı (1.3x)
-                let gercekYol = gercekKusUcusu * 1.3;
-                if (gercekYol < 0.8) gercekYol = 0.8 + (Math.abs(Math.sin((i+1) * 7)) * 0.8);
+                let gercekYol = gercekKusUcusu * 1.28;
+                if (gercekYol < 0.8) gercekYol = 0.8 + ((i % 4) * 0.25);
+                if (gercekYol > 12.0 && licenseLvl <= 3) gercekYol = 3.2;
                 mesafe = Math.round(gercekYol * 10) / 10;
             }
 
             const currentKm = Math.round(kumulatifMesafe * 10) / 10;
             const scaledSonrakiMesafe = mesafe;
             kumulatifMesafe += scaledSonrakiMesafe;
-            
-            const yolcuTipleri = ["Sivil", "Öğrenci", "Karışık", "Yaşlı"];
-            const tip = yolcuTipleri[Math.floor(Math.random() * yolcuTipleri.length)];
-            
-            const bekleyen = isTraining ? 0 : Math.floor(Math.random() * 40) + 10;
-            
-            const yollar = ["Asfalt Cadde", "Mahalle Sokağı", "Toprak Yol", "Kumlu Yol", "Çimenli Yol", "Sahil Şeridi Yolu", "Çakıllı Yol"];
-            const rastgeleYol = yollar[Math.floor(Math.random() * yollar.length)];
-            
-            const kavsakMevcut = Math.random() < 0.3;
-            
+
+            const tip = yolcuTipleri[(taskIndex + i) % yolcuTipleri.length];
+            const bekleyen = isTraining ? 0 : (12 + ((taskIndex * 7 + i * 5) % 28));
+            const dogruYolTipi = selected[i].yolTipi || inferRealisticRoadType(selected[i].name);
+            const kavsakMevcut = (i > 0 && i < selected.length - 1 && (i % 3 === 1));
+
             let stopAnons = "";
             if (i === 0) {
                 stopAnons = selected[0].name + " kalkış durağındayız. İlk durulacak hedef durak: " + (selected[1] ? selected[1].name : endStop) + ".";
@@ -778,7 +832,7 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                 bekleyenYolcu: bekleyen,
                 gercekMesafeSonraki: scaledSonrakiMesafe,
                 yolcuTipi: tip,
-                yolTipi: rastgeleYol,
+                yolTipi: dogruYolTipi,
                 kavsakVar: kavsakMevcut
             });
         }
@@ -786,6 +840,7 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
         return {
             id: id,
             sehir: cityName,
+            district: activeDistrict || "Merkez",
             name: title,
             desc: desc,
             startStop: startStop,
@@ -798,6 +853,7 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
             otobusKapasitesi: 80,
             taskIndex: taskIndex,
             licenseLevel: licenseLvl,
+            totalKm: Math.round(kumulatifMesafe * 10) / 10,
             stops: processedStops
         };
     };
@@ -814,7 +870,7 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
             if (lic === 2) color = "#eab308";
             if (lic === 3) color = "#ef4444";
             if (lic === 4) color = "#a855f7";
-            
+
             let isReturn = (globalTaskIndex % 2 !== 0);
             let routeId = cityName.toLowerCase() + "_task_" + globalTaskIndex;
             let isTraining = (lic === 1 && task <= 3);
@@ -823,21 +879,15 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
             }
 
             let newRoute = buildRoute(routeId, globalTaskIndex, lic, task, stopCount, color, isReturn, prevStops, isTraining);
-            
-            if (lic === 4) {
-                // Lisans 4 gerçek mesafeleri korur
-            }
-
             routes.push(newRoute);
-            
+
             if (!isReturn) {
                 prevStops = newRoute.stops;
             }
-
             globalTaskIndex++;
         }
     }
-    
+
     if (typeof routesData === 'undefined' || !routesData) routesData = {};
     routes.forEach(r => {
         routesData[r.id] = r;
@@ -853,52 +903,109 @@ function createOrGetFreeRoamRoute(cityName, districtName, neighborhoodName) {
     if (typeof routesData === 'undefined' || !routesData) routesData = {};
 
     cityName = cityName || "Tekirdağ";
-    districtName = districtName || "Süleymanpaşa";
+    districtName = (!districtName || districtName === "all") ? (cityName === "Tekirdağ" ? "Süleymanpaşa" : "Merkez") : districtName;
     neighborhoodName = neighborhoodName || "Merkez";
 
     const isFullDistrictTour = neighborhoodName.includes("Genel Şehir Turu") || neighborhoodName.includes("İlçe Turu");
     const routeSlug = (cityName + "_" + districtName + "_" + neighborhoodName).toLowerCase().replace(/[^a-z0-9]/g, '_');
     const routeId = "free_roam_" + routeSlug;
 
-    // Tekirdağ için resmi TEKULAŞ veritabanından eşleşen hatları kontrol et
+    // Tekirdağ için yalnızca seçilen ilçenin gerçek duraklarını kullan (Asla Çorlu tekulas[0]'a düşmez!)
     if (cityName === "Tekirdağ" && typeof window !== 'undefined' && window.tekulasHatVeritabani) {
         const tekulas = window.tekulasHatVeritabani;
-        const matchingLine = tekulas.find(r => 
-            (r.district === districtName || r.originDistrict === districtName || r.destDistrict === districtName) &&
+        const matchingLine = tekulas.find(r =>
+            r && !r.isReturn && !r.isDistrict && r.district === districtName &&
             (!isFullDistrictTour ? (r.name && r.name.toLowerCase().includes(neighborhoodName.toLowerCase())) : true)
-        ) || tekulas.find(r => r.district === districtName) || tekulas[0];
+        );
 
-        if (matchingLine) {
+        if (matchingLine && Array.isArray(matchingLine.stops) && matchingLine.stops.length >= 2) {
+            const mStart = matchingLine.startStop || matchingLine.stops[0].name || "Kalkış Garajı";
+            const mEnd = matchingLine.endStop || matchingLine.stops[matchingLine.stops.length - 1].name || "Varış Durağı";
             const freeRoute = Object.assign({}, matchingLine, {
                 id: routeId,
                 sehir: "Tekirdağ",
                 district: districtName,
                 isFreeRoam: true,
                 taskIndex: null,
-                name: "[Serbest Rota] Tekirdağ " + districtName + ": " + (isFullDistrictTour ? "Tüm Mahalleler Turu" : neighborhoodName),
-                speechBriefing: "Tekirdağ " + districtName + ", " + neighborhoodName + " serbest seferi. Kalkış durağınız: " + (matchingLine.startStop || "Kalkış Garajı") + ". İyi sürüşler kaptan."
+                startStop: mStart,
+                endStop: mEnd,
+                name: "[Serbest Rota] Tekirdağ " + districtName + ": " + (isFullDistrictTour ? "İlçe Merkez Turu" : neighborhoodName),
+                speechBriefing: "Tekirdağ " + districtName + ", " + neighborhoodName + " serbest seferi. Kalkış durağınız: " + mStart + ". İyi sürüşler kaptan."
             });
             routesData[routeId] = freeRoute;
             return freeRoute;
         }
+
+        // İlçenin kendi sürekli şehir turu duraklarından temiz serbest hat üret (Velimeşe, Marmaraereğlisi, Ergene, Saray vb.)
+        const circuit = buildDistrictContinuousCircuit(districtName, tekulas);
+        if (circuit && Array.isArray(circuit.master) && circuit.master.length >= 2) {
+            const cStops = circuit.master.slice(0, 14).map((s, idx, arr) => Object.assign({}, s, {
+                gercekMesafeSonraki: idx === arr.length - 1 ? 0 : (s.gercekMesafeSonraki || 1.2),
+                yolTipi: s.yolTipi || "Asfalt Cadde"
+            }));
+            const cTotalKm = cStops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0);
+            const freeCircuitRoute = {
+                id: routeId,
+                sehir: "Tekirdağ",
+                district: districtName,
+                mahalle: neighborhoodName,
+                isFreeRoam: true,
+                taskIndex: null,
+                licenseLevel: 1,
+                color: "#22c55e",
+                name: "[Serbest Rota] Tekirdağ " + districtName + ": " + (isFullDistrictTour ? "Tüm Duraklar İlçe Turu" : neighborhoodName),
+                startStop: cStops[0].name,
+                endStop: cStops[cStops.length - 1].name,
+                intermediateStops: cStops.slice(1, -1).map(s => s.name),
+                stops: cStops,
+                totalKm: Number(cTotalKm.toFixed(1)),
+                speechBriefing: "Tekirdağ " + districtName + " serbest ilçe seferi. İlk durak: " + cStops[0].name + ". Son durak: " + cStops[cStops.length - 1].name + ". İyi yolculuklar kaptan."
+            };
+            routesData[routeId] = freeCircuitRoute;
+            return freeCircuitRoute;
+        }
     }
 
-    // Diğer tüm iller için koordinat ve gerçekçi durak ağı oluştur
-    let baseLat = 39.92;
-    let baseLon = 32.85;
+    // Diğer 80 il için seçilen il ve ilçenin gerçek coğrafi koordinatlarını bul
+    let baseLat = 39.9208;
+    let baseLon = 32.8541;
 
-    if (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName] && varsayilanSehirDuraklari[cityName].length > 0) {
+    if (typeof sehirRotalari !== 'undefined' && sehirRotalari[cityName]) {
+        const sr = sehirRotalari[cityName];
+        if (sr.coordinates && sr.coordinates.lat && sr.coordinates.lon) {
+            baseLat = sr.coordinates.lat;
+            baseLon = sr.coordinates.lon;
+        }
+        if (sr.ilcelerBilgisi && Array.isArray(sr.ilcelerBilgisi.liste)) {
+            const dFound = sr.ilcelerBilgisi.liste.find(x => x && (x.ad === districtName || x.id === districtName));
+            if (dFound && dFound.lat && dFound.lon) {
+                baseLat = dFound.lat;
+                baseLon = dFound.lon;
+            }
+        }
+    } else if (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName] && varsayilanSehirDuraklari[cityName].length > 0) {
         baseLat = varsayilanSehirDuraklari[cityName][0].lat || baseLat;
         baseLon = varsayilanSehirDuraklari[cityName][0].lon || baseLon;
     }
 
-    const cleanMahalle = neighborhoodName.replace(" Mahallesi", "").replace(" Beldesi", "");
+    if (typeof window !== 'undefined' && window.TurkeyAdminData && window.TurkeyAdminData[cityName] && window.TurkeyAdminData[cityName].districts) {
+        const dAdm = window.TurkeyAdminData[cityName].districts[districtName];
+        if (dAdm && dAdm.lat && dAdm.lon) {
+            baseLat = dAdm.lat;
+            baseLon = dAdm.lon;
+        }
+    }
+
+    const cleanMahalle = isFullDistrictTour
+        ? districtName
+        : neighborhoodName.replace(" Mahallesi", "").replace(" Beldesi", "");
+
     const stops = [
-        { name: cleanMahalle + " Merkez Meydan Durağı", lat: baseLat + 0.005, lon: baseLon + 0.004, gercekMesafeSonraki: 1.8 },
-        { name: cleanMahalle + " Çarşı & Park Durağı", lat: baseLat + 0.009, lon: baseLon + 0.008, gercekMesafeSonraki: 2.1 },
-        { name: cleanMahalle + " Bulvarı & Sağlık Ocağı", lat: baseLat + 0.014, lon: baseLon + 0.012, gercekMesafeSonraki: 2.4 },
-        { name: cleanMahalle + " Okullar & Spor Kompleksi", lat: baseLat + 0.019, lon: baseLon + 0.017, gercekMesafeSonraki: 2.6 },
-        { name: districtName + " Şehirlerarası Otogar & Transfer Merkezi", lat: baseLat + 0.025, lon: baseLon + 0.023, gercekMesafeSonraki: 0 }
+        { name: cleanMahalle + " Merkez Meydan Durağı", lat: baseLat + 0.002, lon: baseLon + 0.002, gercekMesafeSonraki: 1.5, yolTipi: "Asfalt Cadde", bekleyenYolcu: 16, yolcuTipi: "Karışık" },
+        { name: cleanMahalle + " Belediye & Çarşı Durağı", lat: baseLat + 0.007, lon: baseLon + 0.006, gercekMesafeSonraki: 1.7, yolTipi: "Asfalt Cadde", bekleyenYolcu: 14, yolcuTipi: "Sivil" },
+        { name: cleanMahalle + " Devlet Hastanesi & Bulvar", lat: baseLat + 0.012, lon: baseLon + 0.011, gercekMesafeSonraki: 1.9, yolTipi: "Asfalt Cadde", bekleyenYolcu: 18, yolcuTipi: "Yaşlı" },
+        { name: cleanMahalle + " Okullar & Spor Kompleksi", lat: baseLat + 0.017, lon: baseLon + 0.016, gercekMesafeSonraki: 2.1, yolTipi: "Asfalt Cadde", bekleyenYolcu: 20, yolcuTipi: "Öğrenci" },
+        { name: districtName + " Otogar & Transfer Merkezi", lat: baseLat + 0.023, lon: baseLon + 0.022, gercekMesafeSonraki: 0, yolTipi: "Asfalt Cadde", bekleyenYolcu: 0, yolcuTipi: "Sivil" }
     ];
 
     const totalKm = stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0);
@@ -912,13 +1019,13 @@ function createOrGetFreeRoamRoute(cityName, districtName, neighborhoodName) {
         taskIndex: null,
         licenseLevel: 1,
         color: "#22c55e",
-        name: "[Serbest Rota] " + (cityName || 'Tekirdağ') + " - " + (districtName || 'Merkez') + (cleanMahalle ? " (" + cleanMahalle + ")" : ""),
+        name: "[Serbest Rota] " + cityName + " - " + districtName + (isFullDistrictTour ? " (İlçe Merkez Hattı)" : (" (" + cleanMahalle + ")")),
         startStop: stops[0].name,
         endStop: stops[stops.length - 1].name,
         intermediateStops: stops.slice(1, -1).map(s => s.name),
         stops: stops,
         totalKm: Number(totalKm.toFixed(1)),
-        speechBriefing: cityName + " " + districtName + ", " + cleanMahalle + " serbest seferi. İlk durak: " + stops[0].name + ". Son durak: " + stops[stops.length - 1].name + ". Toplam " + stops.length + " durak, " + totalKm.toFixed(1) + " kilometre. İyi yolculuklar kaptan."
+        speechBriefing: cityName + " " + districtName + " serbest seferi. İlk durak: " + stops[0].name + ". Son durak: " + stops[stops.length - 1].name + ". Toplam " + stops.length + " durak, " + totalKm.toFixed(1) + " kilometre. İyi yolculuklar kaptan."
     };
 
     routesData[routeId] = freeRoute;

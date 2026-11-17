@@ -2714,7 +2714,7 @@ const Game = {
             audio.currentTerrain = "asfalt";
         }
         
-                if (this.activeRouteData && this.activeRouteData.isHierarchical) {
+        if (this.activeRouteData && this.activeRouteData.isHierarchical) {
             // HİYERARŞİK ULTRA HAFİF HARİTA MOTORU (TEKİRDAĞ GERÇEK MESAFE STANDARDI)
             const nextStop = this.activeRouteData.stops[this.currentStopIndex];
             const prevStop = this.currentStopIndex > 0 ? this.activeRouteData.stops[this.currentStopIndex - 1] : null;
@@ -2726,6 +2726,10 @@ const Game = {
             }
             this.currentDistanceToNext = stopDistance;
             this.hierarchicalBeepPlayed = false;
+            this.upcomingTurns = [];
+            this.roadCurvature = 0;
+            const hLane = document.querySelector('.lane-container');
+            if (hLane) hLane.style.transform = 'translateX(-50%) rotateX(60deg) skewX(0deg)';
             
             const nextStopEl = document.getElementById('hud-next-stop');
             if (nextStopEl) {
@@ -2744,30 +2748,34 @@ const Game = {
             ? (nextStop.gercekMesafeSonraki || 0.9)
             : ((prevStop && prevStop.gercekMesafeSonraki) ? prevStop.gercekMesafeSonraki : (nextStop.gercekMesafeSonraki || 0.9));
         
-        let combinedMeta = ((nextStop ? nextStop.name : '') + ' ' + (prevStop ? prevStop.name : '') + ' ' + (this.activeRouteData.name || '')).toLowerCase();
-        let isIntercityCorridor = combinedMeta.includes("otoyol") || combinedMeta.includes("çevre yolu") || combinedMeta.includes("malkara") || combinedMeta.includes("saray") || combinedMeta.includes("kınalı") || combinedMeta.includes("çorlu") || combinedMeta.includes("otogar");
+        let combinedMeta = ((nextStop ? nextStop.name : '') + ' ' + (prevStop ? prevStop.name : '') + ' + ' + (this.activeRouteData.name || '')).toLowerCase();
+        let isIntercityCorridor = combinedMeta.includes("otoyol") || combinedMeta.includes("çevre yolu") || combinedMeta.includes("malkara") || combinedMeta.includes("saray") || combinedMeta.includes("kınalı") || (this.activeRouteData && (this.activeRouteData.isIntercity || this.activeRouteData.isDistrict));
         let isBoulevardCampus = combinedMeta.includes("üniversite") || combinedMeta.includes("kampüs") || combinedMeta.includes("sanayi") || combinedMeta.includes("hastane") || combinedMeta.includes("sahil") || combinedMeta.includes("bulvar");
 
         let calibratedMeters = rawDistKm * 1000;
         if (isIntercityCorridor) {
-            // İlçeler arası gerçek durak mesafesi: 2.4 km - 4.2 km
             if (calibratedMeters < 2400) calibratedMeters = 2400 + ((this.currentStopIndex * 157) % 1800);
         } else if (isBoulevardCampus) {
-            // Ana bulvar, üniversite ve sahil mesafesi: 1.3 km - 2.1 km
             if (calibratedMeters < 1300) calibratedMeters = 1300 + ((this.currentStopIndex * 93) % 800);
         } else {
-            // Şehir içi TEKULAŞ cadde ve mahalle durağı: 850m - 1350m
             if (calibratedMeters < 850) calibratedMeters = 850 + ((this.currentStopIndex * 67) % 500);
         }
 
         let fallbackDistance = Math.round(calibratedMeters);
 
         if (!isResume) {
-            // Önceki duraktan kalan bekleyen OSRM isteği varsa iptal et ve yeni durağın mesafesini anında ata
+            // Önceki duraktan kalan bekleyen OSRM isteğini ve eski virajları tamamen sıfırla (yollar üst üste binmesin!)
             if (this._osrmAbortController) {
                 try { this._osrmAbortController.abort(); } catch (e) {}
                 this._osrmAbortController = null;
             }
+            this.upcomingTurns = [];
+            this.roadCurvature = 0;
+            const initLaneCont = document.querySelector('.lane-container');
+            if (initLaneCont) initLaneCont.style.transform = 'translateX(-50%) rotateX(60deg) skewX(0deg)';
+            const initBusSpr = document.getElementById('bus-sprite');
+            if (initBusSpr) initBusSpr.style.transform = 'translateX(-50%) rotate(0deg)';
+
             this.currentDistanceToNext = fallbackDistance;
             this.currentLegTotalDistance = this.currentDistanceToNext || 1000;
             this.currentLegDistanceCovered = 0;
@@ -2813,27 +2821,21 @@ const Game = {
                         let routeDist = route.distance;
                         if (routeDist < 850) routeDist = fallbackDistance;
                         const alreadyCovered = Math.max(0, this.currentLegDistanceCovered || 0);
-                        this.currentLegTotalDistance = routeDist;
-                        this.currentDistanceToNext = Math.max(50, routeDist - alreadyCovered); // OSRM gerçek mesafe (sürülen kısım düşülerek)
-                        
+                        const activeTurnWaiting = Array.isArray(this.upcomingTurns) && this.upcomingTurns.some(t => t && t.state === "waiting");
+
                         // Kasis Eşleştirme (Polyline ve OSM verisi ile)
                         const coords = route.geometry.coordinates; // [[lon, lat], [lon, lat]]
                         let accumulatedDistance = 0;
-                        
                         const cityBumps = (typeof window.cityBumps !== 'undefined') ? window.cityBumps[this.currentCity] : [];
-                        
+
                         if (cityBumps && cityBumps.length > 0) {
                             for (let i = 0; i < coords.length - 1; i++) {
                                 let c1 = coords[i]; let c2 = coords[i+1];
-                                // Segment mesafesi (kuş uçuşu - OSRM genelde sık noktalıdır)
                                 let d = typeof calculateDistance === 'function' ? calculateDistance(c1[1], c1[0], c2[1], c2[0]) * 1000 : 50;
                                 accumulatedDistance += d;
-                                
-                                // Bu segment etrafında kasis var mı?
                                 cityBumps.forEach(bump => {
                                     let distToBump = typeof calculateDistance === 'function' ? calculateDistance(bump.lat, bump.lon, c2[1], c2[0]) * 1000 : 100;
-                                    if (distToBump < 50) { // 50 metre yakındaysa yolda kabul et
-                                        // Aynı kasisi tekrar ekleme
+                                    if (distToBump < 50) {
                                         if (!this.routeBumps.find(b => b.lat === bump.lat && b.lon === bump.lon)) {
                                             this.routeBumps.push({ lat: bump.lat, lon: bump.lon, distance: accumulatedDistance, passed: false });
                                         }
@@ -2841,22 +2843,26 @@ const Game = {
                                 });
                             }
                         }
-                        
-                        // TÜRKİYE GERÇEK YOL GEOMETRİSİ VİRAJ ÇIKARIMI (OSRM Polyline Açı Analizi)
-                        if (typeof TurkeyCurvesEngine !== 'undefined') {
-                            const realCurves = TurkeyCurvesEngine.extractCurvesFromCoordinates(coords, routeDist, {
-                                city: this.currentCity,
-                                routeData: this.activeRouteData,
-                                currentStop: nextStop,
-                                prevStop: prevStop
-                            });
-                            if (realCurves && realCurves.length > 0) {
-                                this.upcomingTurns = realCurves;
-                            }
-                        }
 
-                        if (typeof UI !== 'undefined' && document.getElementById('garage-screen').classList.contains('hidden')) {
-                            UI.showToast("Gerçek yol ve virajlar oluşturuldu!", "success");
+                        // Yalnızca araç etaba henüz yeni başlamışsa (< 65m) mesafe ve virajları güncelle;
+                        // sürüş ortasında yolu veya aktif virajı asla değiştirme!
+                        if (alreadyCovered < 65 && !activeTurnWaiting) {
+                            this.currentLegTotalDistance = routeDist;
+                            this.currentDistanceToNext = Math.max(250, routeDist - alreadyCovered);
+
+                            if (typeof TurkeyCurvesEngine !== 'undefined') {
+                                const realCurves = TurkeyCurvesEngine.extractCurvesFromCoordinates(coords, routeDist, {
+                                    city: this.currentCity,
+                                    routeData: this.activeRouteData,
+                                    currentStop: nextStop,
+                                    prevStop: prevStop,
+                                    stopIndex: this.currentStopIndex
+                                });
+                                if (Array.isArray(realCurves)) {
+                                    const maxAllowedDist = this.currentDistanceToNext - 120;
+                                    this.upcomingTurns = realCurves.filter(c => c && typeof c.distance === 'number' && c.distance > 160 && c.distance < maxAllowedDist);
+                                }
+                            }
                         }
                     } else if (!this.currentDistanceToNext || this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
                         this.currentDistanceToNext = fallbackDistance;
@@ -2916,77 +2922,48 @@ const Game = {
             }
         }
 
-        // --- TÜRKİYE KARAYOLLARI GERÇEK VİRAJ VE DAĞ GEÇİTLERİ SİSTEMİ ---
-        if (typeof TurkeyCurvesEngine !== 'undefined' && (!this.upcomingTurns || this.upcomingTurns.length === 0)) {
-            if (this.activeRouteData && this.activeRouteData.stops && this.activeRouteData.stops.length >= 3) {
-                this.upcomingTurns = TurkeyCurvesEngine.extractCurvesFromStopCoordinates(this.activeRouteData.stops, this.currentDistanceToNext, {
-                    city: this.currentCity,
-                    routeData: this.activeRouteData,
-                    currentStop: nextStop,
-                    prevStop: prevStop
-                });
+        // --- TÜRKİYE KARAYOLLARI GERÇEK VİRAJ VE DAĞ GEÇİTLERİ SİSTEMİ (TEKİL VE ÇAKIŞMASIZ) ---
+        if (!isResume || !Array.isArray(this.upcomingTurns)) {
+            if (typeof TurkeyCurvesEngine !== 'undefined') {
+                if (this.activeRouteData && this.activeRouteData.stops && this.activeRouteData.stops.length >= 3) {
+                    this.upcomingTurns = TurkeyCurvesEngine.extractCurvesFromStopCoordinates(this.activeRouteData.stops, this.currentDistanceToNext, {
+                        city: this.currentCity,
+                        routeData: this.activeRouteData,
+                        currentStop: nextStop,
+                        prevStop: prevStop,
+                        stopIndex: this.currentStopIndex
+                    });
+                } else {
+                    this.upcomingTurns = TurkeyCurvesEngine.getCurvatureForCorridor(this.currentCity, this.activeRouteData, this.currentDistanceToNext, {
+                        currentStop: nextStop,
+                        prevStop: prevStop,
+                        stopIndex: this.currentStopIndex
+                    });
+                }
             } else {
-                this.upcomingTurns = TurkeyCurvesEngine.getCurvatureForCorridor(this.currentCity, this.activeRouteData, this.currentDistanceToNext, {
-                    currentStop: nextStop,
-                    prevStop: prevStop
-                });
+                this.upcomingTurns = [];
+                if (this.currentDistanceToNext >= 1100) {
+                    const turnDist = Math.round(this.currentDistanceToNext * 0.45);
+                    this.upcomingTurns.push({
+                        distance: turnDist,
+                        direction: (this.currentStopIndex % 2 === 0) ? "hafif sağa" : "hafif sola",
+                        requiredProgress: 70,
+                        isSpecial: false,
+                        currentProgress: 0,
+                        milestones: [300, 0],
+                        state: "approaching",
+                        lastWarningTime: 0
+                    });
+                }
             }
         }
-        if (!this.upcomingTurns || this.upcomingTurns.length === 0) {
+
+        if (!Array.isArray(this.upcomingTurns)) {
             this.upcomingTurns = [];
         }
-        let numTurns = Math.floor(this.currentDistanceToNext / 1500);
-        if (numTurns > 3) numTurns = 3;
-        
-        const directions = [
-            { dir: "tam sağa", req: 100 },
-            { dir: "hafif sağa", req: 50 },
-            { dir: "tam sola", req: 100 },
-            { dir: "hafif sola", req: 50 },
-            { dir: "kavşaktan tam sağa dönün", req: 150, special: true },
-            { dir: "düz ilerleyin", req: 0, special: true }
-        ];
-
-        let remainingDistance = this.currentDistanceToNext;
-        for(let i=0; i<numTurns; i++) {
-            remainingDistance -= (500 + Math.random() * 1000);
-            if (remainingDistance > 300) {
-                const randType = directions[Math.floor(Math.random() * directions.length)];
-                
-                // Mesafeye göre rastgele bildirim noktaları oluştur
-                const initialDistToTurn = this.currentDistanceToNext - remainingDistance;
-                const allMilestones = [1000, 800, 500, 300, 100];
-                
-                // Sadece dönüşe yeterince mesafe varsa o kilometre taşını dahil et
-                let valid = allMilestones.filter(m => m < initialDistToTurn - 50);
-                
-                // Her noktada %40 ihtimalle sessiz kal (çok konuşup darlamaması için)
-                let selectedMilestones = valid.filter(() => Math.random() > 0.4);
-                
-                // Eğer şans eseri hepsi silinmişse, en az 1 tane uyarı bırak
-                if (valid.length > 0 && selectedMilestones.length === 0) {
-                    selectedMilestones.push(valid[Math.floor(Math.random() * valid.length)]);
-                }
-                
-                // 0 (Şimdi dönün) uyarısı her zaman var
-                selectedMilestones.push(0);
-                // Büyükten küçüğe sırala
-                selectedMilestones.sort((a,b) => b - a);
-                
-                this.upcomingTurns.push({
-                    distance: remainingDistance,
-                    direction: randType.dir,
-                    requiredProgress: randType.req,
-                    isSpecial: randType.special || false,
-                    currentProgress: 0,
-                    milestones: selectedMilestones,
-                    state: "approaching", // approaching, waiting, completed
-                    lastWarningTime: 0
-                });
-            }
-        }
-        // Uzaklığa göre büyükten küçüğe sırala
-        this.upcomingTurns.sort((a,b) => b.distance - a.distance);
+        // Geçersiz veya durağa aşırı yakın virajları temizle ve büyükten küçüğe sırala
+        this.upcomingTurns = this.upcomingTurns.filter(t => t && typeof t.distance === 'number' && !isNaN(t.distance) && t.distance > 140 && t.distance < (this.currentDistanceToNext - 100));
+        this.upcomingTurns.sort((a, b) => b.distance - a.distance);
 
         const hudNextStopEl = document.getElementById('hud-next-stop');
         if (hudNextStopEl) {
@@ -3475,39 +3452,21 @@ const Game = {
 
         if (this.upcomingTurns && this.upcomingTurns.length > 0 && this.speed > 5) {
             const currentTurn = this.upcomingTurns[0];
+            if (!currentTurn || typeof currentTurn.distance !== 'number' || isNaN(currentTurn.distance)) {
+                this.upcomingTurns.shift();
+            } else {
             const distToTurn = this.currentDistanceToNext - currentTurn.distance;
+            if (!Array.isArray(currentTurn.milestones)) {
+                currentTurn.milestones = [0];
+            } else if (currentTurn.state === "approaching" && !currentTurn.milestones.includes(0)) {
+                currentTurn.milestones.push(0);
+            }
 
             if (distToTurn < -250 && currentTurn.state !== "completed") {
-                audio.speak("Yanlış yöne saptınız, rota yeniden hesaplanıyor.");
-                document.getElementById('nav-feedback').innerText = "Yanlış yöne girildi! Rota +100m uzadı.";
-                document.getElementById('nav-feedback').style.color = '#ef4444';
-                
-                this.currentDistanceToNext += 100;
                 this.roadCurvature = 0;
-                
-                // Zaman aşıldığında dönüşü diziden çıkar ki sonsuza kadar kalmasın
+                const staleLane = document.querySelector('.lane-container');
+                if (staleLane) staleLane.style.transform = 'translateX(-50%) rotateX(60deg) skewX(0deg)';
                 this.upcomingTurns.shift();
-                
-                // Rota yeniden hesaplandı: Türkiye karayolları otantik virajı ekle
-                if (this.currentDistanceToNext > 500) {
-                    if (typeof TurkeyCurvesEngine !== 'undefined') {
-                        const fallbackCurves = TurkeyCurvesEngine.getCurvatureForCorridor(this.currentCity, this.activeRouteData, this.currentDistanceToNext);
-                        if (fallbackCurves && fallbackCurves.length > 0) {
-                            this.upcomingTurns.unshift(fallbackCurves[0]);
-                        }
-                    } else {
-                        const newTurnDist = this.currentDistanceToNext - (300 + Math.random() * 200);
-                        this.upcomingTurns.unshift({
-                            distance: newTurnDist,
-                            direction: "hafif sağa",
-                            requiredProgress: 80,
-                            state: "approaching",
-                            currentProgress: 0,
-                            milestones: [250, 0],
-                            lastWarningTime: 0
-                        });
-                    }
-                }
             } 
             else if (currentTurn.state === "approaching") {
                 
@@ -3694,6 +3653,7 @@ const Game = {
                         this.upcomingTurns.shift();
                     }
                 }
+            }
             }
         }
 

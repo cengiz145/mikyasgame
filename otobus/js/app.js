@@ -1470,12 +1470,28 @@ document.addEventListener('DOMContentLoaded', () => {
         listEl.innerHTML = '';
         
         const currentCity = Game.currentCity || "Tekirdağ";
-        const districtList = (typeof ilceRotalari !== 'undefined' && ilceRotalari[currentCity]) 
-            ? ilceRotalari[currentCity] 
-            : (typeof ilceRotalari !== 'undefined' ? ilceRotalari["Tekirdağ"] : []);
+        const curDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || (currentCity === "Tekirdağ" ? "Süleymanpaşa" : "Merkez"));
+        let districtList = [];
 
-        const curDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
-        const tkData = (typeof sehirRotalari !== 'undefined' && sehirRotalari["Tekirdağ"] && sehirRotalari["Tekirdağ"].ilcelerBilgisi) ? sehirRotalari["Tekirdağ"].ilcelerBilgisi : null;
+        if (typeof ilceRotalari !== 'undefined' && Array.isArray(ilceRotalari[currentCity])) {
+            districtList = ilceRotalari[currentCity].filter(r => {
+                if (!r || !r.stops || r.stops.length < 2) return false;
+                if (currentCity === "Tekirdağ" && curDist !== 'all') {
+                    return r.isDistrict || r.isBorderRoute || r.isKomsuRoute || r.district === curDist || r.originDistrict === curDist || r.destDistrict === curDist;
+                }
+                return true;
+            });
+        } else if (typeof sehirRotalari !== 'undefined' && sehirRotalari[currentCity] && sehirRotalari[currentCity].ilcelerBilgisi && Array.isArray(sehirRotalari[currentCity].ilcelerBilgisi.liste)) {
+            districtList = sehirRotalari[currentCity].ilcelerBilgisi.liste.slice(0, 12).map(ilce => {
+                return createOrGetFreeRoamRoute(currentCity, ilce.ad || ilce.id, (ilce.ad || ilce.id) + " Genel İlçe Turu");
+            }).filter(Boolean);
+        } else if (typeof window !== 'undefined' && window.TurkeyAdminData && window.TurkeyAdminData[currentCity] && window.TurkeyAdminData[currentCity].districts) {
+            districtList = Object.keys(window.TurkeyAdminData[currentCity].districts).slice(0, 12).map(dName => {
+                return createOrGetFreeRoamRoute(currentCity, dName, dName + " Genel İlçe Turu");
+            }).filter(Boolean);
+        }
+
+        const tkData = (typeof sehirRotalari !== 'undefined' && sehirRotalari[currentCity] && sehirRotalari[currentCity].ilcelerBilgisi) ? sehirRotalari[currentCity].ilcelerBilgisi : null;
         const komsuList = (tkData && tkData.komsuIlceler && tkData.komsuIlceler[curDist]) ? tkData.komsuIlceler[curDist] : [];
 
         const descEl = document.getElementById('district-modal-desc');
@@ -1606,18 +1622,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const cityName = (e.detail && e.detail.city) || (typeof Game !== 'undefined' && Game.currentCity) || "Tekirdağ";
         const districtName = (e.detail && e.detail.district) || (typeof Game !== 'undefined' && Game.activeDistrict) || localStorage.getItem('activeDistrict') || "Süleymanpaşa";
         
-        // Tekirdağ için aktif ilçe rotaları kontrol et
+        // Aktif il ve ilçe rotalarını doğrula (Başka ilin duraklarını asla karıştırma!)
         const task0 = (typeof routesData !== 'undefined') ? routesData["tekirdag_task_0"] : null;
+        const checkDist = (districtName === 'all') ? 'Süleymanpaşa' : districtName;
         const needsRegen = (cityName === "Tekirdağ")
-            ? (!task0 || task0.district !== districtName)
+            ? (!task0 || task0.district !== checkDist)
             : (!routesData || !routesData[`${cityName.toLowerCase()}_task_0`]);
             
-        if (needsRegen) {
-            const realCityStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName])
-                ? varsayilanSehirDuraklari[cityName]
-                : (typeof varsayilanSehirDuraklari !== 'undefined' ? varsayilanSehirDuraklari["Tekirdağ"] : []);
-            
-            if (typeof generateRoutesFromAPI === 'function') {
+        if (needsRegen && typeof generateRoutesFromAPI === 'function') {
+            if (cityName === "Tekirdağ") {
+                const tkStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari["Tekirdağ"])
+                    ? varsayilanSehirDuraklari["Tekirdağ"]
+                    : [];
+                generateRoutesFromAPI(tkStops, "Tekirdağ", checkDist);
+            } else {
+                const realCityStops = (typeof varsayilanSehirDuraklari !== 'undefined' && Array.isArray(varsayilanSehirDuraklari[cityName]) && varsayilanSehirDuraklari[cityName].length >= 2)
+                    ? varsayilanSehirDuraklari[cityName]
+                    : null;
                 generateRoutesFromAPI(realCityStops, cityName, districtName);
             }
         }
