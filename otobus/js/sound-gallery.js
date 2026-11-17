@@ -1276,10 +1276,10 @@ const SoundGallery = {
         {
             id: "human_deniz_wheeze_laugh",
             category: "human",
-            icon: "🌪️",
-            title: "Deniz Abla: En Düşükten Başlayıp Zirveye Çıkan Katıla Katıla Kahkaha Tufanı!",
-            specs: "Orijinal Deniz Sesi • 4 Kademeli Yükselen Ciğer Hırıltılı Uzun Kahkaha Tufanı",
-            desc: "Deniz ablamızın otobüste önce kısık kısık tutmaya çalışıp sonra tutamayarak kademe kademe en şiddetli noktaya tırmanan, ciğerleri hırıldaya hırıldaya katıla katıla güldüğü uzun kahkaha tufanı!",
+            icon: "🫖",
+            title: "Deniz Abla: Cam Siler / Çaydanlık Düdüğü Gibi 'Viu Viu' Viyaklayarak Gülme Krizi!",
+            specs: "Orijinal Deniz Sesi • Sıfır 'Hah' Sesi • Tiz Çaydanlık Viyaklamalı Kahkaha Tufanı",
+            desc: "Deniz ablamızın önce otobüste kısık kısık tutmaya çalışıp sonra tek bir 'hah' diyemeden tiz cam sileceği / çaydanlık düdüğü gibi 'viiiiüüü - hiiiiih' diye viyaklayarak güldüğü efsane sahne!",
             playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playWheezeLaughPhoneDrama) window.HumanNpcVoices.playWheezeLaughPhoneDrama("deniz", true); }
         },
         {
