@@ -3703,7 +3703,7 @@ const Game = {
             const rpmCompressorFactor = Math.max(0.85, (this.engineRPM || 800) / 900);
             if (this.airPressure < 120) {
                 let prevPressure = this.airPressure;
-                this.airPressure += (10.5 * rpmCompressorFactor) * deltaTime;
+                this.airPressure += (18.5 * rpmCompressorFactor) * deltaTime;
                 if (this.airPressure >= 120 && prevPressure < 120) {
                     this.airPressure = 120;
                     this.lastApuPurgeTime = currentTime;
@@ -3788,8 +3788,17 @@ const Game = {
             }
         }
         
-        // İmdat kilitliyse araba hızlanamaz, gaza basma iptal edilir
+        // İmdat kilitliyse araba hızlanamaz, gaza basma iptal edilir; sürücüye neden beklediğini söyle!
         if (this.isEmergencyBrakeLocked) {
+            if (this.keys.w || this.keys.arrowup) {
+                const nowAir = performance.now();
+                if (!this._lastAirLockWarnTime || (nowAir - this._lastAirLockWarnTime > 3500)) {
+                    this._lastAirLockWarnTime = nowAir;
+                    const airMsg = `Hava basıncı doluyor (${Math.round(this.airPressure)} PSI). 61 PSI olduğunda imdat frenleri otomatik çözülecek, lütfen birkaç saniye bekleyiniz.`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(airMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("💨 " + airMsg, "warning");
+                }
+            }
             this.keys.w = false;
             this.keys.arrowup = false;
         }
@@ -3941,8 +3950,9 @@ const Game = {
         // driftVelocity'yi yavaşça target'a yaklaştır
         this.driftVelocity += (this.targetDriftVelocity - this.driftVelocity) * 2 * deltaTime;
         
-        // Hızla orantılı olarak şerit pozisyonunu güncelle
-        let speedFactor = this.speed / 50; // 50 km/h baz alındı
+        // Hızla orantılı olarak şerit pozisyonunu güncelle (Kalkışta da direksiyon tepki versin, bariyere yapışmasın!)
+        const activeSteerSpeed = Math.max(this.speed, (this.keys.w || this.keys.arrowup) ? 18 : 0);
+        let speedFactor = activeSteerSpeed / 50; // 50 km/h baz alındı
         
         let roadCurvature = this.roadCurvature || 0;
         
@@ -3957,8 +3967,9 @@ const Game = {
         const swayChip = (typeof BusFleet !== 'undefined' && BusFleet.getBusChip) ? BusFleet.getBusChip(null, this) : null;
         const stabilityDamping = (swayChip && typeof swayChip.stabilityFactor === 'number') ? swayChip.stabilityFactor : 1.0;
         const suspensionSwayMult = (1.0 + (suspDmg * 0.01) + (chassisDmg * 0.015)) * stabilityDamping;
+        const effectiveDrift = (this.speed > 14) ? (this.driftVelocity * visDriftMultiplier * suspensionSwayMult) : 0;
         
-        let lateralVelocity = (this.steeringAngle + (this.driftVelocity * visDriftMultiplier * suspensionSwayMult) + roadCurvature) * speedFactor;
+        let lateralVelocity = (this.steeringAngle + effectiveDrift + (this.speed > 5 ? roadCurvature : 0)) * speedFactor;
         
         this.lanePosition += lateralVelocity * deltaTime;
 
@@ -4194,15 +4205,20 @@ const Game = {
             audio.updateBusPosition(this.lanePosition);
         }
 
-        // Yol kenarına sürtünme engeli (Ölüm sistemi kaldırıldı)
+        // Yol kenarı koruyucu şerit asistanı: Aracı asla 0 km/s'ye kilitlemez, yumuşakça şerit içine (20 / 80) toplar!
         if (this.lanePosition <= 15 || this.lanePosition >= 85) {
-            this.speed = Math.max(0, this.speed - (15 * deltaTime)); // Kare hızından bağımsız (zaman tabanlı) sürtünme
-            this.lanePosition = Math.max(15, Math.min(85, this.lanePosition)); // Yolda tut
+            const hitLeft = (this.lanePosition <= 15);
+            this.lanePosition = hitLeft ? 19.0 : 81.0;
+            this.driftVelocity = 0;
+            this.targetDriftVelocity = 0;
+            if (this.speed > 30) {
+                this.speed = Math.max(30, this.speed - (12 * deltaTime));
+            }
 
             // Tırtıklı Emniyet Şeridi (Rumble Strips) Titreşim Sesi
-            if ((this.lanePosition <= 18 || this.lanePosition >= 82) && this.speed > 25) {
+            if (this.speed > 15) {
                 if (typeof HighwayFacilities !== 'undefined' && HighwayFacilities.playRumbleSound) {
-                    if (!this._lastRumbleTime || (Date.now() - this._lastRumbleTime > 380)) {
+                    if (!this._lastRumbleTime || (Date.now() - this._lastRumbleTime > 450)) {
                         this._lastRumbleTime = Date.now();
                         HighwayFacilities.playRumbleSound();
                     }
@@ -5436,7 +5452,7 @@ const Game = {
         // Durağa varış tamamlandı; kapılar henüz açılmadı. Kalkış işlemi yolcular binip kapılar kapandıktan sonra tetiklenir.
     },
 
-    checkAutoDepart: function() {
+    checkAutoDepart: function(fromGasKey = false) {
         if (this.departCountdownTimer) {
             clearTimeout(this.departCountdownTimer);
             this.departCountdownTimer = null;
@@ -5444,16 +5460,32 @@ const Game = {
             document.getElementById('global-progress-text').parentElement.classList.add('hidden');
         }
         
-        // Koşan yolcu veya onay bekleyen yolcu olayı varsa hemen kalkış yapma
-        if (this.activeRunningPassenger || this.activePassengerEvent) {
+        // Koşan yolcu veya onay bekleyen yolcu olayı varsa hemen kalkış yapma (Gaza basıldıysa sebebini söyle!)
+        if (this.activeRunningPassenger) {
+            if (fromGasKey) {
+                const rMsg = "Durağa koşan yolcu var! Almak için PageUp (Sayfa Yukarı) tuşuyla ön kapıyı açınız.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(rMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🏃 " + rMsg, "info");
+            }
+            return;
+        }
+        if (this.activePassengerEvent) {
+            if (fromGasKey) {
+                const eMsg = "Yetersiz bakiyeli yolcu kararınızı bekliyor! İzin vermek için Y, indirmek için N tuşuna basınız.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(eMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("💳 " + eMsg, "warning");
+            }
             return;
         }
 
         const remAlightEl = document.getElementById('stop-alighting-count');
         const remAlightCount = remAlightEl ? (parseInt(remAlightEl.innerText, 10) || 0) : 0;
         if (remAlightCount > 0 && this.activeRouteData && Array.isArray(this.activeRouteData.stops) && this.currentStopIndex < this.activeRouteData.stops.length - 1) {
-            if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onMissedAlightBlock === 'function') {
-                window.HumanNpcVoices.onMissedAlightBlock();
+            const handledAlight = (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onMissedAlightBlock === 'function')
+                ? window.HumanNpcVoices.onMissedAlightBlock()
+                : false;
+            if (!handledAlight && fromGasKey && typeof audio !== 'undefined' && audio.speak) {
+                audio.speak("Durakta inecek yolcular var! Önce PageDown (Sayfa Aşağı) tuşuyla arka kapıyı açıp yolcuları indiriniz.");
             }
             return;
         }
@@ -6227,7 +6259,34 @@ const Game = {
                     if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
                     if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("♿ " + msg, "warning");
                 } else {
-                    this.checkAutoDepart();
+                    this.checkAutoDepart(true);
+                }
+            } else if (!this.isDriving && isDrivingScreen && !e.repeat && (k === 'w' || e.code === 'KeyW' || k === 'arrowup' || e.code === 'ArrowUp')) {
+                // Yolda yakıt bitmesi veya döngü durması halinde acil yedek bidon + sürüş kurtarma!
+                if (typeof this.currentFuelLiters === 'number' && this.currentFuelLiters <= 0) {
+                    this.currentFuelLiters = 30;
+                    this.fuelWarned15 = false;
+                    this.fuelWarned5 = false;
+                    this.engineStarted = true;
+                    this.isDriving = true;
+                    if (typeof audio !== 'undefined' && !audio.isEngineRunning && typeof audio.startEngine === 'function') {
+                        audio.startEngine();
+                    }
+                    this.lastFrameTime = performance.now();
+                    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+                    this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
+                    const recMsg = "Acil durum yedek mazot bidonu (30 Litre) depoya eklendi ve motor çalıştırıldı, yola devam edebilirsiniz!";
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(recMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⛽ " + recMsg, "success");
+                } else if (!this.isBeingTowed) {
+                    this.isDriving = true;
+                    if (typeof audio !== 'undefined' && !audio.isEngineRunning && typeof audio.startEngine === 'function') {
+                        this.engineStarted = true;
+                        audio.startEngine();
+                    }
+                    this.lastFrameTime = performance.now();
+                    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+                    this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
                 }
             }
         }
@@ -6849,6 +6908,19 @@ window.addEventListener('keydown', (e) => {
     }
 });
 window.addEventListener('keyup', (e) => Game.handleKeyUp(e));
+window.addEventListener('blur', () => {
+    if (typeof Game !== 'undefined' && Game.keys) {
+        Game.keys.w = false;
+        Game.keys.s = false;
+        Game.keys.a = false;
+        Game.keys.d = false;
+        Game.keys.arrowup = false;
+        Game.keys.arrowdown = false;
+        Game.keys.arrowleft = false;
+        Game.keys.arrowright = false;
+        Game.isBrakeKeyDown = false;
+    }
+});
 
 // BUG FIX: Sekme değiştiğinde veya pencere odağı kaybolduğunda takılı kalan tuşları (Hayalet Girdi) temizle
 window.addEventListener('blur', () => {
