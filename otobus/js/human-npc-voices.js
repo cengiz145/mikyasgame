@@ -59,24 +59,78 @@
         patienceMild: [
             { file: 'warn_mild_01.mp3', label: 'Tonton Teyze: "Aman kaptan evladım, biraz yumuşak bas şu frene, dizlerim ağrıyor tutunamıyorum."' },
             { file: 'warn_mild_02.mp3', label: 'Yolcu Hanım: "Kaptan bey, kasislere biraz daha yavaş girerseniz çok seviniriz, sarsıldık arkada."' },
-            { file: 'kid_bump_01.mp3', label: 'Çocuk Yolcu: "Hoop! Anne sıkı tutun, kaptan bizi uçuracak galiba!"' }
+            { file: 'kid_bump_01.mp3', label: 'Çocuk Yolcu: "Hoop! Anne sıkı tutun, kaptan bizi uçuracak galiba!"' },
+            { file: 'warn_mild_03.mp3', label: 'Pazar Arabalı Teyze: "Ayy domateslerim ezilecek poşette kaptan oğlum, azıcık yavaş gir şu çukurlara!"' },
+            { file: 'warn_mild_04.mp3', label: 'Öğrenci Genç Kız: "Hoop! Telefon elimden uçuyordu az kalsın kaptan abi, ne fren yaptın be!"' }
         ],
         patienceMedium: [
             { file: 'warn_medium_01.mp3', label: 'Emekli Amca: "Yeter ama kaptan bey! Az önce de sarsıldık, çuval mı taşıyorsun insan mı taşıyorsun?!"' },
-            { file: 'warn_medium_02.mp3', label: 'Yolcu Hanım: "Kaptan bey lütfen dikkat edin artık, üst üste ani fren yapıyorsunuz, ayaktaki yolcular düşecek!"' }
+            { file: 'warn_medium_02.mp3', label: 'Yolcu Hanım: "Kaptan bey lütfen dikkat edin artık, üst üste ani fren yapıyorsunuz, ayaktaki yolcular düşecek!"' },
+            { file: 'warn_medium_03.mp3', label: 'Takım Elbiseli Yolcu: "Kaptan bey gömleğime kahve döküldü sarsıntıdan, biraz daha özenli kullanalım lütfen!"' },
+            { file: 'warn_medium_04.mp3', label: 'Bebekli Anne: "Kaptan bey rica ediyorum sarsmayın bu kadar, bebek ağlayacak şimdi arkada!"' }
         ],
         patienceAngry: [
             { file: 'warn_angry_01.mp3', label: 'Tansiyonlu Teyze: "İndir beni ilk durakta kaptan! Bu ne biçim araba kullanmak böyle, tansiyonum fırladı valla!"' },
-            { file: 'warn_angry_02.mp3', label: 'Sinirli Amca: "Kaptan yavaş sür şu otobüsü! Her çukura kasise küt küt giriyorsun, sabrımız taştı artık!"' }
+            { file: 'warn_angry_02.mp3', label: 'Sinirli Amca: "Kaptan yavaş sür şu otobüsü! Her çukura kasise küt küt giriyorsun, sabrımız taştı artık!"' },
+            { file: 'warn_angry_03.mp3', label: 'Öfkeli Yolcu: "Beyaz Masayı arayıp plakanı vereceğim şimdi kaptan! Lunapark mı burası, savura savura götürüyorsun bizi!"' },
+            { file: 'warn_angry_04.mp3', label: 'Öfkeli Teyze: "Tövbe estağfurullah! Evladım bu ne sert sürüş böyle, yüreğimiz ağzımıza geldi kaçıncı sarsıntı bu!"' }
+        ],
+
+        // Sert Viraj, Aşırı Hız, Uzun Bekleme, Korna Sitemi, Usta Sürüş Övgüsü & Doğal Kabin Sohbetleri
+        curvePanic: [
+            { file: 'curve_panic_f1.mp3', label: 'Teyze: "Ayyy savrulduk! Kaptan evladım viraja bu hızla girilir mi, devrileceğiz şimdi!"' },
+            { file: 'curve_panic_m1.mp3', label: 'Emekli Amca: "Hooop tutunun millet! Kaptan ralli mi yapıyorsun, virajda yan yattı koca otobüs!"' },
+            { file: 'curve_kid_01.mp3', label: 'Çocuk Yolcu: "Uuuu! Lunapark treni gibi yana yattık anneee!"' }
+        ],
+        curveMurmur: { file: 'curve_murmur_f1.mp3', label: 'Yolcu Hanım: "Üff başım döndü valla, virajlara biraz daha tatlı girsek keşke kaptan bey."' },
+        stopBell: [
+            { file: 'stop_bell_01.mp3', label: 'Tonton Teyze: "Kaptan evladım, müsait bir yerde durakta indirebilir misin zahmet olmazsa?"' },
+            { file: 'stop_bell_02.mp3', label: 'Emekli Amca: "Kaptan usta, gelecek durakta ineceğiz inşallah, arka kapıyı unutma!"' },
+            { file: 'stop_bell_03.mp3', label: 'Öğrenci Kız: "Kaptan abi, gelecek durakta inecek var!"' }
+        ],
+        stopBellFinal: { file: 'stop_bell_final.mp3', label: 'Yolcu Hanım: "Son durağa geldik çok şükür, elinize sağlık kaptan bey!"' },
+        alightThanks: [
+            { file: 'alight_thank_01.mp3', label: 'İnen Teyze: "Ellerine kollarına sağlık kaptan evladım, Allah kaza bela vermesin, hayırlı işler!"' },
+            { file: 'alight_thank_02.mp3', label: 'İnen Amca: "Kazasız belasız hayırlı nöbetler kaptan usta, kolay gelsin!"' },
+            { file: 'alight_thank_03.mp3', label: 'İnen Öğrenci: "Çok teşekkürler kaptan abi, iyi günler kolay gelsin!"' }
+        ],
+        alightAngry: { file: 'alight_angry_01.mp3', label: 'Sitemli İnen Yolcu: "Oh be nihayet indik, içimiz dışımıza çıktı valla kaptan!"' },
+        waitLong: [
+            { file: 'wait_long_01.mp3', label: 'Sabırsız Yolcu: "Of ya, ne bitmez trafikmiş arkadaş! Kaptan bey önümüzde yol mu tıkandı, niye kıpırdamıyoruz?"' },
+            { file: 'wait_long_02.mp3', label: 'Öğrenci Kız: "Eyvah derse geç kaldık yine, saat kaç oldu hâlâ kıpırdamadık!"' },
+            { file: 'wait_long_03.mp3', label: 'Tonton Teyze: "Sabır çekin evladım sabır, uçacak hali yok ya şoförün, açılır şimdi yol!"' }
+        ],
+        overspeed: [
+            { file: 'overspeed_01.mp3', label: 'Korkan Yolcu: "Kaptan bey biraz yavaş mı gitsek acaba? İbre doksanı geçti, korkuyoruz arkada!"' },
+            { file: 'overspeed_02.mp3', label: 'Emekli Amca: "Aman kaptan usta, acelemiz yok, geç olsun güç olmasın, ayağını gazdan biraz çek gözünü seveyim!"' },
+            { file: 'overspeed_kid.mp3', label: 'Heyecanlı Çocuk: "Vaaay baba bak, otobüs yarış arabası gibi gidiyor vıııınn!"' }
+        ],
+        hornSpam: [
+            { file: 'horn_spam_01.mp3', label: 'Emekli Amca: "Kaptan usta kulağımızın pası silindi valla, düğün konvoyunda mıyız, basma şu kornaya bu kadar!"' },
+            { file: 'horn_spam_02.mp3', label: 'Bebekli Anne: "Şşşt kaptan bey rica ediyorum, kucağımda bebek uyuyor, kornayla sıçrattınız çocuğu!"' }
+        ],
+        smoothPraise: [
+            { file: 'praise_smooth_01.mp3', label: 'Usta Şoför Amca: "Maşallah kaptan kardeşime be! Vites geçişleri, frenaj pamuk gibi, kırk yıllık usta şoförsün valla!"' },
+            { file: 'praise_smooth_02.mp3', label: 'Tonton Teyze: "Çay bardağını konsola koysan bir damla dökülmez valla, pamuk gibi sürüyorsun evladım!"' },
+            { file: 'praise_smooth_03.mp3', label: 'Genç Yolcu: "Valla helal olsun kaptan abi, arkada mışıl mışıl dinlendik, sürüşün on numara!"' }
+        ],
+        ambientSlice: [
+            { file: 'ambient_phone_01.mp3', pan: -0.35, label: 'Arka Koltuk (Telefon): "Alo hanım, otobüsteyim şimdi, on dakikaya merkezde inerim, sıcak ekmek de alırım gelirken..."' },
+            { file: 'ambient_phone_f1.mp3', pan: 0.35, label: 'Öğrenci Sohbeti: "Kanka bindim otobüse geliyorum, kantinde çayı söyle sen, beş dakikaya kampüsteyim!"' },
+            { file: 'ambient_seat_offer.mp3', pan: -0.25, label: 'Kibar Genç: "Buyur teyzeciğim sen şöyle cam kenarına otur, ben ayakta giderim hiç sorun değil."' },
+            { file: 'ambient_kid_question.mp3', pan: 0.25, label: 'Meraklı Çocuk: "Anne bak! Kaptan amcanın önünde ne kadar çok ışıklı düğme var, ben de büyüyünce otobüs kaptanı olacağım!"' },
+            { file: 'ambient_route_ask.mp3', pan: 0.3, label: 'Yolcu Sorusu: "Pardon kaptan abi, bu araç merkez durağından geçiyor mu acaba?"' }
         ],
 
         // Durak, Kapı, Rampa, Bakiye ve İkram Etkileşimleri
         greetings: {
-            yasli: ['teyze_greet.mp3', 'amca_greet.mp3'],
-            ogrenci: ['student_greet_01.mp3'],
+            yasli: ['teyze_greet.mp3', 'amca_greet.mp3', 'greet_amca_02.mp3'],
+            ogrenci: ['student_greet_01.mp3', 'greet_student_02.mp3'],
             tam: ['tam_greet_m1.mp3', 'tam_greet_f1.mp3']
         },
-        standing: 'young_standing.mp3',
+        greetMorning: 'greet_morning_01.mp3',
+        greetEvening: 'greet_evening_01.mp3',
+        standing: ['young_standing.mp3', 'standing_02.mp3', 'standing_03.mp3'],
         rearDoorRemind: 'amca_reardoor.mp3',
         acRequest: 'ac_request.mp3',
         rampThank: 'teyze_ramp_thank.mp3',
@@ -386,26 +440,268 @@
         },
 
         // 5. DURAK BİNİŞ SELAMLARI, AYAKTA YOLCU, KOŞAN YOLCU, YETERSİZ BAKİYE, RAMPA
-        onPassengerBoarded: function (pType, stopIndex, isStanding) {
+        onPassengerBoarded: function (pType, stopIndex, isStanding, clockMinutes) {
             if (!this.canSpeakInCabin()) return;
             if (stopIndex !== this.lastGreetingStopIndex) {
                 this.lastGreetingStopIndex = stopIndex;
                 this.greetingsAtCurrentStop = 0;
+                this.fullStopWarnedIndex = -1;
             }
             if (isStanding && this.greetingsAtCurrentStop === 0) {
                 this.greetingsAtCurrentStop++;
-                setTimeout(() => this.playClip(CLIPS.standing, { pan: 0.25, volume: 0.88 }), 420);
+                const standFile = Array.isArray(CLIPS.standing) ? this.pickRandom(CLIPS.standing) : CLIPS.standing;
+                setTimeout(() => this.playClip(standFile, { pan: 0.25, volume: 0.88 }), 420);
                 return;
             }
             // Her durakta en fazla 1 doğal selam (kalabalık yapmasın, çok gerçekçi duyulsun)
-            if (this.greetingsAtCurrentStop >= 1 || Math.random() > 0.65) return;
+            if (this.greetingsAtCurrentStop >= 1 || Math.random() > 0.72) return;
             this.greetingsAtCurrentStop++;
 
-            const list = CLIPS.greetings[pType] || CLIPS.greetings.tam;
-            const file = this.pickRandom(list);
+            const baseList = (CLIPS.greetings[pType] || CLIPS.greetings.tam).slice();
+            if (typeof clockMinutes === 'number') {
+                if (clockMinutes >= 330 && clockMinutes < 660) baseList.push(CLIPS.greetMorning);
+                else if (clockMinutes >= 1050 || clockMinutes < 300) baseList.push(CLIPS.greetEvening);
+            }
+            const file = this.pickRandom(baseList);
             setTimeout(() => {
                 this.playClip(file, { pan: 0.35, volume: 0.88 });
             }, 460);
+        },
+
+        onBusFullAtStop: function (stopIndex) {
+            if (!this.canSpeakInCabin()) return false;
+            if (this.fullStopWarnedIndex === stopIndex) return false;
+            this.fullStopWarnedIndex = stopIndex;
+            setTimeout(() => {
+                this.playClip('bus_full_left_01.mp3', {
+                    pan: 0.65,
+                    volume: 0.92,
+                    nvdaText: 'Durakta kalan yolcu: Hay Allah, otobüs tamamen dolu, bir sonrakine bineriz artık!',
+                    toastText: '🚏 Duraktaki Yolcu: "İğne atsan yere düşmez otobüste! Bir sonrakine bineriz artık!"',
+                    toastType: 'warning'
+                });
+            }, 450);
+            return true;
+        },
+
+        onRearDoorAlight: function (alightingCount) {
+            if (!this.canSpeakInCabin() || (alightingCount || 0) <= 0) return false;
+            const now = performance.now();
+            if (this._lastAlightVoiceTime && (now - this._lastAlightVoiceTime < 9000)) return false;
+            this._lastAlightVoiceTime = now;
+
+            if ((this.angerLevel || 0) >= 2) {
+                setTimeout(() => {
+                    this.playClip(CLIPS.alightAngry.file, {
+                        pan: -0.45,
+                        volume: 0.92,
+                        nvdaText: CLIPS.alightAngry.label,
+                        toastText: `😤 ${CLIPS.alightAngry.label}`,
+                        toastType: 'warning'
+                    });
+                }, 480);
+                return true;
+            }
+
+            if (Math.random() > 0.78) return false;
+            const chosen = this.pickRandom(CLIPS.alightThanks);
+            setTimeout(() => {
+                this.playClip(chosen.file, {
+                    pan: -0.45,
+                    volume: 0.90,
+                    nvdaText: chosen.label,
+                    toastText: `👋 ${chosen.label}`,
+                    toastType: 'success'
+                });
+            }, 520);
+            return true;
+        },
+
+        onStopBellRing: function (isFinalStop) {
+            if (!this.canSpeakInCabin()) return false;
+            const chosen = isFinalStop ? CLIPS.stopBellFinal : this.pickRandom(CLIPS.stopBell);
+            const pan = Number(((Math.random() - 0.5) * 0.6).toFixed(2));
+            setTimeout(() => {
+                this.playClip(chosen.file, {
+                    pan,
+                    volume: 0.92,
+                    nvdaText: 'Duracak zili çaldı. ' + chosen.label,
+                    toastText: `🔔 ${chosen.label}`,
+                    toastType: 'info'
+                });
+            }, 520);
+            return true;
+        },
+
+        onSharpCurve: function (state, isTurnRight, passengersOnBoard) {
+            if (!this.canSpeakInCabin() || (passengersOnBoard || 0) <= 0) return false;
+            const now = performance.now();
+            if (this._lastCurveVoiceTime && (now - this._lastCurveVoiceTime < 8500)) return false;
+            this._lastCurveVoiceTime = now;
+
+            const throwPan = isTurnRight ? -0.55 : 0.55;
+            if (state === 'panic') {
+                this.angerLevel = Math.min(4, (this.angerLevel || 0) + 1);
+                const chosen = this.pickRandom(CLIPS.curvePanic);
+                this.playClip(chosen.file, {
+                    pan: throwPan,
+                    volume: 0.96,
+                    interrupt: true,
+                    nvdaText: chosen.label,
+                    toastText: `↩️ ${chosen.label}`,
+                    toastType: 'warning'
+                });
+                return true;
+            } else if (state === 'murmur') {
+                this.playClip(CLIPS.curveMurmur.file, {
+                    pan: throwPan * 0.65,
+                    volume: 0.88,
+                    nvdaText: CLIPS.curveMurmur.label,
+                    toastText: `💫 ${CLIPS.curveMurmur.label}`,
+                    toastType: 'info'
+                });
+                return true;
+            }
+            return false;
+        },
+
+        onStopPunctuality: function (deltaMinutes, waitingCount) {
+            if (!this.canSpeakInCabin() || (waitingCount || 0) <= 0 || typeof deltaMinutes !== 'number') return false;
+            if (deltaMinutes >= 4.0) {
+                setTimeout(() => {
+                    if (this.activeHowl && this.activeHowl.playing && this.activeHowl.playing()) return;
+                    this.playClip('late_complain_01.mp3', {
+                        pan: 0.45,
+                        volume: 0.90,
+                        nvdaText: 'Duraktaki yolcu rötar sitemi: Neredesin be kaptan bey, ağaç olduk durakta beklemekten!',
+                        toastText: '⏱️ Duraktaki Yolcu: "Ağaç olduk durakta beklemekten kaptan bey, rötar yaptı bu hat!"',
+                        toastType: 'warning'
+                    });
+                }, 3100);
+                return true;
+            } else if (Math.abs(deltaMinutes) <= 1.0) {
+                this._ontimeCount = (this._ontimeCount || 0) + 1;
+                if (this._ontimeCount % 3 === 1) {
+                    setTimeout(() => {
+                        if (this.activeHowl && this.activeHowl.playing && this.activeHowl.playing()) return;
+                        this.playClip('ontime_praise_01.mp3', {
+                            pan: 0.4,
+                            volume: 0.90,
+                            nvdaText: 'Duraktaki yolcu: Vallahi İsviçre saati gibi tam dakikasında geldi otobüs, helal olsun kaptan!',
+                            toastText: '⌚ Yolcu: "İsviçre saati gibi tam dakikasında geldi otobüs, helal olsun kaptan!"',
+                            toastType: 'success'
+                        });
+                    }, 3100);
+                    return true;
+                }
+            }
+            return false;
+        },
+
+        onLongStationaryWait: function () {
+            if (!this.canSpeakInCabin()) return false;
+            this._waitIdx = ((this._waitIdx || 0) + 1) % CLIPS.waitLong.length;
+            const chosen = CLIPS.waitLong[this._waitIdx];
+            this.playClip(chosen.file, {
+                pan: -0.25,
+                volume: 0.90,
+                nvdaText: chosen.label,
+                toastText: `⏳ ${chosen.label}`,
+                toastType: 'info'
+            });
+            return true;
+        },
+
+        onHornPressed: function (passengersOnBoard, hasNearbyHazard) {
+            if (!this.canSpeakInCabin() || (passengersOnBoard || 0) <= 0 || hasNearbyHazard) return false;
+            const now = performance.now();
+            this._hornTimes = (this._hornTimes || []).filter(t => (now - t) < 8000);
+            this._hornTimes.push(now);
+            if (this._hornTimes.length >= 3 && (!this._lastHornScoldTime || (now - this._lastHornScoldTime > 22000))) {
+                this._hornTimes = [];
+                this._lastHornScoldTime = now;
+                const chosen = this.pickRandom(CLIPS.hornSpam);
+                setTimeout(() => {
+                    this.playClip(chosen.file, {
+                        pan: -0.2,
+                        volume: 0.94,
+                        nvdaText: chosen.label,
+                        toastText: `📯 ${chosen.label}`,
+                        toastType: 'warning'
+                    });
+                }, 420);
+                return true;
+            }
+            return false;
+        },
+
+        onLowAirAlarm: function (passengersOnBoard) {
+            if (!this.canSpeakInCabin() || (passengersOnBoard || 0) <= 0) return false;
+            const now = performance.now();
+            if (this._lastLowAirVoice && (now - this._lastLowAirVoice < 35000)) return false;
+            this._lastLowAirVoice = now;
+            setTimeout(() => {
+                this.playClip('low_air_panic_m1.mp3', {
+                    pan: -0.3,
+                    volume: 0.94,
+                    nvdaText: 'Yolcu telaşı: Kaptan usta bu öten alarm neyin nesi yahu, otobüsün havası mı bitti?!',
+                    toastText: '🚨 Yolcu: "Kaptan usta bu öten alarm neyin nesi yahu, otobüsün havası mı bitti?!"',
+                    toastType: 'warning'
+                });
+            }, 650);
+            return true;
+        },
+
+        onThunderclap: function (passengersOnBoard) {
+            if (!this.canSpeakInCabin() || (passengersOnBoard || 0) <= 0) return false;
+            const now = performance.now();
+            if (this._lastThunderVoice && (now - this._lastThunderVoice < 75000)) return false;
+            this._lastThunderVoice = now;
+            setTimeout(() => {
+                this.playClip('weather_thunder_01.mp3', {
+                    pan: 0.25,
+                    volume: 0.90,
+                    nvdaText: 'Tonton Teyze: Bismillahirrahmanirrahim! Ne gök gürledi öyle, iyi ki otobüsün içindeyiz!',
+                    toastText: '⛈️ Teyze: "Bismillahirrahmanirrahim! Ne gök gürledi öyle, iyi ki otobüsün içindeyiz!"',
+                    toastType: 'info'
+                });
+            }, 900);
+            return true;
+        },
+
+        onDriverWindowOpened: function (gameObj) {
+            if (!this.canSpeakInCabin() || !gameObj || (gameObj.passengersOnBoard || 0) <= 0) return false;
+            const isColdOrWet = (gameObj.weather === 'rainy' || gameObj.weather === 'snowy' || (typeof gameObj.temperature === 'number' && gameObj.temperature <= 14) || gameObj.speed > 55);
+            if (!isColdOrWet) return false;
+            const now = performance.now();
+            if (this._lastWindowDraftVoice && (now - this._lastWindowDraftVoice < 45000)) return false;
+            this._lastWindowDraftVoice = now;
+            setTimeout(() => {
+                if (typeof audio !== 'undefined' && audio.isWindowOpen) {
+                    this.playClip('window_draft_01.mp3', {
+                        pan: -0.35,
+                        volume: 0.90,
+                        nvdaText: 'Ön koltuktaki yolcu: Üff kaptan bey, açık camdan buz gibi cereyan vurdu boynumuza, End tuşuyla kapatabilir misiniz?',
+                        toastText: '🪟 Yolcu: "Açık camdan buz gibi cereyan vurdu boynumuza kaptan bey! (End: Camı Kapat)"',
+                        toastType: 'info'
+                    });
+                }
+            }, 2200);
+            return true;
+        },
+
+        onCaptainTeaSip: function (passengersOnBoard) {
+            if (!this.canSpeakInCabin() || (passengersOnBoard || 0) <= 0) return false;
+            setTimeout(() => {
+                this.playClip('tea_smell_kid.mp3', {
+                    pan: 0.25,
+                    volume: 0.92,
+                    nvdaText: 'Çocuk Yolcu: Mmm! Kaptan amcanın çayı ne güzel koktu, benim de canım simit çekti anne!',
+                    toastText: '🫖 Çocuk Yolcu: "Mmm! Kaptan amcanın çayı ne güzel koktu, canım simit çekti anne!"',
+                    toastType: 'success'
+                });
+            }, 900);
+            return true;
         },
 
         onRunningPassengerAppear: function () {
@@ -741,10 +1037,67 @@
             }
         },
 
-        // 10. AKILLI KABİN İÇİ ORTAM & GÜVENLİK UYARICI YOLCULAR (FAR, SİLECEK, SICAK/SOĞUK)
+        // 10. AKILLI KABİN İÇİ ORTAM, AŞIRI HIZ, USTA SÜRÜŞ ÖVGÜSÜ & DOĞAL YOLCU SOHBETLERİ
         checkSmartCabinReminders: function (gameObj, deltaTime) {
             if (!gameObj || !gameObj.isDriving || !this.canSpeakInCabin()) return;
             const now = performance.now();
+
+            // Aşırı hız tepkisi (92 km/s ve üzeri 5.5 saniye kesintisiz sürülürse)
+            if ((gameObj.passengersOnBoard || 0) > 0 && gameObj.speed >= 92) {
+                this._overspeedSecs = (this._overspeedSecs || 0) + deltaTime;
+                if (this._overspeedSecs >= 5.5 && (!this._lastOverspeedTime || (now - this._lastOverspeedTime > 38000))) {
+                    this._overspeedSecs = 0;
+                    this._lastOverspeedTime = now;
+                    this.lastSmartRemindTime = now;
+                    const chosen = this.pickRandom(CLIPS.overspeed);
+                    this.playClip(chosen.file, {
+                        pan: -0.25,
+                        volume: 0.94,
+                        nvdaText: chosen.label,
+                        toastText: `🏎️ ${chosen.label}`,
+                        toastType: 'warning'
+                    });
+                    return;
+                }
+            } else {
+                this._overspeedSecs = 0;
+            }
+
+            // Pamuk gibi sarsıntısız usta sürüş övgüsü & Doğal kabin içi yaşam sohbetleri
+            if ((gameObj.passengersOnBoard || 0) >= 2 && gameObj.speed >= 26 && gameObj.speed <= 84 && (gameObj.passengerComfort || 100) >= 97 && (this.angerLevel || 0) === 0) {
+                this._smoothDriveSecs = (this._smoothDriveSecs || 0) + deltaTime;
+                if (this._smoothDriveSecs >= 52 && (!this.lastSmartRemindTime || (now - this.lastSmartRemindTime > 36000))) {
+                    this._smoothDriveSecs = 0;
+                    this.lastSmartRemindTime = now;
+                    this._ambientToggle = !this._ambientToggle;
+                    if (this._ambientToggle) {
+                        const praise = this.pickRandom(CLIPS.smoothPraise);
+                        if (typeof gameObj.addMoney === 'function') gameObj.addMoney(20);
+                        if (typeof gameObj.addXP === 'function') gameObj.addXP(15);
+                        this.playClip(praise.file, {
+                            pan: 0.2,
+                            volume: 0.92,
+                            nvdaText: praise.label + ' Artı 20 Lira ve 15 XP Usta Sürüş Övgüsü!',
+                            toastText: `🌟 ${praise.label} (+20 ₺ / +15 XP)`,
+                            toastType: 'success'
+                        });
+                    } else {
+                        this._ambientIdx = ((this._ambientIdx || 0) + 1) % CLIPS.ambientSlice.length;
+                        const slice = CLIPS.ambientSlice[this._ambientIdx];
+                        this.playClip(slice.file, {
+                            pan: slice.pan,
+                            volume: 0.80,
+                            nvdaText: slice.label,
+                            toastText: `💬 ${slice.label}`,
+                            toastType: 'info'
+                        });
+                    }
+                    return;
+                }
+            } else if ((this.angerLevel || 0) > 0) {
+                this._smoothDriveSecs = 0;
+            }
+
             if (this.lastSmartRemindTime && (now - this.lastSmartRemindTime < 48000)) return;
 
             if (gameObj.isNight && !gameObj.isHeadlightsOn && gameObj.speed > 22 && (!gameObj.busDamage || gameObj.busDamage.headlights < 100)) {

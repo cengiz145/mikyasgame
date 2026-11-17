@@ -930,6 +930,96 @@ const SoundGallery = {
             specs: "F1 Akademi & F2 Başucu Sözlüğü",
             desc: "Retarder ve ağır vasıta sürüş sırlarını anlatan baş eğitmen.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("concept_retarder.mp3", { pan: 0, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_curve_teyze",
+            category: "human",
+            icon: "↩️",
+            title: "Sert Virajda Savrulan Tonton Teyze",
+            specs: "Merkezkaç Fiziği & Viraj Savrulması",
+            desc: "Viraja aşırı hızlı girdiğinizde koltukta yana savrulup korkan teyze.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("curve_panic_f1.mp3", { pan: -0.55, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_praise_amca",
+            category: "human",
+            icon: "🌟",
+            title: "Pamuk Sürüşü Öven Usta Şoför Amca",
+            specs: "Sarsıntısız Sürüş Ödülü (+20 ₺ / +15 XP)",
+            desc: "Uzun süre sarsmadan pamuk gibi sürdüğünüzde takdir eden emekli kaptan.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("praise_smooth_01.mp3", { pan: 0.2, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_tea_kid",
+            category: "human",
+            icon: "🫖",
+            title: "Kaptanın Çay Kokusuna İmrenen Çocuk",
+            specs: "Shift + C Çay Molası Tepkisi",
+            desc: "Durakta sıcak çay yudumladığınızda canı simit çeken sevimli çocuk.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("tea_smell_kid.mp3", { pan: 0.25, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_horn_mom",
+            category: "human",
+            icon: "📯",
+            title: "Kornaya Kızan Bebekli Anne",
+            specs: "Üst Üste Korna (L) Sitemi",
+            desc: "Trafikte gereksiz yere peş peşe kornaya bastığınızda bebeği uyanan anne.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("horn_spam_02.mp3", { pan: -0.2, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_stop_bell",
+            category: "human",
+            icon: "🔔",
+            title: "Duracak Zili Çalınca Seslenen Teyze",
+            specs: "220m Durak İstek Anonsu",
+            desc: "İnecek var zili çaldığında arkadan nazikçe seslenen yaşlı yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("stop_bell_01.mp3", { pan: -0.3, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_alight_bless",
+            category: "human",
+            icon: "👋",
+            title: "Arka Kapıdan İnerken Hayır Duası",
+            specs: "PageDown İniş Nezaketi",
+            desc: "Durakta arka kapıyı açtığınızda ellerin dert görmesin diye dua eden yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("alight_thank_01.mp3", { pan: -0.45, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_coffee_spill",
+            category: "human",
+            icon: "☕",
+            title: "Gömleğine Kahve Dökülen Yolcu (2. Kademe)",
+            specs: "Hafızalı Yolcu Sabır Sistemi",
+            desc: "Sert fren ve çukurda üstüne kahve dökülüp sitem eden yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("warn_medium_03.mp3", { pan: 0.2, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_beyaz_masa",
+            category: "human",
+            icon: "😠",
+            title: "Beyaz Masaya Şikayet Eden Öfkeli Yolcu",
+            specs: "3. Kademe Sabır Taşması",
+            desc: "Üst üste sarsıntılardan sonra plakanızı almaya kalkan öfkeli yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("warn_angry_03.mp3", { pan: -0.25, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_seat_offer",
+            category: "human",
+            icon: "💺",
+            title: "Yaşlı Teyzeye Yer Veren Kibar Genç",
+            specs: "Doğal Kabin İçi Yaşam Sohbeti",
+            desc: "Seyir halinde arka koltuklarda yaşlı yolcuya cam kenarını veren genç.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("ambient_seat_offer.mp3", { pan: -0.25, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_thunder",
+            category: "human",
+            icon: "⛈️",
+            title: "Gök Gürleyince İrkilen Teyze",
+            specs: "Sağanak Yağış & Fırtına Atmosferi",
+            desc: "Dışarıda şiddetli gök gürlediğinde otobüsün içinde dua eden teyze.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("weather_thunder_01.mp3", { pan: 0.25, volume: 1.0, force: true, interrupt: true }); }
         }
     ],
 
@@ -1223,7 +1313,7 @@ const SoundGallery = {
                 statusBanner.style.display = 'flex';
                 statusText.innerText = '▶️ Çalıyor: ' + s.title;
             }
-            if (typeof audio !== 'undefined' && audio.speak) {
+            if (s.category !== 'human' && typeof audio !== 'undefined' && audio.speak) {
                 audio.speak(s.title + ' çalınıyor.');
             }
             if (typeof s.playFn === 'function') {

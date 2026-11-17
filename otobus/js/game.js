@@ -3610,10 +3610,14 @@ const Game = {
                         }
                         if (evalRes.passengerState === 'panic' && (!currentTurn.lastPanicTime || currentTime > currentTurn.lastPanicTime + 6000)) {
                             if (typeof audio.playPassengerShock === 'function') audio.playPassengerShock();
-                            if (typeof audio.speak === 'function') audio.speak("Kaptan yavaş, viraj çok sert savuruyor!");
+                            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onSharpCurve('panic', isTurnRight, this.passengersOnBoard))) {
+                                if (typeof audio.speak === 'function') audio.speak("Kaptan yavaş, viraj çok sert savuruyor!");
+                            }
                             currentTurn.lastPanicTime = currentTime;
                         } else if (evalRes.passengerState === 'murmur' && (!currentTurn.lastMurmurTime || currentTime > currentTurn.lastMurmurTime + 8000)) {
-                            if (typeof audio.playPassengerDiscontent === 'function') audio.playPassengerDiscontent();
+                            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onSharpCurve('murmur', isTurnRight, this.passengersOnBoard))) {
+                                if (typeof audio.playPassengerDiscontent === 'function') audio.playPassengerDiscontent();
+                            }
                             currentTurn.lastMurmurTime = currentTime;
                         }
                     } else if (currentTurn.isScreeching) {
@@ -3752,6 +3756,9 @@ const Game = {
             if (!this.isLowAirAlarmActive) {
                 this.isLowAirAlarmActive = true;
                 audio.startLowAirAlarm();
+                if (typeof window.HumanNpcVoices !== 'undefined') {
+                    window.HumanNpcVoices.onLowAirAlarm(this.passengersOnBoard);
+                }
             }
         } else {
             if (this.isLowAirAlarmActive) {
@@ -4200,8 +4207,10 @@ const Game = {
                     if (lamp) lamp.style.display = 'inline-block';
                     
                     const bellMsg = "Duracak zili çaldı. Gelecek durakta inecek yolcu var.";
-                    if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(bellMsg);
-                    if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(bellMsg);
+                    if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onStopBellRing(isFinalStop))) {
+                        if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(bellMsg);
+                        if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(bellMsg);
+                    }
                 }
             }
 
@@ -4537,8 +4546,10 @@ const Game = {
             this.stationaryWaitTimer = (this.stationaryWaitTimer || 0) + deltaTime;
             if (this.stationaryWaitTimer > 28) { // 28 saniyeden fazla durulursa
                 this.stationaryWaitTimer = 0;
-                if (typeof audio !== 'undefined' && audio.playPassengerGroan) {
-                    audio.playPassengerGroan();
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onLongStationaryWait())) {
+                    if (typeof audio !== 'undefined' && audio.playPassengerGroan) {
+                        audio.playPassengerGroan();
+                    }
                 }
             }
         } else {
@@ -4670,6 +4681,9 @@ const Game = {
                 this.thunderTimer = 0;
                 if (typeof audio !== 'undefined' && audio.playThunderclap) {
                     audio.playThunderclap();
+                    if (typeof window.HumanNpcVoices !== 'undefined') {
+                        window.HumanNpcVoices.onThunderclap(this.passengersOnBoard);
+                    }
                 }
             }
             if (audio.isWiperOn) {
@@ -5260,6 +5274,9 @@ const Game = {
                 timingArrivalNotice = " Tam saatinde nizami varış!";
                 this.addMoney(20);
             }
+            if (typeof window.HumanNpcVoices !== 'undefined') {
+                window.HumanNpcVoices.onStopPunctuality(delta, waiting);
+            }
         }
         
         // Tekerlekli sandalye yolcusu uyarısı
@@ -5581,6 +5598,9 @@ const Game = {
                 }
             } else {
                 document.getElementById('passenger-dialog').innerText = '"Otobüs tamamen dolu, bir sonrakine bineceğim."';
+                if (typeof window.HumanNpcVoices !== 'undefined') {
+                    window.HumanNpcVoices.onBusFullAtStop(this.currentStopIndex);
+                }
                 document.getElementById('passenger-feedback').innerText = "Kapasite dolu, yolcu binemedi.";
                 document.getElementById('passenger-feedback').style.color = '#ef4444';
                 stopData.bekleyenYolcu--;
@@ -5720,7 +5740,11 @@ const Game = {
             if (btn) btn.innerText = "Arka Kapıyı Kapat";
             if (!this.isDriving) {
                 const alightEl = document.getElementById('stop-alighting-count');
+                const prevAlight = alightEl ? (parseInt(alightEl.innerText, 10) || 0) : 0;
                 if (alightEl) alightEl.innerText = "0";
+                if (prevAlight > 0 && typeof window.HumanNpcVoices !== 'undefined') {
+                    window.HumanNpcVoices.onRearDoorAlight(prevAlight);
+                }
             }
         } else {
             if (typeof audio !== 'undefined' && typeof audio.playPneumaticDoorClose === 'function') audio.playPneumaticDoorClose();
@@ -5809,7 +5833,7 @@ const Game = {
             document.getElementById('passenger-dialog').innerText = '"Kolay gelsin."';
         }
         if (typeof window.HumanNpcVoices !== 'undefined') {
-            window.HumanNpcVoices.onPassengerBoarded(pType, this.currentStopIndex, isStanding);
+            window.HumanNpcVoices.onPassengerBoarded(pType, this.currentStopIndex, isStanding, this.clockMinutes);
         }
     },
 
@@ -6242,7 +6266,9 @@ const Game = {
                         this.passengerComfort = Math.min(100, (this.passengerComfort || 90) + 5);
                         this.addXP(15, "Sıcak Demli Çay Molası");
                         const teaMsg = "Sıcak demli çay yudumlandı. Afiyet olsun kaptanım (+15 tecrübe, +5 konfor).";
-                        if (typeof audio.speak === 'function') audio.speak(teaMsg);
+                        if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onCaptainTeaSip(this.passengersOnBoard))) {
+                            if (typeof audio.speak === 'function') audio.speak(teaMsg);
+                        }
                         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("☕ Çay Yudumlandı (+15 XP, +5 Konfor)", "success");
                     });
                 }
@@ -6507,6 +6533,10 @@ const Game = {
                 if (typeof Multiplayer !== 'undefined' && Multiplayer.broadcastHorn) {
                     Multiplayer.broadcastHorn();
                 }
+                const hasAheadHazard = Array.isArray(this.activeNPCs) && this.activeNPCs.some(n => !n.hasCollided && ((n.type === 'ahead' && n.y > 0 && n.y < 220) || (n.type === 'hazard' && n.y > 0 && n.y < 380)));
+                if (typeof window.HumanNpcVoices !== 'undefined') {
+                    window.HumanNpcVoices.onHornPressed(this.passengersOnBoard, hasAheadHazard);
+                }
             }
             // Öndeki aracı uyar: Korna çalınca öndeki araç panikle fiziksel olarak sağa kırar ve gaza basar
             if (this.activeNPCs && this.activeNPCs.length > 0) {
@@ -6546,6 +6576,9 @@ const Game = {
                 const winMsg = "Kaptan camı açıldı. Dış sesler ve serin hava kokpite doluyor.";
                 if (typeof audio.speak === 'function') audio.speak(winMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Açıldı (Home)", "info");
+                if (typeof window.HumanNpcVoices !== 'undefined') {
+                    window.HumanNpcVoices.onDriverWindowOpened(this);
+                }
             }
             return;
         }
