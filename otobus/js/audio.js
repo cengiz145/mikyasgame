@@ -428,6 +428,9 @@ class AudioSystem {
             window.speechSynthesis.cancel();
         }
         this.activeUtterance = null;
+        if (typeof this.unduckAnnouncement === 'function') {
+            this.unduckAnnouncement();
+        }
         
         let liveRegion = document.getElementById('nvda-live-region');
         if (liveRegion) liveRegion.textContent = '';
@@ -2654,6 +2657,13 @@ startEngine() {
         try {
             this.init();
             if (!this.ctx) return;
+            if (this.ctx.state === 'suspended') {
+                this.ctx.resume().catch(() => {});
+            }
+            if (this.ctx.state !== 'running') {
+                // AudioContext henüz askıdaysa HTML5 sesi sessize düşürmemek için doğrudan tarayıcı çıkışında bırak
+                return;
+            }
             if (!this._speechBoostBus) {
                 const gain = this.ctx.createGain();
                 gain.gain.value = boostGain;

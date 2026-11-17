@@ -1550,9 +1550,14 @@
                     }
                 }
                 
-                // Akaryakıt bonusu
-                if (reward.fuel && typeof Game.fuel === 'number') {
-                    Game.fuel = Math.min(100, Game.fuel + reward.fuel);
+                // Akaryakıt bonusu (Yüzde bazında gerçek litre karşılığı depoya eklenir)
+                if (reward.fuel) {
+                    const cap = (typeof Game.getFuelCapacity === 'function') ? Game.getFuelCapacity() : (Game.fuelTankCapacity || 500);
+                    const curFuel = (typeof Game.currentFuelLiters === 'number') ? Game.currentFuelLiters : cap;
+                    const bonusLiters = Math.round((reward.fuel / 100) * cap);
+                    Game.currentFuelLiters = Math.min(cap, curFuel + bonusLiters);
+                    Game.fuelWarned15 = false;
+                    Game.fuelWarned5 = false;
                 }
 
                 if (typeof UI !== 'undefined' && typeof UI.updatePlayerStats === 'function') {

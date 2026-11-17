@@ -2127,6 +2127,7 @@ const Game = {
         this.fuelWarned5 = false;
         this.totalDrivingSeconds = 0;
         this.activeRouteData = routesData[routeId];
+        this.isTrainingRoute = !!(this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus));
         
         // AKILLI ÇEVRE VE YOL ZEMİNİ MOTORU: Bölge ve yol yüzeyi tespiti
         if (typeof SmartEnvironmentEngine !== 'undefined') {
@@ -2381,8 +2382,11 @@ const Game = {
                 const featureText = (mission && mission.featureUnlock) ? mission.featureUnlock : "Standart Hat Seferi";
                 const rulesText = (mission && mission.rulesActive) ? mission.rulesActive : "Temel Emniyet Kuralları";
                 
-                const activeBusName = (this.activeBus && (this.activeBus.name || this.activeBus.fullName))
-                    ? (this.activeBus.name || this.activeBus.fullName)
+                const curSelectedBus = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function')
+                    ? BusFleet.getSelectedBus()
+                    : (this.selectedBus || this.activeBus || null);
+                const activeBusName = (curSelectedBus && (curSelectedBus.fullName || curSelectedBus.name))
+                    ? (curSelectedBus.fullName || curSelectedBus.name)
                     : "Standart Şehir İçi Otobüsü";
                 const taskDisplayTitle = (mission && mission.title) ? mission.title : r.name;
                 const displayTaskNum = (mission && mission.taskNum) ? mission.taskNum : (tIdx + 1);
@@ -2491,6 +2495,7 @@ const Game = {
         
         this.lastFrameTime = performance.now();
         this.nextNavSoundTime = this.lastFrameTime + 10000 + Math.random() * 20000;
+        if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
         this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
         this.copilotFirstStopWarned = false;
         if (window.voiceAssistant && window.voiceAssistant.isCopilotEnabled) {
@@ -2643,6 +2648,7 @@ const Game = {
         this.lastFrameTime = performance.now();
         this.nextNavSoundTime = this.lastFrameTime + 10000 + Math.random() * 20000; // 10-30s sonra ilk ses
         this.nextAmbienceTime = this.lastFrameTime + 5000 + Math.random() * 5000;
+        if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
         this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
         
         this.planNextStop();
@@ -3286,7 +3292,7 @@ const Game = {
 
     gameLoop: function(currentTime) {
         if (!this.isDriving) return;
-        
+        try {
         let deltaTime = (currentTime - this.lastFrameTime) / 1000;
         this.lastFrameTime = currentTime;
         // KRİTİK ÇÖKME VE DONMA KALKANI: Sekme arka planda kalsa bile fiziğin patlamasını engeller
@@ -4173,7 +4179,7 @@ const Game = {
             else hudFuelVal.style.color = '#ef4444';
         }
         if (typeof SolarPrayerEngine !== 'undefined') {
-            SolarPrayerEngine.update(this.clockMinutes, this.currentCity, this.speed, this.doorsOpen);
+            SolarPrayerEngine.update(this.clockMinutes, this.currentCity, this.speed, !!(this.frontDoorOpen || this.rearDoorOpen));
         }
         if (typeof PowertrainDynamicsEngine !== 'undefined') {
             PowertrainDynamicsEngine.updateThermodynamics(this, deltaTime);
@@ -4720,8 +4726,13 @@ const Game = {
         }
         
         this.updateBusVisuals();
-        
-        this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
+        } catch (loopErr) {
+            console.error('[GameLoop Error]', loopErr);
+        } finally {
+            if (this.isDriving) {
+                this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
+            }
+        }
     },
 
     spawnAndMoveNPCs: function(deltaTime) {
@@ -5489,6 +5500,7 @@ const Game = {
         
         UI.switchScreen('driving-screen');
         this.lastFrameTime = performance.now();
+        if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
         this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
         
         this.planNextStop();
@@ -7089,6 +7101,7 @@ const SanayiMechanic = {
 
 if (typeof window !== 'undefined') {
     window.Game = Game;
+    window.game = Game;
 }
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = Game;

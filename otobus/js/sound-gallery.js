@@ -1314,8 +1314,8 @@ const SoundGallery = {
             category: "human",
             icon: "🥊",
             title: "Yolda Yanından Geçtiğimiz 3B Sokak / Trafik Kavgası + Yolcu Tepkisi!",
-            specs: "Gerçek Zamanlı 3B Yaklaşma -> Cam Yanından Geçiş -> Uzaklaşma + H Korna Etkileşimi",
-            desc: "Yolda ilerlerken sağ kaldırımda kavga eden 2 adamın sesleri uzaktan yaklaşıp tam camınızın dibinden geçerek arkada kalır (Seferde H ile korna çalarsanız dönüp size de bağırır!), ardından otobüsteki yolcu yorum yapar!",
+            specs: "Gerçek Zamanlı 3B Yaklaşma -> Cam Yanından Geçiş -> Uzaklaşma + L Korna Etkileşimi",
+            desc: "Yolda ilerlerken sağ kaldırımda kavga eden 2 adamın sesleri uzaktan yaklaşıp tam camınızın dibinden geçerek arkada kalır (Seferde L ile korna çalarsanız dönüp size de bağırır!), ardından otobüsteki yolcu yorum yapar!",
             playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.triggerRoadsideFight) window.HumanNpcVoices.triggerRoadsideFight(true); }
         }
     ],

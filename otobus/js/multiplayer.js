@@ -118,7 +118,7 @@
                 // 6. Düzenli Kalp Atışı (Adaptif Kota Korumalı Heartbeat)
                 this.syncTimer = setInterval(() => {
                     const isDriving = (typeof Game !== 'undefined' && Game.isDriving);
-                    const speed = (typeof Game !== 'undefined') ? (Game.currentSpeed || 0) : 0;
+                    const speed = (typeof Game !== 'undefined') ? (Game.speed || 0) : 0;
                     // Araç dururken veya menüdeyken gereksiz Firebase yazmasını frenle
                     if (!isDriving) {
                         const now = Date.now();
@@ -152,7 +152,7 @@
                 const busName = currentBus ? currentBus.name : this.profile.bus;
                 const isDriving = typeof Game !== 'undefined' ? !!Game.isDriving : false;
                 const currentCity = typeof Game !== 'undefined' ? (Game.currentCity || "Tekirdağ") : "Tekirdağ";
-                const currentDistrict = typeof Game !== 'undefined' ? (Game.currentDistrict || "Süleymanpaşa") : "Süleymanpaşa";
+                const currentDistrict = typeof Game !== 'undefined' ? (Game.activeDistrict || "Süleymanpaşa") : "Süleymanpaşa";
                 const activeRouteId = typeof Game !== 'undefined' ? (Game.activeRouteId || "") : "";
                 const routeName = (typeof Game !== 'undefined' && Game.activeRouteData) ? Game.activeRouteData.name : "Garaj";
                 const speed = typeof Game !== 'undefined' ? Math.round(Game.speed || 0) : 0;

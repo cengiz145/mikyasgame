@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p26';
+    const AUDIO_VER = '?v=20261117p27';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -278,8 +278,15 @@
             if (this.recentFiles.length > 14) this.recentFiles.shift();
         },
 
+        getGameObj: function () {
+            if (typeof Game !== 'undefined' && Game) return Game;
+            if (typeof window !== 'undefined' && window.Game) return window.Game;
+            if (typeof game !== 'undefined' && game) return game;
+            return null;
+        },
+
         getGameContext: function (override = {}) {
-            const g = (typeof game !== 'undefined') ? game : null;
+            const g = this.getGameObj();
             const passCount = typeof override.passengersOnBoard === 'number'
                 ? override.passengersOnBoard
                 : ((g && typeof g.passengersOnBoard === 'number') ? g.passengersOnBoard : 0);
@@ -410,7 +417,8 @@
                     const waiterPan = this._centralStopWaiter.seatPan || 0.30;
                     this._centralStopWaiter = null;
                     setTimeout(() => {
-                        if (typeof game !== 'undefined' && game.isDriving) return;
+                        const gNow = this.getGameObj();
+                        if (gNow && gNow.isDriving) return;
                         this.playClip('smart_central_arrived.mp3', {
                             pan: waiterPan,
                             volume: 0.94,
@@ -565,7 +573,7 @@
             if (this._demoForceOcclusion === 'muffled') return false;
             if (this._demoForceOcclusion === 'open') return true;
             const winOpen = (typeof audio !== 'undefined' && !!audio.isWindowOpen);
-            const g = (typeof game !== 'undefined') ? game : null;
+            const g = this.getGameObj();
             const doorOpen = !!(g && (g.frontDoorOpen || g.rearDoorOpen));
             const brokenGlass = !!(g && g.busDamage && ((g.busDamage.leftWindow || 0) >= 100 || (g.busDamage.rightWindow || 0) >= 100));
             return !!(winOpen || doorOpen || brokenGlass);
@@ -1012,10 +1020,13 @@
                 const b1 = this.pickSmart(CLIPS.berserkMeltdown, smartCtx);
                 const b2 = this.pickSmart(CLIPS.berserkMeltdown.filter(x => x.file !== b1.file), smartCtx) || b1;
 
-                if (typeof game !== 'undefined' && typeof game.money === 'number' && game.money >= 50) {
-                    game.money -= 50;
-                    const moneyEl = document.getElementById('hud-money');
-                    if (moneyEl) moneyEl.innerText = `${Math.floor(game.money)} ₺`;
+                const gRiot1 = this.getGameObj();
+                if (gRiot1 && typeof gRiot1.playerBudget === 'number' && gRiot1.playerBudget >= 50) {
+                    gRiot1.playerBudget -= 50;
+                    if (typeof gRiot1.saveData === 'function') gRiot1.saveData();
+                    if (typeof UI !== 'undefined' && typeof UI.updatePlayerStats === 'function') {
+                        UI.updatePlayerStats(gRiot1.licenseLevel, gRiot1.completedTasks, gRiot1.playerBudget, typeof gRiot1.getLicenseTitle === 'function' ? gRiot1.getLicenseTitle() : 'Kaptan');
+                    }
                 }
 
                 setTimeout(() => {
@@ -1053,10 +1064,13 @@
                 if ((passengersOnBoard || 0) >= 3) {
                     this.playClip(CLIPS.sfxUproar, { pan: 0, volume: 0.62, backgroundSfx: true });
                 }
-                if (typeof game !== 'undefined' && typeof game.money === 'number' && game.money >= 50) {
-                    game.money -= 50;
-                    const moneyEl = document.getElementById('hud-money');
-                    if (moneyEl) moneyEl.innerText = `${Math.floor(game.money)} ₺`;
+                const gRiot1 = this.getGameObj();
+                if (gRiot1 && typeof gRiot1.playerBudget === 'number' && gRiot1.playerBudget >= 50) {
+                    gRiot1.playerBudget -= 50;
+                    if (typeof gRiot1.saveData === 'function') gRiot1.saveData();
+                    if (typeof UI !== 'undefined' && typeof UI.updatePlayerStats === 'function') {
+                        UI.updatePlayerStats(gRiot1.licenseLevel, gRiot1.completedTasks, gRiot1.playerBudget, typeof gRiot1.getLicenseTitle === 'function' ? gRiot1.getLicenseTitle() : 'Kaptan');
+                    }
                 }
                 setTimeout(() => {
                     this.playClip(riot.file, {
@@ -1171,7 +1185,7 @@
 
             // Bireysel Simüle Yolcu Ajanı Oluştur (Gerçek 3B Koltuk Konumu, Kişilik ve İneceği Hedef Durak!)
             if (!Array.isArray(this.simulatedPassengers)) this.simulatedPassengers = [];
-            const g = (typeof game !== 'undefined') ? game : null;
+            const g = this.getGameObj();
             const totalStops = (g && g.activeRouteData && Array.isArray(g.activeRouteData.stops)) ? g.activeRouteData.stops.length : ((stopIndex || 0) + 4);
             const minDest = Math.min(totalStops - 1, (stopIndex || 0) + 1);
             const targetStopIndex = minDest + Math.floor(Math.random() * Math.max(1, totalStops - minDest));
@@ -1338,7 +1352,7 @@
 
         onStopBellRing: function (isFinalStop) {
             if (!this.canSpeakInCabin()) return false;
-            const g = (typeof game !== 'undefined') ? game : null;
+            const g = this.getGameObj();
             const curStopIdx = g ? (g.currentStopIndex || 0) : 0;
             const dueAgent = (Array.isArray(this.simulatedPassengers) && this.simulatedPassengers.length > 0)
                 ? (this.simulatedPassengers.find(ag => ag.targetStopIndex === curStopIdx) || this.simulatedPassengers[0])
@@ -1404,7 +1418,8 @@
 
         onStopPunctuality: function (deltaMinutes, waitingCount) {
             if (!this.canSpeakInCabin() || typeof deltaMinutes !== 'number') return false;
-            if ((waitingCount || 0) <= 0 && !(deltaMinutes <= -2.2 && typeof game !== 'undefined' && (game.passengersOnBoard || 0) > 0)) return false;
+            const g = this.getGameObj();
+            if ((waitingCount || 0) <= 0 && !(deltaMinutes <= -2.2 && g && (g.passengersOnBoard || 0) > 0)) return false;
             if (deltaMinutes >= 7.0) {
                 setTimeout(() => {
                     if (this.activeHowl && this.activeHowl.playing && this.activeHowl.playing()) return;
@@ -1431,7 +1446,7 @@
                     });
                 }, 3100);
                 return true;
-            } else if (deltaMinutes <= -2.2 && this.inspector && (this.inspector.roughCount || 0) >= 2 && typeof game !== 'undefined' && (game.passengersOnBoard || 0) > 0) {
+            } else if (deltaMinutes <= -2.2 && this.inspector && (this.inspector.roughCount || 0) >= 2 && g && (g.passengersOnBoard || 0) > 0) {
                 setTimeout(() => {
                     if (this.isPlayingNow()) return;
                     this.playClip('smart_early_reckless.mp3', {
@@ -3138,7 +3153,7 @@
         },
 
         speakLivePassengerReport: function (gameObj) {
-            const g = gameObj || ((typeof game !== 'undefined') ? game : null);
+            const g = gameObj || this.getGameObj();
             const total = g ? (g.passengersOnBoard || 0) : 0;
             const r = this.roster || { yasli: 0, ogrenci: 0, tam: 0, standing: 0 };
             const rep = this.getCityReputation();
@@ -3282,8 +3297,8 @@
             // İleride kavga kornası + 1. Adam bağırışı -> üstüne binerek 2. Adam bağırışı -> Yanlarından geçince otobüsteki yolcu yorumu!
             this.playExteriorSpatialHowl(CLIPS.sfxHorn, sf, 0);
             const descToast = isVariant1
-                ? `🥊 ${sideText} İleride 2 Şoför Yakapaça Kavga Ediyor! (Cam: Home / Korna: H)`
-                : `🥊 ${sideText} İleride Esnaf ile Sürücü Kavga Ediyor! (Cam: Home / Korna: H)`;
+                ? `🥊 ${sideText} İleride 2 Şoför Yakapaça Kavga Ediyor! (Cam: Home / Korna: L)`
+                : `🥊 ${sideText} İleride Esnaf ile Sürücü Kavga Ediyor! (Cam: Home / Korna: L)`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(descToast, 'warning');
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
                 audio.updateNvdaLiveRegion(`${sideText} ileride iki adam kavga ediyor, yanlarından geçiyorsunuz!`);
@@ -3308,7 +3323,7 @@
                                 this._demoFightInterval = null;
                             }
                         }
-                        const g = (typeof game !== 'undefined') ? game : null;
+                        const g = this.getGameObj();
                         if (forceDemo || (g && (g.passengersOnBoard || 0) > 0)) {
                             this._stuntTimers.push(setTimeout(() => {
                                 this.playClip('street_fight_cabin_watch.mp3', {
