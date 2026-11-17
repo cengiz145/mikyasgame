@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p24';
+    const AUDIO_VER = '?v=20261117p25';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -512,6 +512,16 @@
 
         stopAll: function () {
             this._demoForceOcclusion = null;
+            if (this._demoFightInterval) {
+                clearInterval(this._demoFightInterval);
+                this._demoFightInterval = null;
+            }
+            if (this.activeStreetFight && Array.isArray(this.activeStreetFight.entries)) {
+                this.activeStreetFight.entries.forEach(en => {
+                    try { if (en.howl) en.howl.stop(en.sid); } catch (e) {}
+                });
+                this.activeStreetFight = null;
+            }
             if (this._footstepTimers && Array.isArray(this._footstepTimers)) {
                 this._footstepTimers.forEach(t => clearTimeout(t));
                 this._footstepTimers = [];
@@ -774,6 +784,9 @@
             this._hawkerTriggeredInRoute = false;
             this.hawkerActiveUntil = 0;
             this._stuffyCoughTime = 0;
+            this.activeStreetFight = null;
+            this._roadsideFightDriveSecs = 0;
+            this._nextRoadsideFightThreshold = 68 + Math.random() * 35;
             this.lastJoltVoiceTime = 0;
             this.lastNearMissTime = 0;
             this.lastGreetingStopIndex = -1;
@@ -1434,7 +1447,41 @@
         },
 
         onHornPressed: function (passengersOnBoard, hasNearbyHazard) {
-            if (!this.canSpeakInCabin() || (passengersOnBoard || 0) <= 0 || hasNearbyHazard) return false;
+            if (!this.canSpeakInCabin()) return false;
+            // Yolda kavga eden adamların yanından geçerken kornaya (H) basarsan kavgacı dönüp otobüse bağırır!
+            if (this.activeStreetFight && this.activeStreetFight.active && !this.activeStreetFight.hornSnapped && Math.abs(this.activeStreetFight.distMeters) < 58) {
+                this.activeStreetFight.hornSnapped = true;
+                const sf = this.activeStreetFight;
+                const snapPan = sf.sideSign * 0.85;
+                setTimeout(() => {
+                    const hSnap = this.getHowl('street_fight_horn_snap.mp3');
+                    if (hSnap) {
+                        const sid = hSnap.play();
+                        const absD = Math.abs(sf.distMeters || 0);
+                        const dGain = Math.max(0.25, Math.min(1.0, 1.0 / (1.0 + Math.pow(absD / 34, 1.5))));
+                        hSnap.volume(this.getVolume(dGain), sid);
+                        if (typeof hSnap.stereo === 'function') hSnap.stereo(snapPan, sid);
+                        try {
+                            const snd = typeof hSnap._soundById === 'function' ? hSnap._soundById(sid) : null;
+                            if (snd && snd._node && this.ensureExteriorFilter()) {
+                                this.updateExteriorOcclusion();
+                                snd._node.disconnect();
+                                snd._node.connect(this.exteriorFilter);
+                                snd._mikyasRoutedExterior = true;
+                            }
+                        } catch (e) {}
+                        sf.entries.push({ howl: hSnap, sid, panOffset: 0 });
+                    }
+                    if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                        audio.updateNvdaLiveRegion('Kavgacı adam kornanıza sinirlendi: Sen ne basıyorsun lan kornaya oradan?! İşine bak yürü git karışma bize!');
+                    }
+                    if (typeof UI !== 'undefined' && UI.showToast) {
+                        UI.showToast('🥊🤬 Kavgacı Adam Otobüse Döndü: "SEN NE BASIYORSUN LAN KORNAYA ORADAN?! İşine bak yürü git karışma bize!!"', 'error');
+                    }
+                }, 260);
+                return true;
+            }
+            if ((passengersOnBoard || 0) <= 0 || hasNearbyHazard) return false;
             const now = performance.now();
             this._hornTimes = (this._hornTimes || []).filter(t => (now - t) < 8000);
             this._hornTimes.push(now);
@@ -1916,6 +1963,19 @@
         checkSmartCabinReminders: function (gameObj, deltaTime) {
             if (!gameObj || !gameObj.isDriving || !this.canSpeakInCabin()) return;
             const now = performance.now();
+
+            // 10-0. Yolda Kavga Eden 2 Adamın Yanından Geçiş 3B Fiziği & Doğal Karşılaşma Zamanlayıcısı!
+            if (this.activeStreetFight && this.activeStreetFight.active) {
+                this.updateRoadsideFight(gameObj, deltaTime);
+            } else if (gameObj.speed >= 22 && (typeof gameObj.currentDistanceToNext !== 'number' || gameObj.currentDistanceToNext > 210)) {
+                this._roadsideFightDriveSecs = (this._roadsideFightDriveSecs || 0) + deltaTime;
+                const thresh = this._nextRoadsideFightThreshold || 78;
+                if (this._roadsideFightDriveSecs >= thresh && !this.isPlayingNow()) {
+                    this._roadsideFightDriveSecs = 0;
+                    this._nextRoadsideFightThreshold = 95 + Math.random() * 45;
+                    this.triggerRoadsideFight(false);
+                }
+            }
 
             // 10a. Gerçek Zamanlı Zikzak / Sert Şerit Kırma Fiziği Dedektörü (Swerve)
             if ((gameObj.passengersOnBoard || 0) > 0 && gameObj.speed > 32 && typeof gameObj.steeringAngle === 'number') {
@@ -3075,6 +3135,154 @@
             if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
                 UI.showToast(`📡 ${total} Yolcu (${r.yasli || 0} Yaşlı / ${r.ogrenci || 0} Öğrenci) • ${moodText} • İtibar: ${repTitle}`, 'info');
             }
+            return true;
+        },
+
+        // 16. YOLDA KAVGA EDEN 2 ADAMIN YANINDAN 3B GEÇİŞ SAHNESİ (Yaklaşma -> Tam Cam Hizası -> Uzaklaşma + H Korna Tepkisi + Kabin Yorumu!)
+        computeStreetFightSpatial: function (distMeters, sideSign) {
+            const absD = Math.abs(distMeters);
+            const gain = Math.max(0.08, Math.min(1.0, 1.0 / (1.0 + Math.pow(absD / 32, 1.55))));
+            const width = 0.36 + 0.56 * (1.0 - Math.min(1.0, absD / 80));
+            return { gain, pan: Math.max(-0.96, Math.min(0.96, sideSign * width)) };
+        },
+
+        playExteriorSpatialHowl: function (filename, sf, panOffset = 0, onend = null) {
+            const h = this.getHowl(filename);
+            if (!h) {
+                if (typeof onend === 'function') onend();
+                return null;
+            }
+            const sid = h.play();
+            const sp = this.computeStreetFightSpatial(sf.distMeters, sf.sideSign);
+            h.volume(this.getVolume(sp.gain), sid);
+            if (typeof h.stereo === 'function') {
+                h.stereo(Math.max(-0.98, Math.min(0.98, sp.pan + panOffset)), sid);
+            }
+            try {
+                const snd = typeof h._soundById === 'function' ? h._soundById(sid) : null;
+                if (snd && snd._node && this.ensureExteriorFilter()) {
+                    this.updateExteriorOcclusion();
+                    snd._node.disconnect();
+                    snd._node.connect(this.exteriorFilter);
+                    snd._mikyasRoutedExterior = true;
+                }
+            } catch (e) {}
+            const entry = { howl: h, sid, panOffset };
+            sf.entries.push(entry);
+            if (typeof onend === 'function') {
+                h.once('end', () => onend(), sid);
+            }
+            return { h, sid };
+        },
+
+        updateRoadsideFight: function (gameObj, deltaTime) {
+            const sf = this.activeStreetFight;
+            if (!sf || !sf.active) return;
+            const speedKmh = sf.isDemo ? 40 : ((gameObj && typeof gameObj.speed === 'number') ? gameObj.speed : 36);
+            sf.distMeters -= (speedKmh / 3.6) * deltaTime;
+
+            const sp = this.computeStreetFightSpatial(sf.distMeters, sf.sideSign);
+            sf.entries.forEach(en => {
+                try {
+                    if (en.howl && en.howl.playing(en.sid)) {
+                        en.howl.volume(this.getVolume(sp.gain), en.sid);
+                        if (typeof en.howl.stereo === 'function') {
+                            en.howl.stereo(Math.max(-0.98, Math.min(0.98, sp.pan + (en.panOffset || 0))), en.sid);
+                        }
+                    }
+                } catch (e) {}
+            });
+
+            if (sf.distMeters < -95 && sf.brawlFinished) {
+                sf.active = false;
+                if (this._demoFightInterval) {
+                    clearInterval(this._demoFightInterval);
+                    this._demoFightInterval = null;
+                }
+            }
+        },
+
+        triggerRoadsideFight: function (forceDemo = false) {
+            if (!this.canSpeakInCabin(forceDemo)) return false;
+            if (this._demoFightInterval) {
+                clearInterval(this._demoFightInterval);
+                this._demoFightInterval = null;
+            }
+            if (!this._stuntTimers) this._stuntTimers = [];
+
+            this._fightVariantIdx = ((this._fightVariantIdx || 0) + 1) % 2;
+            const isVariant1 = (this._fightVariantIdx === 1);
+            const fileA = isVariant1 ? 'street_fight1_a.mp3' : 'street_fight2_a.mp3';
+            const fileB = isVariant1 ? 'street_fight1_b.mp3' : 'street_fight2_b.mp3';
+            const sideSign = forceDemo ? 1 : (Math.random() < 0.72 ? 1 : -1);
+            const sideText = sideSign > 0 ? 'Sağ kaldırımda' : 'Sol şeritte';
+
+            const sf = {
+                active: true,
+                isDemo: !!forceDemo,
+                distMeters: 56,
+                sideSign,
+                hornSnapped: false,
+                brawlFinished: false,
+                entries: []
+            };
+            this.activeStreetFight = sf;
+
+            if (forceDemo) {
+                this._demoForceOcclusion = 'open';
+                this.updateExteriorOcclusion();
+                this._demoFightInterval = setInterval(() => {
+                    this.updateRoadsideFight(null, 0.08);
+                }, 80);
+            }
+
+            // İleride kavga kornası + 1. Adam bağırışı -> üstüne binerek 2. Adam bağırışı -> Yanlarından geçince otobüsteki yolcu yorumu!
+            this.playExteriorSpatialHowl(CLIPS.sfxHorn, sf, 0);
+            const descToast = isVariant1
+                ? `🥊 ${sideText} İleride 2 Şoför Yakapaça Kavga Ediyor! (Cam: Home / Korna: H)`
+                : `🥊 ${sideText} İleride Esnaf ile Sürücü Kavga Ediyor! (Cam: Home / Korna: H)`;
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(descToast, 'warning');
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                audio.updateNvdaLiveRegion(`${sideText} ileride iki adam kavga ediyor, yanlarından geçiyorsunuz!`);
+            }
+
+            this._stuntTimers.push(setTimeout(() => {
+                if (!sf.active) return;
+                const playedA = this.playExteriorSpatialHowl(fileA, sf, -0.06);
+                const overlapMs = (playedA && playedA.h && typeof playedA.h.duration === 'function' && playedA.h.duration() > 1.5)
+                    ? Math.max(1800, Math.round(playedA.h.duration() * 1000) - 1100)
+                    : 3400;
+
+                this._stuntTimers.push(setTimeout(() => {
+                    if (!sf.active) return;
+                    this.playExteriorSpatialHowl(fileB, sf, 0.06, () => {
+                        sf.brawlFinished = true;
+                        if (forceDemo) {
+                            this._demoForceOcclusion = null;
+                            this.updateExteriorOcclusion();
+                            if (this._demoFightInterval) {
+                                clearInterval(this._demoFightInterval);
+                                this._demoFightInterval = null;
+                            }
+                        }
+                        const g = (typeof game !== 'undefined') ? game : null;
+                        if (forceDemo || (g && (g.passengersOnBoard || 0) > 0)) {
+                            this._stuntTimers.push(setTimeout(() => {
+                                this.playClip('street_fight_cabin_watch.mp3', {
+                                    pan: sideSign * 0.42,
+                                    volume: 0.92,
+                                    priority: 2,
+                                    force: forceDemo,
+                                    nvdaText: 'Otobüsten kavgayı izleyen yolcu: Ohoo dışarıya bak fena birbirine girdi adamlar yakapaça oldular! Hiç bulaşma bas geç vallahi başımıza iş almayalım!',
+                                    toastText: '👀 Yolcu Camdan Baktı: "Ohoo dışarıya bak fena birbirine girdi adamlar! Hiç bulaşma bas geç vallahi!"',
+                                    toastType: 'info'
+                                });
+                            }, 350));
+                        }
+                    });
+                }, overlapMs));
+            }, 260));
+
             return true;
         },
 

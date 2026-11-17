@@ -1308,6 +1308,15 @@ const SoundGallery = {
             specs: "Hava Durumu + Engelli Rampası / El Freni / Kapı Kilidi Algılayıcısı",
             desc: "Yağmurda durakta kapıyı açmayı geciktirirseniz veya rampayı/el frenini açık unutarak gaza basarsanız yolcular neyi unuttuğunuzu nokta atışı söyler!",
             playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("smart_rain_open_door.mp3", { pan: 0.65, volume: 1.0, force: true, interrupt: true, onend: () => { setTimeout(() => window.HumanNpcVoices.playClip("smart_ramp_open_warn.mp3", { pan: 0.45, volume: 0.96, force: true }), 350); } }); } }
+        },
+        {
+            id: "human_stunt_street_fight",
+            category: "human",
+            icon: "🥊",
+            title: "Yolda Yanından Geçtiğimiz 3B Sokak / Trafik Kavgası + Yolcu Tepkisi!",
+            specs: "Gerçek Zamanlı 3B Yaklaşma -> Cam Yanından Geçiş -> Uzaklaşma + H Korna Etkileşimi",
+            desc: "Yolda ilerlerken sağ kaldırımda kavga eden 2 adamın sesleri uzaktan yaklaşıp tam camınızın dibinden geçerek arkada kalır (Seferde H ile korna çalarsanız dönüp size de bağırır!), ardından otobüsteki yolcu yorum yapar!",
+            playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.triggerRoadsideFight) window.HumanNpcVoices.triggerRoadsideFight(true); }
         }
     ],
 
