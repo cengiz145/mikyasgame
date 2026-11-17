@@ -2710,6 +2710,15 @@ startEngine() {
         if (anonsText) {
             // 3'lü zil melodisi (Dı - Dı - Dııın) biter bitmez net konuşma başlasın (750 ms)
             setTimeout(() => {
+                if (typeof window.HumanNpcVoices !== 'undefined') {
+                    if (phase === 'depart' && options && options.isInitial) {
+                        this.updateNvdaLiveRegion(anonsText);
+                        if (window.HumanNpcVoices.playIbisWelcome()) return;
+                    } else if (phase === 'arrive' && options && options.isFinal) {
+                        this.updateNvdaLiveRegion(anonsText);
+                        if (window.HumanNpcVoices.playIbisFinalStop()) return;
+                    }
+                }
                 this.speak(anonsText);
             }, 750);
         }

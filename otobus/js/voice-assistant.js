@@ -1773,10 +1773,11 @@ class VoiceAssistant {
         if (!lesson) return;
         if (typeof audio !== 'undefined') {
             audio.stopSpeech();
-            // KULLANICI KURALI: Eğitim okunurken sesler sussun ki ekran okuyucuyla eğitimi tamamlamak kolay olsun
             if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
             const fullText = `${lesson.stageName}. ${lesson.title}. ${lesson.speech}`;
-            audio.speak(fullText);
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playAcademyLesson(lesson.id, fullText))) {
+                audio.speak(fullText);
+            }
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast(`📖 ${lesson.title}`, 'info');
             }
@@ -1788,6 +1789,13 @@ class VoiceAssistant {
         if (audio.playSelect) audio.playSelect();
         audio.stopSpeech();
         if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
+
+        if (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playFullAcademySequence(this.tutorialLessons.map(l => l.id))) {
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast("▶️ Sesli Sürüş Eğitimi Başlatıldı (Baş Eğitmen Stüdyo Sesi)", "success");
+            }
+            return;
+        }
 
         const sequence = [
             "Sürüş eğitimi başlatılıyor. Otobüsü nasıl süreceğinizi ve tüm tuşları adım adım anlatıyorum."
@@ -1804,6 +1812,9 @@ class VoiceAssistant {
     }
 
     stopTutorialSpeech() {
+        if (typeof window.HumanNpcVoices !== 'undefined') {
+            window.HumanNpcVoices.stopAcademyLesson();
+        }
         if (typeof audio !== 'undefined') {
             if (audio.stopSpeech) audio.stopSpeech();
             if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();

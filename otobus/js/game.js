@@ -101,7 +101,9 @@ const Game = {
         if (toAdd <= 0) {
             const fullMsg = "Deponuz zaten tamamen dolu!";
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(fullMsg, "info");
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playFuelAlreadyFull())) {
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
+            }
             return 0;
         }
         let effCostPerLiter = costPerLiter;
@@ -141,7 +143,10 @@ const Game = {
             ? `⛽ Şirket Akaryakıt İstasyonu (Seviye 3) ayrıcalığıyla depoya ${Math.floor(toAdd)} litre mazot ÜCRETSİZ dolduruldu! Depo: %${Math.floor((this.currentFuelLiters / cap) * 100)} dolu.`
             : `⛽ Depoya ${Math.floor(toAdd)} litre mazot dolduruldu (-${cost} ₺). Depo şu an %${Math.floor((this.currentFuelLiters / cap) * 100)} dolu.`;
         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(succMsg, "success");
-        if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Depoya ${Math.floor(toAdd)} litre mazot alındı. Yakıt seviyeniz yüzde ${Math.floor((this.currentFuelLiters / cap) * 100)}.`);
+        const fuelPct = Math.floor((this.currentFuelLiters / cap) * 100);
+        if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playFuelFilled(toAdd, fuelPct))) {
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Depoya ${Math.floor(toAdd)} litre mazot alındı. Yakıt seviyeniz yüzde ${fuelPct}.`);
+        }
         return toAdd;
     },
 
@@ -794,8 +799,10 @@ const Game = {
                 this.addMoney(selected.reward);
                 this.addXP(selected.xp);
                 const msg = `Arka koltukta ${selected.name} bulundu ve TEKULAŞ Emanet Bürosuna teslim edildi! ${selected.reward} Lira dürüst şoför primi ve ${selected.xp} tecrübe kazandınız.`;
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onLostItemFound(msg))) {
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                    if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+                }
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(selected.toast, "success");
                 if (this.pendingFinishAfterLostCheck) {
                     this.pendingFinishAfterLostCheck = false;
@@ -3285,6 +3292,9 @@ const Game = {
         this.lastFrameTime = currentTime;
         // KRİTİK ÇÖKME VE DONMA KALKANI: Sekme arka planda kalsa bile fiziğin patlamasını engeller
         if (deltaTime > 0.1) deltaTime = 0.1;
+        if (typeof window.HumanNpcVoices !== 'undefined') {
+            window.HumanNpcVoices.checkSmartCabinReminders(this, deltaTime);
+        }
         
         // --- ZAMANIN AKIŞI (1:4 Senkronize Simülasyon Ölçeği) ---
         // 1 gerçek dakika = 4 oyun dakikası. 2 saatlik gerçek oynanış = Tam 8 saatlik resmi şoför vardiyası!
@@ -4438,7 +4448,9 @@ const Game = {
                 this.busDamage.exhaust = Math.min(100, this.busDamage.exhaust + 20); // Tek seferde kopmaz, %20 hasar alır
                 this.busDamage.health = Math.max(0, this.busDamage.health - 10);
                 if (typeof audio.playRearCrash === 'function') audio.playRearCrash();
-                if (typeof audio.speak === 'function') audio.speak("Arkadan çarptılar! Egzoz hasar aldı.");
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onRearEndHit())) {
+                    if (typeof audio.speak === 'function') audio.speak("Arkadan çarptılar! Egzoz hasar aldı.");
+                }
             }
         }
         
@@ -6097,7 +6109,11 @@ const Game = {
                 }
                 return;
             }
+            const prevBusTemp = this.busTemperature;
             this.isACOn = !this.isACOn;
+            if (this.isACOn && typeof window.HumanNpcVoices !== 'undefined') {
+                window.HumanNpcVoices.onAcTurnedOn(prevBusTemp);
+            }
             if (typeof BusConceptGuide !== 'undefined' && BusConceptGuide.announceAction('ac', this.isACOn)) {
                 return;
             }
@@ -6660,6 +6676,7 @@ const SanayiMechanic = {
         
         const greetingText = "Merhabalar efendim. Görünüşe göre aracınız ciddi bir kazaya maruz kalmış. Hemen aracınızın bir röntgenini çekeceğim ve size bir rapor sunacağım. Devam etmek için Enter tuşuna basın.";
         dialogEl.innerText = greetingText;
+        if (typeof window.HumanNpcVoices !== 'undefined') window.HumanNpcVoices.playSanayiWelcome();
         if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(greetingText);
     },
 
@@ -6696,6 +6713,7 @@ const SanayiMechanic = {
         
         statusEl.innerText = "Araç Ekspertiz ve Hasar Raporu";
         dialogEl.innerText = "Hasarlı parçalar dış donanımdan ana şasiye doğru sıralandı. Aşağı-Yukarı oklarla inceleyip Enter ile onarım listesine ekleyin.";
+        if (typeof window.HumanNpcVoices !== 'undefined') window.HumanNpcVoices.playSanayiReport();
         if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("Röntgen tamamlandı. Hasarlı parçalar listelendi. Aşağı yukarı yön tuşlarıyla parçaları ve sürüşe etkilerini inceleyip, onarmak istediğiniz parçanın üzerinde enter tuşuna basın.");
         
         reportContainer.classList.remove('hidden');
@@ -6788,6 +6806,7 @@ const SanayiMechanic = {
         const partsToRepair = this.parts.filter(p => p.toRepair);
         
         if (partsToRepair.length === 0) {
+            if (typeof window.HumanNpcVoices !== 'undefined') window.HumanNpcVoices.playSanayiSkip();
             if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("Hiçbir parçayı onarmadınız. İşler bitti patron. Sonra görüşürüz. Daha bakılacak çok araba var.");
             setTimeout(() => this.finishRepair(), 5000);
             return;
@@ -6803,8 +6822,9 @@ const SanayiMechanic = {
                 // EĞİTİM VE GARANTİ DESTEĞİ: Sıfır masraf, belediye eğitim desteği
                 const finalMsg = "Tüm onarımlar kaptanlık akademisi kasko ve garanti desteği kapsamında ücretsiz olarak karşılandı. Aracınız hazır kaptan, iyi görevler!";
                 document.getElementById('sanayi-dialog').innerText = finalMsg;
+                if (typeof window.HumanNpcVoices !== 'undefined') window.HumanNpcVoices.playSanayiDone();
                 if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(finalMsg);
-                setTimeout(() => this.finishRepair(), 2500);
+                setTimeout(() => this.finishRepair(), 5500);
                 return;
             }
             
@@ -6814,6 +6834,7 @@ const SanayiMechanic = {
             
             const msg = "Su an " + part.name + " parcasini onariyorum.";
             document.getElementById('sanayi-dialog').innerText = msg;
+            if (typeof window.HumanNpcVoices !== 'undefined') window.HumanNpcVoices.playSanayiWrench();
             if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
             
             // Kademe Binası Seviyesine Göre Onarım Süresi (Hatta Geri Dönme Hızı)

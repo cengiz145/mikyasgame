@@ -562,6 +562,291 @@
                 }
             });
             return true;
+        },
+
+        // 7. SANAYİ BAŞ USTASI VE HAVALI SOMUN TABANCASI (SANAYİ EKRANI)
+        playSanayiWelcome: function () {
+            if (!this.isEnabled()) return false;
+            this.playClip('sanayi_welcome.mp3', { pan: 0, volume: 0.95, force: true, interrupt: true });
+            return true;
+        },
+
+        playSanayiReport: function () {
+            if (!this.isEnabled()) return false;
+            this.playClip('sanayi_report.mp3', { pan: 0, volume: 0.95, force: true, interrupt: true });
+            return true;
+        },
+
+        playSanayiWrench: function () {
+            if (!this.isEnabled()) return false;
+            this.playClip('sfx_impact_wrench.mp3', { pan: 0.25, volume: 0.72, force: true, backgroundSfx: true });
+            return true;
+        },
+
+        playSanayiDone: function () {
+            if (!this.isEnabled()) return false;
+            this.playClip('sanayi_done.mp3', { pan: 0, volume: 0.96, force: true, interrupt: true });
+            return true;
+        },
+
+        playSanayiSkip: function () {
+            if (!this.isEnabled()) return false;
+            this.playClip('sanayi_skip.mp3', { pan: 0, volume: 0.95, force: true, interrupt: true });
+            return true;
+        },
+
+        // 8. AKARYAKIT POMPACISI VE DİNLENME TESİSİ GÖREVLİLERİ (MUAVİN, ÇAYCI, AŞÇI, YIKAMACI)
+        playFuelFilled: function (liters, pct) {
+            if (!this.isEnabled()) return false;
+            this.playClip('sfx_fuel_nozzle.mp3', { pan: -0.45, volume: 0.75, force: true, backgroundSfx: true });
+            setTimeout(() => {
+                this.playClip('fuel_filled.mp3', {
+                    pan: -0.4,
+                    volume: 0.95,
+                    force: true,
+                    interrupt: true,
+                    nvdaText: `Depoya ${Math.floor(liters)} litre mazot dolduruldu, yakıt seviyeniz yüzde ${pct}. Pompacı Usta: Hayırlı yolculuklar kaptan!`
+                });
+            }, 420);
+            return true;
+        },
+
+        playFuelAlreadyFull: function () {
+            if (!this.isEnabled()) return false;
+            this.playClip('fuel_already_full.mp3', {
+                pan: -0.35,
+                volume: 0.92,
+                force: true,
+                interrupt: true,
+                nvdaText: 'Deponuz zaten ağzına kadar dolu kaptanım!'
+            });
+            return true;
+        },
+
+        playFacilityBreakStart: function () {
+            if (!this.isEnabled()) return false;
+            this.angerLevel = 0;
+            this.playClip('muavin_break_start.mp3', {
+                pan: 0.15,
+                volume: 0.95,
+                force: true,
+                interrupt: true,
+                nvdaText: 'Muavin Anonsu: Dinlenme tesisine ulaştık, 30 dakika ihtiyaç molası verilmiştir.'
+            });
+            return true;
+        },
+
+        playFacilityBreakEnd: function () {
+            if (!this.isEnabled()) return false;
+            this.playClip('peron_break_end.mp3', {
+                pan: 0,
+                volume: 0.94,
+                force: true,
+                interrupt: true,
+                nvdaText: 'Peron Anonsu: Mola süresi sona erdi, aracınız hareket etmek üzeredir.'
+            });
+            return true;
+        },
+
+        playTeaServed: function () {
+            if (!this.isEnabled()) return false;
+            setTimeout(() => {
+                this.playClip('tea_served.mp3', {
+                    pan: 0.25,
+                    volume: 0.94,
+                    force: true,
+                    interrupt: true,
+                    nvdaText: 'Çaycı Usta: Buyur kaptanım, tavşan kanı demli Rize çayın hazır!'
+                });
+            }, 320);
+            return true;
+        },
+
+        playFoodServed: function (foodName) {
+            if (!this.isEnabled()) return false;
+            setTimeout(() => {
+                this.playClip('food_served.mp3', {
+                    pan: 0.2,
+                    volume: 0.94,
+                    force: true,
+                    interrupt: true,
+                    nvdaText: `Afiyet olsun kaptan! ${foodName || 'Sıcak yemeğiniz'} servis edildi.`
+                });
+            }, 320);
+            return true;
+        },
+
+        playWashBoyDone: function () {
+            if (!this.isEnabled()) return false;
+            setTimeout(() => {
+                this.playClip('wash_boy_done.mp3', {
+                    pan: 0.3,
+                    volume: 0.95,
+                    force: true,
+                    interrupt: true,
+                    nvdaText: 'Tesis görevlisi ön camı ve farları pırıl pırıl yıkadı!'
+                });
+            }, 480);
+            return true;
+        },
+
+        // 9. KURUMSAL BELEDİYE / TEKULAŞ ANONS SPİKERİ (İREM) VE KAYIP EŞYA
+        playIbisWelcome: function () {
+            if (!this.canSpeakInCabin()) return false;
+            this.playClip('ibis_welcome.mp3', { pan: 0, volume: 0.92, interrupt: true });
+            return true;
+        },
+
+        playIbisFinalStop: function () {
+            if (!this.canSpeakInCabin()) return false;
+            this.playClip('ibis_final_stop.mp3', { pan: 0, volume: 0.94, interrupt: true });
+            return true;
+        },
+
+        onLostItemFound: function (fullMsg) {
+            if (!this.canSpeakInCabin(true)) return false;
+            this.playClip('lost_item_found.mp3', {
+                pan: 0.15,
+                volume: 0.95,
+                force: true,
+                interrupt: true,
+                nvdaText: fullMsg
+            });
+            return true;
+        },
+
+        onRearEndHit: function () {
+            if (!this.canSpeakInCabin()) return false;
+            this.playClip('rear_hit_apology.mp3', {
+                pan: 0,
+                volume: 0.96,
+                interrupt: true,
+                nvdaText: 'Arkadan çarptılar! Egzoz hasar aldı. Arkadaki sürücü: Eyvah kaptan abi özür dilerim, duramadım!',
+                toastText: '💥 Arkadaki Sürücü: "Eyvah kaptan abi çok özür dilerim, duramadım arkadan dokundurdum!"',
+                toastType: 'warning'
+            });
+            return true;
+        },
+
+        onAcTurnedOn: function (busTemp) {
+            if (!this.canSpeakInCabin()) return;
+            if (typeof busTemp === 'number' && (busTemp >= 26 || busTemp <= 15)) {
+                setTimeout(() => {
+                    this.playClip('ac_thank.mp3', {
+                        pan: -0.2,
+                        volume: 0.88,
+                        nvdaText: 'Yolcu: Ohh be dünya varmış, içerisi ne güzel ferahladı, teşekkürler kaptan!'
+                    });
+                }, 1400);
+            }
+        },
+
+        // 10. AKILLI KABİN İÇİ ORTAM & GÜVENLİK UYARICI YOLCULAR (FAR, SİLECEK, SICAK/SOĞUK)
+        checkSmartCabinReminders: function (gameObj, deltaTime) {
+            if (!gameObj || !gameObj.isDriving || !this.canSpeakInCabin()) return;
+            const now = performance.now();
+            if (this.lastSmartRemindTime && (now - this.lastSmartRemindTime < 48000)) return;
+
+            if (gameObj.isNight && !gameObj.isHeadlightsOn && gameObj.speed > 22 && (!gameObj.busDamage || gameObj.busDamage.headlights < 100)) {
+                this._darkDriveSecs = (this._darkDriveSecs || 0) + deltaTime;
+                if (this._darkDriveSecs >= 6.5) {
+                    this._darkDriveSecs = 0;
+                    this.lastSmartRemindTime = now;
+                    this.playClip('dark_headlights_warn.mp3', {
+                        pan: 0.25,
+                        volume: 0.94,
+                        nvdaText: 'Yolcu uyarısı: Kaptan bey farları yakmayı unuttunuz, F tuşuyla farları açın!',
+                        toastText: '💡 Yolcu: "Kaptan bey farları yakmayı unuttunuz galiba! (F tuşu)"',
+                        toastType: 'warning'
+                    });
+                    return;
+                }
+            } else {
+                this._darkDriveSecs = 0;
+            }
+
+            const wiperOn = (typeof audio !== 'undefined' && audio.isWiperOn);
+            if ((gameObj.weather === 'rainy' || gameObj.weather === 'snowy') && !wiperOn && gameObj.speed > 22 && (!gameObj.busDamage || gameObj.busDamage.wipers < 100)) {
+                this._wetDriveSecs = (this._wetDriveSecs || 0) + deltaTime;
+                if (this._wetDriveSecs >= 7.5) {
+                    this._wetDriveSecs = 0;
+                    this.lastSmartRemindTime = now;
+                    this.playClip('rain_wipers_warn.mp3', {
+                        pan: 0.35,
+                        volume: 0.94,
+                        nvdaText: 'Yolcu uyarısı: Ön cam yağmurdan sırılsıklam oldu, Shift ve W ile silecekleri çalıştırın!',
+                        toastText: '🌧️ Yolcu: "Kaptan usta ön cam sırılsıklam oldu, silecekleri çalıştırsana! (Shift+W)"',
+                        toastType: 'warning'
+                    });
+                    return;
+                }
+            } else {
+                this._wetDriveSecs = 0;
+            }
+
+            if ((gameObj.passengersOnBoard || 0) > 0 && !gameObj.isACOn && typeof gameObj.busTemperature === 'number') {
+                if (gameObj.busTemperature >= 27) {
+                    this.lastSmartRemindTime = now;
+                    this.playClip('ac_request.mp3', {
+                        pan: -0.25,
+                        volume: 0.92,
+                        nvdaText: 'Yolcu: Kaptan bey otobüsün içi çok sıcak oldu, K tuşuyla klimayı açabilir misiniz?',
+                        toastText: '❄️ Yolcu: "Kaptan bey içerisi çok havasız kaldı, klimayı açabilir misiniz? (K tuşu)"',
+                        toastType: 'info'
+                    });
+                } else if (gameObj.busTemperature <= 13) {
+                    this.lastSmartRemindTime = now;
+                    this.playClip('cold_request.mp3', {
+                        pan: -0.3,
+                        volume: 0.92,
+                        nvdaText: 'Yolcu: Kaptan evladım üşüdük arkada, K tuşuyla kaloriferi açsana!',
+                        toastText: '🔥 Yolcu: "Kaptan evladım donduk arkada, klimayı kaloriferi açsana! (K tuşu)"',
+                        toastType: 'info'
+                    });
+                }
+            }
+        },
+
+        // 11. MİKYAS KAPTANLIK AKADEMİSİ 13 SESLİ DERS (BAŞ EĞİTMEN UĞUR IŞIK)
+        playAcademyLesson: function (lessonId, fallbackText) {
+            if (!this.isEnabled()) return false;
+            this._academyQueue = null;
+            const file = 'lesson_' + lessonId + '.mp3';
+            this.playClip(file, {
+                pan: 0,
+                volume: 1.0,
+                force: true,
+                interrupt: true,
+                nvdaText: fallbackText || ''
+            });
+            return true;
+        },
+
+        playFullAcademySequence: function (lessonIds) {
+            if (!this.isEnabled() || !Array.isArray(lessonIds) || lessonIds.length === 0) return false;
+            this._academyQueue = lessonIds.slice();
+            const next = () => {
+                if (!this._academyQueue || this._academyQueue.length === 0) return;
+                const id = this._academyQueue.shift();
+                this.playClip('lesson_' + id + '.mp3', {
+                    pan: 0,
+                    volume: 1.0,
+                    force: true,
+                    interrupt: true,
+                    onend: () => {
+                        if (this._academyQueue && this._academyQueue.length > 0) {
+                            setTimeout(next, 450);
+                        }
+                    }
+                });
+            };
+            next();
+            return true;
+        },
+
+        stopAcademyLesson: function () {
+            this._academyQueue = null;
+            this.stopAll();
         }
     };
 

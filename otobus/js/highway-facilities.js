@@ -461,8 +461,10 @@
             this.playTeaChime();
             const msg = `🍲 Afiyet olsun! ${(fac && fac.name) || 'Tesis'}'nde ${(spec && spec.name) || 'Yemek'} yediniz (${(spec && spec.price) || 0} ₺). ${(spec && spec.effectDesc) || ''}.`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak(`Afiyet olsun kaptan! ${spec.name} yediniz. Zindelik ve enerjiniz arttı.`);
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playFoodServed(spec.name))) {
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak(`Afiyet olsun kaptan! ${spec.name} yediniz. Zindelik ve enerjiniz arttı.`);
+                }
             }
         },
 
@@ -487,7 +489,9 @@
             this.playTeaChime();
             const msg = "☕ Tesis çay ocağından demli tavşan kanı çayınızı yudumladınız (-15 ₺). Uykunuz tamamen dağıldı!";
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "info");
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak("Tavşan kanı demli çayınızı yudumladınız. Uykunuz tamamen dağıldı kaptan!");
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playTeaServed())) {
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak("Tavşan kanı demli çayınızı yudumladınız. Uykunuz tamamen dağıldı kaptan!");
+            }
         },
 
         // Ön Camı & Farları Yıkatma
@@ -500,7 +504,9 @@
             if (needed <= 1) {
                 const fullMsg = `Deponuz zaten tamamen dolu (%${Math.floor((current / cap) * 100)} - ${Math.floor(current)} L).`;
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(fullMsg, "info");
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playFuelAlreadyFull())) {
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
+                }
                 return;
             }
             Game.refuel();
@@ -542,8 +548,10 @@
             const feeText = washFee > 0 ? `(-${washFee} ₺${washDiscountNote})` : `(ÜCRETSİZ!${washDiscountNote})`;
             const msg = `🧼 Tesis personeli otobüsün ön camını ve farlarını tazyikli su ve fırçayla pırıl pırıl yıkadı ${feeText}. Görüş açınız mükemmel!`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak("Otobüsün ön camı ve farları yıkandı. Gece görüşünüz maksimuma çıktı.");
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playWashBoyDone())) {
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak("Otobüsün ön camı ve farları yıkandı. Gece görüşünüz maksimuma çıktı.");
+                }
             }
         },
 
@@ -577,19 +585,23 @@
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast(`📢 [Muavin Anonsu] 30 Dk İhtiyaç Molası Başladı! (+${tipsEarned || 0} ₺ Yolcu Bahşişi)`, "success");
             }
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak(muavinText);
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playFacilityBreakStart())) {
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak(muavinText);
+                }
             }
 
-            // 5 saniye sonra kalkış anonsunu hazırla
+            // 12 saniye sonra kalkış anonsunu hazırla
             if (this.breakTimer) clearTimeout(this.breakTimer);
             this.breakTimer = setTimeout(() => {
                 const departAnnounce = `Tekirdağ Seyahat yolcuları, ihtiyaç molanız sona ermiştir. Aracınız hareket etmek üzeredir, lütfen yerlerinizi alınız!`;
                 if (typeof UI !== 'undefined' && UI.showToast) {
                     UI.showToast("🔔 [Peron Anonsu] Otobüs hareket etmek üzere! Lütfen yerlerinizi alınız.", "info");
                 }
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak(departAnnounce);
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playFacilityBreakEnd())) {
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak(departAnnounce);
+                    }
                 }
                 this.isBreakActive = false;
             }, 12000);
