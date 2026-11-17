@@ -953,7 +953,7 @@ const SoundGallery = {
             id: "human_tea_kid",
             category: "human",
             icon: "🫖",
-            title: "Kaptanın Çay Kokusuna İmrenen Çocuk",
+            title: "Taze Çay Kokusuna İmrenen Çocuk",
             specs: "Shift + C Çay Molası Tepkisi",
             desc: "Durakta sıcak çay yudumladığınızda canı simit çeken sevimli çocuk.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("tea_smell_kid.mp3", { pan: 0.25, volume: 1.0, force: true, interrupt: true }); }

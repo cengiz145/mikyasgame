@@ -8,6 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
+    const AUDIO_VER = '?v=20261117u';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -23,7 +24,7 @@
         ch19: [
             { file: 'ch19_01.mp3', text: 'Karşı şeritteki kaptanım selamlar! Bolu Dağı tünel çıkışında yoğun sis var, hızını 70\'e düşür, kazasız belasız hayırlı işler!' },
             { file: 'ch19_02.mp3', text: '59 plakalı meslektaşım dinlemede misin? İleride sağ şeritte yol çalışması var, sol şeritten akıp git, tekerine taş değmesin!' },
-            { file: 'ch19_03.mp3', text: 'Aleykümselam usta kaptanım! Yol tertemiz, radar da yok, 19. kanaldan tüm şoför kardeşlerime hayırlı nöbetler!' },
+            { file: 'ch19_03.mp3', text: 'Aleykümselam meslektaşım! Yol tertemiz, radar da yok, 19. kanaldan tüm emekçi meslektaşlarıma hayırlı nöbetler!' },
             { file: 'ch19_04.mp3', text: 'Kaptanım hayırlı yolculuklar! Susurluk tesislerine yaklaşıyorsan tostu ve köpüklü ayranı yeni çıktı, bir mola ver nefeslen!' }
         ],
 
@@ -33,23 +34,23 @@
 
         // Dış Trafik & Yaya Çarpışma / Tehlike Tepkileri (3B Sağ/Sol Yönlü)
         crashLeft: [
-            { file: 'npc_crash_left_01.mp3', label: 'Sol Şerit Sürücüsü: "Hooop kaptan! Sol aynaya hiç mi bakmıyorsun?! Boydan boya çizdin güzelim arabayı!"' },
-            { file: 'npc_crash_left_02.mp3', label: 'Sol Şerit Sürücüsü: "Yuh artık kaptan bey! Koca otobüsü sol şeride üstümüze kırdın!"' }
+            { file: 'npc_crash_left_01.mp3', label: 'Sol Şerit Sürücüsü: "Hooop! Sol aynaya hiç mi bakmıyorsun yahu?! Boydan boya çizdin güzelim arabayı!"' },
+            { file: 'npc_crash_left_02.mp3', label: 'Sol Şerit Sürücüsü: "Yuh artık ya! Koca otobüsü sol şeride üstümüze kırdın, sinyal de mi yok?!"' }
         ],
         crashRight: [
             { file: 'npc_crash_right_01.mp3', label: 'Sağ Şerit Taksicisi: "Hoop! Sağ şeritte taksi var görmüyor musun, çamurluğu dağıttın!"' },
-            { file: 'npc_pedestrian_right_01.mp3', label: 'Kaldırımdaki Yaya: "Ayyy! Dikkat etsene be kardeşim, kaldırıma çıkacaksın, az kalsın eziliyorduk!"' }
+            { file: 'npc_pedestrian_right_01.mp3', label: 'Kaldırımdaki Yaya: "Ayyy! Önünüze baksanıza lütfen, kaldırıma çıkacaksınız, az kalsın eziliyorduk!"' }
         ],
         crashFront: [
-            { file: 'npc_crash_front_01.mp3', label: 'Öndeki Sürücü: "Eyvaaah! Frenin mi patladı kaptan?! Dümdüz tampona girdin!"' }
+            { file: 'npc_crash_front_01.mp3', label: 'Öndeki Sürücü: "Eyvaaah! Frenin mi patladı yahu?! Dümdüz tampona girdin!"' }
         ],
         nearMiss: [
-            { file: 'npc_nearmiss_01.mp3', label: 'Yan Şerit Sürücüsü: "Yavaş geç be kaptan! Rüzgarından savrulduk!"' },
-            { file: 'npc_nearmiss_f1.mp3', label: 'Yaya / Sürücü: "Ayy! Ne kadar yakın geçtin öyle kaptan, aynan çarpacaktı neredeyse!"' }
+            { file: 'npc_nearmiss_01.mp3', label: 'Yan Şerit Sürücüsü: "Yavaş geç biraz yavaş! Koca otobüsün rüzgarından savrulduk!"' },
+            { file: 'npc_nearmiss_f1.mp3', label: 'Yaya / Sürücü: "Ayy! Ne kadar yakın geçtiniz öyle, otobüsün aynası çarpacaktı neredeyse!"' }
         ],
         redLight: [
-            { file: 'npc_pedestrian_redlight.mp3', label: 'Yaya Geçidindeki Vatandaş: "Ayy! Kırmızı ışıkta geçilir mi kaptan?! Yaya geçidindeyiz!"' },
-            { file: 'npc_redlight_01.mp3', label: 'Kavşaktaki Sürücü: "Hooop! Kırmızı yanıyor kaptan, az kalsın kavşakta biçiyordun bizi!"' }
+            { file: 'npc_pedestrian_redlight.mp3', label: 'Yaya Geçidindeki Vatandaş: "Ayy! Kırmızı ışıkta geçilir mi böyle?! Yaya geçidindeyiz!"' },
+            { file: 'npc_redlight_01.mp3', label: 'Kavşaktaki Sürücü: "Hooop! Kırmızı yanıyor kırmızı, görmüyor musun?! Az kalsın kavşakta biçiyordun bizi!"' }
         ],
 
         // Kabin İçi Kaza Panik & Korku Çığlıkları
@@ -57,69 +58,69 @@
 
         // Kademeli Yolcu Sabır & Hafıza Tepkileri (1: Kibar Uyarı, 2: Sitem, 3: Küfürsüz Öfke)
         patienceMild: [
-            { file: 'warn_mild_01.mp3', label: 'Tonton Teyze: "Aman kaptan evladım, biraz yumuşak bas şu frene, dizlerim ağrıyor tutunamıyorum."' },
-            { file: 'warn_mild_02.mp3', label: 'Yolcu Hanım: "Kaptan bey, kasislere biraz daha yavaş girerseniz çok seviniriz, sarsıldık arkada."' },
-            { file: 'kid_bump_01.mp3', label: 'Çocuk Yolcu: "Hoop! Anne sıkı tutun, kaptan bizi uçuracak galiba!"' },
-            { file: 'warn_mild_03.mp3', label: 'Pazar Arabalı Teyze: "Ayy domateslerim ezilecek poşette kaptan oğlum, azıcık yavaş gir şu çukurlara!"' },
-            { file: 'warn_mild_04.mp3', label: 'Öğrenci Genç Kız: "Hoop! Telefon elimden uçuyordu az kalsın kaptan abi, ne fren yaptın be!"' }
+            { file: 'warn_mild_01.mp3', label: 'Tonton Teyze: "Aman evladım, biraz yumuşak bas şu frene, dizlerim ağrıyor tutunamıyorum."' },
+            { file: 'warn_mild_02.mp3', label: 'Yolcu: "Affedersiniz, kasislere biraz daha yavaş girerseniz çok seviniriz, bayağı sarsıldık arkada."' },
+            { file: 'kid_bump_01.mp3', label: 'Çocuk Yolcu: "Hoop! Anne sıkı tutun, otobüs bizi havaya uçuracak galiba!"' },
+            { file: 'warn_mild_03.mp3', label: 'Pazar Arabalı Teyze: "Ayy domateslerim ezilecek poşette evladım, azıcık yavaş gir şu çukurlara!"' },
+            { file: 'warn_mild_04.mp3', label: 'Öğrenci Genç: "Hoop! Telefon elimden uçuyordu az kalsın, ne sert fren oldu öyle ya!"' }
         ],
         patienceMedium: [
-            { file: 'warn_medium_01.mp3', label: 'Emekli Amca: "Yeter ama kaptan bey! Az önce de sarsıldık, çuval mı taşıyorsun insan mı taşıyorsun?!"' },
-            { file: 'warn_medium_02.mp3', label: 'Yolcu Hanım: "Kaptan bey lütfen dikkat edin artık, üst üste ani fren yapıyorsunuz, ayaktaki yolcular düşecek!"' },
-            { file: 'warn_medium_03.mp3', label: 'Takım Elbiseli Yolcu: "Kaptan bey gömleğime kahve döküldü sarsıntıdan, biraz daha özenli kullanalım lütfen!"' },
-            { file: 'warn_medium_04.mp3', label: 'Bebekli Anne: "Kaptan bey rica ediyorum sarsmayın bu kadar, bebek ağlayacak şimdi arkada!"' }
+            { file: 'warn_medium_01.mp3', label: 'Emekli Amca: "Yeter ama artık yahu! Az önce de sarsıldık, çuval mı taşıyorsunuz insan mı taşıyorsunuz?!"' },
+            { file: 'warn_medium_02.mp3', label: 'Yolcu: "Lütfen biraz daha dikkatli sürer misiniz, üst üste ani fren yapıyorsunuz, ayaktaki yolcular düşecek!"' },
+            { file: 'warn_medium_03.mp3', label: 'Yolcu: "Pardon ama gömleğime kahve döküldü sarsıntıdan, biraz daha özenli kullanalım lütfen!"' },
+            { file: 'warn_medium_04.mp3', label: 'Bebekli Anne: "Rica ediyorum bu kadar sert sarsmayın aracı, bebek ağlayacak şimdi arkada!"' }
         ],
         patienceAngry: [
-            { file: 'warn_angry_01.mp3', label: 'Tansiyonlu Teyze: "İndir beni ilk durakta kaptan! Bu ne biçim araba kullanmak böyle, tansiyonum fırladı valla!"' },
-            { file: 'warn_angry_02.mp3', label: 'Sinirli Amca: "Kaptan yavaş sür şu otobüsü! Her çukura kasise küt küt giriyorsun, sabrımız taştı artık!"' },
-            { file: 'warn_angry_03.mp3', label: 'Öfkeli Yolcu: "Beyaz Masayı arayıp plakanı vereceğim şimdi kaptan! Lunapark mı burası, savura savura götürüyorsun bizi!"' },
+            { file: 'warn_angry_01.mp3', label: 'Tansiyonlu Teyze: "İndir beni ilk durakta lütfen! Bu ne biçim araba kullanmak böyle, tansiyonum fırladı valla!"' },
+            { file: 'warn_angry_02.mp3', label: 'Sinirli Amca: "Yavaş sür biraz şu otobüsü! Her çukura kasise küt küt giriyorsun, sabrımız taştı artık!"' },
+            { file: 'warn_angry_03.mp3', label: 'Öfkeli Yolcu: "Beyaz Masayı arayıp plakanızı vereceğim şimdi! Lunapark mı burası, savura savura götürüyorsunuz bizi!"' },
             { file: 'warn_angry_04.mp3', label: 'Öfkeli Teyze: "Tövbe estağfurullah! Evladım bu ne sert sürüş böyle, yüreğimiz ağzımıza geldi kaçıncı sarsıntı bu!"' }
         ],
 
         // Sert Viraj, Aşırı Hız, Uzun Bekleme, Korna Sitemi, Usta Sürüş Övgüsü & Doğal Kabin Sohbetleri
         curvePanic: [
-            { file: 'curve_panic_f1.mp3', label: 'Teyze: "Ayyy savrulduk! Kaptan evladım viraja bu hızla girilir mi, devrileceğiz şimdi!"' },
-            { file: 'curve_panic_m1.mp3', label: 'Emekli Amca: "Hooop tutunun millet! Kaptan ralli mi yapıyorsun, virajda yan yattı koca otobüs!"' },
+            { file: 'curve_panic_f1.mp3', label: 'Teyze: "Ayyy savrulduk! Evladım viraja bu hızla girilir mi hiç, devrileceğiz şimdi!"' },
+            { file: 'curve_panic_m1.mp3', label: 'Emekli Amca: "Hooop tutunun millet! Yarış pistinde miyiz yahu, virajda yan yattı koca otobüs!"' },
             { file: 'curve_kid_01.mp3', label: 'Çocuk Yolcu: "Uuuu! Lunapark treni gibi yana yattık anneee!"' }
         ],
-        curveMurmur: { file: 'curve_murmur_f1.mp3', label: 'Yolcu Hanım: "Üff başım döndü valla, virajlara biraz daha tatlı girsek keşke kaptan bey."' },
+        curveMurmur: { file: 'curve_murmur_f1.mp3', label: 'Yolcu: "Üff başım döndü valla, virajlara biraz daha yumuşak girsek keşke."' },
         stopBell: [
-            { file: 'stop_bell_01.mp3', label: 'Tonton Teyze: "Kaptan evladım, müsait bir yerde durakta indirebilir misin zahmet olmazsa?"' },
-            { file: 'stop_bell_02.mp3', label: 'Emekli Amca: "Kaptan usta, gelecek durakta ineceğiz inşallah, arka kapıyı unutma!"' },
-            { file: 'stop_bell_03.mp3', label: 'Öğrenci Kız: "Kaptan abi, gelecek durakta inecek var!"' }
+            { file: 'stop_bell_01.mp3', label: 'Tonton Teyze: "Evladım, müsait bir yerde gelecek durakta indirebilir misin zahmet olmazsa?"' },
+            { file: 'stop_bell_02.mp3', label: 'Emekli Amca: "Gelecek durakta ineceğiz inşallah, arka kapıyı unutmayalım!"' },
+            { file: 'stop_bell_03.mp3', label: 'Öğrenci: "Pardon, gelecek durakta inecek var!"' }
         ],
-        stopBellFinal: { file: 'stop_bell_final.mp3', label: 'Yolcu Hanım: "Son durağa geldik çok şükür, elinize sağlık kaptan bey!"' },
+        stopBellFinal: { file: 'stop_bell_final.mp3', label: 'Yolcu: "Son durağa geldik çok şükür, ellerinize emeğinize sağlık, iyi günler!"' },
         alightThanks: [
-            { file: 'alight_thank_01.mp3', label: 'İnen Teyze: "Ellerine kollarına sağlık kaptan evladım, Allah kaza bela vermesin, hayırlı işler!"' },
-            { file: 'alight_thank_02.mp3', label: 'İnen Amca: "Kazasız belasız hayırlı nöbetler kaptan usta, kolay gelsin!"' },
-            { file: 'alight_thank_03.mp3', label: 'İnen Öğrenci: "Çok teşekkürler kaptan abi, iyi günler kolay gelsin!"' }
+            { file: 'alight_thank_01.mp3', label: 'İnen Teyze: "Ellerine kollarına sağlık evladım, Allah kaza bela vermesin, hayırlı işler!"' },
+            { file: 'alight_thank_02.mp3', label: 'İnen Amca: "Kazasız belasız hayırlı nöbetler olsun, kolay gelsin!"' },
+            { file: 'alight_thank_03.mp3', label: 'İnen Öğrenci: "Çok teşekkürler, ellerinize sağlık, iyi günler kolay gelsin!"' }
         ],
-        alightAngry: { file: 'alight_angry_01.mp3', label: 'Sitemli İnen Yolcu: "Oh be nihayet indik, içimiz dışımıza çıktı valla kaptan!"' },
+        alightAngry: { file: 'alight_angry_01.mp3', label: 'Sitemli İnen Yolcu: "Oh be nihayet indik, içimiz dışımıza çıktı valla bu nasıl sürüş!"' },
         waitLong: [
-            { file: 'wait_long_01.mp3', label: 'Sabırsız Yolcu: "Of ya, ne bitmez trafikmiş arkadaş! Kaptan bey önümüzde yol mu tıkandı, niye kıpırdamıyoruz?"' },
+            { file: 'wait_long_01.mp3', label: 'Sabırsız Yolcu: "Of ya, ne bitmez trafikmiş arkadaş! Önümüzde yol mu tıkandı acaba, niye hiç kıpırdamıyoruz?"' },
             { file: 'wait_long_02.mp3', label: 'Öğrenci Kız: "Eyvah derse geç kaldık yine, saat kaç oldu hâlâ kıpırdamadık!"' },
             { file: 'wait_long_03.mp3', label: 'Tonton Teyze: "Sabır çekin evladım sabır, uçacak hali yok ya şoförün, açılır şimdi yol!"' }
         ],
         overspeed: [
-            { file: 'overspeed_01.mp3', label: 'Korkan Yolcu: "Kaptan bey biraz yavaş mı gitsek acaba? İbre doksanı geçti, korkuyoruz arkada!"' },
-            { file: 'overspeed_02.mp3', label: 'Emekli Amca: "Aman kaptan usta, acelemiz yok, geç olsun güç olmasın, ayağını gazdan biraz çek gözünü seveyim!"' },
+            { file: 'overspeed_01.mp3', label: 'Korkan Yolcu: "Pardon, biraz yavaş mı gitsek acaba? İbre doksanı geçti, korkuyoruz arkada!"' },
+            { file: 'overspeed_02.mp3', label: 'Emekli Amca: "Aman gözünü seveyim acelemiz yok, geç olsun güç olmasın, ayağını gazdan biraz çek lütfen!"' },
             { file: 'overspeed_kid.mp3', label: 'Heyecanlı Çocuk: "Vaaay baba bak, otobüs yarış arabası gibi gidiyor vıııınn!"' }
         ],
         hornSpam: [
-            { file: 'horn_spam_01.mp3', label: 'Emekli Amca: "Kaptan usta kulağımızın pası silindi valla, düğün konvoyunda mıyız, basma şu kornaya bu kadar!"' },
-            { file: 'horn_spam_02.mp3', label: 'Bebekli Anne: "Şşşt kaptan bey rica ediyorum, kucağımda bebek uyuyor, kornayla sıçrattınız çocuğu!"' }
+            { file: 'horn_spam_01.mp3', label: 'Emekli Amca: "Kulağımızın pası silindi valla, düğün konvoyunda mıyız yahu, basma şu kornaya bu kadar!"' },
+            { file: 'horn_spam_02.mp3', label: 'Bebekli Anne: "Rica ediyorum basmayın şu kornaya artık, kucağımda bebek uyuyor, sıçrattınız çocuğu!"' }
         ],
         smoothPraise: [
-            { file: 'praise_smooth_01.mp3', label: 'Usta Şoför Amca: "Maşallah kaptan kardeşime be! Vites geçişleri, frenaj pamuk gibi, kırk yıllık usta şoförsün valla!"' },
+            { file: 'praise_smooth_01.mp3', label: 'Emekli Şoför Amca: "Maşallah be, bileğine sağlık! Vites geçişleri, frenaj pamuk gibi, kırk yıllık usta şoförsün valla!"' },
             { file: 'praise_smooth_02.mp3', label: 'Tonton Teyze: "Çay bardağını konsola koysan bir damla dökülmez valla, pamuk gibi sürüyorsun evladım!"' },
-            { file: 'praise_smooth_03.mp3', label: 'Genç Yolcu: "Valla helal olsun kaptan abi, arkada mışıl mışıl dinlendik, sürüşün on numara!"' }
+            { file: 'praise_smooth_03.mp3', label: 'Genç Yolcu: "Valla helal olsun, arkada mışıl mışıl dinlendik, sürüşünüz on numara gerçekten!"' }
         ],
         ambientSlice: [
             { file: 'ambient_phone_01.mp3', pan: -0.35, label: 'Arka Koltuk (Telefon): "Alo hanım, otobüsteyim şimdi, on dakikaya merkezde inerim, sıcak ekmek de alırım gelirken..."' },
             { file: 'ambient_phone_f1.mp3', pan: 0.35, label: 'Öğrenci Sohbeti: "Kanka bindim otobüse geliyorum, kantinde çayı söyle sen, beş dakikaya kampüsteyim!"' },
             { file: 'ambient_seat_offer.mp3', pan: -0.25, label: 'Kibar Genç: "Buyur teyzeciğim sen şöyle cam kenarına otur, ben ayakta giderim hiç sorun değil."' },
-            { file: 'ambient_kid_question.mp3', pan: 0.25, label: 'Meraklı Çocuk: "Anne bak! Kaptan amcanın önünde ne kadar çok ışıklı düğme var, ben de büyüyünce otobüs kaptanı olacağım!"' },
-            { file: 'ambient_route_ask.mp3', pan: 0.3, label: 'Yolcu Sorusu: "Pardon kaptan abi, bu araç merkez durağından geçiyor mu acaba?"' }
+            { file: 'ambient_kid_question.mp3', pan: 0.25, label: 'Meraklı Çocuk: "Anne bak! Şoför koltuğunun önünde ne kadar çok ışıklı düğme var, ben de büyüyünce otobüs şoförü olacağım!"' },
+            { file: 'ambient_route_ask.mp3', pan: 0.3, label: 'Yolcu Sorusu: "Çok pardon, bu otobüs merkez durağından geçiyor mu acaba?"' }
         ],
 
         // Durak, Kapı, Rampa, Bakiye ve İkram Etkileşimleri
@@ -143,8 +144,8 @@
         muavinCologne: 'muavin_cologne.mp3',
         cologneReplies: [
             { file: 'teyze_cologne.mp3', text: 'Sağ olasın evladım, limon kolonyası da pek güzel ferahlattı içimizi.' },
-            { file: 'amca_cologne.mp3', text: 'Eyvallah kaptanım, hem sürüşün rahatladı hem kolonya iyi geldi, sağ olasın.' },
-            { file: 'kid_cologne.mp3', text: 'Vaaay limon kolonyası! Mis gibi koktu kaptan amca, sağ ol!' }
+            { file: 'amca_cologne.mp3', text: 'Eyvallah çok sağ olasın, hem sürüş rahatladı hem kolonya ferahlattı içimizi.' },
+            { file: 'kid_cologne.mp3', text: 'Vaaay limon kolonyası! Mis gibi koktu ellerim, çok teşekkürler!' }
         ]
     };
 
@@ -199,7 +200,7 @@
         getHowl: function (filename) {
             if (!this.howlCache[filename] && typeof Howl !== 'undefined') {
                 this.howlCache[filename] = new Howl({
-                    src: [BASE_PATH + filename],
+                    src: [BASE_PATH + filename + AUDIO_VER],
                     preload: true
                 });
             }
@@ -259,7 +260,7 @@
 
             // Fallback HTML5 Audio
             try {
-                const a = new Audio(BASE_PATH + filename);
+                const a = new Audio(BASE_PATH + filename + AUDIO_VER);
                 a.volume = vol;
                 if (typeof opts.onend === 'function') {
                     a.onended = () => opts.onend();
@@ -573,8 +574,8 @@
                     this.playClip('late_complain_01.mp3', {
                         pan: 0.45,
                         volume: 0.90,
-                        nvdaText: 'Duraktaki yolcu rötar sitemi: Neredesin be kaptan bey, ağaç olduk durakta beklemekten!',
-                        toastText: '⏱️ Duraktaki Yolcu: "Ağaç olduk durakta beklemekten kaptan bey, rötar yaptı bu hat!"',
+                        nvdaText: 'Duraktaki yolcu rötar sitemi: Neredesiniz yahu, ağaç olduk durakta beklemekten!',
+                        toastText: '⏱️ Duraktaki Yolcu: "Neredesiniz yahu, ağaç olduk durakta beklemekten, rötar yaptı bu hat!"',
                         toastType: 'warning'
                     });
                 }, 3100);
@@ -587,8 +588,8 @@
                         this.playClip('ontime_praise_01.mp3', {
                             pan: 0.4,
                             volume: 0.90,
-                            nvdaText: 'Duraktaki yolcu: Vallahi İsviçre saati gibi tam dakikasında geldi otobüs, helal olsun kaptan!',
-                            toastText: '⌚ Yolcu: "İsviçre saati gibi tam dakikasında geldi otobüs, helal olsun kaptan!"',
+                            nvdaText: 'Duraktaki yolcu: Vallahi İsviçre saati gibi tam dakikasında geldi otobüs, helal olsun size!',
+                            toastText: '⌚ Yolcu: "İsviçre saati gibi tam dakikasında geldi otobüs, helal olsun size!"',
                             toastType: 'success'
                         });
                     }, 3100);
@@ -644,8 +645,8 @@
                 this.playClip('low_air_panic_m1.mp3', {
                     pan: -0.3,
                     volume: 0.94,
-                    nvdaText: 'Yolcu telaşı: Kaptan usta bu öten alarm neyin nesi yahu, otobüsün havası mı bitti?!',
-                    toastText: '🚨 Yolcu: "Kaptan usta bu öten alarm neyin nesi yahu, otobüsün havası mı bitti?!"',
+                    nvdaText: 'Yolcu telaşı: Yahu bu öten alarm neyin nesi böyle, otobüsün fren havası mı bitti?!',
+                    toastText: '🚨 Yolcu: "Yahu bu öten alarm neyin nesi böyle, otobüsün fren havası mı bitti?!"',
                     toastType: 'warning'
                 });
             }, 650);
@@ -681,8 +682,8 @@
                     this.playClip('window_draft_01.mp3', {
                         pan: -0.35,
                         volume: 0.90,
-                        nvdaText: 'Ön koltuktaki yolcu: Üff kaptan bey, açık camdan buz gibi cereyan vurdu boynumuza, End tuşuyla kapatabilir misiniz?',
-                        toastText: '🪟 Yolcu: "Açık camdan buz gibi cereyan vurdu boynumuza kaptan bey! (End: Camı Kapat)"',
+                        nvdaText: 'Ön koltuktaki yolcu: Affedersiniz, öndeki açık camdan buz gibi cereyan vurdu boynumuza, End tuşuyla kapatabilir misiniz?',
+                        toastText: '🪟 Yolcu: "Affedersiniz, öndeki açık camdan buz gibi cereyan vurdu boynumuza! (End: Camı Kapat)"',
                         toastType: 'info'
                     });
                 }
@@ -696,8 +697,8 @@
                 this.playClip('tea_smell_kid.mp3', {
                     pan: 0.25,
                     volume: 0.92,
-                    nvdaText: 'Çocuk Yolcu: Mmm! Kaptan amcanın çayı ne güzel koktu, benim de canım simit çekti anne!',
-                    toastText: '🫖 Çocuk Yolcu: "Mmm! Kaptan amcanın çayı ne güzel koktu, canım simit çekti anne!"',
+                    nvdaText: 'Çocuk Yolcu: Mmm! Ön taraftan ne güzel taze çay kokusu geldi, benim de canım simit çekti anne!',
+                    toastText: '🫖 Çocuk Yolcu: "Mmm! Ön taraftan ne güzel taze çay kokusu geldi, canım simit çekti anne!"',
                     toastType: 'success'
                 });
             }, 900);
@@ -710,7 +711,7 @@
                 pan: 0.65,
                 volume: 1.0,
                 interrupt: true,
-                nvdaText: 'Durağa doğru koşan bir yolcu var: Kaptanım dur bekle lütfen geliyorum! Ön kapıyı açmak için PageUp tuşuna basın.'
+                nvdaText: 'Durağa doğru koşan bir yolcu var: Hooop durun bekleyin lütfen geliyorum! Ön kapıyı açmak için PageUp tuşuna basın.'
             });
             return true;
         },
@@ -722,7 +723,7 @@
                 this.playClip(CLIPS.runnerBoarded, {
                     pan: 0.3,
                     volume: 0.95,
-                    nvdaText: 'Koşan yolcu bindi: Oh be, helal olsun kaptanım, işe yetiştim sayende! Artı 60 Lira ve 30 XP.'
+                    nvdaText: 'Koşan yolcu bindi: Oh be, helal olsun size, işe yetiştim sayenizde! Artı 60 Lira ve 30 XP.'
                 });
             }, 320);
             return true;
@@ -733,7 +734,7 @@
             this.playClip(CLIPS.runnerMissed, {
                 pan: 0.75,
                 volume: 0.88,
-                nvdaText: 'Yolcu durağa yetişemedi: Ah be kaptanım, kıl payı kaçırdım otobüsü.'
+                nvdaText: 'Yolcu durağa yetişemedi: Ah be, kıl payı gözümün önünde kaçırdım otobüsü.'
             });
             return true;
         },
@@ -745,7 +746,7 @@
                     pan: 0.35,
                     volume: 0.96,
                     interrupt: true,
-                    nvdaText: 'Yolcunun kartında bakiye yetersiz: Kaptan abi sınava yetişmem lazım, idare edebilir misin? İzin vermek için Y, indirmek için N tuşuna basın.'
+                    nvdaText: 'Yolcunun kartında bakiye yetersiz: Çok pardon, sınava yetişmem lazım, idare edebilir misiniz? İzin vermek için Y, indirmek için N tuşuna basın.'
                 });
             }, 380);
             return true;
@@ -759,8 +760,8 @@
                 volume: 0.95,
                 interrupt: true,
                 nvdaText: allowed
-                    ? 'Yolcuya izin verdiniz: Çok teşekkür ederim kaptan abi! Artı 50 Lira gönlü zengin kaptan primi.'
-                    : 'Yolcuyu indirdiniz: Peki kaptan abi, canın sağ olsun, iyi nöbetler.'
+                    ? 'Yolcuya izin verdiniz: Çok teşekkür ederim, hayatımı kurtardınız! Artı 50 Lira hoşgörü primi.'
+                    : 'Yolcuyu indirdiniz: Peki, canınız sağ olsun, iyi yolculuklar.'
             });
             return true;
         },
@@ -772,7 +773,7 @@
                 this.playClip(CLIPS.rampThank, {
                     pan: 0.35,
                     volume: 0.95,
-                    nvdaText: 'Tekerlekli sandalye rampası açıldı. Yolcu: Allah razı olsun kaptan evladım, ellerin dert görmesin. Artı 30 XP.'
+                    nvdaText: 'Tekerlekli sandalye rampası açıldı. Yolcu: Allah razı olsun evladım, ellerin dert görmesin. Artı 30 XP.'
                 });
             }, 550);
             return true;
@@ -1017,8 +1018,8 @@
                 pan: 0,
                 volume: 0.96,
                 interrupt: true,
-                nvdaText: 'Arkadan çarptılar! Egzoz hasar aldı. Arkadaki sürücü: Eyvah kaptan abi özür dilerim, duramadım!',
-                toastText: '💥 Arkadaki Sürücü: "Eyvah kaptan abi çok özür dilerim, duramadım arkadan dokundurdum!"',
+                nvdaText: 'Arkadan çarptılar! Egzoz hasar aldı. Arkadaki sürücü: Eyvah çok özür dilerim, duramadım!',
+                toastText: '💥 Arkadaki Sürücü: "Eyvah çok özür dilerim, aniden durunca arkadan dokundurdum!"',
                 toastType: 'warning'
             });
             return true;
@@ -1031,7 +1032,7 @@
                     this.playClip('ac_thank.mp3', {
                         pan: -0.2,
                         volume: 0.88,
-                        nvdaText: 'Yolcu: Ohh be dünya varmış, içerisi ne güzel ferahladı, teşekkürler kaptan!'
+                        nvdaText: 'Yolcu: Ohh be dünya varmış, içerisi ne güzel ferahladı, çok teşekkürler!'
                     });
                 }, 1400);
             }
@@ -1108,8 +1109,8 @@
                     this.playClip('dark_headlights_warn.mp3', {
                         pan: 0.25,
                         volume: 0.94,
-                        nvdaText: 'Yolcu uyarısı: Kaptan bey farları yakmayı unuttunuz, F tuşuyla farları açın!',
-                        toastText: '💡 Yolcu: "Kaptan bey farları yakmayı unuttunuz galiba! (F tuşu)"',
+                        nvdaText: 'Yolcu uyarısı: Pardon, farları yakmayı unuttunuz, F tuşuyla farları açabilir misiniz?',
+                        toastText: '💡 Yolcu: "Pardon, farları yakmayı unuttunuz galiba! (F tuşu)"',
                         toastType: 'warning'
                     });
                     return;
@@ -1128,7 +1129,7 @@
                         pan: 0.35,
                         volume: 0.94,
                         nvdaText: 'Yolcu uyarısı: Ön cam yağmurdan sırılsıklam oldu, Shift ve W ile silecekleri çalıştırın!',
-                        toastText: '🌧️ Yolcu: "Kaptan usta ön cam sırılsıklam oldu, silecekleri çalıştırsana! (Shift+W)"',
+                        toastText: '🌧️ Yolcu: "Pardon, ön cam yağmurdan sırılsıklam oldu, silecekleri çalıştırabilir misiniz? (Shift+W)"',
                         toastType: 'warning'
                     });
                     return;
@@ -1143,8 +1144,8 @@
                     this.playClip('ac_request.mp3', {
                         pan: -0.25,
                         volume: 0.92,
-                        nvdaText: 'Yolcu: Kaptan bey otobüsün içi çok sıcak oldu, K tuşuyla klimayı açabilir misiniz?',
-                        toastText: '❄️ Yolcu: "Kaptan bey içerisi çok havasız kaldı, klimayı açabilir misiniz? (K tuşu)"',
+                        nvdaText: 'Yolcu: Affedersiniz, otobüsün içi çok sıcak oldu, K tuşuyla klimayı açabilir misiniz?',
+                        toastText: '❄️ Yolcu: "Affedersiniz, içerisi çok havasız kaldı, klimayı açabilir misiniz? (K tuşu)"',
                         toastType: 'info'
                     });
                 } else if (gameObj.busTemperature <= 13) {
@@ -1152,8 +1153,8 @@
                     this.playClip('cold_request.mp3', {
                         pan: -0.3,
                         volume: 0.92,
-                        nvdaText: 'Yolcu: Kaptan evladım üşüdük arkada, K tuşuyla kaloriferi açsana!',
-                        toastText: '🔥 Yolcu: "Kaptan evladım donduk arkada, klimayı kaloriferi açsana! (K tuşu)"',
+                        nvdaText: 'Yolcu: Üşüdük arkada, K tuşuyla kaloriferi açabilir misiniz?',
+                        toastText: '🔥 Yolcu: "Üşüdük arkada, klimayı kaloriferi açabilir misiniz? (K tuşu)"',
                         toastType: 'info'
                     });
                     return;

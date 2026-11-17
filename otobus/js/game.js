@@ -4622,7 +4622,7 @@ const Game = {
                     
                     if (this.busTemperature > (22 + comfortRange)) {
                         const complaints = [
-                            '"Şoför bey yandık, klimayı açar mısın?"',
+                            '"Affedersiniz yandık, klimayı açar mısınız?"',
                             '"İçerisi hamam gibi oldu, nefes alamıyoruz!"',
                             '"Çok sıcak, pişiyoruz burada!"'
                         ];
@@ -4633,7 +4633,7 @@ const Game = {
                     } else if (this.busTemperature < (22 - comfortRange)) {
                         const complaints = [
                             '"Burası buz gibi oldu, donduracaksın bizi!"',
-                            '"Şoför bey üşüyoruz, ısıtıcıyı açar mısın?"',
+                            '"Affedersiniz üşüyoruz, ısıtıcıyı açar mısınız?"',
                             '"Çok soğuk, hasta olacağız!"'
                         ];
                         document.getElementById('passenger-dialog').innerText = complaints[Math.floor(Math.random() * complaints.length)];
@@ -5352,8 +5352,8 @@ const Game = {
                     window.HumanNpcVoices.playClip('amca_reardoor.mp3', {
                         pan: -0.35,
                         volume: 0.92,
-                        nvdaText: 'Yolcu: Kaptan arka kapıyı açsana evladım, durakta ineceğiz!',
-                        toastText: '🗣️ Yolcu: "Kaptan! Arka kapıyı açsana, durakta ineceğiz!" (PageDown)',
+                        nvdaText: 'Yolcu: Pardon, arka kapıyı açsana evladım, durakta ineceğiz!',
+                        toastText: '🗣️ Yolcu: "Pardon! Arka kapıyı açsana evladım, durakta ineceğiz!" (PageDown)',
                         toastType: 'warning'
                     });
                 }
@@ -5458,7 +5458,7 @@ const Game = {
             this.runningPassengerBonusCount = (this.runningPassengerBonusCount || 0) + 1;
             this.passengerComfort = Math.min(100, (this.passengerComfort || 90) + 5);
 
-            const praise = "Helal olsun kaptanım, işe yetiştim sayende! Senin gibi şoför zor bulunur!";
+            const praise = "Helal olsun size, işe yetiştim sayenizde! Sizin gibi düşünceli şoför zor bulunur!";
             const dialogEl = document.getElementById('passenger-dialog');
             if (dialogEl) dialogEl.innerText = `"${praise}"`;
             const feedbackEl = document.getElementById('passenger-feedback');
@@ -5619,7 +5619,7 @@ const Game = {
         if (alertEl) alertEl.classList.remove('hidden');
 
         const alertText = document.getElementById('running-passenger-text');
-        if (alertText) alertText.innerText = '🏃 Koşan Yolcu: "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı!" (Açmak için PageUp tuşu veya buton)';
+        if (alertText) alertText.innerText = '🏃 Koşan Yolcu: "Hooop durun bekleyin lütfen geliyorum, kapatmayın ön kapıyııı!" (Açmak için PageUp tuşu veya buton)';
 
         const msg = "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı! Durağa doğru koşan bir yolcu var. Kapıyı açmak için Sayfa Yukarı yani PageUp tuşuna veya Ön Kapıyı Aç butonuna basınız.";
         if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onRunningPassengerAppear())) {
@@ -5778,7 +5778,7 @@ const Game = {
                 audio.playValidatorSound('yetersiz');
             }
             const dEl = document.getElementById('passenger-dialog');
-            if (dEl) dEl.innerText = '"Şey kaptan abi, öğrenci kartımda bakiye bitmiş de... idare edebilir misin?" (Y: İzin Ver / N: İndir)';
+            if (dEl) dEl.innerText = '"Şey çok pardon, öğrenci kartımda bakiye bitmiş de... bu seferlik idare edebilir misiniz?" (Y: İzin Ver / N: İndir)';
             if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onInsufficientBalanceAsk())) {
                 if (typeof audio !== 'undefined' && audio.speak) {
                     audio.speak("Kartta bakiye yetersiz! Yolcuya izin vermek için Y tuşuna, indirmek için N tuşuna basınız.");
