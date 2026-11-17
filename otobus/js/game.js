@@ -4200,8 +4200,11 @@ const Game = {
         if (this.speed > 5) { this.wasMovingBeforeStop = true; }
         if (this.speed > 0) {
             // GERÇEKÇİ OYUN ÖLÇEĞİ: 1 gerçek kilometre = Oyun içinde 250 metre sürüş süresi (4 kat hızlı)
-            // PROFESYONEL AKUSTİK: DURACAK ZİLİ VE KOKPİT İKAZ LAMBASI (220m kala)
-            if (this.currentDistanceToNext <= 220 && !this.stopRequestBellTriggered && this.speed > 8) {
+            // PROFESYONEL AKUSTİK: KİŞİLİĞE DUYARLI AKILLI DURACAK ZİLİ (Sabırsız 255m, Normal 205m, Dalgın Öğrenci 120m!)
+            const smartBellDist = (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.getSmartBellDistance === 'function')
+                ? window.HumanNpcVoices.getSmartBellDistance(this.currentStopIndex)
+                : 220;
+            if (this.currentDistanceToNext <= smartBellDist && !this.stopRequestBellTriggered && this.speed > 8) {
                 const isFinalStop = this.activeRouteData && this.activeRouteData.stops && (this.currentStopIndex === this.activeRouteData.stops.length - 1);
                 const remainingStops = this.activeRouteData && this.activeRouteData.stops ? Math.max(1, this.activeRouteData.stops.length - this.currentStopIndex - 1) : 1;
                 const alighting = isFinalStop ? this.passengersOnBoard : Math.min(this.passengersOnBoard, Math.max(1, Math.round(this.passengersOnBoard / (remainingStops + 1))));
@@ -6336,9 +6339,13 @@ const Game = {
         }
 
         if (k === 'q' || e.code === 'KeyQ') {
-            if (!e.ctrlKey && !e.altKey && !e.shiftKey) {
+            if (!e.ctrlKey && !e.altKey) {
                 e.preventDefault();
-                if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.triggerCabinQuietAnons === 'function') {
+                if (e.shiftKey) {
+                    if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.speakLivePassengerReport === 'function') {
+                        window.HumanNpcVoices.speakLivePassengerReport(this);
+                    }
+                } else if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.triggerCabinQuietAnons === 'function') {
                     window.HumanNpcVoices.triggerCabinQuietAnons(this);
                 }
                 return;
