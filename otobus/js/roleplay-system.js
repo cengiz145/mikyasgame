@@ -151,9 +151,23 @@
             }
         },
 
-        // Rol 3: 👮 Bölge Trafik Polisi & Takograf Denetimi
+        // Rol 3: 👮 Bölge Trafik Polisi, PTS Plaka Tanıma & Takograf Denetimi
         triggerPoliceInspection: function () {
             this.playSound('whistle', 0.9);
+            const id = (typeof window.getDriverPoliceIdentity === 'function')
+                ? window.getDriverPoliceIdentity()
+                : { driverName: 'Kaptan', plate: '59 TKL 059', busName: 'Yolcu Otobüsü', licenseTitle: 'Kaptan Şoför' };
+
+            setTimeout(() => {
+                if (typeof audio !== 'undefined' && typeof audio.playPtsScanTone === 'function') {
+                    audio.playPtsScanTone();
+                }
+                const ptsScanMsg = `🚓 [PTS Plaka & GBT Sorgusu] "${id.plate} plakalı ${id.busName} — Sürücü: ${id.driverName} (${id.licenseTitle}). Takograf inceleniyor..."`;
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(ptsScanMsg, "info");
+                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                    audio.updateNvdaLiveRegion(`Trafik polisi PTS tabletten sorguluyor: ${id.plate} plakalı ${id.busName}, sürücü ${id.driverName}.`);
+                }
+            }, 450);
 
             setTimeout(() => {
                 this.playSound('tachograph', 0.85);
@@ -164,30 +178,44 @@
                 setTimeout(() => {
                     if (!isOverSpeed) {
                         if (typeof Game !== 'undefined') Game.addXP(30);
-                        const msg = `👮 [Bölge Trafik Polisi] "Düdük çaldı, sağa yanaştınız. Takograf incelendi: Hızınız saatte ${currentSpeed} km, kurallara uygun. Takograf tertemiz kaptan, hayırlı yolculuklar!" (+30 XP)`;
+                        const msg = `👮 [Bölge Trafik Polisi] "${id.plate} plakalı araç sürücüsü Sayın ${id.driverName}; ehliyet ve GBT kaydınız temiz, hızınız ${currentSpeed} km/s. Hayırlı yolculuklar Kaptan ${id.driverName}!" (+30 XP)`;
                         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
                         if (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playPoliceInspectionResult(false, currentSpeed, true)) {
                             return;
                         }
                         if (typeof audio !== 'undefined' && audio.speak) {
-                            audio.speak(`Trafik polisi takograf fişini inceledi. Hızınız saatte ${currentSpeed} kilometre, limitlere uygun. Takograf temiz kaptan, iyi yolculuklar!`);
+                            audio.speak(`Trafik polisi sorguladı: ${id.plate} plakalı araç sürücüsü ${id.driverName}, ehliyet ve takograf temiz, hız ${currentSpeed}. İyi yolculuklar ${id.driverName}!`);
                         }
                     } else {
                         if (typeof Game !== 'undefined') {
                             Game.playerBudget = Math.max(0, (Game.playerBudget || 0) - 350);
                             Game.saveData();
                         }
-                        const warnMsg = `⚠️ [Trafik Cezası] "Polis takograf fişini inceledi: Hızınız ${currentSpeed} km/s! 100 km/s otoyol hız sınırı aşıldığı için 350 ₺ ceza kesildi. Lütfen hız limitlerine uyalım kaptan!"`;
+                        const warnMsg = `⚠️ [Trafik Ceza Tutanağı] "${id.plate} plakalı ${id.busName} sürücüsü ${id.driverName} adına, ${currentSpeed} km/s hız ihlalinden 350 ₺ ceza plakaya ve ehliyete işlendi!"`;
                         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
                         if (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playPoliceInspectionResult(true, currentSpeed, true)) {
                             return;
                         }
                         if (typeof audio !== 'undefined' && audio.speak) {
-                            audio.speak(`Dikkat! Polis takograf fişinde ${currentSpeed} kilometre aşırı hız tespit etti. Üç yüz elli lira trafik cezası kesildi.`);
+                            audio.speak(`Dikkat! Trafik polisi ${id.plate} plakalı araç sürücüsü ${id.driverName} adına, ${currentSpeed} hız ihlalinden 350 Lira ceza kesti.`);
                         }
                     }
                 }, 2200);
             }, 1200);
+        },
+
+        triggerPtsPlateQuery: function () {
+            if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.triggerRoadsidePtsCheck === 'function') {
+                window.HumanNpcVoices.triggerRoadsidePtsCheck(typeof Game !== 'undefined' ? Game : null, true);
+                return;
+            }
+            const id = (typeof window.getDriverPoliceIdentity === 'function')
+                ? window.getDriverPoliceIdentity()
+                : { driverName: 'Kaptan', plate: '59 TKL 059', busName: 'Yolcu Otobüsü', licenseTitle: 'Kaptan Şoför' };
+            if (typeof audio !== 'undefined' && typeof audio.playPtsScanTone === 'function') audio.playPtsScanTone();
+            const msg = `Bölge Trafik PTS Kaydı: Plaka ${id.plate}, Sürücü ${id.driverName}, Araç ${id.busName}. Kayıt temiz.`;
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🚓 ${msg}`, "info");
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
         },
 
         triggerPoliceChaseAction: function () {
@@ -234,13 +262,14 @@
                 this.playSound('radioStart', 0.20);
             }
 
+            const id = (typeof window.getDriverPoliceIdentity === 'function')
+                ? window.getDriverPoliceIdentity()
+                : { driverName: 'Kaptan', plate: '59 TKL 059' };
             const chats = [
-                "Tekirdağ yönüne giden kaptanım selamlar! Bolu Dağı tünel çıkışında sis var, hızını 70'e bağla, kazasız belasız hayırlı işler!",
-                "59 plakalı meslektaşım dinlemede misin? Giresun Tirebolu sahilinde yol çalışması var, sağ şeritten devam et, tekerine taş değmesin!",
-                "Aleykümselam usta kaptanım! Karadeniz yolu açık, yağış hafifledi. Tüm meslektaşlara hayırlı seferler, 19. kanaldan selamlar!",
-                "Doğu seferindeki hemşehrim, Kop Dağı zirvesinde hafif buzlanma başlamış, retarderini hazır tut, selamlar hürmetler!",
-                "Kaptanım hayırlı yolculuklar! Susurluk tesislerine yaklaşıyorsan tostu ve ayranı sıcaktır, bir mola ver nefeslen!",
-                "Kuzey Marmara Otoyolu gişeler açık kaptan, sol şerit akıyor. 19. kanaldan tüm şoför kardeşlerime selam olsun!"
+                `${id.plate} plakalı ${id.driverName} kaptanım selamlar! Bolu Dağı tünel çıkışında sis var, kazasız belasız hayırlı işler!`,
+                `${id.plate} plakalı meslektaşım ${id.driverName} dinlemede misin? İleride sağ şeritte yol çalışması var, sol şeritten devam et, tekerine taş değmesin!`,
+                `Aleykümselam ${id.driverName} usta! Yol açık, radar temiz, ${id.plate} plakana taş değmesin, 19. kanaldan selamlar!`,
+                `${id.driverName} kaptanım hayırlı yolculuklar! Susurluk tesislerine yaklaşıyorsan tostu ve ayranı sıcaktır, bir mola ver nefeslen!`
             ];
             const chat = chats[Math.floor(Math.random() * chats.length)];
 
@@ -282,10 +311,32 @@
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
         },
 
-        // HUD Butonunu Ekle
+        // HUD Butonunu ve Plaka/Sürücü Rozetini Ekle
+        updateHudPlateBadge: function () {
+            const container = document.getElementById('hud-indicators');
+            if (!container) return;
+            const id = (typeof window.getDriverPoliceIdentity === 'function')
+                ? window.getDriverPoliceIdentity()
+                : { driverName: 'Kaptan', plate: '59 TKL 059' };
+            let badge = document.getElementById('hud-plate-badge');
+            if (!badge) {
+                badge = document.createElement('button');
+                badge.id = 'hud-plate-badge';
+                badge.type = 'button';
+                badge.style.cssText = 'background: rgba(15, 23, 42, 0.9); border: 1.5px solid #38bdf8; color: #f8fafc; padding: 5px 11px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px;';
+                badge.addEventListener('click', () => this.triggerPtsPlateQuery());
+                container.appendChild(badge);
+            }
+            badge.innerHTML = `<span style="background:#1d4ed8; color:#fff; padding:1px 5px; border-radius:3px; font-size:0.75rem;">TR</span> ${id.plate} • ${id.driverName}`;
+            badge.title = `Araç Plakası: ${id.plate} | Sürücü: ${id.driverName} (Polis PTS Sorgusu için tıklayın veya Alt + G)`;
+            badge.setAttribute('aria-label', `Kayıtlı Plaka ${id.plate}, Sürücü ${id.driverName}. Bölge Trafik PTS sorgusu için tıklayın veya Alt G tuşuna basın.`);
+        },
+
         injectHudButton: function () {
             const container = document.getElementById('hud-indicators');
-            if (!container || document.getElementById('hud-roleplay-btn')) return;
+            if (!container) return;
+            this.updateHudPlateBadge();
+            if (document.getElementById('hud-roleplay-btn')) return;
 
             const btnRp = document.createElement('button');
             btnRp.id = 'hud-roleplay-btn';
@@ -323,6 +374,9 @@
                     } else if (k === 'k' || e.code === 'KeyK') {
                         e.preventDefault();
                         this.triggerPoliceChaseAction();
+                    } else if (k === 'g' || e.code === 'KeyG') {
+                        e.preventDefault();
+                        this.triggerPtsPlateQuery();
                     }
                 }
             });
@@ -384,7 +438,42 @@
             const container = document.getElementById('roleplay-modal-content');
             if (!container) return;
 
+            const id = (typeof window.getDriverPoliceIdentity === 'function')
+                ? window.getDriverPoliceIdentity()
+                : { driverName: 'Kaptan', plate: '59 TKL 059', busName: 'Yolcu Otobüsü', licenseTitle: 'Kaptan Şoför' };
+            const safeAttr = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
             let html = `
+            <!-- Kaptan Kimliği & Otobüs Plakası (Bölge Trafik PTS / GBT Kaydı) -->
+            <div style="background: rgba(15, 23, 42, 0.92); border: 2px solid #38bdf8; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
+                    <div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #7dd3fc;">🪪 Kaptan Kimliği & Araç Plakası (Polis PTS / GBT Kaydı)</div>
+                        <div style="color: #cbd5e1; font-size: 0.85rem; margin-top: 2px;">
+                            Trafik polisi denetimlerinde, PTS kameralarında, megafon anonslarında ve Kanal 19 telsizde okunan resmi kimliğiniz. (Hızlı PTS Sorgu: <strong>Alt + G</strong>)
+                        </div>
+                    </div>
+                    <button id="rp-btn-pts-query" type="button" class="modern-btn" style="padding: 8px 12px; background: #0284c7; color: #fff; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;" aria-label="Bölge Trafik PTS plaka ve sürücü kimlik sorgusunu sesli dinle (Alt G)">
+                        🚓 PTS Sorgula (Alt + G)
+                    </button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; align-items: end;">
+                    <div>
+                        <label for="rp-driver-name-input" style="display:block; color:#bae6fd; font-size:0.83rem; font-weight:bold; margin-bottom:4px;">Kaptan Adı Soyadı:</label>
+                        <input id="rp-driver-name-input" type="text" value="${safeAttr(id.driverName)}" maxlength="40" aria-label="Kaptan Adı Soyadı" style="width:100%; padding:9px 11px; border-radius:8px; border:1px solid #38bdf8; background:#0f172a; color:#fff; font-weight:bold; font-size:0.95rem;">
+                    </div>
+                    <div>
+                        <label for="rp-bus-plate-input" style="display:block; color:#bae6fd; font-size:0.83rem; font-weight:bold; margin-bottom:4px;">Otobüs Plakası (Örn: 59 UEM 259):</label>
+                        <input id="rp-bus-plate-input" type="text" value="${safeAttr(id.plate)}" maxlength="16" aria-label="Otobüs Plakası" style="width:100%; padding:9px 11px; border-radius:8px; border:1px solid #38bdf8; background:#0f172a; color:#facc15; font-weight:bold; font-size:0.98rem; text-transform:uppercase;">
+                    </div>
+                    <div>
+                        <button id="rp-btn-save-identity" type="button" class="modern-btn" style="width:100%; padding:10px 12px; background:#059669; color:#fff; font-weight:bold; border-radius:8px; border:none; cursor:pointer;" aria-label="Kaptan adını ve otobüs plakasını kaydet">
+                            💾 İsim & Plakayı Kaydet
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
                 
                 <!-- 1. Kolonya & İkram Servisi -->
@@ -503,6 +592,24 @@
             </div>`;
 
             container.innerHTML = html;
+
+            const btnPtsQuery = document.getElementById('rp-btn-pts-query');
+            if (btnPtsQuery) btnPtsQuery.addEventListener('click', () => this.triggerPtsPlateQuery());
+            const btnSaveId = document.getElementById('rp-btn-save-identity');
+            if (btnSaveId) {
+                btnSaveId.addEventListener('click', () => {
+                    const nameInp = document.getElementById('rp-driver-name-input');
+                    const plateInp = document.getElementById('rp-bus-plate-input');
+                    const updated = (typeof window.saveDriverPoliceIdentity === 'function')
+                        ? window.saveDriverPoliceIdentity(nameInp ? nameInp.value : '', plateInp ? plateInp.value : '')
+                        : id;
+                    this.updateHudPlateBadge();
+                    this.renderModalContent();
+                    const confirmMsg = `Trafik PTS kaydı güncellendi: Sürücü ${updated.driverName}, Plaka ${updated.plate}.`;
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🪪 ${confirmMsg}`, "success");
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(confirmMsg);
+                });
+            }
 
             document.getElementById('rp-btn-cologne').addEventListener('click', () => this.triggerCologneService());
             document.getElementById('rp-btn-luggage').addEventListener('click', () => this.triggerLuggageAndTerminal('3tone'));

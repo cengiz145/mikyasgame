@@ -2154,6 +2154,9 @@ const Game = {
         this.passengerComfort = 100;
         if (typeof window.HumanNpcVoices !== 'undefined') window.HumanNpcVoices.resetForNewRoute();
         this.stopRequestBellTriggered = false;
+        if (typeof RoleplaySystem !== 'undefined' && typeof RoleplaySystem.updateHudPlateBadge === 'function') {
+            RoleplaySystem.updateHudPlateBadge();
+        }
         if (this.currentStopIndex === 0 && !isResume && !this.terminalAnnouncedForRoute) {
             this.terminalAnnouncedForRoute = true;
             this.playTerminalDepartureAnnouncement();
@@ -2652,6 +2655,9 @@ const Game = {
         this.stopApproachAnnounced = alreadyInsideApproachZone;
         this.departAnnounced = false;
         this.stopRequestBellTriggered = false;
+        if (typeof RoleplaySystem !== 'undefined' && typeof RoleplaySystem.updateHudPlateBadge === 'function') {
+            RoleplaySystem.updateHudPlateBadge();
+        }
         const bellHudPlan = document.getElementById('hud-stop-request');
         if (bellHudPlan) bellHudPlan.style.display = 'none';
         this.isRampDeployed = false;
@@ -5280,6 +5286,9 @@ const Game = {
         this.roadCurvature = 0;
         this.passengersOnBoard -= alighting;
         this.stopRequestBellTriggered = false;
+        if (typeof RoleplaySystem !== 'undefined' && typeof RoleplaySystem.updateHudPlateBadge === 'function') {
+            RoleplaySystem.updateHudPlateBadge();
+        }
         const bellHudArrive = document.getElementById('hud-stop-request');
         if (bellHudArrive) bellHudArrive.style.display = 'none';
 
@@ -5591,6 +5600,9 @@ const Game = {
             const kneelingHud = document.getElementById('hud-kneeling');
             if (kneelingHud) kneelingHud.style.display = 'inline-block';
             this.stopRequestBellTriggered = false;
+        if (typeof RoleplaySystem !== 'undefined' && typeof RoleplaySystem.updateHudPlateBadge === 'function') {
+            RoleplaySystem.updateHudPlateBadge();
+        }
             const bellHudFront = document.getElementById('hud-stop-request');
             if (bellHudFront) bellHudFront.style.display = 'none';
             btn.innerText = "Ön Kapıyı Kapat";

@@ -1836,8 +1836,58 @@
             return true;
         },
 
+        getPoliceIdentity: function () {
+            if (typeof window.getDriverPoliceIdentity === 'function') {
+                return window.getDriverPoliceIdentity();
+            }
+            return {
+                driverName: (typeof Game !== 'undefined' && Game.username) ? Game.username : 'Kaptan',
+                plate: '59 TKL 059',
+                busName: 'Yolcu Otobüsü',
+                licenseTitle: 'Kaptan Şoför',
+                cityName: 'Tekirdağ'
+            };
+        },
+
+        triggerRoadsidePtsCheck: function (gameObj, isManual = false) {
+            const g = gameObj || this.getGameObj();
+            const id = this.getPoliceIdentity();
+            const curSpeed = (g && typeof g.speed === 'number') ? Math.round(g.speed) : 0;
+
+            if (typeof audio !== 'undefined' && typeof audio.playPtsScanTone === 'function') {
+                audio.playPtsScanTone();
+            }
+
+            let nvdaMsg = '';
+            let toastMsg = '';
+            let toastType = 'info';
+
+            if (isManual && (!g || !g.isDriving || curSpeed < 3)) {
+                nvdaMsg = `Bölge Trafik PTS ve Sürücü Sicil Kaydı: Plaka ${id.plate}, Araç ${id.busName}, Kayıtlı Sürücü ${id.driverName}, Ehliyet Ünvanı ${id.licenseTitle}. Plaka ve GBT kaydı temiz.`;
+                toastMsg = `🚓 [Bölge Trafik PTS Kaydı] Plaka: ${id.plate} | Sürücü: ${id.driverName} (${id.licenseTitle}) | Araç: ${id.busName} — Sicil Temiz`;
+                toastType = 'success';
+            } else if (curSpeed >= 96) {
+                nvdaMsg = `Bölge Trafik PTS Radar Uyarısı! ${id.plate} plakalı araç sürücüsü ${id.driverName}, hızınız ${curSpeed}! Radar sınırındasınız, hızınızı düşürün!`;
+                toastMsg = `⚠️🚓 [PTS Radar Uyarısı] "${id.plate} plakalı ${id.busName} — Sürücü ${id.driverName}, hızınız ${curSpeed} km/s! Yavaşlayın!"`;
+                toastType = 'warning';
+            } else {
+                nvdaMsg = `Bölge Trafik PTS Plaka Tanıma Noktası: ${id.plate} plakalı araç, sürücü ${id.driverName}, hız ${curSpeed}. Kayıt temiz, iyi yolculuklar.`;
+                toastMsg = `🚓 [PTS Plaka Okuma] ${id.plate} • Kaptan ${id.driverName} (${curSpeed} km/s) — Kayıt Temiz, İyi Seferler!`;
+                toastType = 'info';
+            }
+
+            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
+                UI.showToast(toastMsg, toastType);
+            }
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                audio.updateNvdaLiveRegion(nvdaMsg);
+            }
+            return true;
+        },
+
         playPoliceInspectionResult: function (isOverSpeed, currentSpeed, force = false) {
             if (!this.canSpeakInCabin(force)) return false;
+            const id = this.getPoliceIdentity();
             const file = isOverSpeed ? CLIPS.policeFine : CLIPS.policeClean;
             this.playClip(file, {
                 pan: -0.55,
@@ -1845,8 +1895,8 @@
                 force,
                 interrupt: true,
                 nvdaText: isOverSpeed
-                    ? `Trafik polisi ${currentSpeed} kilometre hız tespiti nedeniyle 350 Lira ceza kesti.`
-                    : `Trafik polisi takografı inceledi: Hızınız ${currentSpeed} kilometre, kurallara uygun. Artı 30 XP.`
+                    ? `Trafik polisi ${id.plate} plakalı araç sürücüsü ${id.driverName} adına, ${currentSpeed} hız tespiti nedeniyle 350 Lira ceza kesti.`
+                    : `Trafik polisi sorguladı: ${id.plate} plakalı araç sürücüsü ${id.driverName}, ehliyet ve takograf temiz, hız ${currentSpeed}. Hayırlı yolculuklar ${id.driverName}! Artı 30 XP.`
             });
             return true;
         },
@@ -2084,6 +2134,17 @@
                     this._roadsideFightDriveSecs = 0;
                     this._nextRoadsideFightThreshold = 95 + Math.random() * 45;
                     this.triggerRoadsideFight(false);
+                }
+            }
+
+            // 10-0b. Bölge Trafik PTS (Plaka Tanıma Sistemi) & Mobil Ekip Geçiş Kontrolü (Durağa uzaktayken plaka ve isim okur)
+            if (gameObj.speed >= 26 && (typeof gameObj.currentDistanceToNext !== 'number' || gameObj.currentDistanceToNext > 240)) {
+                this._ptsCheckpointSecs = (this._ptsCheckpointSecs || 0) + deltaTime;
+                const ptsThresh = this._nextPtsCheckpointThreshold || 92;
+                if (this._ptsCheckpointSecs >= ptsThresh && !this.isPlayingNow() && now >= (this.announcementBusyUntil || 0)) {
+                    this._ptsCheckpointSecs = 0;
+                    this._nextPtsCheckpointThreshold = 125 + Math.random() * 45;
+                    this.triggerRoadsidePtsCheck(gameObj, false);
                 }
             }
 
@@ -3507,13 +3568,23 @@
             if (typeof audio !== 'undefined' && typeof audio.playRadioSquelch === 'function') {
                 audio.playRadioSquelch(true);
             }
+            if (typeof audio !== 'undefined' && typeof audio.playPtsScanTone === 'function') {
+                audio.playPtsScanTone();
+            }
+
+            const id = this.getPoliceIdentity();
+            const reasonLabel = (reason === 'radar')
+                ? 'PTS Radarda aşırı hız'
+                : (reason === 'red_light'
+                    ? 'EDS Kırmızı ışık ihlali'
+                    : (reason === 'hit_and_run' ? 'Kaza yerini terk ihbarı' : 'Bölge Trafik PTS takibi'));
 
             const startMsg = forceDemo
-                ? '🚨 [AKSİYON VİTRİNİ] Bölge Trafik Ekibi Sirenle Peşinize Düştü! Megafon İhtarı -> Kaçış -> Barikat Kıskacı!'
-                : '🚨 POLİS PEŞİNİZE DÜŞTÜ! S tuşuyla yavaşlayıp sağa çekin (8 sn)! Kaçmaya devam ederseniz ileride barikat kurulacak!';
+                ? `🚨 [PTS EŞLEŞTİ: ${id.plate} • ${id.driverName}] Bölge Trafik Ekibi Sirenle Peşinize Düştü! Megafon İhtarı -> Kaçış -> Barikat Kıskacı!`
+                : `🚨 POLİS PTS TESPİTİ (${reasonLabel}): "${id.plate} PLAKALI OTOBÜS SÜRÜCÜSÜ ${id.driverName.toUpperCase()}, S TUŞUYLA SAĞA ÇEKİN!"`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(startMsg, 'error');
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
-                audio.updateNvdaLiveRegion('Polis kovalamacası başladı! Arkadan ekip otosu sirenle yaklaşıyor: Derhal sağa çek ve motoru durdur! Durmak için S tuşuna basın, kaçarsanız barikat kurulacak!');
+                audio.updateNvdaLiveRegion(`Polis PTS kamerası tespit etti! Polis megafonu: ${id.plate} plakalı otobüs sürücüsü ${id.driverName}, ${reasonLabel} nedeniyle derhal sağa çek ve motoru durdur! Durmak için S tuşuna basın!`);
             }
 
             this._policeChaseTimers.push(setTimeout(() => {
@@ -3525,7 +3596,7 @@
                     priority: 4,
                     force: forceDemo,
                     interrupt: true,
-                    toastText: '📢🚓 Polis Megafonu: "OTOBÜS SÜRÜCÜSÜ, DERHAL SAĞA ÇEK VE MOTORU DURDUR!!"',
+                    toastText: `📢🚓 Polis Megafonu: "${id.plate} PLAKALI OTOBÜS SÜRÜCÜSÜ ${id.driverName.toUpperCase()}, DERHAL SAĞA ÇEK VE MOTORU DURDUR!!"`,
                     toastType: 'error',
                     onend: () => {
                         if (!chase.active || chase.resolved) return;
@@ -3566,6 +3637,7 @@
                     if (typeof siren.stereo === 'function') siren.stereo(-0.82, chase.sirenSid);
                 } catch (e) {}
             }
+            const id = this.getPoliceIdentity();
             this._policeChaseTimers.push(setTimeout(() => {
                 if (!chase.active) return;
                 this.playClip('police_chase_escalate.mp3', {
@@ -3574,7 +3646,8 @@
                     priority: 4,
                     force: true,
                     interrupt: true,
-                    toastText: '🚨🚓 Ekip Telsizi: "DUR İHTARINA UYMUYOR KAÇMAYA DEVAM EDİYOR, ÖNÜNÜ KESİN BARİKAT KURUN!!"',
+                    nvdaText: `Ekip telsizi merkez anonsu: ${id.plate} plakalı otobüs sürücüsü ${id.driverName} dur ihtarına uymuyor, kaçmaya devam ediyor! Önünü kesin barikat kurun!`,
+                    toastText: `🚨🚓 Ekip Telsizi: "${id.plate} PLAKALI ARAÇ SÜRÜCÜSÜ ${id.driverName.toUpperCase()} KAÇIYOR, ÖNÜNÜ KESİN BARİKAT KURUN!!"`,
                     toastType: 'error',
                     onend: () => {
                         if (!chase.active) return;
@@ -3604,8 +3677,8 @@
                                             priority: 4,
                                             force: true,
                                             interrupt: true,
-                                            nvdaText: 'Polis barikatı otobüsün önünü kesti! Başkomiser: Kontağı kapat ellerini direksiyondan çek hemen! Polisten kaçmak neymiş göstereceğim sana!',
-                                            toastText: '🛑🚓 BARİKAT KISKACI! Başkomiser: "KONTAĞI KAPAT ELLERİNİ DİREKSİYONDAN ÇEK HEMEN!!"',
+                                            nvdaText: `Polis barikatı ${id.plate} plakalı otobüsün önünü kesti! Başkomiser: Sürücü ${id.driverName}, kontağı kapat ellerini direksiyondan çek hemen!`,
+                                            toastText: `🛑🚓 BARİKAT KISKACI (${id.plate})! Başkomiser: "${id.driverName.toUpperCase()}, KONTAĞI KAPAT ELLERİNİ DİREKSİYONDAN ÇEK!!"`,
                                             toastType: 'error',
                                             onend: () => {
                                                 chase.active = false;
@@ -3643,6 +3716,7 @@
                 if (this._policeSirenHowl) {
                     try { this._policeSirenHowl.stop(); } catch (e) {}
                 }
+                const id = this.getPoliceIdentity();
                 const fineAmt = chase.escalated ? 550 : 350;
                 this.applyFineToPlayer(fineAmt);
                 this.adjustCityReputation(-6);
@@ -3654,8 +3728,8 @@
                         isExterior: false,
                         priority: 4,
                         interrupt: true,
-                        nvdaText: `Sağa çekip durdunuz. Sert Başkomiser: İndir camı kontağı kapat! Koca otobüsle onca insanın canını taşıyorsun, bu ne biçim sürüş böyle?! ${fineAmt} Lira trafik cezası kesildi, dikkatli devam edin.`,
-                        toastText: `👮‍♂️ Sert Başkomiser: "İndir camı kontağı kapat! Bir daha görmeyeyim ehliyetine el koyarım!" (-${fineAmt} ₺ Ceza)`,
+                        nvdaText: `Sağa çekip durdunuz. Sert Başkomiser GBT ve plaka sorgusu yaptı: ${id.plate} plakalı otobüs sürücüsü ${id.driverName}, indir camı kontağı kapat! ${id.plate} plakasına ve siciline ${fineAmt} Lira ceza kesildi, dikkatli devam edin.`,
+                        toastText: `👮‍♂️ Başkomiser (${id.plate} • ${id.driverName}): "İndir camı kontağı kapat! Plakana ve siciline ${fineAmt} ₺ ceza işlendi!"`,
                         toastType: 'warning',
                         onend: () => {
                             this.stopPolicePursuit();
@@ -3668,6 +3742,7 @@
             // B) 8.5 SANİYE GEÇTİ VE SÜRÜCÜ DURMAYIP KAÇMAYA DEVAM EDİYOR! (Barikat Anonsu + Çığlık!)
             if (!chase.escalated && chase.elapsed >= 8.5 && gameObj.speed > 12) {
                 chase.escalated = true;
+                const id = this.getPoliceIdentity();
                 if (siren && chase.sirenSid !== null) {
                     try { siren.rate(1.18, chase.sirenSid); } catch (e) {}
                 }
@@ -3680,8 +3755,8 @@
                     isExterior: false,
                     priority: 4,
                     interrupt: true,
-                    nvdaText: 'Polisten kaçıyorsunuz! Ekip megafonu: Dur ihtarına uymuyor kaçmaya devam ediyor, merkez önünü kesin barikat kurun! Son uyarım derhal frene bas dur!',
-                    toastText: '🚨🚓 BARİKAT EMRİ VERİLDİ: "DUR İHTARINA UYMUYOR, MERKEZ ÖNÜNÜ KESİN BARİKAT KURUN!!"',
+                    nvdaText: `Polisten kaçıyorsunuz! Telsiz merkez anonsu: ${id.plate} plakalı otobüs sürücüsü ${id.driverName} dur ihtarına uymuyor, kaçmaya devam ediyor! Merkez önünü kesin barikat kurun!`,
+                    toastText: `🚨🚓 MERKEZ TELSİZİ: "${id.plate} PLAKALI OTOBÜS SÜRÜCÜSÜ ${id.driverName.toUpperCase()} KAÇIYOR, ÖNÜNÜ KESİN BARİKAT KURUN!!"`,
                     toastType: 'error',
                     onend: () => {
                         if (!chase.active || chase.resolved) return;
@@ -3706,6 +3781,7 @@
             // C) 16.5 SANİYE SONUNDA İLERİDE POLİS BARİKATI YOLU KESER VE OTOBÜSÜ DURDURUR!
             if (chase.elapsed >= 16.5 && !chase.resolved) {
                 chase.resolved = true;
+                const id = this.getPoliceIdentity();
                 gameObj.speed = 0;
                 gameObj.acceleration = 0;
                 if (gameObj.keys) {
@@ -3730,8 +3806,8 @@
                         isExterior: false,
                         priority: 4,
                         interrupt: true,
-                        nvdaText: 'İleride polis barikatı yolu kesti ve otobüs durduruldu! Başkomiser: Kontağı kapat ellerini direksiyondan çek hemen! Polisten kaçmak ve yolcu hayatını tehlikeye atmaktan 950 Lira ağır ceza kesildi!',
-                        toastText: '🛑🚓 POLİS BARİKATI YOLU KESTİ! "KONTAĞI KAPAT ELLERİNİ DİREKSİYONDAN ÇEK HEMEN!!" (-950 ₺ Ağır Ceza)',
+                        nvdaText: `İleride polis barikatı ${id.plate} plakalı otobüsün yolunu kesti! Başkomiser: Sürücü ${id.driverName}, kontağı kapat ellerini direksiyondan çek hemen! ${id.plate} plakasına ve adına 950 Lira ağır ceza kesildi!`,
+                        toastText: `🛑🚓 BARİKAT YOLU KESTİ (${id.plate})! "SÜRÜCÜ ${id.driverName.toUpperCase()}, KONTAĞI KAPAT!!" (-950 ₺ Ağır Ceza)`,
                         toastType: 'error',
                         onend: () => {
                             this.stopPolicePursuit();

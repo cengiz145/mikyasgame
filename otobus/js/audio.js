@@ -4276,9 +4276,156 @@ startEngine() {
         } catch (e) {}
     }
 
+    // --- BÖLGE TRAFİK PTS (PLAKA TANIMA SİSTEMİ) & RADAR TABLET SORGULAMA TONU ---
+    playPtsScanTone() {
+        this.init();
+        if (!this.ctx) return;
+        const volPref = (typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : 1.0;
+        if (volPref <= 0.01) return;
+        if (this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+        }
+        try {
+            const now = this.ctx.currentTime;
+            const peak = Math.min(0.30, 0.24 * Math.max(0.4, volPref));
+            const notes = [
+                { freq: 1760, offset: 0.00, dur: 0.055 },
+                { freq: 2217.46, offset: 0.075, dur: 0.075 }
+            ];
+            notes.forEach(n => {
+                const t = now + n.offset;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(n.freq, t);
+                gain.gain.setValueAtTime(0.0001, t);
+                gain.gain.linearRampToValueAtTime(peak, t + 0.006);
+                gain.gain.setValueAtTime(peak, t + n.dur - 0.012);
+                gain.gain.linearRampToValueAtTime(0.0001, t + n.dur);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(t);
+                osc.stop(t + n.dur + 0.01);
+            });
+        } catch (e) {}
+    }
+
 }
 
 const audio = new AudioSystem();
+
+// --- MERKEZİ SÜRÜCÜ KİMLİĞİ & OTOBÜS PLAKA SİSTEMİ (POLİS PTS / GBT & TELSİZ ENTEGRASYONU) ---
+window.getDriverPoliceIdentity = function () {
+    let driverName = '';
+    try {
+        driverName = (localStorage.getItem('otobusDriverDisplayName') || '').trim()
+            || (localStorage.getItem('otobusUsername') || '').trim()
+            || ((typeof Game !== 'undefined' && Game.username) ? String(Game.username).trim() : '')
+            || ((typeof Multiplayer !== 'undefined' && Multiplayer.profile && Multiplayer.profile.name) ? String(Multiplayer.profile.name).trim() : '')
+            || 'Kaptan';
+    } catch (e) {
+        driverName = 'Kaptan';
+    }
+
+    let cityName = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : 'Tekirdağ';
+    let cityPlateCode = '59';
+    if (typeof sehirRotalari !== 'undefined' && sehirRotalari[cityName] && sehirRotalari[cityName].plaka) {
+        cityPlateCode = String(sehirRotalari[cityName].plaka).padStart(2, '0');
+    }
+
+    let customPlate = '';
+    try {
+        customPlate = (localStorage.getItem('otobusCustomPlate') || '').trim();
+    } catch (e) {}
+
+    let plate = customPlate;
+    if (!plate) {
+        // Sürücünün gerçek ad-soyad baş harflerinden ve il plaka kodundan gerçekçi Türk plakası üret (Örn: 59 UEM 259)
+        const trMap = { 'ç': 'C', 'Ç': 'C', 'ğ': 'G', 'Ğ': 'G', 'ı': 'I', 'İ': 'I', 'i': 'I', 'ö': 'O', 'Ö': 'O', 'ş': 'S', 'Ş': 'S', 'ü': 'U', 'Ü': 'U' };
+        const cleanAscii = driverName.split('').map(ch => trMap[ch] || ch).join('').toUpperCase();
+        const words = cleanAscii.replace(/[^A-Z\s]/g, ' ').split(/\s+/).filter(Boolean);
+        let letters = '';
+        if (words.length >= 2) {
+            letters = words.slice(0, 3).map(w => w[0]).join('');
+        } else if (words.length === 1 && words[0] !== 'KAPTAN') {
+            const w = words[0].replace(/[QWX]/g, '');
+            const consonants = w.replace(/[AEIOU]/g, '');
+            letters = (consonants.length >= 3 ? consonants.slice(0, 3) : w.slice(0, 3));
+        }
+        letters = (letters || 'TKL').replace(/[QWX]/g, 'K').slice(0, 3);
+        if (letters.length < 2) letters = 'TKL';
+
+        let hash = 0;
+        for (let i = 0; i < driverName.length; i++) {
+            hash = ((hash << 5) - hash + driverName.charCodeAt(i)) | 0;
+        }
+        const suffixNum = 100 + (Math.abs(hash) % 899);
+        plate = `${cityPlateCode} ${letters} ${suffixNum}`;
+
+        try {
+            localStorage.setItem('otobusPlate', plate);
+            if (typeof Multiplayer !== 'undefined' && Multiplayer.profile) {
+                Multiplayer.profile.plate = plate;
+            }
+        } catch (e) {}
+    }
+
+    const activeBus = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function')
+        ? BusFleet.getSelectedBus()
+        : null;
+    const busName = (activeBus && activeBus.name) ? activeBus.name : 'Yolcu Otobüsü';
+
+    let companyName = 'Belediye / Özel Halk Ulaşım';
+    try {
+        const savedComp = (localStorage.getItem('otobusCompany') || '').trim();
+        if (savedComp) companyName = savedComp;
+    } catch (e) {}
+
+    const licenseTitle = (typeof Game !== 'undefined' && typeof Game.getLicenseTitle === 'function')
+        ? Game.getLicenseTitle()
+        : 'Kaptan Şoför';
+
+    return {
+        driverName,
+        plate,
+        busName,
+        companyName,
+        licenseTitle,
+        cityName,
+        cityPlateCode,
+        isCustomPlate: Boolean(customPlate)
+    };
+};
+
+window.saveDriverPoliceIdentity = function (newName, newPlate) {
+    try {
+        const cleanName = String(newName || '').trim();
+        const cleanPlate = String(newPlate || '').trim().toUpperCase().replace(/\s+/g, ' ');
+        if (cleanName) {
+            localStorage.setItem('otobusDriverDisplayName', cleanName);
+            if (typeof Multiplayer !== 'undefined' && Multiplayer.profile) {
+                Multiplayer.profile.name = cleanName;
+            }
+        } else {
+            localStorage.removeItem('otobusDriverDisplayName');
+        }
+
+        if (cleanPlate) {
+            localStorage.setItem('otobusCustomPlate', cleanPlate);
+            localStorage.setItem('otobusPlate', cleanPlate);
+            if (typeof Multiplayer !== 'undefined' && Multiplayer.profile) {
+                Multiplayer.profile.plate = cleanPlate;
+            }
+        } else {
+            localStorage.removeItem('otobusCustomPlate');
+        }
+
+        if (typeof Multiplayer !== 'undefined' && typeof Multiplayer.syncMyState === 'function') {
+            Multiplayer.syncMyState();
+        }
+    } catch (e) {}
+    return window.getDriverPoliceIdentity();
+};
 
 // NVDA susturma tuşuna (Ctrl) basıldığında oyunun anonslarını da sustur
 window.addEventListener('keydown', (e) => {
