@@ -4385,8 +4385,19 @@ window.getDriverPoliceIdentity = function () {
         ? Game.getLicenseTitle()
         : 'Kaptan Şoför';
 
+    const isGenericCaptain = /^kaptan(\s*\d+)?$/i.test(driverName);
+    const firstWord = driverName.split(/\s+/)[0] || 'Kaptan';
+    const politeAddress = isGenericCaptain ? 'Kaptan' : `${firstWord} Kaptan`;
+    const sternAddress = isGenericCaptain ? 'Şoför efendi' : `Şoför ${firstWord}`;
+    const recordHolder = isGenericCaptain ? 'Kaptan Şoför' : driverName;
+
     return {
         driverName,
+        firstWord,
+        isGenericCaptain,
+        politeAddress,
+        sternAddress,
+        recordHolder,
         plate,
         busName,
         companyName,

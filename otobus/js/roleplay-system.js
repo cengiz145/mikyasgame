@@ -156,16 +156,16 @@
             this.playSound('whistle', 0.9);
             const id = (typeof window.getDriverPoliceIdentity === 'function')
                 ? window.getDriverPoliceIdentity()
-                : { driverName: 'Kaptan', plate: '59 TKL 059', busName: 'Yolcu Otobüsü', licenseTitle: 'Kaptan Şoför' };
+                : { driverName: 'Kaptan', politeAddress: 'Kaptan', sternAddress: 'Şoför efendi', recordHolder: 'Kaptan Şoför', plate: '59 TKL 059', busName: 'Yolcu Otobüsü', licenseTitle: 'Kaptan Şoför' };
 
             setTimeout(() => {
                 if (typeof audio !== 'undefined' && typeof audio.playPtsScanTone === 'function') {
                     audio.playPtsScanTone();
                 }
-                const ptsScanMsg = `🚓 [PTS Plaka & GBT Sorgusu] "${id.plate} plakalı ${id.busName} — Sürücü: ${id.driverName} (${id.licenseTitle}). Takograf inceleniyor..."`;
+                const ptsScanMsg = `🚓 [PTS Plaka & Ehliyet Kontrolü] "${id.plate} plakalı ${id.busName} — Şoför: ${id.recordHolder} (${id.licenseTitle}). Takograf inceleniyor..."`;
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(ptsScanMsg, "info");
                 if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
-                    audio.updateNvdaLiveRegion(`Trafik polisi PTS tabletten sorguluyor: ${id.plate} plakalı ${id.busName}, sürücü ${id.driverName}.`);
+                    audio.updateNvdaLiveRegion(`Trafik polisi PTS tabletten kontrol ediyor: ${id.plate} plakalı ${id.busName}, şoför ${id.recordHolder}.`);
                 }
             }, 450);
 
@@ -178,26 +178,26 @@
                 setTimeout(() => {
                     if (!isOverSpeed) {
                         if (typeof Game !== 'undefined') Game.addXP(30);
-                        const msg = `👮 [Bölge Trafik Polisi] "${id.plate} plakalı araç sürücüsü Sayın ${id.driverName}; ehliyet ve GBT kaydınız temiz, hızınız ${currentSpeed} km/s. Hayırlı yolculuklar Kaptan ${id.driverName}!" (+30 XP)`;
+                        const msg = `👮 [Bölge Trafik Polisi] "${id.plate} — Ehliyet ve takograf tertemiz ${id.politeAddress}, hızın ${currentSpeed} km/s. Hayırlı yolculuklar!" (+30 XP)`;
                         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
                         if (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playPoliceInspectionResult(false, currentSpeed, true)) {
                             return;
                         }
                         if (typeof audio !== 'undefined' && audio.speak) {
-                            audio.speak(`Trafik polisi sorguladı: ${id.plate} plakalı araç sürücüsü ${id.driverName}, ehliyet ve takograf temiz, hız ${currentSpeed}. İyi yolculuklar ${id.driverName}!`);
+                            audio.speak(`Trafik polisi baktı: ${id.plate} plakalı otobüs, ehliyet ve takograf tertemiz, hız ${currentSpeed}. Hayırlı yolculuklar ${id.politeAddress}!`);
                         }
                     } else {
                         if (typeof Game !== 'undefined') {
                             Game.playerBudget = Math.max(0, (Game.playerBudget || 0) - 350);
                             Game.saveData();
                         }
-                        const warnMsg = `⚠️ [Trafik Ceza Tutanağı] "${id.plate} plakalı ${id.busName} sürücüsü ${id.driverName} adına, ${currentSpeed} km/s hız ihlalinden 350 ₺ ceza plakaya ve ehliyete işlendi!"`;
+                        const warnMsg = `⚠️ [Trafik Cezası] "${id.plate} plakalı otobüse ve ${id.recordHolder} adına, ${currentSpeed} km/s hız ihlalinden 350 ₺ ceza yazıldı!"`;
                         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
                         if (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playPoliceInspectionResult(true, currentSpeed, true)) {
                             return;
                         }
                         if (typeof audio !== 'undefined' && audio.speak) {
-                            audio.speak(`Dikkat! Trafik polisi ${id.plate} plakalı araç sürücüsü ${id.driverName} adına, ${currentSpeed} hız ihlalinden 350 Lira ceza kesti.`);
+                            audio.speak(`Dikkat! Trafik polisi ${id.plate} plakalı otobüse ve ${id.recordHolder} adına, ${currentSpeed} hız ihlalinden 350 Lira ceza yazdı.`);
                         }
                     }
                 }, 2200);
@@ -266,10 +266,10 @@
                 ? window.getDriverPoliceIdentity()
                 : { driverName: 'Kaptan', plate: '59 TKL 059' };
             const chats = [
-                `${id.plate} plakalı ${id.driverName} kaptanım selamlar! Bolu Dağı tünel çıkışında sis var, kazasız belasız hayırlı işler!`,
-                `${id.plate} plakalı meslektaşım ${id.driverName} dinlemede misin? İleride sağ şeritte yol çalışması var, sol şeritten devam et, tekerine taş değmesin!`,
-                `Aleykümselam ${id.driverName} usta! Yol açık, radar temiz, ${id.plate} plakana taş değmesin, 19. kanaldan selamlar!`,
-                `${id.driverName} kaptanım hayırlı yolculuklar! Susurluk tesislerine yaklaşıyorsan tostu ve ayranı sıcaktır, bir mola ver nefeslen!`
+                `${id.plate} plakalı ${id.politeAddress || 'Kaptan'} selamlar! Bolu Dağı tünel çıkışında sis var, kazasız belasız hayırlı işler!`,
+                `${id.plate} plakalı meslektaşım dinlemede misin? İleride sağ şeritte yol çalışması var, sol şeritten devam et ${id.politeAddress || 'Kaptan'}, tekerine taş değmesin!`,
+                `Aleykümselam ${id.politeAddress || 'usta'}! Yol açık, radar temiz, ${id.plate} plakana taş değmesin, 19. kanaldan selamlar!`,
+                `Hayırlı yolculuklar ${id.politeAddress || 'Kaptan'}! Susurluk tesislerine yaklaşıyorsan tostu ve ayranı sıcaktır, bir mola ver nefeslen!`
             ];
             const chat = chats[Math.floor(Math.random() * chats.length)];
 

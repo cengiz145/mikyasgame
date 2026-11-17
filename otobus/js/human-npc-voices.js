@@ -1840,8 +1840,16 @@
             if (typeof window.getDriverPoliceIdentity === 'function') {
                 return window.getDriverPoliceIdentity();
             }
+            const rawName = (typeof Game !== 'undefined' && Game.username) ? String(Game.username).trim() : 'Kaptan';
+            const isGen = /^kaptan(\s*\d+)?$/i.test(rawName);
+            const first = rawName.split(/\s+/)[0] || 'Kaptan';
             return {
-                driverName: (typeof Game !== 'undefined' && Game.username) ? Game.username : 'Kaptan',
+                driverName: rawName,
+                firstWord: first,
+                isGenericCaptain: isGen,
+                politeAddress: isGen ? 'Kaptan' : `${first} Kaptan`,
+                sternAddress: isGen ? 'Şoför efendi' : `Şoför ${first}`,
+                recordHolder: isGen ? 'Kaptan Şoför' : rawName,
                 plate: '59 TKL 059',
                 busName: 'Yolcu Otobüsü',
                 licenseTitle: 'Kaptan Şoför',
@@ -1863,16 +1871,16 @@
             let toastType = 'info';
 
             if (isManual && (!g || !g.isDriving || curSpeed < 3)) {
-                nvdaMsg = `Bölge Trafik PTS ve Sürücü Sicil Kaydı: Plaka ${id.plate}, Araç ${id.busName}, Kayıtlı Sürücü ${id.driverName}, Ehliyet Ünvanı ${id.licenseTitle}. Plaka ve GBT kaydı temiz.`;
-                toastMsg = `🚓 [Bölge Trafik PTS Kaydı] Plaka: ${id.plate} | Sürücü: ${id.driverName} (${id.licenseTitle}) | Araç: ${id.busName} — Sicil Temiz`;
+                nvdaMsg = `Bölge Trafik PTS Kaydı: ${id.plate} plakalı ${id.busName}, Şoför ${id.recordHolder}, Ünvan ${id.licenseTitle}. Plaka ve ehliyet kaydı temiz.`;
+                toastMsg = `🚓 [Bölge Trafik PTS] Plaka: ${id.plate} | Şoför: ${id.recordHolder} (${id.licenseTitle}) | Araç: ${id.busName} — Kayıt Temiz`;
                 toastType = 'success';
             } else if (curSpeed >= 96) {
-                nvdaMsg = `Bölge Trafik PTS Radar Uyarısı! ${id.plate} plakalı araç sürücüsü ${id.driverName}, hızınız ${curSpeed}! Radar sınırındasınız, hızınızı düşürün!`;
-                toastMsg = `⚠️🚓 [PTS Radar Uyarısı] "${id.plate} plakalı ${id.busName} — Sürücü ${id.driverName}, hızınız ${curSpeed} km/s! Yavaşlayın!"`;
+                nvdaMsg = `Bölge Trafik PTS Radar Uyarısı! ${id.plate} plakalı otobüs, ${id.politeAddress} hızın ${curSpeed}! Radara girdin, yavaşla!`;
+                toastMsg = `⚠️🚓 [PTS Radar Uyarısı] "${id.plate} plakalı otobüs — ${id.politeAddress}, hızın ${curSpeed} km/s! Yavaşla!"`;
                 toastType = 'warning';
             } else {
-                nvdaMsg = `Bölge Trafik PTS Plaka Tanıma Noktası: ${id.plate} plakalı araç, sürücü ${id.driverName}, hız ${curSpeed}. Kayıt temiz, iyi yolculuklar.`;
-                toastMsg = `🚓 [PTS Plaka Okuma] ${id.plate} • Kaptan ${id.driverName} (${curSpeed} km/s) — Kayıt Temiz, İyi Seferler!`;
+                nvdaMsg = `Bölge Trafik PTS Noktası: ${id.plate} plakalı otobüs, ${id.politeAddress}, hız ${curSpeed}. Kayıt temiz, hayırlı yolculuklar.`;
+                toastMsg = `🚓 [PTS Plaka Okuma] ${id.plate} • ${id.politeAddress} (${curSpeed} km/s) — Kayıt Temiz, Hayırlı Seferler!`;
                 toastType = 'info';
             }
 
@@ -1895,8 +1903,8 @@
                 force,
                 interrupt: true,
                 nvdaText: isOverSpeed
-                    ? `Trafik polisi ${id.plate} plakalı araç sürücüsü ${id.driverName} adına, ${currentSpeed} hız tespiti nedeniyle 350 Lira ceza kesti.`
-                    : `Trafik polisi sorguladı: ${id.plate} plakalı araç sürücüsü ${id.driverName}, ehliyet ve takograf temiz, hız ${currentSpeed}. Hayırlı yolculuklar ${id.driverName}! Artı 30 XP.`
+                    ? `Trafik polisi ${id.plate} plakalı otobüse ve ${id.recordHolder} adına, ${currentSpeed} hız tespiti nedeniyle 350 Lira ceza yazdı.`
+                    : `Trafik polisi baktı: ${id.plate} plakalı otobüs, ehliyet ve takograf tertemiz, hız ${currentSpeed}. Hayırlı yolculuklar ${id.politeAddress}! Artı 30 XP.`
             });
             return true;
         },
@@ -3580,11 +3588,11 @@
                     : (reason === 'hit_and_run' ? 'Kaza yerini terk ihbarı' : 'Bölge Trafik PTS takibi'));
 
             const startMsg = forceDemo
-                ? `🚨 [PTS EŞLEŞTİ: ${id.plate} • ${id.driverName}] Bölge Trafik Ekibi Sirenle Peşinize Düştü! Megafon İhtarı -> Kaçış -> Barikat Kıskacı!`
-                : `🚨 POLİS PTS TESPİTİ (${reasonLabel}): "${id.plate} PLAKALI OTOBÜS SÜRÜCÜSÜ ${id.driverName.toUpperCase()}, S TUŞUYLA SAĞA ÇEKİN!"`;
+                ? `🚨 [PTS EŞLEŞTİ: ${id.plate} • ${id.politeAddress}] Bölge Trafik Ekibi Sirenle Peşinize Düştü! Megafon İhtarı -> Kaçış -> Barikat Kıskacı!`
+                : `🚨 POLİS MEGAFONU (${reasonLabel}): "${id.plate} PLAKALI OTOBÜS! DERHAL SAĞA ÇEK DUR!"`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(startMsg, 'error');
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
-                audio.updateNvdaLiveRegion(`Polis PTS kamerası tespit etti! Polis megafonu: ${id.plate} plakalı otobüs sürücüsü ${id.driverName}, ${reasonLabel} nedeniyle derhal sağa çek ve motoru durdur! Durmak için S tuşuna basın!`);
+                audio.updateNvdaLiveRegion(`Polis megafonu: ${id.plate} plakalı otobüs, ${id.sternAddress}! ${reasonLabel} nedeniyle derhal sağa çek ve motoru durdur! Durmak için S tuşuna basın!`);
             }
 
             this._policeChaseTimers.push(setTimeout(() => {
@@ -3596,7 +3604,7 @@
                     priority: 4,
                     force: forceDemo,
                     interrupt: true,
-                    toastText: `📢🚓 Polis Megafonu: "${id.plate} PLAKALI OTOBÜS SÜRÜCÜSÜ ${id.driverName.toUpperCase()}, DERHAL SAĞA ÇEK VE MOTORU DURDUR!!"`,
+                    toastText: `📢🚓 Polis Megafonu: "${id.plate} PLAKALI OTOBÜS, DERHAL SAĞA ÇEK VE MOTORU DURDUR!!"`,
                     toastType: 'error',
                     onend: () => {
                         if (!chase.active || chase.resolved) return;
@@ -3646,8 +3654,8 @@
                     priority: 4,
                     force: true,
                     interrupt: true,
-                    nvdaText: `Ekip telsizi merkez anonsu: ${id.plate} plakalı otobüs sürücüsü ${id.driverName} dur ihtarına uymuyor, kaçmaya devam ediyor! Önünü kesin barikat kurun!`,
-                    toastText: `🚨🚓 Ekip Telsizi: "${id.plate} PLAKALI ARAÇ SÜRÜCÜSÜ ${id.driverName.toUpperCase()} KAÇIYOR, ÖNÜNÜ KESİN BARİKAT KURUN!!"`,
+                    nvdaText: `Ekip telsizi merkez anonsu: Merkez, ${id.plate} plakalı otobüs dur ihtarına uymuyor, kaçmaya devam ediyor! Önünü kesin barikat kurun!`,
+                    toastText: `🚨🚓 Ekip Telsizi: "MERKEZ, ${id.plate} PLAKALI OTOBÜS KAÇIYOR, ÖNÜNÜ KESİN BARİKAT KURUN!!"`,
                     toastType: 'error',
                     onend: () => {
                         if (!chase.active) return;
@@ -3677,8 +3685,8 @@
                                             priority: 4,
                                             force: true,
                                             interrupt: true,
-                                            nvdaText: `Polis barikatı ${id.plate} plakalı otobüsün önünü kesti! Başkomiser: Sürücü ${id.driverName}, kontağı kapat ellerini direksiyondan çek hemen!`,
-                                            toastText: `🛑🚓 BARİKAT KISKACI (${id.plate})! Başkomiser: "${id.driverName.toUpperCase()}, KONTAĞI KAPAT ELLERİNİ DİREKSİYONDAN ÇEK!!"`,
+                                            nvdaText: `Polis barikatı ${id.plate} plakalı otobüsün önünü kesti! Başkomiser: ${id.sternAddress}, kontağı kapat ellerini direksiyondan çek hemen!`,
+                                            toastText: `🛑🚓 BARİKAT KISKACI (${id.plate})! Başkomiser: "${id.sternAddress.toUpperCase()}, KONTAĞI KAPAT ELLERİNİ DİREKSİYONDAN ÇEK!!"`,
                                             toastType: 'error',
                                             onend: () => {
                                                 chase.active = false;
@@ -3728,8 +3736,8 @@
                         isExterior: false,
                         priority: 4,
                         interrupt: true,
-                        nvdaText: `Sağa çekip durdunuz. Sert Başkomiser GBT ve plaka sorgusu yaptı: ${id.plate} plakalı otobüs sürücüsü ${id.driverName}, indir camı kontağı kapat! ${id.plate} plakasına ve siciline ${fineAmt} Lira ceza kesildi, dikkatli devam edin.`,
-                        toastText: `👮‍♂️ Başkomiser (${id.plate} • ${id.driverName}): "İndir camı kontağı kapat! Plakana ve siciline ${fineAmt} ₺ ceza işlendi!"`,
+                        nvdaText: `Sağa çekip durdunuz. Sert Başkomiser ehliyete ve plakaya baktı: ${id.sternAddress}, indir camı kontağı kapat! ${id.plate} plakasına ${fineAmt} Lira ceza yazıldı, dikkatli devam et.`,
+                        toastText: `👮‍♂️ Başkomiser (${id.plate}): "${id.sternAddress}, indir camı kontağı kapat! Plakana ${fineAmt} ₺ ceza yazıldı!"`,
                         toastType: 'warning',
                         onend: () => {
                             this.stopPolicePursuit();
@@ -3755,8 +3763,8 @@
                     isExterior: false,
                     priority: 4,
                     interrupt: true,
-                    nvdaText: `Polisten kaçıyorsunuz! Telsiz merkez anonsu: ${id.plate} plakalı otobüs sürücüsü ${id.driverName} dur ihtarına uymuyor, kaçmaya devam ediyor! Merkez önünü kesin barikat kurun!`,
-                    toastText: `🚨🚓 MERKEZ TELSİZİ: "${id.plate} PLAKALI OTOBÜS SÜRÜCÜSÜ ${id.driverName.toUpperCase()} KAÇIYOR, ÖNÜNÜ KESİN BARİKAT KURUN!!"`,
+                    nvdaText: `Polisten kaçıyorsunuz! Merkez telsiz anonsu: Merkez, ${id.plate} plakalı otobüs dur ihtarına uymuyor, kaçmaya devam ediyor! Önünü kesin barikat kurun!`,
+                    toastText: `🚨🚓 MERKEZ TELSİZİ: "MERKEZ, ${id.plate} PLAKALI OTOBÜS KAÇIYOR, ÖNÜNÜ KESİN BARİKAT KURUN!!"`,
                     toastType: 'error',
                     onend: () => {
                         if (!chase.active || chase.resolved) return;
@@ -3806,8 +3814,8 @@
                         isExterior: false,
                         priority: 4,
                         interrupt: true,
-                        nvdaText: `İleride polis barikatı ${id.plate} plakalı otobüsün yolunu kesti! Başkomiser: Sürücü ${id.driverName}, kontağı kapat ellerini direksiyondan çek hemen! ${id.plate} plakasına ve adına 950 Lira ağır ceza kesildi!`,
-                        toastText: `🛑🚓 BARİKAT YOLU KESTİ (${id.plate})! "SÜRÜCÜ ${id.driverName.toUpperCase()}, KONTAĞI KAPAT!!" (-950 ₺ Ağır Ceza)`,
+                        nvdaText: `İleride polis barikatı ${id.plate} plakalı otobüsün yolunu kesti! Başkomiser: ${id.sternAddress}, kontağı kapat ellerini direksiyondan çek hemen! ${id.plate} plakasına 950 Lira ağır ceza yazıldı!`,
+                        toastText: `🛑🚓 BARİKAT YOLU KESTİ (${id.plate})! "${id.sternAddress.toUpperCase()}, KONTAĞI KAPAT!!" (-950 ₺ Ağır Ceza)`,
                         toastType: 'error',
                         onend: () => {
                             this.stopPolicePursuit();
