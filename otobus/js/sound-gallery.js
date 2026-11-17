@@ -1276,19 +1276,19 @@ const SoundGallery = {
         {
             id: "human_deniz_wheeze_laugh",
             category: "human",
-            icon: "🫁",
-            title: "Atarlı Mahalle Ablası Deniz: Astımı Tutarak Tıkana Öksüre Gülme Krizi! ('Fısfısımı Ver!')",
-            specs: "30 Saniyelik Kesintisiz Astımlı Hırıltı, Öksürük Krizi & Gülerken Anlatma",
-            desc: "Deniz'in gülmekten astımının tuttuğu, göğsü hırıldayıp öksürük krizine girerek 'Ciğerim düdük gibi ötüyor boğulacağım kız fısfısımı ver!' diye haykırdığı 30 saniyelik sahne!",
+            icon: "🚬",
+            title: "Tiryaki Mahalle Ablası: Ciğerleri Hır Hır Öterek Sigara Öksürüklü Gülme Krizi!",
+            specs: "Çatallı Tiryaki Sesi • Göğüsten Gelen Hırıltılı Öksürük & Gülerken Anlatma",
+            desc: "İki paket sigara içmekten göğsü hırıl hırıl öten mahalle ablasının, pazar arabasıyla yere yapışan adamı anlatırken öksürük ve hırıltılı gülme krizine girişi!",
             playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playWheezeLaughPhoneDrama) window.HumanNpcVoices.playWheezeLaughPhoneDrama("deniz", true); }
         },
         {
             id: "human_deniz_shutup_laugh",
             category: "human",
-            icon: "🤭",
-            title: "Atarlı Mahalle Ablası Q İkaz Anonsu Sonrası Hırıldayarak Telefonu Kapatıyor!",
-            specs: "Deniz Karakteri Nefesi Kesilerek Telefon Kapatma (deniz_shutup_laugh.mp3)",
-            desc: "Şoför Q tuşuyla ikaz anonsu geçince hâlâ hırıldayarak 'Ay tamam be yemeyin adamı sustuk işte, kız kapat otobüsten atacak şimdi beni hhhhhh!' deyişi.",
+            icon: "🚬",
+            title: "Tiryaki Mahalle Ablası Q İkaz Anonsu Sonrası Öksüre Hırıldaya Kapatıyor!",
+            specs: "Tiryaki Karakteri Öksürerek Telefon Kapatma (deniz_shutup_laugh.mp3)",
+            desc: "Şoför Q tuşuyla ikaz anonsu geçince öksürüp hırıldayarak 'Ay tamam be yemeyin adamı sustuk işte, kız kapat otobüsten atacak şimdi beni öhhö!' deyişi.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("deniz_shutup_laugh.mp3", { pan: 0.42, volume: 1.0, force: true, interrupt: true }); }
         },
         {
