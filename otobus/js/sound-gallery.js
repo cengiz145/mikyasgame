@@ -1020,6 +1020,60 @@ const SoundGallery = {
             specs: "Sağanak Yağış & Fırtına Atmosferi",
             desc: "Dışarıda şiddetli gök gürlediğinde otobüsün içinde dua eden teyze.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("weather_thunder_01.mp3", { pan: 0.25, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_riot_stop",
+            category: "human",
+            icon: "🚨",
+            title: "5. Kademe KABİN İSYANI & Kapı Yumruklama",
+            specs: "Cama Yumruk Sesi + Öfkeli İsyan (-50 ₺ Ceza)",
+            desc: "Üst üste 5 ağır sarsıntıda kapıyı yumruklayıp otobüsü durdurmanızı isteyen öfkeli yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("sfx_door_fist_bang.mp3", { pan: -0.45, volume: 0.9, force: true, backgroundSfx: true }); window.HumanNpcVoices.playClip("sfx_cabin_uproar.mp3", { pan: 0, volume: 0.55, force: true, backgroundSfx: true }); setTimeout(() => window.HumanNpcVoices.playClip("riot_stop_m1.mp3", { pan: -0.35, volume: 1.0, force: true, interrupt: true }), 420); } }
+        },
+        {
+            id: "human_agg_lvl4",
+            category: "human",
+            icon: "🤬",
+            title: "4. Kademe Çileden Çıkan Kadın Yolcu",
+            specs: "Şiddetli Agresif Sabır Taşması",
+            desc: "Dördüncü sert frende çantaları savrulunca bağırarak tepki gösteren yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("agg_lvl4_f1.mp3", { pan: 0.25, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_reardoor_bang",
+            category: "human",
+            icon: "👊",
+            title: "Arka Kapıyı Yumruklayıp Bağıran Yolcu",
+            specs: "13. Saniye Kapı Unutma Tepkisi",
+            desc: "Durakta arka kapıyı 13 saniye boyunca açmadığınızda camı yumruklayan yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("sfx_door_fist_bang.mp3", { pan: -0.55, volume: 0.9, force: true, backgroundSfx: true }); setTimeout(() => window.HumanNpcVoices.playClip("reardoor_rage_f1.mp3", { pan: -0.5, volume: 1.0, force: true, interrupt: true }), 420); } }
+        },
+        {
+            id: "human_crash_rage",
+            category: "human",
+            icon: "💥",
+            title: "Kaza Sonrası Şoföre Gürleyen Yolcu",
+            specs: "Kabin İçi Ağır Kaza Öfkesi",
+            desc: "Yolculu otobüsle kaza yaptığınızda arkadan şoföre bağıran öfkeli vatandaş.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("crash_rage_m1.mp3", { pan: -0.15, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_speed_rage",
+            category: "human",
+            icon: "🏎️",
+            title: "100+ km/s Ölüm Korkusu Çığlığı",
+            specs: "Aşırı Hız Panik & Öfke Patlaması",
+            desc: "İbre yüzü geçtiğinde kalp krizi geçireceğiz diye bağıran yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("speed_rage_f1.mp3", { pan: 0.2, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_bicker",
+            category: "human",
+            icon: "💢",
+            title: "Otobüste Birbiriyle Tartışan Yolcular",
+            specs: "Kalabalık & Gergin Kabin Kavgası",
+            desc: "Tıklım tıklım ve sarsıntılı otobüste arka sırada birbirine çıkışan yolcular.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("bicker_crowd_m1.mp3", { pan: -0.35, volume: 1.0, force: true, interrupt: true }); }
         }
     ],
 

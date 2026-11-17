@@ -5344,9 +5344,20 @@ const Game = {
         }
         
         UI.switchScreen('stop-screen');
-        // İnecek yolcu varsa ama arka kapı 7 saniye içinde açılmazsa emekli amca seslenir
+        // Kabin isyanı olduysa ilk durakta fazladan 1-3 öfkeli yolcu otobüsü terk eder!
+        if (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.pendingRiotWalkout && this.passengersOnBoard > 0) {
+            const walkout = Math.min(this.passengersOnBoard, 2);
+            this.passengersOnBoard = Math.max(0, this.passengersOnBoard - walkout);
+            window.HumanNpcVoices.pendingRiotWalkout = false;
+            window.HumanNpcVoices.angerLevel = 3;
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast(`💢 Kabin İsyanı: ${walkout} öfkeli yolcu kötü sürüş yüzünden sefer bitmeden otobüsü terk etti!`, 'error');
+            }
+        }
+        // İnecek yolcu varsa ama arka kapı 7 sn içinde açılmazsa seslenir, 13.5 sn içinde hâlâ açılmazsa kapıyı yumruklayıp bağırır!
         if (alighting > 0 && typeof window.HumanNpcVoices !== 'undefined') {
             if (this.rearDoorRemindTimer) clearTimeout(this.rearDoorRemindTimer);
+            if (this.rearDoorRageTimer) clearTimeout(this.rearDoorRageTimer);
             this.rearDoorRemindTimer = setTimeout(() => {
                 if (!this.isDriving && !this.rearDoorOpen && window.HumanNpcVoices.canSpeakInCabin()) {
                     window.HumanNpcVoices.playClip('amca_reardoor.mp3', {
@@ -5358,6 +5369,11 @@ const Game = {
                     });
                 }
             }, 7200);
+            this.rearDoorRageTimer = setTimeout(() => {
+                if (!this.isDriving && !this.rearDoorOpen && window.HumanNpcVoices.canSpeakInCabin()) {
+                    window.HumanNpcVoices.onRearDoorBanging();
+                }
+            }, 13500);
         }
         // Durağa varış tamamlandı; kapılar henüz açılmadı. Kalkış işlemi yolcular binip kapılar kapandıktan sonra tetiklenir.
     },
