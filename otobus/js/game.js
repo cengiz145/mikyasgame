@@ -5519,6 +5519,9 @@ const Game = {
         this.airPressure = Math.max(minAirF, this.airPressure - 2);
         
         this.frontDoorOpen = !this.frontDoorOpen;
+        if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.updateExteriorOcclusion === 'function') {
+            window.HumanNpcVoices.updateExteriorOcclusion();
+        }
         if (typeof BusConceptGuide !== 'undefined') {
             BusConceptGuide.announceAction('front_door', this.frontDoorOpen);
         }
@@ -5544,6 +5547,13 @@ const Game = {
             
             if (!this.isDriving) {
                 this.startBoardingLoop();
+                if (!this.isTrainingRoute && typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.triggerStopHawker === 'function') {
+                    setTimeout(() => {
+                        if (this.frontDoorOpen && !this.isDriving && this.passengersOnBoard >= 2) {
+                            window.HumanNpcVoices.triggerStopHawker(this.currentStopIndex, false);
+                        }
+                    }, 2300);
+                }
             }
         } else {
             // Kapıyı Kapat
@@ -5787,6 +5797,9 @@ const Game = {
         this.airPressure = Math.max(minAirR, this.airPressure - 2);
         
         this.rearDoorOpen = !this.rearDoorOpen;
+        if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.updateExteriorOcclusion === 'function') {
+            window.HumanNpcVoices.updateExteriorOcclusion();
+        }
         if (typeof BusConceptGuide !== 'undefined') {
             BusConceptGuide.announceAction('rear_door', this.rearDoorOpen);
         }
@@ -6645,6 +6658,9 @@ const Game = {
                 if (typeof audio.speak === 'function') audio.speak(winMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Açıldı (Home)", "info");
                 if (typeof window.HumanNpcVoices !== 'undefined') {
+                    if (typeof window.HumanNpcVoices.updateExteriorOcclusion === 'function') {
+                        window.HumanNpcVoices.updateExteriorOcclusion();
+                    }
                     window.HumanNpcVoices.onDriverWindowOpened(this);
                 }
             }
@@ -6678,6 +6694,9 @@ const Game = {
                 audio.setWindowOpen(false);
                 audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
                 const winMsg = "Kaptan camı kapatıldı. Kabin yalıtımı sağlandı.";
+                if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.updateExteriorOcclusion === 'function') {
+                    window.HumanNpcVoices.updateExteriorOcclusion();
+                }
                 if (typeof audio.speak === 'function') audio.speak(winMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Kapatıldı (End)", "info");
             }

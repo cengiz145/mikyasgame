@@ -1200,6 +1200,78 @@ const SoundGallery = {
             specs: "Akıllı Erken Kapı Kapatma Algılayıcısı",
             desc: "Durakta sırada bekleyen yolcu varken ön kapıyı erken kapattığınızda dışarıdan cama vurup bağıran vatandaş.",
             playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("sfx_door_fist_bang.mp3", { pan: 0.7, volume: 0.9, force: true, backgroundSfx: true }); setTimeout(() => window.HumanNpcVoices.playClip("door_slammed_face.mp3", { pan: 0.7, volume: 1.0, force: true, interrupt: true }), 320); } }
+        },
+        {
+            id: "human_stunt_window_occlusion",
+            category: "human",
+            icon: "🪟",
+            title: "Canlı Cam Akustiği İllüzyonu (Cümle Ortasında Cam Açılma!)",
+            specs: "Gerçek Zamanlı 620Hz Boğuk Cam -> 18.5kHz Canlı HD Filtre",
+            desc: "Dışarıda bağıran sürücünün sesi kapalı cam arkasından boğuk gelir; cümle ortasında sol cam açıldığı an (Home tuşu) ses gerçek zamanlı netleşir!",
+            playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.demoWindowOcclusionStunt) window.HumanNpcVoices.demoWindowOcclusionStunt(); }
+        },
+        {
+            id: "human_stunt_walking_aisle",
+            category: "human",
+            icon: "👣",
+            title: "Koridordan Yürüyüp Ensenize Dikilen Yolcu (3B Adım İllüzyonu)",
+            specs: "En Arkadan (+0.68) 6 Adımda Sol Omuz Arkasına (-0.16) 3B Yaklaşma",
+            desc: "En arka koltuktan uzaktan bağırarak kalkan öfkeli yolcu, koridorda tıkır tıkır yürüyerek yaklaşıp tam ensenizin dibinde konuşur!",
+            playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playWalkingAngryConfrontation) window.HumanNpcVoices.playWalkingAngryConfrontation(true); }
+        },
+        {
+            id: "human_stunt_trio_cut",
+            category: "human",
+            icon: "🗣️",
+            title: "Milisaniyelik Laf Kesmeli 3'lü Klima ve Cam Kavgası",
+            specs: "3 Ayrı Karakter Birbirinin Cümlesini Keserek Üst Üste Tartışır",
+            desc: "Sol sıradaki üşüyen teyzenin lafını sağ sıradaki terleyen yolcu keser; orta sıradaki bıkkın yolcu ikisini birden bastırır!",
+            playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playInterruptingTrioFight) window.HumanNpcVoices.playInterruptingTrioFight(true); }
+        },
+        {
+            id: "human_stunt_whisper_gossip",
+            category: "human",
+            icon: "🤫",
+            title: "Arka Koltukta Şoförün Dedikodusunu Fısıldaşan İkili",
+            specs: "ElevenLabs v4 Gerçek Fısıltı (Whisper) & Mikro İnsan Tepkisi",
+            desc: "Gece veya yorgun sürüşte arka sağ koltukta fısıltıyla şoförü çekiştiren iki yolcu.",
+            playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playWhisperGossipPair) window.HumanNpcVoices.playWhisperGossipPair(true); }
+        },
+        {
+            id: "human_stunt_tsk_sigh",
+            category: "human",
+            icon: "😒",
+            title: "Sözsüz Mikro Tepki: Dil Şaklatıp 'Cık Cık' İç Çeken Yaşlı Yolcu",
+            specs: "ElevenLabs Doğal Nefes & Dil Şaklatma (Cık Cık Cık... Püff...)",
+            desc: "Hafif sarsıntıda uzun cümle kurmak yerine dilini şaklatıp derin nefes vererek sabır çeken teyze.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("micro_tsk_sigh.mp3", { pan: -0.35, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_stunt_goal_radio",
+            category: "human",
+            icon: "⚽",
+            title: "90+4 Gol Çığlığı Atan Taraftar & Korkudan Sıçrayan Teyze",
+            specs: "Sürpriz Kabin Mini-Tiyatrosu (Çift Karakter Anlık Tepki)",
+            desc: "Gizlice maç dinlerken bir anda GOOOL diye bağıran yolcu ve yüreğine inip onu azarlayan yan koltuktaki teyze!",
+            playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playGoalRadioDrama) window.HumanNpcVoices.playGoalRadioDrama(true); }
+        },
+        {
+            id: "human_stunt_wheeze_male",
+            category: "human",
+            icon: "🤣",
+            title: "Telefonda Ciğeri Hırıldayarak Katıla Katıla Gülen Adam ('Terlik Uçtu!')",
+            specs: "ElevenLabs v4 Nefesi Kesilerek Hırıltılı Kahkaha + Telefonda Hikaye Anlatma",
+            desc: "Telefonda arkadaşına otobüse koşan adamın ayağından fırlayan terliği anlatırken nefes alamayıp hırıldayarak gülme krizine giren yolcu ve yan koltuğun tepkisi!",
+            playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playWheezeLaughPhoneDrama) window.HumanNpcVoices.playWheezeLaughPhoneDrama("m", true); }
+        },
+        {
+            id: "human_stunt_wheeze_female",
+            category: "human",
+            icon: "😂",
+            title: "Telefonda Boğularak Gülme Krizine Giren Genç Kız ('Pantolonu Cırt Diye Yırtıldı!')",
+            specs: "ElevenLabs v4 Gözünden Yaş Gelerek Kahkaha Krizi + Q İkaz Tepkisi",
+            desc: "Telefonda arkadaşına kapıya sıkışan çantayı anlatırken nefesi kesilip katıla katıla gülen yolcu (Seferde Q tuşuyla susturulunca gülmesini zor tutarak telefonu kapatır!).",
+            playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playWheezeLaughPhoneDrama) window.HumanNpcVoices.playWheezeLaughPhoneDrama("f", true); }
         }
     ],
 
