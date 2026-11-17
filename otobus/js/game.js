@@ -3667,12 +3667,18 @@ const Game = {
         }
         
         if (isBraking) {
+            if (this.speed > 0.5) {
+                this._startedBrakingWhileMoving = true;
+                this._stoppedBrakeHoldTime = 0;
+            }
             if (!this.isBrakeKeyDown) {
-                const minPressure = (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) ? 85 : 0;
-                const brakeAirLoss = 3 + (this.busDamage ? Math.floor((this.busDamage.brakes || 0) / 30) : 0);
-                this.airPressure = Math.max(minPressure, this.airPressure - brakeAirLoss);
                 this.isBrakeKeyDown = true;
-                audio.playBrakeRelease(); // Tıss
+                if (this.speed > 1) {
+                    const minPressure = (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) ? 85 : 0;
+                    const brakeAirLoss = 3 + (this.busDamage ? Math.floor((this.busDamage.brakes || 0) / 30) : 0);
+                    this.airPressure = Math.max(minPressure, this.airPressure - brakeAirLoss);
+                    audio.playBrakeRelease(); // Yalnızca hareket halindeyken fren yapıldığında hava sesi çıkar
+                }
                 
                 // Ayak freni retarder takviyesi (Eğer manuel retarder zaten çekili değilse)
                 if (this.speed > 30 && !this.isEmergencyBrakeLocked && (!this.retarderLevel || this.retarderLevel === 0) && typeof audio.playRetarder === 'function') {
@@ -3683,6 +3689,8 @@ const Game = {
             }
             // Gerçek otobüslerde frene basılı tutmak havayı tüketmez, sadece basıp bırakmak tüketir!
         } else {
+            this._startedBrakingWhileMoving = false;
+            this._stoppedBrakeHoldTime = 0;
             if (this.isBrakeKeyDown) {
                 this.isBrakeKeyDown = false;
                 // Ayak freni bırakıldığında, eğer MANUEL retarder kolu çekili değilse retarder sesini kapat
@@ -4659,10 +4667,31 @@ const Game = {
             if (this.passengersOnBoard > 0 && this.passengerComfort < 65 && audio.playPassengerDiscontent) {
                 audio.playPassengerDiscontent();
             }
-            // Ağır vasıta geri vites ikaz düdüğü (Araç dururken veya geri vitesteyken S / Aşağı tuşuna basılıysa)
-            if (this.isDriving && this.speed === 0 && (this.keys.s || this.keys.arrowdown)) {
-                if (audio.startReverseBeep) audio.startReverseBeep();
-            } else if (this.speed > 0 || this.keys.w || this.keys.arrowup || !this.isDriving) {
+            // Ağır vasıta geri vites ikaz düdüğü ve geri manevra (Yalnızca dururken geri manevra istendiğinde devreye girer, tuş bırakıldığı an susar)
+            const reverseKeyHeld = !!(this.keys.s || this.keys.arrowdown) && !(this.keys.w || this.keys.arrowup);
+            if (this.isDriving && this.speed === 0 && reverseKeyHeld) {
+                if (this._startedBrakingWhileMoving) {
+                    this._stoppedBrakeHoldTime = (this._stoppedBrakeHoldTime || 0) + deltaTime;
+                    if (this._stoppedBrakeHoldTime >= 0.85) {
+                        this._startedBrakingWhileMoving = false;
+                    }
+                }
+                if (!this._startedBrakingWhileMoving && canAccelerate && !this.isEmergencyBrakeLocked && audio.isEngineRunning) {
+                    if (audio.startReverseBeep) audio.startReverseBeep();
+                    const revMeters = (6.5 / 3.6) * deltaTime * 2.8;
+                    const maxLegBack = (this.currentLegTotalDistance || 1500) + 60;
+                    this.currentDistanceToNext = Math.min(maxLegBack, (this.currentDistanceToNext || 0) + revMeters);
+                    this.currentLegDistanceCovered = Math.max(0, (this.currentLegDistanceCovered || 0) - revMeters);
+                    const remBack = Math.max(0, Math.round(this.currentDistanceToNext || 0));
+                    const distElBack = document.getElementById('hud-distance');
+                    if (distElBack) {
+                        distElBack.innerText = remBack >= 1000 ? ((remBack / 1000).toFixed(1) + " km") : (remBack + " m");
+                    }
+                    audio.updateEngineSound(4, 960, 1, false);
+                } else {
+                    if (audio.stopReverseBeep) audio.stopReverseBeep();
+                }
+            } else {
                 if (audio.stopReverseBeep) audio.stopReverseBeep();
             }
         }
@@ -5311,6 +5340,7 @@ const Game = {
         audio.updateTireNoise(0, null);
         if (typeof audio.stopLowAirAlarm === 'function') audio.stopLowAirAlarm();
         if (typeof audio.stopTireScreech === 'function') audio.stopTireScreech();
+        if (typeof audio.stopReverseBeep === 'function') audio.stopReverseBeep();
         
         // Bir sonraki sefere başlarken otomatik frenleme/pompalama cezasını engellemek için tuşları sıfırla
         this.keys.s = false;
@@ -6802,6 +6832,14 @@ const Game = {
         if (k === 'arrowleft' || e.code === 'ArrowLeft') this.keys.arrowleft = false;
         if (k === 'arrowright' || e.code === 'ArrowRight') this.keys.arrowright = false;
         if (this.keys.hasOwnProperty(k)) this.keys[k] = false;
+
+        if (!this.keys.s && !this.keys.arrowdown) {
+            this._startedBrakingWhileMoving = false;
+            this._stoppedBrakeHoldTime = 0;
+            if (typeof audio !== 'undefined' && typeof audio.stopReverseBeep === 'function') {
+                audio.stopReverseBeep();
+            }
+        }
         
         if (k === 'l') {
             if (typeof audio !== 'undefined' && typeof audio.stopHorn === 'function') {
@@ -6871,7 +6909,10 @@ window.addEventListener('blur', () => {
 window.addEventListener('blur', () => {
     Object.keys(Game.keys).forEach(k => Game.keys[k] = false);
     Game.isBrakeKeyDown = false; // Fren cezasını da sıfırla
-    if (typeof audio !== 'undefined' && audio.stopHorn) audio.stopHorn();
+    if (typeof audio !== 'undefined') {
+        if (audio.stopHorn) audio.stopHorn();
+        if (audio.stopReverseBeep) audio.stopReverseBeep();
+    }
 });
 
 // ==========================================

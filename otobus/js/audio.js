@@ -982,6 +982,9 @@ startEngine() {
             this.engineDamageGain = null;
         }
         this.isEngineRunning = false;
+        if (typeof this.stopReverseBeep === 'function') {
+            this.stopReverseBeep();
+        }
         if (typeof this.stopAllRoadSounds === 'function') {
             this.stopAllRoadSounds();
         }
@@ -1502,40 +1505,120 @@ startEngine() {
         }
     }
 
+    _playSingleReversePulse() {
+        if (!this.isReverseBeeping) return;
+        this.init();
+        if (!this.ctx) return;
+        const volPref = (typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : 1.0;
+        if (volPref <= 0.01) return;
+        if (this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+        }
+
+        try {
+            const now = this.ctx.currentTime;
+            const peakGain = Math.min(0.32, 0.25 * Math.max(0.35, volPref));
+            // Kısa, pürüzsüz, tıkırtısız ve yabancı motor sesi içermeyen geri vites sinyali (0.17s bip + 0.39s sessizlik)
+            const tStart = now + 0.005;
+            const tHoldEnd = tStart + 0.010 + 0.140;
+            const tEnd = tHoldEnd + 0.020;
+
+            const masterGain = this.ctx.createGain();
+            masterGain.gain.setValueAtTime(1.0, now);
+            this._activeReversePulseGain = masterGain;
+
+            const lp = this.ctx.createBiquadFilter();
+            lp.type = 'lowpass';
+            lp.frequency.setValueAtTime(2300, now);
+            lp.Q.setValueAtTime(0.7, now);
+
+            masterGain.connect(lp);
+            lp.connect(this.ctx.destination);
+
+            const osc = this.ctx.createOscillator();
+            const env = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1210, tStart);
+
+            env.gain.setValueAtTime(0.0001, tStart);
+            env.gain.linearRampToValueAtTime(peakGain, tStart + 0.010);
+            env.gain.setValueAtTime(peakGain, tHoldEnd);
+            env.gain.linearRampToValueAtTime(0.0001, tEnd);
+
+            osc.connect(env);
+            env.connect(masterGain);
+            osc.start(tStart);
+            osc.stop(tEnd + 0.01);
+
+            const bodyOsc = this.ctx.createOscillator();
+            const bodyEnv = this.ctx.createGain();
+            bodyOsc.type = 'triangle';
+            bodyOsc.frequency.setValueAtTime(1210, tStart);
+
+            bodyEnv.gain.setValueAtTime(0.0001, tStart);
+            bodyEnv.gain.linearRampToValueAtTime(peakGain * 0.16, tStart + 0.010);
+            bodyEnv.gain.setValueAtTime(peakGain * 0.16, tHoldEnd);
+            bodyEnv.gain.linearRampToValueAtTime(0.0001, tEnd);
+
+            bodyOsc.connect(bodyEnv);
+            bodyEnv.connect(masterGain);
+            bodyOsc.start(tStart);
+            bodyOsc.stop(tEnd + 0.01);
+        } catch (e) {}
+    }
+
     startReverseBeep() {
         if (this.isReverseBeeping) return;
         this.isReverseBeeping = true;
-        if (this.sounds && this.sounds.reverseBeep) {
-            try {
-                this.sounds.reverseBeep.volume(0.85);
-                this.sounds.reverseBeep.play();
-            } catch(e){}
+        if (this._reverseBeepInterval) {
+            clearInterval(this._reverseBeepInterval);
+            this._reverseBeepInterval = null;
         }
+        this._playSingleReversePulse();
+        this._reverseBeepInterval = setInterval(() => {
+            if (!this.isReverseBeeping) {
+                clearInterval(this._reverseBeepInterval);
+                this._reverseBeepInterval = null;
+                return;
+            }
+            this._playSingleReversePulse();
+        }, 560);
     }
 
     stopReverseBeep() {
-        if (!this.isReverseBeeping) return;
+        if (this._reverseBeepInterval) {
+            clearInterval(this._reverseBeepInterval);
+            this._reverseBeepInterval = null;
+        }
+        if (!this.isReverseBeeping && !this._activeReversePulseGain) return;
         this.isReverseBeeping = false;
-        if (this.sounds && this.sounds.reverseBeep) {
+        if (this._activeReversePulseGain && this.ctx) {
             try {
-                this.sounds.reverseBeep.fade(this.sounds.reverseBeep.volume(), 0, 200);
-                setTimeout(() => {
-                    if (!this.isReverseBeeping && this.sounds && this.sounds.reverseBeep) {
-                        this.sounds.reverseBeep.stop();
-                    }
-                }, 220);
-            } catch(e){
-                try { this.sounds.reverseBeep.stop(); } catch(e2){}
-            }
+                const now = this.ctx.currentTime;
+                this._activeReversePulseGain.gain.cancelScheduledValues(now);
+                this._activeReversePulseGain.gain.setValueAtTime(this._activeReversePulseGain.gain.value || 0.2, now);
+                this._activeReversePulseGain.gain.linearRampToValueAtTime(0.0001, now + 0.015);
+            } catch (e) {}
+            this._activeReversePulseGain = null;
+        }
+        if (this.sounds && this.sounds.reverseBeep) {
+            try { this.sounds.reverseBeep.stop(); } catch (e) {}
         }
     }
 
     toggleReverseBeepDemo() {
+        if (this._reverseDemoTimeout) {
+            clearTimeout(this._reverseDemoTimeout);
+            this._reverseDemoTimeout = null;
+        }
         if (this.isReverseBeeping) {
             this.stopReverseBeep();
         } else {
             this.startReverseBeep();
-            setTimeout(() => { this.stopReverseBeep(); }, 4000);
+            this._reverseDemoTimeout = setTimeout(() => {
+                this.stopReverseBeep();
+                this._reverseDemoTimeout = null;
+            }, 2200);
         }
     }
 
@@ -1625,9 +1708,12 @@ startEngine() {
             this.currentWindowAudio = null;
         }
 
-        // 3. Retarder sesini tamamen kes
+        // 3. Retarder ve Geri Vites seslerini tamamen kes
         if (typeof this.stopRetarder === 'function') {
             this.stopRetarder();
+        }
+        if (typeof this.stopReverseBeep === 'function') {
+            this.stopReverseBeep();
         }
 
         // 4. Howler üzerindeki tüm efektleri sustur
