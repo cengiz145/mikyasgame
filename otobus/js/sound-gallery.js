@@ -1128,6 +1128,42 @@ const SoundGallery = {
             specs: "Kaba Yolcu İtiş Kakış Tartışması",
             desc: "Kalabalık ve sarsıntılı otobüste arka sırada birbirine papaz olan mahalleliler.",
             playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("slang_bicker_m1.mp3", { pan: -0.5, volume: 1.0, force: true, interrupt: true }); setTimeout(() => window.HumanNpcVoices.playClip("slang_bicker_f1.mp3", { pan: 0.5, volume: 0.96, force: true, backgroundSfx: true }), 2600); } }
+        },
+        {
+            id: "human_rude_tea",
+            category: "human",
+            icon: "🍵",
+            title: "Paşam Çay Höpürdetiyor! Zıkkımlanmayı Bırak da Yürü! (Shift+C)",
+            specs: "Hödük Yolcu Çay Molası Azarı",
+            desc: "Durakta çay yudumladığınızda keyfine bak zıkkımlanmayı bırak da gaza bas diye laf sokan huysuz yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("rude_tea_scold.mp3", { pan: -0.3, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_rude_dangalak",
+            category: "human",
+            icon: "🤬",
+            title: "Dağdan mı İndin Şehre, El Arabası Teslim Edilmez Sana!",
+            specs: "Ağır Kaba Sarsıntı & Fren Azarı",
+            desc: "Sert fren ve çukurda beynimiz kafatasımıza çarptı diye gürleyen zorba yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("rude_hard_m1.mp3", { pan: -0.4, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_rude_kabin_baskin",
+            category: "human",
+            icon: "👊",
+            title: "Şoför Kabinine Yürüyen Zorba & Tımarhane Kaosu (Çift Ses)",
+            specs: "En Ağır Kaba İsyan & Kapı Kırma",
+            desc: "İn o koltuktan aşağı gel buraya diyen kabadayı ile tımarhaneden mi kaçtın diye bağıran yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("sfx_door_fist_bang.mp3", { pan: -0.6, volume: 0.92, force: true, backgroundSfx: true }); window.HumanNpcVoices.playClip("sfx_bags_crash_aisle.mp3", { pan: 0.6, volume: 0.85, force: true, backgroundSfx: true }); setTimeout(() => window.HumanNpcVoices.playClip("rude_berserk_m1.mp3", { pan: -0.6, volume: 1.0, force: true, interrupt: true }), 250); setTimeout(() => window.HumanNpcVoices.playClip("rude_berserk_f1.mp3", { pan: 0.6, volume: 0.96, force: true, backgroundSfx: true }), 2100); } }
+        },
+        {
+            id: "human_rude_ac_cimri",
+            category: "human",
+            icon: "🥵",
+            title: "Lan Açsana Şu Klimayı, Cimrilik mi Yapıyorsun Mazot Gitmesin Diye?!",
+            specs: "Kaba Klima & Sıcaklık Tepkisi",
+            desc: "Otobüs ısındığında kibar rica yerine mazot cimriliğiyle suçlayan kaba yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("rude_ac_hot.mp3", { pan: -0.25, volume: 1.0, force: true, interrupt: true }); }
         }
     ],
 
