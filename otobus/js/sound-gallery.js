@@ -791,7 +791,7 @@ const SoundGallery = {
             id: "human_teyze_angry",
             category: "human",
             icon: "👵",
-            title: "Tansiyonu Fırlayan Tonton Teyze (3. Kademe)",
+            title: "Tansiyonu Fırlayan Tonton Teyze (Sabır Taşması)",
             specs: "Hafızalı Yolcu Sabır Sistemi",
             desc: "Üst üste sert fren ve kasisten sonra sabrı taşan yaşlı teyze tepkisi.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("warn_angry_01.mp3", { pan: 0, volume: 1.0, force: true, interrupt: true }); }
@@ -800,7 +800,7 @@ const SoundGallery = {
             id: "human_amca_med",
             category: "human",
             icon: "👴",
-            title: "Sitem Eden Emekli Amca (2. Kademe)",
+            title: "Sitem Eden Emekli Amca (Sert Sitem)",
             specs: "Hafızalı Yolcu Sabır Sistemi",
             desc: "İkinci sarsıntıda çuval mı taşıyorsun diye sitem eden emekli amca.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("warn_medium_01.mp3", { pan: -0.25, volume: 1.0, force: true, interrupt: true }); }
@@ -989,7 +989,7 @@ const SoundGallery = {
             id: "human_coffee_spill",
             category: "human",
             icon: "☕",
-            title: "Gömleğine Kahve Dökülen Yolcu (2. Kademe)",
+            title: "Gömleğine Kahve Dökülen Yolcu (Sert Sitem)",
             specs: "Hafızalı Yolcu Sabır Sistemi",
             desc: "Sert fren ve çukurda üstüne kahve dökülüp sitem eden yolcu.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("warn_medium_03.mp3", { pan: 0.2, volume: 1.0, force: true, interrupt: true }); }
@@ -999,7 +999,7 @@ const SoundGallery = {
             category: "human",
             icon: "😠",
             title: "Beyaz Masaya Şikayet Eden Öfkeli Yolcu",
-            specs: "3. Kademe Sabır Taşması",
+            specs: "Hafızalı Yolcu Öfkesi",
             desc: "Üst üste sarsıntılardan sonra plakanızı almaya kalkan öfkeli yolcu.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("warn_angry_03.mp3", { pan: -0.25, volume: 1.0, force: true, interrupt: true }); }
         },
@@ -1025,7 +1025,7 @@ const SoundGallery = {
             id: "human_riot_stop",
             category: "human",
             icon: "🚨",
-            title: "5. Kademe KABİN İSYANI & Kapı Yumruklama",
+            title: "Kabin İsyanı & Kapı Yumruklama",
             specs: "Cama Yumruk Sesi + Öfkeli İsyan (-50 ₺ Ceza)",
             desc: "Üst üste 5 ağır sarsıntıda kapıyı yumruklayıp otobüsü durdurmanızı isteyen öfkeli yolcu.",
             playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("sfx_door_fist_bang.mp3", { pan: -0.45, volume: 0.9, force: true, backgroundSfx: true }); window.HumanNpcVoices.playClip("sfx_cabin_uproar.mp3", { pan: 0, volume: 0.55, force: true, backgroundSfx: true }); setTimeout(() => window.HumanNpcVoices.playClip("riot_stop_m1.mp3", { pan: -0.35, volume: 1.0, force: true, interrupt: true }), 420); } }
@@ -1034,7 +1034,7 @@ const SoundGallery = {
             id: "human_agg_lvl4",
             category: "human",
             icon: "🤬",
-            title: "4. Kademe Çileden Çıkan Kadın Yolcu",
+            title: "Çileden Çıkan Öfkeli Kadın Yolcu",
             specs: "Şiddetli Agresif Sabır Taşması",
             desc: "Dördüncü sert frende çantaları savrulunca bağırarak tepki gösteren yolcu.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("agg_lvl4_f1.mp3", { pan: 0.25, volume: 1.0, force: true, interrupt: true }); }
@@ -1074,6 +1074,24 @@ const SoundGallery = {
             specs: "Kalabalık & Gergin Kabin Kavgası",
             desc: "Tıklım tıklım ve sarsıntılı otobüste arka sırada birbirine çıkışan yolcular.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("bicker_crowd_m1.mp3", { pan: -0.35, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_berserk_chaos",
+            category: "human",
+            icon: "🔥",
+            title: "TAM ÇILDIRMA KAOSU (Çoklu Çığlık + 112 İhbarı + Acil Mandal)",
+            specs: "Üst Üste Binen 3B Çift Yolcu + Devrilen Pazar Arabası + Ağlayan Bebek",
+            desc: "Sürekli sarsıntı ve kazadan sonra otobüsün zıvanadan çıkıp 112 Acil'i aradığı ve acil kapı mandalını kopardığı tam kaos anı!",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("sfx_bags_crash_aisle.mp3", { pan: 0.65, volume: 0.85, force: true, backgroundSfx: true }); window.HumanNpcVoices.playClip("sfx_door_fist_bang.mp3", { pan: -0.6, volume: 0.9, force: true, backgroundSfx: true }); window.HumanNpcVoices.playClip("sfx_cabin_uproar.mp3", { pan: 0, volume: 0.7, force: true, backgroundSfx: true }); window.HumanNpcVoices.playClip("sfx_baby_crying_bus.mp3", { pan: 0.35, volume: 0.6, force: true, backgroundSfx: true }); setTimeout(() => window.HumanNpcVoices.playClip("berserk_valve_m1.mp3", { pan: -0.6, volume: 1.0, force: true, interrupt: true }), 260); setTimeout(() => window.HumanNpcVoices.playClip("berserk_112_f1.mp3", { pan: 0.6, volume: 0.96, force: true, backgroundSfx: true }), 2100); } }
+        },
+        {
+            id: "human_berserk_live",
+            category: "human",
+            icon: "📱",
+            title: "Canlı Yayın Açıp Çıldıran Yolcu & Bayılan Teyze",
+            specs: "Çift Katmanlı Panik & Acil Tahliye Alarmı",
+            desc: "Sosyal medyada canlı yayın açıp bağıran öğrenci ile tansiyonu fırlayıp imdat isteyen teyzenin üst üste binen feryadı.",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("sfx_emergency_valve_alarm.mp3", { pan: -0.45, volume: 0.8, force: true, backgroundSfx: true }); setTimeout(() => window.HumanNpcVoices.playClip("berserk_live_f1.mp3", { pan: -0.55, volume: 1.0, force: true, interrupt: true }), 220); setTimeout(() => window.HumanNpcVoices.playClip("berserk_faint_f1.mp3", { pan: 0.55, volume: 0.95, force: true, backgroundSfx: true }), 2200); } }
         }
     ],
 

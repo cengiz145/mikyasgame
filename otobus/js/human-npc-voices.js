@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p5';
+    const AUDIO_VER = '?v=20261117p6';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -17,6 +17,9 @@
         sfxScrape: 'sfx_fender_scrape.mp3',
         sfxDoorBang: 'sfx_door_fist_bang.mp3',
         sfxUproar: 'sfx_cabin_uproar.mp3',
+        sfxBagsCrash: 'sfx_bags_crash_aisle.mp3',
+        sfxBabyCry: 'sfx_baby_crying_bus.mp3',
+        sfxEmergencyValve: 'sfx_emergency_valve_alarm.mp3',
 
         // Merkez Filo Amiri (Telsiz Dispeçer - Uğur Işık)
         dispatch: ['dispatch_01.mp3', 'dispatch_02.mp3', 'dispatch_03.mp3', 'dispatch_04.mp3'],
@@ -96,7 +99,22 @@
             { file: 'riot_stop_m2.mp3', label: 'KABİN İSYANI: "AÇIN KAPIYI İNDİRİN BİZİ ŞURADA!! Sizin yüzünüzden hastanelik mi olacağız, YAZIKLAR OLSUN!!"' },
             { file: 'riot_stop_f2.mp3', label: 'KABİN İSYANI: "AÇ ŞU KAPIYI EVLADIM İNECEĞİM!! Kalbim sıkıştı vallahi billahi, İNDİR BENİ HEMEN!!"' },
             { file: 'riot_stop_m3.mp3', label: 'KABİN İSYANI: "ARAÇ KODUNU ÇEKTİM VİDEOYA ALDIM, BİTTİ BU İŞ!! Açın kapıyı iniyoruz!!"' },
-            { file: 'riot_stop_m4.mp3', label: 'KABİN İSYANI: "YETER BE KAPIYI AÇIN İNİYORUM!! Kırk yıldır otobüse biniyorum böyle rezalet sürüş görmedim!!"' }
+            { file: 'riot_stop_m4.mp3', label: 'Öfkeli Yolcu: "YETER BE KAPIYI AÇIN İNİYORUM!! Kırk yıldır otobüse biniyorum böyle rezalet sürüş görmedim!!"' }
+        ],
+        // TAM ÇILDIRMA & SİNİR KRİZİ KAOSU (Üst Üste Binen Çığlıklar, 112 İhbarı, Pazar Arabası Devrilmesi, Canlı Yayın!)
+        berserkMeltdown: [
+            { file: 'berserk_valve_m1.mp3', label: 'Çıldıran Yolcu: "NEREDE BU ACİL KAPI MANDALI ÇEKİN KOPARIN ŞUNU!! Camı kırıp atlayacağım şimdi, DURDUR ŞU OTOBÜSÜ DURDUUUR!!"' },
+            { file: 'berserk_112_f1.mp3', label: '112\'yi Arayan Yolcu: "ALO YÜZ ON İKİ ACİL Mİ?! Yetişin polis gönderin çabuk, gözü dönmüş bir şoförün eline düştük, İMDAAAT!!"' },
+            { file: 'berserk_eggs_m1.mp3', label: 'Çıldıran Emekli: "PAZAR ARABASI DEVRİLDİ BÜTÜN YUMURTALAR KIRILDI KORİDORDA!! Savaş alanına çevirdin otobüsü, DURDUR ARTIK ŞUNU!!"' },
+            { file: 'berserk_faint_f1.mp3', label: 'Sinir Krizi Geçiren Teyze: "YETİŞİN KOMŞULAR BAYILACAĞIM ŞİMDİ AYYY!! Tansiyonum yirmiye fırladı, AÇIN KAPILARI İMDAAAT!!"' },
+            { file: 'berserk_cabin_m1.mp3', label: 'Kabin Camını Yumruklayan Yolcu: "ŞOFÖR KABİNİNİN CAMINI İNDİRECEĞİM ŞİMDİ!! Çek sağa diyorum sana, YOK MU BU OTOBÜSÜ DURDURACAK BİRİ?!"' },
+            { file: 'berserk_live_f1.mp3', label: 'Canlı Yayın Açan Öğrenci: "CANLI YAYINI AÇTIM ŞU AN HERKES İZLİYOR BU DELİLİĞİ!! Durdurun hemen bu aracı İMDAAAT!!"' },
+            { file: 'berserk_aisle_f1.mp3', label: 'Koridora Düşen Yolcu: "KORİDORA YUVARLANDIM DİZİM KANADI AYYY!! Ambulans çağırın çabuk, FRENE BASIN DURUN ARTIK!!"' },
+            { file: 'berserk_roar_m1.mp3', label: 'Gürleyen Yolcu: "ÇILDIRDINIZ MI SİZ YAHU KENDİNİZE GELİN!! Millet üst üste yıkıldı, ÇEKİN SAĞA DURUN HEMEN!!"' },
+            { file: 'berserk_heart_m1.mp3', label: 'Fenalaşan Yolcu: "NEFES ALAMIYORUM KALBİM SIKIŞTI İMDAT!! Şu kapıları açın yoksa elimden kaza çıkacak, DURDUR ŞU ARABAYI!!"' },
+            { file: 'berserk_mom_f1.mp3', label: 'Çıldıran Anne: "BEBEĞİM KATILDI AĞLAMAKTAN DUYMUYOR MUSUNUZ?! Gözünüz döndü sizin resmen, İNDİRİN BİZİ HEMEN!!"' },
+            { file: 'berserk_chant_m1.mp3', label: 'İsyancı Yolcu: "MİLLET HEP BERABER CAMA VURUP BAĞIRIN!! DURDUR ŞU OTOBÜSÜ ARTIK, AÇ ŞU KAPILARI HEMEN!!"' },
+            { file: 'berserk_kid_cry.mp3', label: 'Ağlayan Çocuk: "ANNEEE ÇOK KORKUYORUM DURDURUN OTOBÜSÜÜÜ!! İnmek istiyorum ben anneee, imdaaat!!"' }
         ],
         // Kaza Sonrası Kabin İçinden Şoföre Çok Sert Öfke Patlaması
         crashRage: [
@@ -353,7 +371,7 @@
 
             // Otobüste yolcu varsa kabin içinden anında korku nidası efekti
             if (passengersOnBoard > 0) {
-                this.angerLevel = Math.min(5, (this.angerLevel || 0) + 2);
+                this.angerLevel = Math.min(8, (this.angerLevel || 0) + 2);
                 this.playClip(CLIPS.sfxGasp, {
                     pan: 0,
                     volume: 0.72,
@@ -476,17 +494,68 @@
             return true;
         },
 
-        // 4. 5 KADEMELİ AGRESİF YOLCU SABIR & KABİN İSYANI SİSTEMİ (1: Kibar -> 2: Sitem -> 3: Kızgın -> 4: Sert Kavga -> 5: KABİN İSYANI!)
+        // 4. HAFIZALI AGRESİF YOLCU ÖFKE VE TAM ÇILDIRMA KAOS MOTORU (Sıfır Seviye Numarası, Saf Artan Çılgınlık!)
         onRoughDriving: function (reason, passengersOnBoard) {
             if (!this.canSpeakInCabin() || (passengersOnBoard || 0) <= 0) return false;
             const now = performance.now();
-            if (this.lastJoltVoiceTime && (now - this.lastJoltVoiceTime < 6500)) return false;
+            if (this.lastJoltVoiceTime && (now - this.lastJoltVoiceTime < 5800)) return false;
             this.lastJoltVoiceTime = now;
 
-            this.angerLevel = Math.min(5, (this.angerLevel || 0) + 1);
+            this.angerLevel = Math.min(8, (this.angerLevel || 0) + 1);
 
-            // 5. KADEME: TAM KABİN İSYANI + CAMA YUMRUK + BEYAZ MASA ŞİKAYET CEZASI!
-            if (this.angerLevel >= 5) {
+            // TAM ÇILDIRMA / ZIVADAN ÇIKMA KAOSU (Çoklu Üst Üste Binen Çığlıklar + Devrilen Pazar Arabası + Ağlayan Bebek + Acil Mandal Alarmı!)
+            if (this.angerLevel >= 6) {
+                this.pendingRiotWalkout = true;
+                this.playClip(CLIPS.sfxBagsCrash, { pan: 0.65, volume: 0.85, backgroundSfx: true });
+                this.playClip(CLIPS.sfxDoorBang, { pan: -0.60, volume: 0.90, backgroundSfx: true });
+                this.playClip(CLIPS.sfxUproar, { pan: 0, volume: 0.70, backgroundSfx: true });
+                this.playClip(CLIPS.sfxBabyCry, { pan: 0.35, volume: 0.62, backgroundSfx: true });
+                if (this.angerLevel >= 7) {
+                    setTimeout(() => {
+                        this.playClip(CLIPS.sfxEmergencyValve, { pan: -0.45, volume: 0.82, backgroundSfx: true });
+                    }, 900);
+                }
+
+                // İki farklı çıldırmış yolcu sol ve sağ kulaklıktan arka arkaya / üst üste binerek bağırır!
+                const idx1 = Math.floor(Math.random() * CLIPS.berserkMeltdown.length);
+                let idx2 = (idx1 + 1 + Math.floor(Math.random() * (CLIPS.berserkMeltdown.length - 1))) % CLIPS.berserkMeltdown.length;
+                const b1 = CLIPS.berserkMeltdown[idx1];
+                const b2 = CLIPS.berserkMeltdown[idx2];
+
+                if (typeof game !== 'undefined' && typeof game.money === 'number' && game.money >= 50) {
+                    game.money -= 50;
+                    const moneyEl = document.getElementById('hud-money');
+                    if (moneyEl) moneyEl.innerText = `${Math.floor(game.money)} ₺`;
+                }
+
+                setTimeout(() => {
+                    this.playClip(b1.file, {
+                        pan: -0.60,
+                        volume: 1.0,
+                        interrupt: true,
+                        nvdaText: b1.label + ' ' + b2.label,
+                        toastText: `🔥 ${b1.label}`,
+                        toastType: 'error'
+                    });
+                }, 280);
+
+                // Üst üste binen 2. çıldırmış yolcu (1.9 sn sonra sağ kulaklıktan patlar!)
+                if ((passengersOnBoard || 0) >= 2) {
+                    setTimeout(() => {
+                        this.playClip(b2.file, {
+                            pan: 0.60,
+                            volume: 0.96,
+                            backgroundSfx: true,
+                            toastText: `🚨 ${b2.label}`,
+                            toastType: 'error'
+                        });
+                    }, 2100);
+                }
+                return true;
+            }
+
+            // KAPI YUMRUKLAMA & İSYAN BAŞLANGICI
+            if (this.angerLevel === 5) {
                 this.pendingRiotWalkout = true;
                 const riot = this.pickRandom(CLIPS.cabinRiot);
                 this.playClip(CLIPS.sfxDoorBang, { pan: -0.45, volume: 0.88, backgroundSfx: true });
@@ -501,14 +570,11 @@
                         pan: -0.35,
                         volume: 1.0,
                         interrupt: true,
-                        nvdaText: riot.label + ' Yolcular kapıyı yumruklayıp Beyaz Masaya şikayet etti! Eksi 50 Lira konfor cezası!',
-                        toastText: `🚨 ${riot.label} (-50 ₺ Beyaz Masa Cezası!)`,
-                        toastType: 'error',
-                        onend: () => {
-                            setTimeout(() => this.playRiotDispatchAlert(5), 350);
-                        }
+                        nvdaText: riot.label,
+                        toastText: `🚨 ${riot.label}`,
+                        toastType: 'error'
                     });
-                }, 420);
+                }, 400);
                 return true;
             }
 
@@ -528,7 +594,6 @@
                 this.playClip(CLIPS.sfxUproar, { pan: 0, volume: 0.45, backgroundSfx: true });
             }
 
-            const isLvl4Warn = (this.angerLevel === 4);
             const chosen = this.pickRandom(pool);
             const randomCabinPan = Number(((Math.random() - 0.5) * 0.55).toFixed(2));
             setTimeout(() => {
@@ -536,55 +601,17 @@
                     pan: randomCabinPan,
                     volume: this.angerLevel >= 4 ? 0.98 : 0.94,
                     interrupt: this.angerLevel >= 4,
-                    nvdaText: chosen.label + (isLvl4Warn ? ' Dikkat: Yolcu gerginliği 4. seviyede! Bir sarsıntı daha olursa 5. seviye kabin isyanı çıkacak!' : ''),
-                    toastText: `${toastPrefix} [Seviye ${this.angerLevel}/5] ${chosen.label}`,
-                    toastType: toastLvl,
-                    onend: () => {
-                        if (isLvl4Warn) {
-                            setTimeout(() => this.playRiotDispatchAlert(4), 380);
-                        }
-                    }
+                    nvdaText: chosen.label,
+                    toastText: `${toastPrefix} ${chosen.label}`,
+                    toastType: toastLvl
                 });
             }, 320);
             return true;
         },
 
-        playRiotDispatchAlert: function (lvl) {
-            if (!this.canSpeakInCabin()) return;
-            const file = lvl >= 5 ? 'dispatch_riot_lvl5.mp3' : 'dispatch_riot_warn_lvl4.mp3';
-            if (typeof audio !== 'undefined' && typeof audio.playRadioSquelch === 'function') {
-                audio.playRadioSquelch(true);
-            }
-            setTimeout(() => {
-                this.playClip(file, {
-                    pan: -0.2,
-                    volume: 0.95,
-                    toastText: lvl >= 5
-                        ? '📻 [MERKEZ]: 5. Seviye Kabin İsyanı! Beyaz Masa şikayeti ve -50 ₺ ceza işlendi!'
-                        : '📻 [MERKEZ İKAZI]: Yolcu Gerginliği 4/5! 5. seviyede isyan çıkacak, Alt+V ile kolonya dağıtın veya yavaşlayın!',
-                    toastType: lvl >= 5 ? 'error' : 'warning',
-                    onend: () => {
-                        if (typeof audio !== 'undefined' && typeof audio.playRadioSquelch === 'function') {
-                            setTimeout(() => audio.playRadioSquelch(false), 85);
-                        }
-                    }
-                });
-            }, 160);
-        },
-
-        getAngerStatusText: function () {
-            const lvl = this.angerLevel || 0;
-            if (lvl === 0) return 'Yolcu gerginliği 5 üzerinden 0, herkes huzurlu.';
-            if (lvl === 1) return 'Yolcu gerginliği 5 üzerinden 1, hafif huzursuzluk var.';
-            if (lvl === 2) return 'Yolcu gerginliği 5 üzerinden 2, yolcular sitemli.';
-            if (lvl === 3) return 'Yolcu gerginliği 5 üzerinden 3, yolcular öfkeli.';
-            if (lvl === 4) return 'Dikkat! Yolcu gerginliği 5 üzerinden 4, kritik sınır! Bir sarsıntıda 5. seviye kabin isyanı çıkabilir, Alt ve V ile kolonya ikram edin!';
-            return 'Alarm! Yolcu gerginliği 5 üzerinden 5, kabinde isyan var!';
-        },
-
         onRearDoorBanging: function () {
             if (!this.canSpeakInCabin()) return false;
-            this.angerLevel = Math.min(5, (this.angerLevel || 0) + 1);
+            this.angerLevel = Math.min(8, (this.angerLevel || 0) + 1);
             const chosen = this.pickRandom(CLIPS.rearDoorRage);
             this.playClip(CLIPS.sfxDoorBang, { pan: -0.55, volume: 0.88, backgroundSfx: true });
             setTimeout(() => {
@@ -702,7 +729,7 @@
 
             const throwPan = isTurnRight ? -0.55 : 0.55;
             if (state === 'panic') {
-                this.angerLevel = Math.min(5, (this.angerLevel || 0) + 1);
+                this.angerLevel = Math.min(8, (this.angerLevel || 0) + 1);
                 const useRage = (this.angerLevel >= 3);
                 const chosen = this.pickRandom(useRage ? CLIPS.curveRage : CLIPS.curvePanic);
                 if (useRage) this.playClip(CLIPS.sfxUproar, { pan: 0, volume: 0.48, backgroundSfx: true });
@@ -1247,7 +1274,7 @@
                     this.lastSmartRemindTime = now;
                     const useRage = (gameObj.speed >= 100 || (this.angerLevel || 0) >= 2);
                     if (useRage) {
-                        this.angerLevel = Math.min(5, (this.angerLevel || 0) + 1);
+                        this.angerLevel = Math.min(8, (this.angerLevel || 0) + 1);
                         const rage = this.pickRandom(CLIPS.speedRage);
                         this.playClip(CLIPS.sfxUproar, { pan: 0, volume: 0.45, backgroundSfx: true });
                         this.playClip(rage.file, {
