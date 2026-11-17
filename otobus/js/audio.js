@@ -2717,13 +2717,84 @@ startEngine() {
         } catch (e) {}
     }
 
+    // --- DURAĞA 100 METRE KALA NET KOKPİT "BİP - BİP" UYARI SİNYALİ ---
+    playStopApproachBeep() {
+        this.init();
+        if (!this.ctx) return;
+        const volPref = (typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : 1.0;
+        if (volPref <= 0.01) return;
+        if (this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+        }
+
+        try {
+            const now = this.ctx.currentTime;
+            const peakGain = Math.min(0.62, 0.48 * Math.max(0.45, volPref));
+            // İki net, tok elektronik kokpit "BİP - BİP" darbesi (arada 85ms net boşluk)
+            const pulses = [
+                { offset: 0.01, hold: 0.098, release: 0.022, gain: peakGain },
+                { offset: 0.215, hold: 0.105, release: 0.025, gain: peakGain * 1.04 }
+            ];
+
+            const toneFilter = this.ctx.createBiquadFilter();
+            toneFilter.type = 'lowpass';
+            toneFilter.frequency.setValueAtTime(2800, now);
+            toneFilter.Q.setValueAtTime(0.7, now);
+            // Motor kısılsa bile "bip-bip" sinyali asla kısılmasın diye doğrudan destination'a bağlanır
+            toneFilter.connect(this.ctx.destination);
+
+            pulses.forEach(p => {
+                const t = now + p.offset;
+                const endHold = t + 0.007 + p.hold;
+                const endAll = endHold + p.release;
+
+                const mainOsc = this.ctx.createOscillator();
+                const mainGain = this.ctx.createGain();
+                mainOsc.type = 'sine';
+                mainOsc.frequency.setValueAtTime(1080, t);
+
+                mainGain.gain.setValueAtTime(0.0001, t);
+                mainGain.gain.linearRampToValueAtTime(p.gain, t + 0.007);
+                mainGain.gain.setValueAtTime(p.gain, endHold);
+                mainGain.gain.linearRampToValueAtTime(0.0001, endAll);
+
+                mainOsc.connect(mainGain);
+                mainGain.connect(toneFilter);
+                mainOsc.start(t);
+                mainOsc.stop(endAll + 0.01);
+
+                // Kokpit ikaz netliği için hafif üçgen dalga gövdesi (tıslama yapmaz, motor sesini yarar)
+                const bodyOsc = this.ctx.createOscillator();
+                const bodyGain = this.ctx.createGain();
+                bodyOsc.type = 'triangle';
+                bodyOsc.frequency.setValueAtTime(1080, t);
+
+                bodyGain.gain.setValueAtTime(0.0001, t);
+                bodyGain.gain.linearRampToValueAtTime(p.gain * 0.24, t + 0.007);
+                bodyGain.gain.setValueAtTime(p.gain * 0.24, endHold);
+                bodyGain.gain.linearRampToValueAtTime(0.0001, endAll);
+
+                bodyOsc.connect(bodyGain);
+                bodyGain.connect(toneFilter);
+                bodyOsc.start(t);
+                bodyOsc.stop(endAll + 0.01);
+            });
+        } catch (e) {}
+    }
+
     // --- AKILLI VE GERÇEKÇİ BELEDİYE OTOBÜSÜ ANONS SİSTEMİ (SADECE DURAK NAVİGASYONU / HOSTES MP3) ---
     playBusAnnouncement(phase, stopName, options = {}) {
         if (!stopName) return;
-        this.duckForAnnouncement(5500);
-        this.playIBISChime();
+        this.duckForAnnouncement(phase === 'approach' ? 4200 : 5500);
+        if (phase === 'approach') {
+            if (!options.skipBeep) {
+                this.playStopApproachBeep();
+            }
+        } else {
+            this.playIBISChime();
+        }
         if (typeof window.HumanNpcVoices !== "undefined" && typeof window.HumanNpcVoices.notifyBusAnnouncement === "function") {
-            window.HumanNpcVoices.notifyBusAnnouncement(5000);
+            window.HumanNpcVoices.notifyBusAnnouncement(phase === 'approach' ? 4000 : 5000);
         }
 
         let navStopText = '';
@@ -2736,7 +2807,8 @@ startEngine() {
         }
 
         if (navStopText) {
-            // 3'lü zil melodisi biter bitmez yalnızca hostes MP3 veya saf durak navigasyonu konuşur (NVDA ile üst üste binmez!)
+            // Yaklaşmada "bip-bip" sinyali biter bitmez (520ms), diğerlerinde 3'lü zil sonrası (700ms) yalnızca durak navigasyonu konuşur
+            const speakDelayMs = (phase === 'approach') ? 520 : 700;
             setTimeout(() => {
                 if (typeof window.HumanNpcVoices !== 'undefined') {
                     if (phase === 'depart' && options && options.isInitial) {
@@ -2748,7 +2820,7 @@ startEngine() {
                     }
                 }
                 this.speakNavigation(navStopText);
-            }, 700);
+            }, speakDelayMs);
         }
     }
 

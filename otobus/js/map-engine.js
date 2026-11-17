@@ -47,9 +47,13 @@ const MapEngine = {
         const targetStop = this.activeRoute.stops[this.currentStopIndex];
         const distance = targetStop.pos - busPosition;
 
-        // Durağa 20 metre kala sinyal ver (Sadece 1 kez)
-        if (distance <= 20 && distance > 0 && !this.approachBeepPlayed) {
-            this.playApproachingBeep();
+        // Durağa 100 metre kala bip-bip sinyali ver (Sadece 1 kez)
+        if (distance <= 100 && distance > 15 && !this.approachBeepPlayed) {
+            if (typeof audio !== 'undefined' && typeof audio.playStopApproachBeep === 'function') {
+                audio.playStopApproachBeep();
+            } else {
+                this.playApproachingBeep();
+            }
             this.approachBeepPlayed = true;
         }
 

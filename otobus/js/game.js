@@ -2647,7 +2647,9 @@ const Game = {
     },
 
     planNextStop: function(isResume = false) {
-        this.stopApproachAnnounced = false;
+        const alreadyInsideApproachZone = Boolean(isResume && typeof this.currentDistanceToNext === 'number' && this.currentDistanceToNext < 95);
+        this.stop100mBeepPlayed = alreadyInsideApproachZone;
+        this.stopApproachAnnounced = alreadyInsideApproachZone;
         this.departAnnounced = false;
         this.stopRequestBellTriggered = false;
         const bellHudPlan = document.getElementById('hud-stop-request');
@@ -4231,16 +4233,25 @@ const Game = {
                 }
             }
 
-            // FAZ 3: DURAĞA YAKLAŞMA ANONSU (85 - 100 metre kala)
-            if (this.currentDistanceToNext <= 95 && !this.stopApproachAnnounced && this.speed > 4) {
+            // DURAĞA 100 METRE KALA NET "BİP - BİP" SESLİ İKAZ VE YAKLAŞMA ANONSU
+            if (this.currentDistanceToNext <= 100 && this.currentDistanceToNext > 15 && !this.stop100mBeepPlayed && this.speed > 1) {
+                this.stop100mBeepPlayed = true;
+                if (typeof audio !== 'undefined' && typeof audio.playStopApproachBeep === 'function') {
+                    audio.playStopApproachBeep();
+                }
+            }
+
+            if (this.currentDistanceToNext <= 100 && this.currentDistanceToNext > 15 && !this.stopApproachAnnounced && this.speed > 2) {
                 this.stopApproachAnnounced = true;
                 const isFinalStop = this.activeRouteData && this.activeRouteData.stops && (this.currentStopIndex >= this.activeRouteData.stops.length - 1);
                 const nextStop = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops[this.currentStopIndex] : null;
                 const stopName = nextStop ? nextStop.name : 'Sıradaki Durak';
                 if (typeof audio !== 'undefined' && typeof audio.playBusAnnouncement === 'function') {
-                    audio.playBusAnnouncement('approach', stopName, { isFinal: isFinalStop });
+                    audio.playBusAnnouncement('approach', stopName, { isFinal: isFinalStop, skipBeep: true });
                 } else if (typeof audio !== 'undefined' && typeof audio.speakNavigation === 'function') {
-                    audio.speakNavigation(`${stopName} durağına 100 metre.`);
+                    setTimeout(() => {
+                        audio.speakNavigation(`${stopName} durağına 100 metre.`);
+                    }, 520);
                 }
             }
             const distanceScale = 2.8; // Gerçekçi oyun sürat ölçeği (100 km/s'de mesafe, duraklar ve trafik canlı akar!)
