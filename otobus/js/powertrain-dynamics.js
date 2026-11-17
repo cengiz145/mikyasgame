@@ -176,10 +176,11 @@
             game.engineOilPressure = Math.max(1.5, Math.min(5.5, 3.2 + (rpm / 2500) * 2.2 - oilLoss));
 
             // 5. CANLI TURBOŞARJ BASINCI (0.0 - 2.4 Bar) VE AKUSTİK NEFES
-            const isThrottle = !!(game.keys && (game.keys.w || game.keys.arrowup));
+            const canMoveNow = !!(game.isDriving && !doorsOpen && !game.isRampDeployed && !game.isLuggageOpen && !game.isHandbrakeOn && !game.isEmergencyBrakeLocked);
+            const isThrottle = !!(canMoveNow && game.keys && (game.keys.w || game.keys.arrowup));
             const slope = (typeof game.currentSlopePct === 'number') ? game.currentSlopePct : 0;
             let targetBoost = 0.05;
-            if (isThrottle && rpm > 1000) {
+            if (isThrottle && (game.speed || 0) > 8 && rpm > 1100) {
                 const rpmFactor = Math.min(1.0, Math.max(0.0, (rpm - 1000) / 1300));
                 const hillLoad = (slope > 0) ? Math.min(0.45, slope * 0.06) : 0;
                 const healthFactor = Math.max(0.6, 1.0 - (engineDmg * 0.004));

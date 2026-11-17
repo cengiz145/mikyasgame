@@ -2538,10 +2538,9 @@ const Game = {
         // TEKİRDAĞ İKLİM NORMALLERİ VE ATMOSFERİK SİSTEM (AY İSİMLERİNDEN BAĞIMSIZ)
         if (!this.activeClimateRegime || !this.tekirdagClimate.regimes[this.activeClimateRegime]) {
             const roll = Math.random();
-            if (roll < 0.50) this.activeClimateRegime = "iliman";
-            else if (roll < 0.75) this.activeClimateRegime = "sicak";
-            else if (roll < 0.90) this.activeClimateRegime = "yagmurlu";
-            else this.activeClimateRegime = "karli";
+            if (roll < 0.58) this.activeClimateRegime = "iliman";
+            else if (roll < 0.85) this.activeClimateRegime = "sicak";
+            else this.activeClimateRegime = "yagmurlu";
         }
 
         const regime = this.tekirdagClimate.regimes[this.activeClimateRegime];
@@ -3872,11 +3871,12 @@ const Game = {
                 const isBrake = (this.keys.s || this.keys.arrowdown);
 
                 if (isThrottle) {
-                    // GERÇEKÇİ AĞIR VASITA DİZEL TORK EĞRİSİ VE PARÇA DİNAMİĞİ
-                    let baseAccel = 5.4 * busAccelFactor * enginePowerHealth;
-                    if (this.speed > 45) baseAccel = 3.9 * busAccelFactor * enginePowerHealth;
-                    if (this.speed > 70) baseAccel = 2.5 * busAccelFactor * enginePowerHealth;
-                    this.acceleration = baseAccel * weightMultiplier;
+                    // GERÇEKÇİ AĞIR VASITA DİZEL TORK KONVERTÖRÜ (1. ve 2. Vites Yüksek Kalkış Torku)
+                    let baseAccel = 11.2 * busAccelFactor * enginePowerHealth;
+                    if (this.speed > 25) baseAccel = 7.6 * busAccelFactor * enginePowerHealth;
+                    if (this.speed > 55) baseAccel = 5.0 * busAccelFactor * enginePowerHealth;
+                    if (this.speed > 80) baseAccel = 3.2 * busAccelFactor * enginePowerHealth;
+                    this.acceleration = baseAccel * Math.max(0.75, weightMultiplier);
                 } else if (isBrake) {
                     // SERVİS VE HAVALI FREN KALİBRASYONU (Araç fren gücü + 2. Grup balata kondisyonu)
                     let baseBrake = -10.5 * busBrakeFactor * brakePartHealth;
@@ -4059,9 +4059,16 @@ const Game = {
             }
 
             // Eğim yerçekimi ivmesi (Newton: F = m*g*sin(theta))
-            // İnişte araç hızlanır, tırmanışta hız keser
+            // İnişte araç hızlanır, tırmanışta hız keser; ancak 1./2. viteste gaza basıldığında dizel tork yokuşu daima tırmanır!
+            const activeGasClimb = canAccelerate && !this.isEmergencyBrakeLocked && audio.isEngineRunning && (this.keys.w || this.keys.arrowup);
             if (this.speed > 0 || incPhys.speedDelta > 0) {
                 this.speed += incPhys.speedDelta;
+            }
+            if (activeGasClimb && this.speed < 42) {
+                const minClimbSpeed = prevSpeed + (4.2 * deltaTime);
+                if (this.speed < minClimbSpeed) {
+                    this.speed = minClimbSpeed;
+                }
             }
 
             // Balata aşırı ısınma ve fren şişmesi uyarısı
@@ -4111,7 +4118,7 @@ const Game = {
         }
 
         // RPM VE VİTES MANTIĞI (6 İleri Otomatik Şanzıman)
-        let isThrottleOn = (this.keys.w || this.keys.arrowup);
+        let isThrottleOn = canAccelerate && !this.isEmergencyBrakeLocked && audio.isEngineRunning && (this.keys.w || this.keys.arrowup);
         let targetRPM = this.dynamicIdleRPM || 800;
         const gearSpeedRatios = [0, 22, 42, 62, 85, 110, 135];
         const maxGear = 6;
@@ -4148,7 +4155,7 @@ const Game = {
             this.engineRPM = 2200; // Vites küçülünce devir artar
         }
 
-        audio.updateEngineSound(this.speed, this.engineRPM, this.currentGear);
+        audio.updateEngineSound(this.speed, this.engineRPM, this.currentGear, isThrottleOn);
         if (typeof audio.updateTireNoise === 'function') audio.updateTireNoise(this.speed, this.currentRoadType, this.passengersOnBoard);
         if (typeof audio.updateWeatherSound === 'function') audio.updateWeatherSound(this.speed, this.weather);
 
@@ -6184,6 +6191,33 @@ const Game = {
             if (k === 'arrowdown' || e.code === 'ArrowDown') { this.keys.arrowdown = true; }
             if (k === 'arrowleft' || e.code === 'ArrowLeft') this.keys.arrowleft = true;
             if (k === 'arrowright' || e.code === 'ArrowRight') this.keys.arrowright = true;
+
+            // DURAK EKRANINDAYKEN (!this.isDriving) GAZA BASILIRSA: Hazırsa kalkış yap, değilse neden gitmediğini net söyle!
+            const stopScreenOpen = document.getElementById('stop-screen') && !document.getElementById('stop-screen').classList.contains('hidden');
+            if (!this.isDriving && stopScreenOpen && !e.repeat && (k === 'w' || e.code === 'KeyW' || k === 'arrowup' || e.code === 'ArrowUp')) {
+                if (!audio.isEngineRunning) {
+                    const msg = "Motor kapalı. Kalkış için önce Boşluk tuşuyla motoru çalıştırınız.";
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔑 " + msg, "warning");
+                } else if (this.frontDoorOpen || this.rearDoorOpen) {
+                    const humanDoor = (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onInterlockGasAttempt === 'function')
+                        ? window.HumanNpcVoices.onInterlockGasAttempt('doors', this.passengersOnBoard)
+                        : false;
+                    const msg = this.frontDoorOpen && this.rearDoorOpen
+                        ? "Ön ve arka kapılar açık! Kalkış yapmak için PageUp ve PageDown tuşlarıyla kapıları kapatınız."
+                        : (this.frontDoorOpen
+                            ? "Ön kapı açık! Kalkış yapmak için PageUp (Sayfa Yukarı) tuşuyla ön kapıyı kapatınız."
+                            : "Arka kapı açık! Kalkış yapmak için PageDown (Sayfa Aşağı) tuşuyla arka kapıyı kapatınız.");
+                    if (!humanDoor && typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🚪 " + msg, "warning");
+                } else if (this.isRampDeployed) {
+                    const msg = "Engelli rampası açık! Kalkış için önce U tuşuyla rampayı kapatınız.";
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("♿ " + msg, "warning");
+                } else {
+                    this.checkAutoDepart();
+                }
+            }
         }
         
         // Sadece oyun içindeysek ekran okuyucu veya sayfa kaydırmasını engellemek için preventDefault kullan

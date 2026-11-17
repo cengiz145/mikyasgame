@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p25';
+    const AUDIO_VER = '?v=20261117p26';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -615,6 +615,38 @@
             return true;
         },
 
+        ensureAnnouncementSpeakerBoost: function () {
+            if (this.announcementBoostInput) return true;
+            if (typeof Howler === 'undefined' || !Howler.ctx || !Howler.masterGain) return false;
+            try {
+                const ctx = Howler.ctx;
+                const eq = ctx.createBiquadFilter();
+                eq.type = 'peaking';
+                eq.frequency.value = 2600;
+                eq.Q.value = 0.95;
+                eq.gain.value = 3.2;
+
+                const gain = ctx.createGain();
+                gain.gain.value = 1.48;
+
+                const comp = ctx.createDynamicsCompressor();
+                comp.threshold.value = -7;
+                comp.knee.value = 5;
+                comp.ratio.value = 6;
+                comp.attack.value = 0.003;
+                comp.release.value = 0.12;
+
+                eq.connect(gain);
+                gain.connect(comp);
+                comp.connect(Howler.masterGain);
+
+                this.announcementBoostInput = eq;
+                return true;
+            } catch (e) {
+                return false;
+            }
+        },
+
         playClip: function (filename, opts = {}) {
             if (!filename) return null;
             const force = !!opts.force;
@@ -649,11 +681,15 @@
                 }
             }
 
+            const isHostessAnons = !!opts.isAnnouncement || /^(ibis_|cabin_quiet_anons|stop_(?!bell_|idle_)|muavin_|peron_break_end|hgs_)/.test(filename);
             const pan = typeof opts.pan === 'number' ? Math.max(-1, Math.min(1, opts.pan)) : 0;
-            const vol = this.getVolume(typeof opts.volume === 'number' ? opts.volume : 0.95);
+            const vol = this.getVolume(isHostessAnons ? 1.0 : (typeof opts.volume === 'number' ? opts.volume : 0.95));
             if (vol <= 0.01) {
                 if (typeof opts.onend === 'function') opts.onend();
                 return null;
+            }
+            if (isHostessAnons && typeof audio !== 'undefined' && typeof audio.duckForAnnouncement === 'function') {
+                audio.duckForAnnouncement(6500);
             }
 
             if ((opts.interrupt || priority > (this.activePriority || 0)) && this.activeHowl && !opts.backgroundSfx) {
@@ -686,6 +722,10 @@
                             snd._node.disconnect();
                             snd._node.connect(this.exteriorFilter);
                             snd._mikyasRoutedExterior = true;
+                        } else if (isHostessAnons && this.ensureAnnouncementSpeakerBoost()) {
+                            snd._node.disconnect();
+                            snd._node.connect(this.announcementBoostInput);
+                            snd._mikyasRoutedExterior = true;
                         } else if (!opts.isExterior && autoRear && this.ensureRearCabinFilter()) {
                             snd._node.disconnect();
                             snd._node.connect(this.rearCabinFilter);
@@ -702,6 +742,9 @@
                     this.activePriority = priority;
                     h.once('end', () => {
                         if (this.activeHowl === h) this.activePriority = 0;
+                        if (isHostessAnons && typeof audio !== 'undefined' && typeof audio.unduckAnnouncement === 'function') {
+                            audio.unduckAnnouncement();
+                        }
                     }, sid);
                 }
                 if (typeof opts.onend === 'function') {

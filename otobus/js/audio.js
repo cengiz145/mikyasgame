@@ -66,7 +66,7 @@ class AudioSystem {
             safeLoadBuffer('sounds/bassrolanti.mp3', d => {
                 this.bassIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.v8_bass = d;
             });
-            safeLoadBuffer('sounds/freesound_new_bus_idle.mp3', d => {
+            safeLoadBuffer('sounds/freesound_pure_bus_idle.mp3', d => {
                 this.cityIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.city_cummins = d;
             });
             safeLoadBuffer('sounds/freesound_articulated_idle.mp3', d => {
@@ -496,7 +496,8 @@ class AudioSystem {
         // 1. Web Audio ortam/motor/efekt mikseri sesini ayarla
         if (this.environmentMixer && this.ctx) {
             try {
-                this.environmentMixer.gain.setTargetAtTime(newVol, this.ctx.currentTime, 0.05);
+                const duckFactor = this._isDuckedForAnnouncement ? 0.24 : 1.0;
+                this.environmentMixer.gain.setTargetAtTime(newVol * duckFactor, this.ctx.currentTime, 0.05);
             } catch(e) {}
         }
 
@@ -559,11 +560,11 @@ class AudioSystem {
         // Setra (%98) ve Travego (%95) gibi lüks araçlarda motor sesi kadife gibi boğuk ve tok bir nefes (2200-2600 Hz) haline gelir.
         // Otokar/BMC gibi ekonomik şehir içi otobüslerde mekanik sesler daha açıktır (7000-8000 Hz).
         if (this.engineCabinFilter) {
-            // nvhLevel 60 -> ~7500 Hz | nvhLevel 98 -> ~2200 Hz
+            // Tıslama ve fan hışırtısını kesen tok dizel kabin yalıtımı (3200 Hz -> 1850 Hz)
             const normalizedNvh = Math.max(0, Math.min(1, (nvh - 55) / 45));
-            const targetFreq = 7500 - (normalizedNvh * 5300); // 7500 Hz down to 2200 Hz
+            const targetFreq = 3200 - (normalizedNvh * 1350);
             this.engineCabinFilter.frequency.setTargetAtTime(targetFreq, now, 0.15);
-            this.engineCabinFilter.Q.setTargetAtTime(1.0 + (normalizedNvh * 0.8), now, 0.15);
+            this.engineCabinFilter.Q.setTargetAtTime(0.85, now, 0.15);
         }
     }
 
@@ -884,7 +885,7 @@ startEngine() {
                 this.idleSource.loopEnd = activeBuffer.duration;
 
                 this.idleGain = this.ctx.createGain();
-                this.idleGain.gain.value = 1.0;
+                this.idleGain.gain.value = 0.54;
 
                 if (!this.enginePanner) {
                     this.enginePanner = this.ctx.createStereoPanner();
@@ -901,7 +902,7 @@ startEngine() {
                 if (!this.engineCabinFilter) {
                     this.engineCabinFilter = this.ctx.createBiquadFilter();
                     this.engineCabinFilter.type = 'lowpass';
-                    this.engineCabinFilter.frequency.value = 8000;
+                    this.engineCabinFilter.frequency.value = 3000;
                 }
 
                 this.idleSource.connect(this.engineBassFilter);
@@ -1046,28 +1047,27 @@ startEngine() {
         }
 
         
-        // Otobüs İçi Yolcu & Kabin Ambiyansı (Canlı yolcu doluluğuna duyarlı akustik)
+        // Otobüs İçi Klima / Havalandırma Ambiyansı (Yalnızca klima açıkken çok hafif üfler; tıslama yapmaz)
         if (this.sounds && this.sounds.cabinAmbience) {
-            const passCount = (typeof passengersCount === 'number') ? passengersCount : 20;
-            if (passCount <= 0) {
+            const acActive = (typeof Game !== 'undefined' && !!Game.isACOn);
+            if (!acActive || speed < 2) {
                 if (this.sounds.cabinAmbience.playing()) {
-                    this.sounds.cabinAmbience.fade(this.sounds.cabinAmbience.volume(), 0, 400);
+                    this.sounds.cabinAmbience.fade(this.sounds.cabinAmbience.volume(), 0, 300);
+                    setTimeout(() => { if ((!acActive || speed < 2) && this.sounds.cabinAmbience) this.sounds.cabinAmbience.pause(); }, 320);
                 }
             } else {
                 if (!this.sounds.cabinAmbience.playing()) {
                     this.sounds.cabinAmbience.volume(0);
                     this.sounds.cabinAmbience.play();
                 }
-                const occupancyFactor = Math.min(1.0, passCount / 40);
-                const targetCabinVol = Math.min(0.25, (0.04 + (speed / 120) * 0.08) * (0.3 + occupancyFactor * 0.7));
-                this.sounds.cabinAmbience.volume(targetCabinVol);
+                this.sounds.cabinAmbience.volume(0.04);
             }
         }
 
-        // 1. ASFALT YOL SESİ (freesound_road_asphalt.mp3)
+        // 1. ASFALT YOL SESİ (freesound_road_asphalt.mp3 - tıslama yapmayan yumuşak lastik yuvarlanması)
         if (isAsphalt && this.sounds.roadAsphalt) {
-            const targetAsphaltVol = Math.min(0.50, (speed / 90) * 0.42 + windowVolBoost);
-            const targetAsphaltRate = Math.min(1.30, Math.max(0.75, 0.75 + (speed / 100) * 0.45));
+            const targetAsphaltVol = Math.min(0.18, (speed / 100) * 0.14 + (this.isWindowOpen ? 0.06 : 0));
+            const targetAsphaltRate = Math.min(1.18, Math.max(0.78, 0.78 + (speed / 110) * 0.35));
             if (!this.sounds.roadAsphalt.playing()) {
                 this.sounds.roadAsphalt.volume(0);
                 this.sounds.roadAsphalt.play();
@@ -1109,18 +1109,10 @@ startEngine() {
             setTimeout(() => { if (!isSandDirt && this.sounds.roadGravelAsphalt) this.sounds.roadGravelAsphalt.pause(); }, 200);
         }
 
-        // 4. KABİN VE AÇIK CAM RÜZGAR SESİ (freesound_road_wind_ambience.mp3)
-        if (speed >= 25 && this.sounds.roadWind) {
-            let targetWindVol = Math.min(0.35, ((speed - 25) / 75) * 0.30);
-            if (this.isWindowOpen) {
-                targetWindVol = Math.min(0.80, targetWindVol + 0.35 + ((speed - 25) / 75) * 0.25);
-            } else {
-                // NVH Akustik Çift Cam İzolasyonu: Setra (%98) ve Travego (%95) kabinlerinde rüzgar sesi yarı yarıya sönümlenir
-                const nvh = this.activeBusNvh || 70;
-                const windDamping = Math.max(0.45, 1.0 - (((nvh - 55) / 45) * 0.50));
-                targetWindVol *= windDamping;
-            }
-            const targetWindRate = Math.min(1.30, 0.90 + (speed / 100) * 0.30);
+        // 4. AÇIK CAM RÜZGAR SESİ (Cam kapalıyken tamamen sessizdir, tıslama yapmaz; yalnız Home ile cam açıkken ve yüksek hızda hafif duyulur)
+        if (this.isWindowOpen && speed >= 65 && this.sounds.roadWind) {
+            const targetWindVol = Math.min(0.22, ((speed - 65) / 65) * 0.20);
+            const targetWindRate = Math.min(1.15, 0.90 + (speed / 120) * 0.20);
             if (!this.sounds.roadWind.playing()) {
                 this.sounds.roadWind.volume(0);
                 this.sounds.roadWind.play();
@@ -1128,8 +1120,8 @@ startEngine() {
             this.sounds.roadWind.volume(targetWindVol);
             this.sounds.roadWind.rate(targetWindRate);
         } else if (this.sounds.roadWind && this.sounds.roadWind.playing()) {
-            this.sounds.roadWind.fade(this.sounds.roadWind.volume(), 0, 250);
-            setTimeout(() => { if (speed < 25 && this.sounds.roadWind) this.sounds.roadWind.pause(); }, 250);
+            this.sounds.roadWind.fade(this.sounds.roadWind.volume(), 0, 200);
+            setTimeout(() => { if ((!this.isWindowOpen || speed < 65) && this.sounds.roadWind) this.sounds.roadWind.pause(); }, 220);
         }
 
         // 5. Yol derz vuruntusu (davul/çekiç hissini önlemek için kaldırıldı)
@@ -1662,28 +1654,34 @@ startEngine() {
         });
     }
 
-    updateEngineSound(speed, rpm = null, gear = null) {
-        if (!this.isEngineRunning || !this.idleSource) return;
+    updateEngineSound(speed, rpm = null, gear = null, isThrottle = false) {
+        if (!this.isEngineRunning || !this.idleSource || !this.ctx) return;
         
-        // Vites Değişimi Kontrolü (Hava tahliye sesi)
         if (gear !== null && gear !== this.currentGear) {
-            if (gear > this.currentGear) {
-                // Vites büyüttüğünde tıslama
-                this.playGearShiftSound();
-            }
             this.currentGear = gear;
         }
 
-        // RÖLANTİ SESİ ASLA KALINLAŞIP İNCELMEYECEK - 100% SABİT DOĞAL TON (1.000)
-        // Hiçbir devirde veya hızda rölanti sesi suni olarak inceltilmez ya da kalınlaştırılmaz.
-        if (this.idleSource.playbackRate && this.idleSource.playbackRate.value !== 1.0) {
-            this.idleSource.playbackRate.setValueAtTime(1.0, this.ctx.currentTime);
-        }
-        this.currentIdleRate = 1.0;
+        const now = this.ctx.currentTime;
+        const safeRpm = (typeof rpm === 'number' && !isNaN(rpm)) ? rpm : 800;
+        const rpmRatio = Math.max(0, Math.min(1, (safeRpm - 800) / 1600));
 
-        // RÖLANTİ SES SEVİYESİ ASLA YÜKSELİP ALÇALMAYACAK - 100% SABİT SEVİYE (1.000)
-        if (this.idleGain && this.idleGain.gain && this.idleGain.gain.value !== 1.0) {
-            this.idleGain.gain.setValueAtTime(1.0, this.ctx.currentTime);
+        // DOĞAL DİZEL TORK TEPKİSİ: Gaza basıldığında motor tok bir şekilde devirlenir (1.00 -> 1.23), sıfır tıslama!
+        const targetRate = 1.0 + (rpmRatio * 0.18) + (isThrottle ? 0.05 : 0.0);
+        if (this.idleSource.playbackRate) {
+            this.idleSource.playbackRate.setTargetAtTime(targetRate, now, 0.12);
+        }
+        this.currentIdleRate = targetRate;
+
+        // Rölantide sakin (0.54), gaza basıldığında tok ve güçlü (0.76); hostes anonsunda otomatik kısılır
+        const duckMult = this._isDuckedForAnnouncement ? 0.38 : 1.0;
+        const targetEngineGain = (0.54 + (isThrottle ? 0.16 : 0.0) + (rpmRatio * 0.06)) * duckMult;
+        if (this.idleGain && this.idleGain.gain) {
+            this.idleGain.gain.setTargetAtTime(targetEngineGain, now, 0.10);
+        }
+
+        if (this.engineBassFilter) {
+            const baseBoost = (this.activeSoundProfile && typeof this.activeSoundProfile.bassBoost === 'number') ? this.activeSoundProfile.bassBoost : 0;
+            this.engineBassFilter.gain.setTargetAtTime(baseBoost + (isThrottle ? 2.8 : 0), now, 0.14);
         }
 
         // Retarder kontrolü (Frenleme esnasında)
@@ -1996,110 +1994,41 @@ startEngine() {
     }
     
     startExhaustDrag() {
-        if (!this.ctx || this.exhaustDragSource) return;
-        
-        const bufferSize = this.ctx.sampleRate * 2;
-        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
-        
-        this.exhaustDragSource = this.ctx.createBufferSource();
-        this.exhaustDragSource.buffer = buffer;
-        this.exhaustDragSource.loop = true;
-        
-        const filter = this.ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = 4000;
-        
-        this.exhaustDragGain = this.ctx.createGain();
-        this.exhaustDragGain.gain.value = 0;
-        
-        this.exhaustDragSource.connect(filter);
-        filter.connect(this.exhaustDragGain);
-        this.exhaustDragGain.connect(this.environmentMixer);
-        
-        this.exhaustDragSource.start(0);
+        this.stopExhaustDrag();
     }
     
     stopExhaustDrag() {
         if (this.exhaustDragSource) {
-            this.exhaustDragSource.stop();
-            this.exhaustDragSource.disconnect();
+            try { this.exhaustDragSource.stop(); this.exhaustDragSource.disconnect(); } catch (e) {}
             this.exhaustDragSource = null;
         }
         this.exhaustDragGain = null;
     }
     
     startExhaustWarning() {
-        if (!this.ctx || this.exhaustWarningSource) return;
-        
-        const bufferSize = this.ctx.sampleRate * 2;
-        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1; // Beyaz gürültü (tıslama/hava kaçağı)
-        }
-        
-        this.exhaustWarningSource = this.ctx.createBufferSource();
-        this.exhaustWarningSource.buffer = buffer;
-        this.exhaustWarningSource.loop = true;
-        
-        const filter = this.ctx.createBiquadFilter();
-        filter.type = 'highpass';
-        filter.frequency.value = 5000; // İnce hava ıslığı/tıslama sesi
-        
-        this.exhaustWarningGain = this.ctx.createGain();
-        this.exhaustWarningGain.gain.value = 0;
-        
-        this.exhaustWarningSource.connect(filter);
-        filter.connect(this.exhaustWarningGain);
-        this.exhaustWarningGain.connect(this.environmentMixer);
-        
-        this.exhaustWarningSource.start(0);
+        // Yapay 5000 Hz beyaz gürültü tıslaması ("tısssssssss") tamamen devre dışı bırakıldı
+        this.stopExhaustWarning();
     }
     
     stopExhaustWarning() {
         if (this.exhaustWarningSource) {
-            this.exhaustWarningSource.stop();
-            this.exhaustWarningSource.disconnect();
+            try { this.exhaustWarningSource.stop(); this.exhaustWarningSource.disconnect(); } catch (e) {}
             this.exhaustWarningSource = null;
         }
         this.exhaustWarningGain = null;
     }
     
     updateExhaustWarning(speed) {
-        if (!this.exhaustWarningGain) return;
-        if (speed < 5) {
-            this.exhaustWarningGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
-        } else {
-            // Hız arttıkça tıslama daha çok duyulur
-            let targetVol = Math.min(0.3, 0.05 + (speed / 200));
-            this.exhaustWarningGain.gain.setTargetAtTime(targetVol, this.ctx.currentTime, 0.2);
-        }
+        return;
     }
 
     updateExhaustDrag(speed) {
-        if (!this.exhaustDragGain || !this.ctx) return;
-        if (speed < 5) {
-            this.exhaustDragGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
-        } else {
-            // Kopuk egzoz sürtünme gürültüsü
-            let targetVol = Math.min(0.45, 0.10 + (speed / 160));
-            this.exhaustDragGain.gain.setTargetAtTime(targetVol, this.ctx.currentTime, 0.2);
-        }
+        return;
     }
     
-    // --- VİTES SESİ (Freesound Pnömatik Şanzıman Hava Tahliyesi) ---
+    // --- VİTES SESİ (Gaza basarken tıslama yapmaması için sessiz geçiş) ---
     playGearShiftSound() {
-        if (this.sounds && this.sounds.ecasLeveling) {
-            try {
-                const id = this.sounds.ecasLeveling.play();
-                this.sounds.ecasLeveling.volume(0.28, id);
-                this.sounds.ecasLeveling.rate(1.22, id);
-            } catch (e) {}
-        }
+        return;
     }
 
     playDoorOpen() {
@@ -2682,11 +2611,79 @@ startEngine() {
         });
     }
 
+    // --- HOSTES & DURAK ANONSLARI İÇİN OTOMATİK MOTOR KISMA (DUCKING) + KABİN HOPARLÖR ÖN-YÜKSELTEÇ ---
+    duckForAnnouncement(durationMs = 5600) {
+        this._isDuckedForAnnouncement = true;
+        if (this._duckRestoreTimer) {
+            clearTimeout(this._duckRestoreTimer);
+            this._duckRestoreTimer = null;
+        }
+        const baseVol = (typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : 1.0;
+        if (this.environmentMixer && this.ctx) {
+            try {
+                this.environmentMixer.gain.setTargetAtTime(baseVol * 0.24, this.ctx.currentTime, 0.06);
+            } catch (e) {}
+        }
+        if (this.sounds && this.sounds.passengerMurmur && this.sounds.passengerMurmur.playing()) {
+            try { this.sounds.passengerMurmur.volume(0.03); } catch (e) {}
+        }
+        if (durationMs > 0) {
+            this._duckRestoreTimer = setTimeout(() => {
+                this.unduckAnnouncement();
+            }, durationMs);
+        }
+    }
+
+    unduckAnnouncement() {
+        this._isDuckedForAnnouncement = false;
+        if (this._duckRestoreTimer) {
+            clearTimeout(this._duckRestoreTimer);
+            this._duckRestoreTimer = null;
+        }
+        const baseVol = (typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : 1.0;
+        if (this.environmentMixer && this.ctx) {
+            try {
+                this.environmentMixer.gain.setTargetAtTime(baseVol, this.ctx.currentTime, 0.18);
+            } catch (e) {}
+        }
+    }
+
+    boostSpeechAudioElement(audioEl, boostGain = 1.95) {
+        if (!audioEl) return;
+        audioEl.volume = 1.0;
+        try {
+            this.init();
+            if (!this.ctx) return;
+            if (!this._speechBoostBus) {
+                const gain = this.ctx.createGain();
+                gain.gain.value = boostGain;
+                const eq = this.ctx.createBiquadFilter();
+                eq.type = 'peaking';
+                eq.frequency.value = 2600;
+                eq.Q.value = 1.0;
+                eq.gain.value = 3.5;
+                const comp = this.ctx.createDynamicsCompressor();
+                comp.threshold.value = -8;
+                comp.knee.value = 6;
+                comp.ratio.value = 6;
+                comp.attack.value = 0.003;
+                comp.release.value = 0.12;
+                eq.connect(gain);
+                gain.connect(comp);
+                comp.connect(this.ctx.destination);
+                this._speechBoostBus = eq;
+            }
+            const srcNode = this.ctx.createMediaElementSource(audioEl);
+            srcNode.connect(this._speechBoostBus);
+        } catch (e) {}
+    }
+
     // --- AKILLI VE GERÇEKÇİ BELEDİYE OTOBÜSÜ ANONS SİSTEMİ (IBIS / TEKULAŞ / İETT STANDARDI) ---
     playBusAnnouncement(phase, stopName, options = {}) {
         if (!stopName) return;
+        this.duckForAnnouncement(6500);
         this.playIBISChime();
-        if (typeof window.HumanNpcVoices !== "undefined" && typeof window.HumanNpcVoices.notifyBusAnnouncement === "function") { window.HumanNpcVoices.notifyBusAnnouncement(4800); }
+        if (typeof window.HumanNpcVoices !== "undefined" && typeof window.HumanNpcVoices.notifyBusAnnouncement === "function") { window.HumanNpcVoices.notifyBusAnnouncement(5500); }
         
         let anonsText = '';
         if (phase === 'depart') {
@@ -3578,8 +3575,10 @@ startEngine() {
 
             const utter = new SpeechSynthesisUtterance(cleanText);
             utter.lang = 'tr-TR';
+            utter.volume = 1.0;
             utter.rate = 1.0;
             utter.pitch = 1.0;
+            this.duckForAnnouncement(Math.min(12000, Math.max(3200, cleanText.length * 85)));
 
             const voices = window.speechSynthesis.getVoices();
             if (voices && voices.length > 0) {
@@ -3593,6 +3592,7 @@ startEngine() {
             const finish = () => {
                 if (ended) return;
                 ended = true;
+                this.unduckAnnouncement();
                 if (this.activeUtterance === utter) this.activeUtterance = null;
                 if (typeof onEndCallback === 'function') onEndCallback();
             };
@@ -3653,11 +3653,15 @@ startEngine() {
             if (cachedAudio) {
                 if (this.sequenceId !== currentSeqId) return;
                 const ttsAudio = new Audio("data:audio/mp3;base64," + cachedAudio);
+                this.boostSpeechAudioElement(ttsAudio, 1.95);
+                this.duckForAnnouncement(Math.min(12000, Math.max(3500, text.length * 85)));
                 this.currentTTSAudio = ttsAudio;
-                if (typeof onEndCallback === 'function') {
-                    ttsAudio.onended = () => onEndCallback();
-                }
+                ttsAudio.onended = () => {
+                    this.unduckAnnouncement();
+                    if (typeof onEndCallback === 'function') onEndCallback();
+                };
                 ttsAudio.play().catch(e => {
+                    this.unduckAnnouncement();
                     if (typeof onEndCallback === 'function') onEndCallback();
                 });
                 return;
@@ -3688,11 +3692,15 @@ startEngine() {
                     if (this.sequenceId !== currentSeqId) return;
                     try { localStorage.setItem(cacheKey, data.audioContent); } catch (e) {}
                     const ttsAudio = new Audio("data:audio/mp3;base64," + data.audioContent);
+                    this.boostSpeechAudioElement(ttsAudio, 1.95);
+                    this.duckForAnnouncement(Math.min(12000, Math.max(3500, text.length * 85)));
                     this.currentTTSAudio = ttsAudio;
-                    if (typeof onEndCallback === 'function') {
-                        ttsAudio.onended = () => onEndCallback();
-                    }
+                    ttsAudio.onended = () => {
+                        this.unduckAnnouncement();
+                        if (typeof onEndCallback === 'function') onEndCallback();
+                    };
                     ttsAudio.play().catch(e => {
+                        this.unduckAnnouncement();
                         if (typeof onEndCallback === 'function') onEndCallback();
                     });
                     this.googleTtsDisabled = false;
@@ -3750,9 +3758,12 @@ startEngine() {
 
             if (cachedAudio) {
                 const aud = new Audio("data:audio/mp3;base64," + cachedAudio);
+                this.boostSpeechAudioElement(aud, 1.95);
+                this.duckForAnnouncement(Math.min(12000, Math.max(3500, text.length * 85)));
                 this.currentSequenceAudio = aud;
                 aud.onended = () => {
                     if (this.sequenceId !== currentSeqId) return;
+                    if (index >= textArray.length) this.unduckAnnouncement();
                     setTimeout(playNext, 120);
                 };
                 aud.play().catch(e => {
@@ -4061,35 +4072,9 @@ startEngine() {
                 return;
             }
 
-            // 1. CANLI TURBOŞARJ ISLIĞI (Freesound: freesound_turbo_whistle.mp3)
-            const nvhDamping = Math.max(0.35, 1.0 - (((this.activeBusNvh || 75) - 55) / 50) * 0.55);
-            const isTurboAudible = (isThrottle && rpm > 1150 && turboBoostBar > 0.35);
-
-            if (this.sounds && this.sounds.turboWhistle) {
-                const targetVol = isTurboAudible ? Math.min(0.22, (turboBoostBar / 2.4) * 0.18 * nvhDamping) : 0.0;
-                const targetRate = Math.min(1.35, Math.max(0.82, 0.85 + (turboBoostBar / 2.4) * 0.45));
-                if (targetVol > 0.01) {
-                    if (!this.sounds.turboWhistle.playing()) {
-                        this.sounds.turboWhistle.volume(0.01);
-                        this.sounds.turboWhistle.play();
-                    }
-                    this.sounds.turboWhistle.volume(targetVol);
-                    this.sounds.turboWhistle.rate(targetRate);
-                } else if (this.sounds.turboWhistle.playing()) {
-                    this.sounds.turboWhistle.fade(this.sounds.turboWhistle.volume(), 0, 250);
-                    setTimeout(() => {
-                        try { if (!this._wasThrottleOn && this.sounds.turboWhistle) this.sounds.turboWhistle.pause(); } catch(e){}
-                    }, 260);
-                }
-            }
-
-            // Yüksek turbo basıncında gazdan ayak çekildiğinde Freesound Wastegate tahliyesi
-            if (this._wasThrottleOn && !isThrottle && turboBoostBar >= 1.35 && speed > 18) {
-                const nowMs = Date.now();
-                if (!this._lastWastegateTime || (nowMs - this._lastWastegateTime > 4500)) {
-                    this._lastWastegateTime = nowMs;
-                    this.playWastegateFlutter(turboBoostBar);
-                }
+            // 1. TURBO TISLAMASI VE WASTEGATE DEVRE DIŞI: Gaza basıldığında "tısssssssss" yapmaması için tamamen susturuldu!
+            if (this.sounds && this.sounds.turboWhistle && this.sounds.turboWhistle.playing()) {
+                this.sounds.turboWhistle.stop();
             }
             this._wasThrottleOn = !!isThrottle;
 

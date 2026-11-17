@@ -285,7 +285,7 @@
                 
                 if (distMeters >= 50) {
                     slopePct = (altDiff / distMeters) * 100;
-                    slopePct = Math.max(-12.0, Math.min(12.0, slopePct));
+                    slopePct = Math.max(-7.0, Math.min(7.0, slopePct));
                 } else {
                     slopePct = 0;
                 }
