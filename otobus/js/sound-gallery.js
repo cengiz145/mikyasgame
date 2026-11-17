@@ -1276,19 +1276,19 @@ const SoundGallery = {
         {
             id: "human_deniz_wheeze_laugh",
             category: "human",
-            icon: "🫖",
-            title: "Deniz Abla (Tam 1 Dakika!): Otobüste Utanıp Ağzını Kapatarak Ciğerden Viyaklama Krizi!",
-            specs: "60+ Saniye • Sıfır 'Hah' Sesi • Utanıp Ağzını Sıkarak Sadece Ciğerden Viyaklayarak Gülme",
-            desc: "Deniz ablanın otobüste millet duymasın diye utanıp ağzını sımsıkı kapattığı, tek bir 'hah' diyemeden tam 1 dakika boyunca sadece ciğerinden çaydanlık/silecek gibi viyaklayarak güldüğü sahne!",
+            icon: "🤣",
+            title: "Atarlı Mahalle Ablası Deniz: Katıla Katıla Kahkaha Krizi ('Pazar Arabası Fırladı!')",
+            specs: "Saf Tek Çekim Orijinal Deniz Sesi • Sıfır Efekt / Sıfır Kurgu",
+            desc: "Deniz ablamızın hiçbir dış efekt veya montaj olmadan kendi saf sesiyle katıla katıla dalağı şişerek güldüğü tek parça orijinal kayıt!",
             playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playWheezeLaughPhoneDrama) window.HumanNpcVoices.playWheezeLaughPhoneDrama("deniz", true); }
         },
         {
             id: "human_deniz_shutup_laugh",
             category: "human",
             icon: "🤭",
-            title: "Deniz Abla Q İkaz Anonsu Sonrası Utancından Fısıldayarak Kapatıyor!",
-            specs: "Sıfır 'Hah' Sesi • Utanıp Ağzını Sıkarak Telefon Kapatma (deniz_shutup_laugh.mp3)",
-            desc: "Şoför Q tuşuyla ikaz anonsu geçince Deniz ablanın utancından yerin dibine girip 'Ay çok özür dilerim vallahi tutamadım kendimi sustum, kız kapat rezil oldum otobüse!' deyişi.",
+            title: "Deniz Abla Q İkaz Anonsu Sonrası Gülmesini Zor Tutarak Kapatıyor!",
+            specs: "Saf Tek Çekim Orijinal Deniz Sesi (deniz_shutup_laugh.mp3)",
+            desc: "Şoför Q tuşuyla ikaz anonsu geçince Deniz ablanın gülmesini zor tutarak 'Ay tamam be yemeyin adamı sustuk işte, kız kapat otobüsten atacak şimdi beni hahaha!' deyişi.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("deniz_shutup_laugh.mp3", { pan: 0.42, volume: 1.0, force: true, interrupt: true }); }
         },
         {

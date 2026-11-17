@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p23';
+    const AUDIO_VER = '?v=20261117p24';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -2888,27 +2888,12 @@
                 : (choice === 'f' ? 'wheeze_laugh_phone_f1.mp3' : 'wheeze_laugh_phone_m1.mp3');
             const pan = choice === 'm' ? -0.42 : 0.44;
             const label = choice === 'deniz'
-                ? 'Deniz Abla (1 Dakika Boyunca Utanıp Ağzını Kapatarak Ciğerden Viyaklama Krizi): "Pffft... Kız sus otobüsteyim rezil olacağım ağzımı kapattım... VİU-VİU-VİU!! Ses çıkmasın diye dudaklarımı ısırıyorum ciğerimden düdük ötüyor... VİU-VİU-VİU!! Ön koltuktaki teyze ters ters bakıyor utancımdan yerin dibine girdim!!"'
+                ? 'Mahalle Ablası Deniz (Katıla Katıla Kahkaha Krizi): "AHAHAHA!! Ay kız dur dalağım şişti nefes alamıyorum! Koca herif otobüsün peşinden koşarken pazar arabasının tekeri fırladı boylu boyunca yapıştı yere kız AHAHAHA!! Karnıma kramp girdi gülmekten çatlayacağım!!"'
                 : (choice === 'f'
                     ? 'Telefonda Katıla Katıla Gülen Kız: "AHAHAHA!! Ay kız dur nefes alamıyorum boğulacağım! Çocuğun çantası kapıya sıkıştı pantolonu cırt diye yırtıldı kız AHAHAHA!!"'
                     : 'Telefonda Ciğeri Sökülerek Gülen Yolcu: "AHAHAHA!! Ay dur nefesim kesildi! Adam otobüse yetişecem diye koşarken ayağından terlik uçtu lan AHAHAHA!!"');
 
-            this.wheezeLaughActiveUntil = performance.now() + 80000;
-            // Bulaşıcı Kahkaha Zinciri: Arka beşlideki gençler de 11. saniyede dayanamayıp kıkırdamaya katılır!
-            if (!this._stuntTimers) this._stuntTimers = [];
-            if (force || (this.roster && this.roster.ogrenci > 0) || (typeof game !== 'undefined' && (game.passengersOnBoard || 0) >= 7)) {
-                this._stuntTimers.push(setTimeout(() => {
-                    if (force || performance.now() < (this.wheezeLaughActiveUntil || 0)) {
-                        this.playClip('micro_students_giggle.mp3', {
-                            pan: -pan,
-                            seatRow: 'rear',
-                            volume: 0.68,
-                            force,
-                            backgroundSfx: true
-                        });
-                    }
-                }, 11500));
-            }
+            this.wheezeLaughActiveUntil = performance.now() + 30000;
             this.playClip(file, {
                 pan,
                 volume: 0.98,
