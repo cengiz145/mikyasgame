@@ -1277,9 +1277,9 @@ const SoundGallery = {
             id: "human_deniz_wheeze_laugh",
             category: "human",
             icon: "🫁",
-            title: "Atarlı Mahalle Ablası Deniz: 'Haa' Diyemeden Ciğeri Öterek Hırıltılı Gülme Krizi!",
-            specs: "Sıfır 'Ha-Ha' Sesi • Ciğerdeki Havayı Sonuna Kadar Boşaltan Hırıltılı Gülüş",
-            desc: "Deniz'in gülmekten sesi çıkmayıp ciğerindeki tüm havayı 'hhhhhhhhhh - hırr hırr' diye boşalttığı, nefes nefese fısıldayarak olayı anlattığı gülme krizi!",
+            title: "Atarlı Mahalle Ablası Deniz: Astımı Tutarak Tıkana Öksüre Gülme Krizi! ('Fısfısımı Ver!')",
+            specs: "30 Saniyelik Kesintisiz Astımlı Hırıltı, Öksürük Krizi & Gülerken Anlatma",
+            desc: "Deniz'in gülmekten astımının tuttuğu, göğsü hırıldayıp öksürük krizine girerek 'Ciğerim düdük gibi ötüyor boğulacağım kız fısfısımı ver!' diye haykırdığı 30 saniyelik sahne!",
             playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playWheezeLaughPhoneDrama) window.HumanNpcVoices.playWheezeLaughPhoneDrama("deniz", true); }
         },
         {
