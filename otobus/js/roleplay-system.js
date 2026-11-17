@@ -120,8 +120,10 @@
 
                 const msg = "🎟️ [Otogar Anonsu] 3'lü zil çaldı (Dı-dı-dııın), bagaj kuponları zımbalandı (+45 ₺ Bagaj Geliri).";
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("Otogar anonsu yapıldı. Bagaj kuponları zımbalanarak yolculara teslim edildi. Kasanıza kırk beş lira eklendi.");
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playLuggageStapled())) {
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Otogar anonsu yapıldı. Bagaj kuponları zımbalanarak yolculara teslim edildi. Kasanıza kırk beş lira eklendi.");
+                    }
                 }
             }, 1100);
         },

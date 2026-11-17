@@ -1,15 +1,15 @@
-/* ==========================================================================
-   OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
-   (BUS CONCEPT GUIDE & EDUCATIONAL ONBOARDING SYSTEM)
-   - Hiç otobüs şoförlüğü tecrübesi olmayan herkes için her kavramı açıklar:
-     * Ne işe yarar?
-     * Neden var / Neden hayatidir?
-     * Nasıl kullanılır?
-   - F2 veya Shift + K: İnteraktif Otobüs Kavramları Sözlüğü (NVDA / JAWS Uyumlu)
-   - Shift + O: Eğitici Kılavuz Modu Aç/Kapat (Açıp kapatırken detaylı anlatım)
-   ========================================================================== */
+/* ========================================================================== 
+OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
+(BUS CONCEPT GUIDE & EDUCATIONAL ONBOARDING SYSTEM)
+- Hiç otobüs şoförlüğü tecrübesi olmayan herkes için her kavramı açıklar:
+ * Ne işe yarar?
+ * Neden var / Neden hayatidir?
+ * Nasıl kullanılır?
+- F2 veya Shift + K: İnteraktif Otobüs Kavramları Sözlüğü (NVDA / JAWS Uyumlu)
+- Shift + O: Eğitici Kılavuz Modu Aç/Kapat (Açıp kapatırken detaylı anlatım)
+========================================================================== */
 
-(function(window) {
+(function (window) {
     'use strict';
 
     const BUS_CONCEPTS = [
@@ -113,14 +113,16 @@
         /**
          * Eğitici Modu Aç / Kapat (Shift + O)
          */
-        toggleEducationalMode: function() {
+        toggleEducationalMode: function () {
             this.isEducationalMode = !this.isEducationalMode;
-            const modeText = this.isEducationalMode 
-                ? "Eğitici Kaptan Modu AÇIK. Tuşlara bastığınızda kavramların ne işe yaradığı detaylıca seslendirilir." 
+            const modeText = this.isEducationalMode
+                ? "Eğitici Kaptan Modu AÇIK. Tuşlara bastığınızda kavramların ne işe yaradığı detaylıca seslendirilir."
                 : "Hızlı Kaptan Modu AÇIK. Kısaltılmış durum bildirimleri devrede.";
-            
-            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                audio.speak(modeText);
+
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playEduModeToggle(this.isEducationalMode))) {
+                if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
+                    audio.speak(modeText);
+                }
             }
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
                 audio.updateNvdaLiveRegion("🎓 " + modeText);
@@ -134,14 +136,14 @@
         /**
          * Eylem Gerçekleştiğinde Eğitici Açıklama Seslendir
          */
-        announceAction: function(actionKey, isEngaged, details = {}) {
+        announceAction: function (actionKey, isEngaged, details = {}) {
             if (!this.isEducationalMode) {
                 // Kısa mod: Sadece temel bildirim
                 return false;
             }
 
             let text = "";
-            switch(actionKey) {
+            switch (actionKey) {
                 case "retarder":
                     if (isEngaged) {
                         text = `Retarder Kademe ${details.level || 1}. Yokuş iniş şanzıman frenidir. Balatalara dokunmadan şanzıman yağı direnciyle otobüsü yavaşlatır; balataların ısınıp frenin şişmesini önler.`;
@@ -233,7 +235,7 @@
         /**
          * F2 / Shift + K İnteraktif Kavramlar Sözlüğü Modalını Aç
          */
-        openModal: function() {
+        openModal: function () {
             let modal = document.getElementById('bus-concept-modal');
             if (!modal) {
                 this.createModalDOM();
@@ -259,7 +261,7 @@
         /**
          * Modalı Kapat
          */
-        closeModal: function() {
+        closeModal: function () {
             const modal = document.getElementById('bus-concept-modal');
             if (modal) {
                 modal.classList.add('hidden');
@@ -273,7 +275,7 @@
         /**
          * Modal DOM İskeletini Oluştur
          */
-        createModalDOM: function() {
+        createModalDOM: function () {
             if (document.getElementById('bus-concept-modal')) return;
 
             const modalHtml = `
@@ -336,12 +338,12 @@
         /**
          * Kavram Listesini Ekrana Bas
          */
-        renderConceptList: function(filter = 'all') {
+        renderConceptList: function (filter = 'all') {
             const container = document.getElementById('concept-cards-container');
             if (!container) return;
 
-            const filtered = (filter === 'all') 
-                ? BUS_CONCEPTS 
+            const filtered = (filter === 'all')
+                ? BUS_CONCEPTS
                 : BUS_CONCEPTS.filter(c => c.category === filter);
 
             container.innerHTML = filtered.map((c, idx) => `
@@ -380,17 +382,19 @@
         /**
          * Seçilen Kavramı Baştan Sona Detaylı Seslendir
          */
-        speakConcept: function(conceptId) {
+        speakConcept: function (conceptId) {
             const concept = BUS_CONCEPTS.find(c => c.id === conceptId);
             if (!concept) return;
 
             const fullText = `${concept.title}. Kısayol: ${concept.key}. Ne işe yarar: ${concept.whatIs}. Neden var: ${concept.whyExists}. Nasıl kullanılır: ${concept.howToUse}`;
 
-            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                audio.speak(fullText);
-            }
-            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
-                audio.updateNvdaLiveRegion("📖 " + fullText);
+            if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playConceptGuide(concept.id, "📖 " + fullText))) {
+                if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
+                    audio.speak(fullText);
+                }
+                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                    audio.updateNvdaLiveRegion("📖 " + fullText);
+                }
             }
             if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
                 UI.showToast(`📖 ${concept.title}`, "info");

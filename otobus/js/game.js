@@ -5100,7 +5100,9 @@ const Game = {
         document.getElementById('nav-feedback').style.color = '#ef4444';
         
         this.showWarning("ARAÇ PERT OLDU! ÇEKİCİ ÇAĞRILIYOR.");
-        audio.speak("Aracınız çok ağır hasar aldı ve yola devam edemezsiniz. Çekici çağrılıyor, lütfen bekleyin. Sizi sanayiye götürüyoruz.");
+        if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playTowArrive())) {
+            audio.speak("Aracınız çok ağır hasar aldı ve yola devam edemezsiniz. Çekici çağrılıyor, lütfen bekleyin. Sizi sanayiye götürüyoruz.");
+        }
         
         // Kaza anını kaydet (Kaldığımız yerden devam etmek için)
         this.savedState = {
@@ -6086,8 +6088,10 @@ const Game = {
             const currentTime = performance.now();
             if (!this.lastTowDriverWarnTime || currentTime - this.lastTowDriverWarnTime > 5000) {
                 this.lastTowDriverWarnTime = currentTime;
-                if (typeof audio.speak === 'function') {
-                    audio.speak("Merak etme usta, kontrol bende. Sen işi bana bırak.");
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playTowDrivingWarn())) {
+                    if (typeof audio.speak === 'function') {
+                        audio.speak("Merak etme usta, kontrol bende. Sen işi bana bırak.");
+                    }
                 }
             }
             return; // Tuş işlemini tamamen iptal et

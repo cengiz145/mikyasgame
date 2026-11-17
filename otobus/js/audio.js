@@ -2717,6 +2717,11 @@ startEngine() {
                     } else if (phase === 'arrive' && options && options.isFinal) {
                         this.updateNvdaLiveRegion(anonsText);
                         if (window.HumanNpcVoices.playIbisFinalStop()) return;
+                    } else if (phase === 'arrive' && stopName) {
+                        if (window.HumanNpcVoices.playStopHubAnnouncement(stopName)) {
+                            this.updateNvdaLiveRegion(anonsText);
+                            return;
+                        }
                     }
                 }
                 this.speak(anonsText);

@@ -803,7 +803,22 @@
                         toastText: '🔥 Yolcu: "Kaptan evladım donduk arkada, klimayı kaloriferi açsana! (K tuşu)"',
                         toastType: 'info'
                     });
+                    return;
                 }
+            }
+
+            if (typeof SmartEnvironmentEngine !== 'undefined' && SmartEnvironmentEngine.currentEnv === 'mountain' && gameObj.speed > 55 && (!gameObj.retarderLevel || gameObj.retarderLevel === 0) && !this._mountainWarned) {
+                this._mountainWarned = true;
+                this.lastSmartRemindTime = now;
+                this.playClip('mountain_retarder_warn.mp3', {
+                    pan: 0,
+                    volume: 0.95,
+                    nvdaText: 'Eğitmen Notu: Dik rampa inişinde balataları yakmamak için B tuşuyla retarderi devreye alın!',
+                    toastText: '⛰️ Eğitmen Notu: "Dik rampa inişindeyiz kaptan; balataları yakmamak için B tuşuyla retarderi aç!"',
+                    toastType: 'info'
+                });
+            } else if (typeof SmartEnvironmentEngine !== 'undefined' && SmartEnvironmentEngine.currentEnv !== 'mountain') {
+                this._mountainWarned = false;
             }
         },
 
@@ -847,6 +862,115 @@
         stopAcademyLesson: function () {
             this._academyQueue = null;
             this.stopAll();
+        },
+
+        // 12. F2 KAVRAMLAR BAŞUCU SÖZLÜĞÜ (9 KAVRAM), KURTARICI ÇEKİCİ, HGS, BAGAJ VE 20 İKONİK KURUMSAL DURAK ANONSU
+        playConceptGuide: function (conceptId, fallbackText) {
+            if (!this.isEnabled()) return false;
+            this.playClip('concept_' + conceptId + '.mp3', {
+                pan: 0,
+                volume: 1.0,
+                force: true,
+                interrupt: true,
+                nvdaText: fallbackText || ''
+            });
+            return true;
+        },
+
+        playEduModeToggle: function (isEdu) {
+            if (!this.isEnabled()) return false;
+            this.playClip(isEdu ? 'coach_edu_on.mp3' : 'coach_edu_off.mp3', {
+                pan: 0,
+                volume: 0.95,
+                force: true,
+                interrupt: true
+            });
+            return true;
+        },
+
+        playLuggageStapled: function () {
+            if (!this.isEnabled()) return false;
+            this.playClip('sfx_luggage_thud.mp3', { pan: 0.35, volume: 0.72, force: true, backgroundSfx: true });
+            setTimeout(() => {
+                this.playClip('luggage_stapled.mp3', {
+                    pan: 0.2,
+                    volume: 0.95,
+                    force: true,
+                    interrupt: true,
+                    nvdaText: 'Muavin: Bagaj kuponlarınız biletinize zımbalandı efendim, valizleriniz güvenli bagaja yerleşti. Artı 45 Lira bagaj geliri.'
+                });
+            }, 350);
+            return true;
+        },
+
+        playTowArrive: function () {
+            if (!this.isEnabled()) return false;
+            this.playClip('sfx_tow_winch.mp3', { pan: 0, volume: 0.78, force: true, backgroundSfx: true });
+            setTimeout(() => {
+                this.playClip('tow_arrive.mp3', {
+                    pan: -0.25,
+                    volume: 0.98,
+                    force: true,
+                    interrupt: true,
+                    nvdaText: 'Kurtarıcı çekici geldi, çelik halat bağlandı, sizi sanayi ustasına çekiyor!'
+                });
+            }, 520);
+            return true;
+        },
+
+        playTowDrivingWarn: function () {
+            if (!this.isEnabled()) return false;
+            this.playClip('tow_driving_warn.mp3', {
+                pan: -0.25,
+                volume: 0.95,
+                force: true,
+                interrupt: true
+            });
+            return true;
+        },
+
+        playHgsStatus: function (ok, textMsg) {
+            if (!this.isEnabled()) return false;
+            setTimeout(() => {
+                this.playClip(ok ? 'hgs_ok.mp3' : 'hgs_low.mp3', {
+                    pan: 0,
+                    volume: 0.94,
+                    force: true,
+                    interrupt: true,
+                    nvdaText: textMsg || ''
+                });
+            }, 260);
+            return true;
+        },
+
+        playStopHubAnnouncement: function (stopName) {
+            if (!this.canSpeakInCabin() || !stopName) return false;
+            const s = stopName.toLowerCase();
+            let file = null;
+            if (s.includes('değirmenaltı') || s.includes('üniversite caddesi') || s.includes('kampüs')) file = 'stop_degirmenalti.mp3';
+            else if (s.includes('köprübaşı')) file = 'stop_koprubasi.mp3';
+            else if (s.includes('valilik') || s.includes('hükümet caddesi')) file = 'stop_valilik.mp3';
+            else if (s.includes('şehir hastanesi')) file = 'stop_sehir_hastanesi.mp3';
+            else if (s.includes('spor salonu')) file = 'stop_spor_salonu.mp3';
+            else if (s.includes('altınova')) file = 'stop_altinova.mp3';
+            else if (s.includes('baykallar')) file = 'stop_baykallar.mp3';
+            else if (s.includes('süleymanpaşa yeni otobüs') || s.includes('tekirdağ otogar')) file = 'stop_tekirdag_otogar.mp3';
+            else if (s.includes('çorlu atatürk meydanı') || s.includes('kumyol')) file = 'stop_corlu_meydan.mp3';
+            else if (s.includes('çorlu devlet hastanesi')) file = 'stop_corlu_hastane.mp3';
+            else if (s.includes('çorlu tarihi tren') || s.includes('çorlu tren gar')) file = 'stop_corlu_gar.mp3';
+            else if (s.includes('çorlu atatürk havalimanı') || s.includes('havalimanı')) file = 'stop_corlu_havalimani.mp3';
+            else if (s.includes('saray') && (s.includes('çarşı') || s.includes('cumhuriyet meydanı'))) file = 'stop_saray_carsi.mp3';
+            else if (s.includes('velimeşe')) file = 'stop_velimese.mp3';
+            else if (s.includes('çerkezköy organize') || s.includes('çosb')) file = 'stop_cerkezkoy_osb.mp3';
+            else if (s.includes('marmaraereğlisi')) file = 'stop_eregli_otogar.mp3';
+            else if (s.includes('esenler') || s.includes('büyük istanbul')) file = 'stop_istanbul_otogar.mp3';
+            else if (s.includes('aşti') || s.includes('ankara otogar')) file = 'stop_ankara_asti.mp3';
+            else if (s.includes('izmir otogar')) file = 'stop_izmir_otogar.mp3';
+            else if (s.includes('bursa otogar') || s.includes('bursa büyükşehir')) file = 'stop_bursa_otogar.mp3';
+
+            if (!file) return false;
+            this.playClip(file, { pan: 0, volume: 0.94, interrupt: true });
+            return true;
         }
     };
 

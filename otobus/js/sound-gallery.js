@@ -768,6 +768,168 @@ const SoundGallery = {
                     audio.sounds.roadWind.play();
                 }
             }
+        },
+        {
+            id: "human_taxi_left",
+            category: "human",
+            icon: "🚕",
+            title: "Sinirli Sol Şerit Sürücüsü (Çarpışma)",
+            specs: "ElevenLabs v4 Türkçe • 3B Sol Kulaklık (-0.85)",
+            desc: "Sol şeritteki araca sürttüğünüzde sol kulaklıktan bağıran öfkeli sürücü.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("npc_crash_left_01.mp3", { pan: -0.85, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_ped_right",
+            category: "human",
+            icon: "🚶‍♀️",
+            title: "Çığlık Atan Kaldırım Yayası",
+            specs: "ElevenLabs v4 Türkçe • 3B Sağ Kulaklık (+0.85)",
+            desc: "Kaldırıma veya yaya geçidine tehlikeli yaklaştığınızda çığlık atıp kızan yaya.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("npc_pedestrian_right_01.mp3", { pan: 0.85, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_teyze_angry",
+            category: "human",
+            icon: "👵",
+            title: "Tansiyonu Fırlayan Tonton Teyze (3. Kademe)",
+            specs: "Hafızalı Yolcu Sabır Sistemi",
+            desc: "Üst üste sert fren ve kasisten sonra sabrı taşan yaşlı teyze tepkisi.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("warn_angry_01.mp3", { pan: 0, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_amca_med",
+            category: "human",
+            icon: "👴",
+            title: "Sitem Eden Emekli Amca (2. Kademe)",
+            specs: "Hafızalı Yolcu Sabır Sistemi",
+            desc: "İkinci sarsıntıda çuval mı taşıyorsun diye sitem eden emekli amca.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("warn_medium_01.mp3", { pan: -0.25, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_runner",
+            category: "human",
+            icon: "🏃",
+            title: "Durağa Nefes Nefese Koşan Yolcu",
+            specs: "Akıllı Durak Etkileşimi (PageUp)",
+            desc: "Kapı kapandığı an arkadan yetişmeye çalışan genç yolcunun seslenişi.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("runner_wait.mp3", { pan: 0.65, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_student_bal",
+            category: "human",
+            icon: "🎓",
+            title: "Bakiyesi Biten Üniversiteli Öğrenci",
+            specs: "Kaptan İnsiyatifi (Y / N Kararı)",
+            desc: "Sınava yetişirken kartında bakiye kalmayan öğrencinin mahcup ricası.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("student_no_balance.mp3", { pan: 0.3, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_police",
+            category: "human",
+            icon: "👮",
+            title: "Bölge Trafik Polisi Takograf Denetimi",
+            specs: "Alt + Z Rol Yapma Denetimi",
+            desc: "Takograf fişinizi ve hız kaydınızı inceleyen bölge trafik memuru.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("police_clean.mp3", { pan: -0.4, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_dispatch_crash",
+            category: "human",
+            icon: "📻",
+            title: "Acil Hareket Merkezi Kaza Çağrısı",
+            specs: "Telsiz Dispeçer (Uğur Işık)",
+            desc: "Ağır darbe sensörü tetiklendiğinde merkezden gelen acil telsiz anonsu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("dispatch_crash.mp3", { pan: -0.2, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_ch19",
+            category: "human",
+            icon: "🚛",
+            title: "Kanal 19 Karşı Şerit Usta Kaptan",
+            specs: "Uzun Yol Telsiz Muhabbeti",
+            desc: "Bolu Dağı sis uyarısı veren karşı şeritteki emektar otobüs kaptanı.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("ch19_01.mp3", { pan: -0.2, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_sanayi",
+            category: "human",
+            icon: "🔧",
+            title: "Sanayi Baş Ustası Teslimat Konuşması",
+            specs: "Sanayi ve Ekspertiz Ekranı",
+            desc: "Kasko garantisiyle tüm parçaları sıfırlayıp otobüsü teslim eden usta.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("sanayi_done.mp3", { pan: 0, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_tow",
+            category: "human",
+            icon: "🪝",
+            title: "Kurtarıcı Çekici Ustası",
+            specs: "Ağır Hasar Yol Yardım Sistemi",
+            desc: "Otobüs pert olduğunda çelik halatı bağlayıp sanayiye çeken kurtarıcı.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("tow_arrive.mp3", { pan: -0.25, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_fuel",
+            category: "human",
+            icon: "⛽",
+            title: "Akaryakıt İstasyonu Pompacı Usta",
+            specs: "Mazot Dolum & Tabanca Sesi",
+            desc: "Depoyu mazotla fulleyip kapağı kilitleyen neşeli istasyon ustası.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("fuel_filled.mp3", { pan: -0.35, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_tea",
+            category: "human",
+            icon: "☕",
+            title: "Dinlenme Tesisi Çaycı Usta",
+            specs: "Shift + J Karayolu Mola Tesisi",
+            desc: "Yol yorgunluğunu alan tavşan kanı demli Rize çayı ikramı.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("tea_served.mp3", { pan: 0.25, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_muavin_break",
+            category: "human",
+            icon: "🎙️",
+            title: "Şehirlerarası Muavin 30 Dk Mola Anonsu",
+            specs: "Shift + J Tesis Giriş Anonsu",
+            desc: "Dinlenme tesisine girerken muavinin yaptığı klasik 30 dakika mola anonsu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("muavin_break_start.mp3", { pan: 0.15, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_ibis_hosp",
+            category: "human",
+            icon: "🏥",
+            title: "TEKULAŞ Kurumsal Durak Anons Spikeri",
+            specs: "20 Ana Durak & Terminal Stüdyo Sesi",
+            desc: "Tekirdağ Şehir Hastanesi durağında acil şifalar dileyen kurumsal anons.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("stop_sehir_hastanesi.mp3", { pan: 0, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_kid_col",
+            category: "human",
+            icon: "🧴",
+            title: "Limon Kolonyasına Sevinen Çocuk Yolcu",
+            specs: "Alt + V İkram Servisi",
+            desc: "Muavin kolonya dağıttığında neşeyle teşekkür eden çocuk yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("kid_cologne.mp3", { pan: 0.2, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_dark_warn",
+            category: "human",
+            icon: "💡",
+            title: "Gece Farları Hatırlatan Yolcu",
+            specs: "Akıllı Kabin Güvenlik Uyarısı",
+            desc: "Gece karanlıkta farları açmayı unuttuğunuzda uyaran yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("dark_headlights_warn.mp3", { pan: 0.25, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_academy",
+            category: "human",
+            icon: "🎓",
+            title: "Kaptanlık Akademisi Baş Eğitmeni",
+            specs: "F1 Akademi & F2 Başucu Sözlüğü",
+            desc: "Retarder ve ağır vasıta sürüş sırlarını anlatan baş eğitmen.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("concept_retarder.mp3", { pan: 0, volume: 1.0, force: true, interrupt: true }); }
         }
     ],
 
@@ -791,11 +953,13 @@ const SoundGallery = {
         const tabEngine = document.getElementById('tab-sound-engine');
         const tabAkbil = document.getElementById('tab-sound-akbil');
         const tabFx = document.getElementById('tab-sound-fx');
+        const tabHuman = document.getElementById('tab-sound-human');
 
         if (tabAll) tabAll.addEventListener('click', () => this.switchTab('all'));
         if (tabEngine) tabEngine.addEventListener('click', () => this.switchTab('engine'));
         if (tabAkbil) tabAkbil.addEventListener('click', () => this.switchTab('akbil'));
         if (tabFx) tabFx.addEventListener('click', () => this.switchTab('effect'));
+        if (tabHuman) tabHuman.addEventListener('click', () => this.switchTab('human'));
 
         // Klavye Kısayolları: [S] ile Açma, [Boşluk] ile Çal/Durdur, [ESC] ile Kapatma
         window.addEventListener('keydown', (e) => {
@@ -863,6 +1027,9 @@ const SoundGallery = {
         if (elAkbil) elAkbil.innerHTML = `💳 Gerçek Otobüs Kartı (${countAkbil})`;
         const elFx = document.getElementById('tab-sound-fx');
         if (elFx) elFx.innerHTML = `💨 Havalı Fren & Çevre (${countFx})`;
+        const countHuman = this.sounds.filter(s => s.category === 'human').length;
+        const elHuman = document.getElementById('tab-sound-human');
+        if (elHuman) elHuman.innerHTML = `🗣️ Canlı İnsan & NPC (${countHuman})`;
 
         this.renderModal(this.currentTab);
 
@@ -895,7 +1062,7 @@ const SoundGallery = {
 
     switchTab: function(tab) {
         this.currentTab = tab;
-        ['tab-sound-all', 'tab-sound-engine', 'tab-sound-akbil', 'tab-sound-fx'].forEach(id => {
+        ['tab-sound-all', 'tab-sound-engine', 'tab-sound-akbil', 'tab-sound-fx', 'tab-sound-human'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
                 el.style.background = 'rgba(255,255,255,0.08)';
@@ -904,7 +1071,7 @@ const SoundGallery = {
             }
         });
 
-        const activeId = tab === 'engine' ? 'tab-sound-engine' : (tab === 'akbil' ? 'tab-sound-akbil' : (tab === 'effect' ? 'tab-sound-fx' : 'tab-sound-all'));
+        const activeId = tab === 'engine' ? 'tab-sound-engine' : (tab === 'akbil' ? 'tab-sound-akbil' : (tab === 'effect' ? 'tab-sound-fx' : (tab === 'human' ? 'tab-sound-human' : 'tab-sound-all')));
         const activeEl = document.getElementById(activeId);
         if (activeEl) {
             activeEl.style.background = 'rgba(168,85,247,0.3)';
@@ -955,6 +1122,7 @@ const SoundGallery = {
             if (tab === 'engine') return s.category === 'engine';
             if (tab === 'akbil') return s.category === 'akbil';
             if (tab === 'effect') return s.category === 'effect';
+            if (tab === 'human') return s.category === 'human';
             return true;
         });
 
@@ -982,6 +1150,8 @@ const SoundGallery = {
                 categoryTag = '<span style="color: #c084fc; font-size: 0.85rem; font-weight: bold; background: rgba(168,85,247,0.2); padding: 3px 8px; border-radius: 4px;">⏱️ ' + (s.soundGroup || 'Motor Rölantisi') + '</span>';
             } else if (s.category === 'akbil') {
                 categoryTag = '<span style="color: #38bdf8; font-size: 0.85rem; font-weight: bold; background: rgba(56,189,248,0.2); padding: 3px 8px; border-radius: 4px;">💳 Akbil & Kart Okuyucu</span>';
+            } else if (s.category === 'human') {
+                categoryTag = '<span style="color: #f472b6; font-size: 0.85rem; font-weight: bold; background: rgba(236,72,153,0.2); padding: 3px 8px; border-radius: 4px;">🗣️ ElevenLabs Gerçek İnsan & NPC</span>';
             } else {
                 categoryTag = '<span style="color: #34d399; font-size: 0.85rem; font-weight: bold; background: rgba(16,185,129,0.2); padding: 3px 8px; border-radius: 4px;">💨 Havalı & Mekanik Efekt</span>';
             }
@@ -1252,6 +1422,7 @@ const SoundGallery = {
         if (typeof audio !== 'undefined' && audio.stopRetarder) {
             try { audio.stopRetarder(); } catch(e){}
         }
+        if (window.HumanNpcVoices) { try { window.HumanNpcVoices.stopAll(); } catch(e){} }
         if (typeof audio !== 'undefined' && audio.stopAllRoadSounds) {
             try { audio.stopAllRoadSounds(); } catch(e){}
         }

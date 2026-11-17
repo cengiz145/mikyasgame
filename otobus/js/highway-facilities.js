@@ -389,16 +389,20 @@
                 this.playHgsBeep();
                 const msg = `🏷️ HGS: ${toll.name} geçişi onaylandı. ${cost} ₺ tahsil edildi. Kalan HGS Bakiyeniz: ${this.data.hgsBalance} ₺. Hayırlı yolculuklar kaptan!`;
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak(`He Ge Se: ${cost} lira tahsil edildi. Kalan bakiyeniz ${this.data.hgsBalance} lira.`);
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playHgsStatus(true, msg))) {
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak(`He Ge Se: ${cost} lira tahsil edildi. Kalan bakiyeniz ${this.data.hgsBalance} lira.`);
+                    }
                 }
             } else {
                 this.playHgsWarningBeep();
                 const diff = cost - this.data.hgsBalance;
                 const warnMsg = `⚠️ HGS Yetersiz Bakiye! ${toll.name} ücreti ${cost} ₺, bakiyeniz ${this.data.hgsBalance} ₺. İhlalli geçiş kaydedildi! Ceza yememek için Y tuşuyla bakiye yükleyiniz.`;
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("Dikkat! He Ge Se yetersiz bakiye! İhlalli geçiş uyarısı.");
+                if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playHgsStatus(false, warnMsg))) {
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Dikkat! He Ge Se yetersiz bakiye! İhlalli geçiş uyarısı.");
+                    }
                 }
             }
         },
