@@ -28,7 +28,7 @@
     
     <!-- Stylesheets -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E%F0%9F%9A%8D%3C/text%3E%3C/svg%3E">
-    <link rel="stylesheet" href="css/styles.css?v=1792628000034">
+    <link rel="stylesheet" href="css/styles.css?v=1792628000035">
 </head>
 <body>
     <div id="nvda-live-region" aria-live="assertive" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
@@ -263,11 +263,11 @@
         </button>
     </main>
 
-    <!-- 3. ROUTE SELECTION SCREEN (API ROUTES) -->
-    <main id="route-menu" class="screen hidden" role="application">
+    <!-- 3. ROUTE SELECTION SCREEN (NVDA AÇILIR-KAPANIR ROTA SEÇİM MENÜSÜ) -->
+    <main id="route-menu" class="screen hidden" aria-labelledby="route-sel-title">
         <div class="title-container">
-            <h1 class="main-title" id="route-sel-title">Görev Seçimi</h1>
-            <p class="subtitle" id="route-sel-subtitle">API'den çekilen canlı rotalardan birini seçin</p>
+            <h1 class="main-title" id="route-sel-title">Görev ve Rota Seçimi</h1>
+            <p class="subtitle" id="route-sel-subtitle">Açılır menülerden bölge ve hattınızı hızla seçin</p>
 
             <!-- SERBEST SÜRÜŞ KONUM & BÖLGE SEÇİM PANELİ -->
             <div id="route-location-panel" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: rgba(56,189,248,0.12); border: 1.5px solid #38bdf8; border-radius: 12px; padding: 12px 18px; margin-bottom: 14px; width: 100%; box-shadow: 0 4px 15px rgba(56,189,248,0.15);">
@@ -276,14 +276,49 @@
                     <strong style="color: #fde047; font-size: 1.15rem; display: flex; align-items: center; gap: 6px; margin-top: 2px;">
                         <span id="lbl-route-city">Tekirdağ</span> / <span id="lbl-route-active-district">Süleymanpaşa</span>
                     </strong>
-                    <span style="color: #cbd5e1; font-size: 0.82rem; display: block; margin-top: 2px;">Mahalle hatları, cadde güzergahları ve serbest pratik hatları hazır.</span>
+                    <span style="color: #cbd5e1; font-size: 0.82rem; display: block; margin-top: 2px;">İstediğiniz ili ve ilçeyi aşağıdaki açılır kutulardan doğrudan değiştirebilirsiniz.</span>
                 </div>
-                <button id="btn-change-active-district" class="menu-btn nav-item" style="width: auto; padding: 10px 18px; font-size: 0.92rem; background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8; color: #fff; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 2px 10px rgba(2,132,199,0.3);" aria-label="Farklı bir il, ilçe veya mahalle seçmek için tıklayın">
-                    🗺️ İl & İlçe Değiştir
+                <button id="btn-change-active-district" class="menu-btn nav-item" style="width: auto; padding: 10px 18px; font-size: 0.92rem; background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8; color: #fff; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 2px 10px rgba(2,132,199,0.3);" aria-label="Adım adım il, ilçe ve mahalle seçici penceresini aç">
+                    🗺️ Detaylı Bölge Seçici
                 </button>
             </div>
-            <div id="mission-audio-guide" style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 6px; margin: 10px 0; font-size: 0.95rem;">
-                ⌨️ <strong>(Shift + Oklar)</strong> Pusula (Sağ: Doğu, Sol: Batı, Yukarı: Kuzey, Aşağı: Güney) | <strong>(A)</strong> Açıklama | <strong>(Shift + A)</strong> Adım Adım | <strong>(Esc)</strong> Çık
+
+            <!-- NVDA ERİŞİLEBİLİR HIZLI AÇILIR SEÇİM KUTULARI (İL / İLÇE / HIZLI HAT / ARAMA) -->
+            <section id="nvda-route-quick-panel" aria-label="Hızlı Açılır Rota ve Bölge Seçim Menüsü" style="background: rgba(15, 23, 42, 0.88); border: 1.5px solid rgba(56, 189, 248, 0.45); border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; width: 100%; text-align: left;">
+                <h2 style="font-size: 1.05rem; color: #38bdf8; margin: 0 0 10px 0;">⚡ Hızlı Açılır Rota Seçimi (NVDA Uyumlu)</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                    <div>
+                        <label for="nvda-city-select" style="display: block; font-size: 0.85rem; font-weight: bold; color: #bae6fd; margin-bottom: 4px;">1. İl Seçimi (Açılır Menü):</label>
+                        <select id="nvda-city-select" class="modern-btn nav-item" style="width: 100%; padding: 10px 12px; background: #0f172a; color: #f8fafc; border: 1.5px solid #38bdf8; border-radius: 8px; font-size: 0.96rem;" aria-label="İl seçimi açılır menüsü"></select>
+                    </div>
+                    <div>
+                        <label for="nvda-district-select" style="display: block; font-size: 0.85rem; font-weight: bold; color: #bae6fd; margin-bottom: 4px;">2. İlçe Seçimi (Açılır Menü):</label>
+                        <select id="nvda-district-select" class="modern-btn nav-item" style="width: 100%; padding: 10px 12px; background: #0f172a; color: #f8fafc; border: 1.5px solid #38bdf8; border-radius: 8px; font-size: 0.96rem;" aria-label="İlçe seçimi açılır menüsü"></select>
+                    </div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 10px;">
+                    <div style="flex: 2; min-width: 240px;">
+                        <label for="nvda-quick-route-select" style="display: block; font-size: 0.85rem; font-weight: bold; color: #86efac; margin-bottom: 4px;">3. Doğrudan Hat / Görev Seçin (Açılır Menü):</label>
+                        <select id="nvda-quick-route-select" class="modern-btn nav-item" style="width: 100%; padding: 10px 12px; background: #0f172a; color: #f8fafc; border: 1.5px solid #22c55e; border-radius: 8px; font-size: 0.98rem;" aria-label="Doğrudan hat veya görev seçimi açılır menüsü. Seçtikten sonra Enter tuşuna veya Seferi Başlat düğmesine basın"></select>
+                    </div>
+                    <button type="button" id="btn-nvda-launch-selected-route" class="menu-btn primary-btn nav-item" style="width: auto; padding: 10px 20px; font-size: 0.98rem; background: linear-gradient(135deg, #16a34a, #15803d); border: 1.5px solid #4ade80; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Açılır menüde seçili olan rotayı hemen başlat">
+                        🚀 Seçili Rotayı Başlat
+                    </button>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                    <div style="flex: 2; min-width: 220px;">
+                        <label for="nvda-route-filter-input" style="display: block; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 3px;">🔍 Hat veya Durak Ara:</label>
+                        <input type="search" id="nvda-route-filter-input" class="modern-btn nav-item" style="width: 100%; text-align: left; padding: 8px 12px; background: #0f172a; color: #fff; border: 1px solid rgba(148,163,184,0.5); border-radius: 8px; font-size: 0.92rem;" placeholder="Hat no, mahalle veya durak yazın (örn: 2/7, Hastane, Otogar)..." aria-label="Hat veya durak adına göre filtrele">
+                    </div>
+                    <button type="button" id="btn-nvda-toggle-all-groups" class="modern-btn nav-item" style="padding: 9px 14px; margin-top: 18px; background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #7dd3fc; border-radius: 8px; font-size: 0.88rem; cursor: pointer;" aria-expanded="false" aria-label="Tüm rota kategori menülerini aç veya kapat">
+                        📂 Tüm Kategorileri Aç
+                    </button>
+                </div>
+                <div id="nvda-route-filter-status" aria-live="polite" style="font-size: 0.84rem; color: #94a3b8; margin-top: 6px;"></div>
+            </section>
+
+            <div id="mission-audio-guide" style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 6px; margin: 10px 0; font-size: 0.92rem;">
+                ♿ <strong>NVDA İpucu:</strong> <strong>Tab / C</strong> ile açılır kutular arasında gezebilir, <strong>H</strong> ile rota kategorilerine atlayabilir, kategori başlıklarında <strong>Enter / Boşluk</strong> ile menüyü açıp kapatabilirsiniz.
             </div>
 
             <!-- AKILLI ROTA BULUCU VE OTOBÜS SEÇ / SATIN AL PANELLERİ -->
@@ -656,13 +691,17 @@
             <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 18px; line-height: 1.4;">Yüzlerce ara durakla uğraşmanıza gerek yok. Sadece gitmek istediğiniz <strong>mahalle veya ana durağı</strong> seçin; sistem en uygun rotayı hazırlar, tüm ara durakları sürüş esnasında keşfedersiniz.</p>
 
             <div style="margin-bottom: 16px;">
-                <label for="smart-from-input" style="display: block; font-weight: bold; color: #38bdf8; margin-bottom: 6px;">📍 Nereden? (Kalkış Mahallesi veya Ana Durak):</label>
-                <input type="text" id="smart-from-input" list="smart-stops-datalist" class="modern-btn" style="width: 100%; text-align: left; font-size: 1.1rem; padding: 12px 14px; background: rgba(0,0,0,0.5); border: 2px solid #38bdf8; color: #fff;" placeholder="Örn: Değirmenaltı Kampüs, Valilik & Hükümet Cd., Saray Otogar..." aria-label="Kalkış durağı">
+                <label for="smart-from-select" style="display: block; font-weight: bold; color: #38bdf8; margin-bottom: 6px;">📍 Nereden? (Kalkış Durağı Açılır Menüsü):</label>
+                <select id="smart-from-select" class="modern-btn nav-item" style="width: 100%; padding: 11px 12px; margin-bottom: 8px; background: #0f172a; border: 2px solid #38bdf8; color: #fff; font-size: 1.02rem; border-radius: 8px;" aria-label="Kalkış mahallesi veya durağı açılır menüsü"></select>
+                <label for="smart-from-input" style="display: block; font-size: 0.84rem; color: #94a3b8; margin-bottom: 4px;">Veya kalkış durağını yazarak arayın:</label>
+                <input type="text" id="smart-from-input" list="smart-stops-datalist" class="modern-btn" style="width: 100%; text-align: left; font-size: 1.02rem; padding: 10px 14px; background: rgba(0,0,0,0.5); border: 1.5px solid rgba(56,189,248,0.5); color: #fff;" placeholder="Örn: Değirmenaltı Kampüs, Valilik & Hükümet Cd., Saray Otogar..." aria-label="Kalkış durağı yazma alanı">
             </div>
 
             <div style="margin-bottom: 18px;">
-                <label for="smart-to-input" style="display: block; font-weight: bold; color: #22c55e; margin-bottom: 6px;">🏁 Nereye? (Varış Mahallesi veya Hedef Ana Durak):</label>
-                <input type="text" id="smart-to-input" list="smart-stops-datalist" class="modern-btn" style="width: 100%; text-align: left; font-size: 1.1rem; padding: 12px 14px; background: rgba(0,0,0,0.5); border: 2px solid #22c55e; color: #fff;" placeholder="Örn: Şehir Hastanesi, Saray Devlet Hastanesi, Çorlu Otogar..." aria-label="Varış hedef durağı">
+                <label for="smart-to-select" style="display: block; font-weight: bold; color: #22c55e; margin-bottom: 6px;">🏁 Nereye? (Varış Hedef Durağı Açılır Menüsü):</label>
+                <select id="smart-to-select" class="modern-btn nav-item" style="width: 100%; padding: 11px 12px; margin-bottom: 8px; background: #0f172a; border: 2px solid #22c55e; color: #fff; font-size: 1.02rem; border-radius: 8px;" aria-label="Varış mahallesi veya hedef durağı açılır menüsü"></select>
+                <label for="smart-to-input" style="display: block; font-size: 0.84rem; color: #94a3b8; margin-bottom: 4px;">Veya varış durağını yazarak arayın:</label>
+                <input type="text" id="smart-to-input" list="smart-stops-datalist" class="modern-btn" style="width: 100%; text-align: left; font-size: 1.02rem; padding: 10px 14px; background: rgba(0,0,0,0.5); border: 1.5px solid rgba(34,197,94,0.5); color: #fff;" placeholder="Örn: Şehir Hastanesi, Saray Devlet Hastanesi, Çorlu Otogar..." aria-label="Varış hedef durağı yazma alanı">
             </div>
 
             <datalist id="smart-stops-datalist"></datalist>
@@ -969,49 +1008,49 @@
     <!-- Firebase SDKs & Uygulama Modülleri (Tüm DOM hazır olduktan sonra yüklenir) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="js/firebase.js?v=1792628000034"></script>
-    <script src="js/multiplayer.js?v=1792628000034"></script>
+    <script src="js/firebase.js?v=1792628000035"></script>
+    <script src="js/multiplayer.js?v=1792628000035"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
-    <script src="js/map-engine.js?v=1792628000034"></script>
-    <script src="js/turkey-data.js?v=1792628000034"></script>
-    <script src="js/tekulas-data.js?v=1792628000034"></script>
-    <script src="js/data.js?v=1792628000034"></script>
-    <script src="js/audio-base64.js?v=1792628000034"></script>
-    <script src="sounds/npc_list.js?v=1792628000034"></script>
-    <script src="js/audio.js?v=1792628000034"></script>
-    <script src="js/career-missions.js?v=1792628000034"></script>
-    <script src="js/api.js?v=1792628000034"></script>
-    <script src="js/ui.js?v=1792628000034"></script>
-    <script src="js/bus-fleet.js?v=1792628000034"></script>
-    <script src="js/company-system.js?v=1792628000034"></script>
-    <script src="js/highway-facilities.js?v=1792628000034"></script>
-    <script src="js/human-npc-voices.js?v=1792628000034"></script>
-    <script src="js/roleplay-system.js?v=1792628000034"></script>
-    <script src="js/velimese-navigation.js?v=1792628000034"></script>
-    <script src="js/suleymanpasa-navigation.js?v=1792628000034"></script>
-    <script src="js/saray-navigation.js?v=1792628000034"></script>
-    <script src="js/stop-discovery.js?v=1792628000034"></script>
-    <script src="js/achievements-data.js?v=1792628000034"></script>
-    <script src="js/sound-gallery.js?v=1792628000034"></script>
-    <script src="js/driver-badges.js?v=1792628000034"></script>
-    <script src="js/smart-system.js?v=1792628000034"></script>
-    <script src="js/smart-route.js?v=1792628000034"></script>
-    <script src="js/compass-system.js?v=1792628000034"></script>
-    <script src="js/voice-assistant.js?v=1792628000034"></script>
-    <script src="js/leaderboard-system.js?v=1792628000034"></script>
-    <script src="js/turkey-geography.js?v=1792628000034"></script>
-    <script src="js/turkey-curves.js?v=1792628000034"></script>
-    <script src="js/welcome-calendar.js?v=1792628000034"></script>
-    <script src="js/turkey-atlas.js?v=1792628000034"></script>
-    <script src="js/live-weather.js?v=1792628000034"></script>
-    <script src="js/smart-environment.js?v=1792628000034"></script>
-    <script src="js/city-landmarks.js?v=1792628000034"></script>
-    <script src="js/solar-prayer-engine.js?v=1792628000034"></script>
-    <script src="js/powertrain-dynamics.js?v=1792628000034"></script>
-    <script src="js/bus-concept-guide.js?v=1792628000034"></script>
-    <script src="js/game.js?v=1792628000034"></script>
-    <script src="js/app.js?v=1792628000034"></script>
+    <script src="js/map-engine.js?v=1792628000035"></script>
+    <script src="js/turkey-data.js?v=1792628000035"></script>
+    <script src="js/tekulas-data.js?v=1792628000035"></script>
+    <script src="js/data.js?v=1792628000035"></script>
+    <script src="js/audio-base64.js?v=1792628000035"></script>
+    <script src="sounds/npc_list.js?v=1792628000035"></script>
+    <script src="js/audio.js?v=1792628000035"></script>
+    <script src="js/career-missions.js?v=1792628000035"></script>
+    <script src="js/api.js?v=1792628000035"></script>
+    <script src="js/ui.js?v=1792628000035"></script>
+    <script src="js/bus-fleet.js?v=1792628000035"></script>
+    <script src="js/company-system.js?v=1792628000035"></script>
+    <script src="js/highway-facilities.js?v=1792628000035"></script>
+    <script src="js/human-npc-voices.js?v=1792628000035"></script>
+    <script src="js/roleplay-system.js?v=1792628000035"></script>
+    <script src="js/velimese-navigation.js?v=1792628000035"></script>
+    <script src="js/suleymanpasa-navigation.js?v=1792628000035"></script>
+    <script src="js/saray-navigation.js?v=1792628000035"></script>
+    <script src="js/stop-discovery.js?v=1792628000035"></script>
+    <script src="js/achievements-data.js?v=1792628000035"></script>
+    <script src="js/sound-gallery.js?v=1792628000035"></script>
+    <script src="js/driver-badges.js?v=1792628000035"></script>
+    <script src="js/smart-system.js?v=1792628000035"></script>
+    <script src="js/smart-route.js?v=1792628000035"></script>
+    <script src="js/compass-system.js?v=1792628000035"></script>
+    <script src="js/voice-assistant.js?v=1792628000035"></script>
+    <script src="js/leaderboard-system.js?v=1792628000035"></script>
+    <script src="js/turkey-geography.js?v=1792628000035"></script>
+    <script src="js/turkey-curves.js?v=1792628000035"></script>
+    <script src="js/welcome-calendar.js?v=1792628000035"></script>
+    <script src="js/turkey-atlas.js?v=1792628000035"></script>
+    <script src="js/live-weather.js?v=1792628000035"></script>
+    <script src="js/smart-environment.js?v=1792628000035"></script>
+    <script src="js/city-landmarks.js?v=1792628000035"></script>
+    <script src="js/solar-prayer-engine.js?v=1792628000035"></script>
+    <script src="js/powertrain-dynamics.js?v=1792628000035"></script>
+    <script src="js/bus-concept-guide.js?v=1792628000035"></script>
+    <script src="js/game.js?v=1792628000035"></script>
+    <script src="js/app.js?v=1792628000035"></script>
 </body>
 </html>
 

@@ -1387,17 +1387,51 @@ const AkilliRotaSistemi = {
             }
         });
 
-        // Datalist doldur (Sadece seçili bölgenin mahalle ve ana durakları)
+        // Datalist ve NVDA Açılır Seçim Kutularını (<select>) doldur
+        const stops = this.getAllStops();
         const datalist = document.getElementById('smart-stops-datalist');
         if (datalist) {
             datalist.innerHTML = '';
-            const stops = this.getAllStops();
             stops.forEach(name => {
                 const opt = document.createElement('option');
                 opt.value = name;
                 datalist.appendChild(opt);
             });
         }
+
+        const fromSelect = document.getElementById('smart-from-select');
+        const toSelect = document.getElementById('smart-to-select');
+        [
+            { sel: fromSelect, placeholder: '-- Kalkış Durağı Seçin (' + stops.length + ' Durak) --', inpId: 'smart-from-input' },
+            { sel: toSelect, placeholder: '-- Varış Durağı Seçin (' + stops.length + ' Durak) --', inpId: 'smart-to-input' }
+        ].forEach(cfg => {
+            if (!cfg.sel) return;
+            const prevVal = cfg.sel.value;
+            cfg.sel.innerHTML = '';
+            const defOpt = document.createElement('option');
+            defOpt.value = '';
+            defOpt.textContent = cfg.placeholder;
+            cfg.sel.appendChild(defOpt);
+            stops.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                cfg.sel.appendChild(opt);
+            });
+            if (prevVal && stops.includes(prevVal)) cfg.sel.value = prevVal;
+            if (!cfg.sel._nvdaBound) {
+                cfg.sel._nvdaBound = true;
+                cfg.sel.addEventListener('change', () => {
+                    const inp = document.getElementById(cfg.inpId);
+                    if (inp && cfg.sel.value) {
+                        inp.value = cfg.sel.value;
+                        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+                            audio.updateNvdaLiveRegion((cfg.inpId === 'smart-from-input' ? 'Kalkış durağı seçildi: ' : 'Varış durağı seçildi: ') + cfg.sel.value);
+                        }
+                    }
+                });
+            }
+        });
 
         // Popüler merkez butonları (Seçili bölgeye özel)
         const pillsContainer = document.getElementById('smart-pills-container');
@@ -1493,8 +1527,11 @@ const AkilliRotaSistemi = {
 
         this.updateDistrictUI();
 
+        const fromSelectEl = document.getElementById('smart-from-select');
         const fromInput = document.getElementById('smart-from-input');
-        if (fromInput) {
+        if (fromSelectEl) {
+            fromSelectEl.focus();
+        } else if (fromInput) {
             fromInput.focus();
         }
 

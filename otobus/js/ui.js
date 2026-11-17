@@ -544,69 +544,194 @@ const UI = {
 
     renderRoutes: function(cityName, completedTasks) {
         completedTasks = (typeof completedTasks === 'number') ? completedTasks : 0;
+        cityName = cityName || (typeof Game !== 'undefined' && Game.currentCity) || localStorage.getItem('currentCity') || "Tekirdağ";
         const activeDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
-        
-        // Eğer Tekirdağ için görevler henüz üretilmemişse veya task 0 aktif ilçeyle eşleşmiyorsa MUTLAKA yeniden üret
-        if (cityName === "Tekirdağ" && typeof generateRoutesFromAPI === 'function') {
-            const task0 = (typeof routesData !== 'undefined') ? routesData["tekirdag_task_0"] : null;
-            if (!task0 || task0.district !== activeDist) {
-                const realStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari["Tekirdağ"])
-                    ? varsayilanSehirDuraklari["Tekirdağ"]
-                    : null;
-                generateRoutesFromAPI(realStops, "Tekirdağ", activeDist);
+
+        const lblCity = document.getElementById('lbl-route-city');
+        if (lblCity) lblCity.innerText = cityName;
+        const lblDist = document.getElementById('lbl-route-active-district');
+        if (lblDist) lblDist.innerText = activeDist === 'all' ? 'Tüm İlçeler' : activeDist;
+
+        // Eğer Tekirdağ veya seçili il için görevler henüz üretilmemişse üret
+        if (typeof generateRoutesFromAPI === 'function') {
+            if (cityName === "Tekirdağ") {
+                const task0 = (typeof routesData !== 'undefined') ? routesData["tekirdag_task_0"] : null;
+                if (!task0 || task0.district !== activeDist) {
+                    const realStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari["Tekirdağ"])
+                        ? varsayilanSehirDuraklari["Tekirdağ"]
+                        : null;
+                    generateRoutesFromAPI(realStops, "Tekirdağ", activeDist);
+                }
+            } else if (!routesData || !routesData[cityName.toLowerCase() + "_task_0"]) {
+                const realCityStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName])
+                    ? varsayilanSehirDuraklari[cityName]
+                    : (typeof varsayilanSehirDuraklari !== 'undefined' ? varsayilanSehirDuraklari["Tekirdağ"] : []);
+                generateRoutesFromAPI(realCityStops, cityName, activeDist);
             }
         }
 
         const titleEl = document.getElementById("route-sel-title");
         const subtitleEl = document.getElementById("route-sel-subtitle") || document.querySelector("#route-menu .subtitle");
-        
         const listEl = document.getElementById("dynamic-route-list");
         if (!listEl) return;
         listEl.innerHTML = "";
+
+        // 1. NVDA İL & İLÇE AÇILIR KUTULARINI (<select>) DOLDUR
+        const citySelect = document.getElementById('nvda-city-select');
+        const distSelect = document.getElementById('nvda-district-select');
+        const adminData = (typeof window !== 'undefined' && window.TurkeyAdminData) ? window.TurkeyAdminData : null;
+
+        if (citySelect) {
+            const allCities = adminData
+                ? Object.keys(adminData).sort((a, b) => a.localeCompare(b, 'tr'))
+                : ((typeof masterCitiesList !== 'undefined' && Array.isArray(masterCitiesList))
+                    ? masterCitiesList.slice().sort((a, b) => a.localeCompare(b, 'tr'))
+                    : ["Tekirdağ", "İstanbul", "Ankara", "İzmir", "Bursa"]);
+            citySelect.innerHTML = '';
+            allCities.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                const plate = (adminData && adminData[c] && adminData[c].plate) ? (adminData[c].plate + ' - ') : '';
+                opt.textContent = plate + c;
+                citySelect.appendChild(opt);
+            });
+            citySelect.value = allCities.includes(cityName) ? cityName : allCities[0];
+
+            if (!citySelect._nvdaBound) {
+                citySelect._nvdaBound = true;
+                citySelect.addEventListener('change', () => {
+                    const nextCity = citySelect.value || 'Tekirdağ';
+                    const cInfo = adminData && adminData[nextCity] ? adminData[nextCity] : null;
+                    const distKeys = cInfo && cInfo.districts ? Object.keys(cInfo.districts).sort((a, b) => a.localeCompare(b, 'tr')) : [];
+                    const defaultDist = (nextCity === 'Tekirdağ') ? 'Süleymanpaşa' : (distKeys[0] || 'Merkez');
+                    if (typeof Game !== 'undefined') {
+                        Game.currentCity = nextCity;
+                        Game.activeDistrict = defaultDist;
+                    }
+                    localStorage.setItem('currentCity', nextCity);
+                    localStorage.setItem('activeDistrict', defaultDist);
+                    if (typeof createOrGetFreeRoamRoute === 'function' && nextCity !== 'Tekirdağ') {
+                        createOrGetFreeRoamRoute(nextCity, defaultDist, defaultDist + ' Genel İlçe Turu');
+                    }
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+                        audio.updateNvdaLiveRegion(nextCity + ' ili ve ' + defaultDist + ' ilçesi seçildi, rotalar güncellendi.');
+                    }
+                    document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: nextCity, district: defaultDist } }));
+                });
+            }
+        }
+
+        if (distSelect) {
+            const cInfo = adminData && adminData[cityName] ? adminData[cityName] : null;
+            let distKeys = cInfo && cInfo.districts ? Object.keys(cInfo.districts).sort((a, b) => a.localeCompare(b, 'tr')) : [];
+            if (distKeys.length === 0) {
+                distKeys = cityName === 'Tekirdağ'
+                    ? ['Süleymanpaşa', 'Çorlu', 'Çerkezköy', 'Ergene', 'Velimeşe', 'Saray', 'Kapaklı', 'Malkara', 'Şarköy', 'Muratlı', 'Hayrabolu', 'Marmaraereğlisi']
+                    : ['Merkez'];
+            }
+            distSelect.innerHTML = '';
+            if (cityName === 'Tekirdağ') {
+                const allOpt = document.createElement('option');
+                allOpt.value = 'all';
+                allOpt.textContent = 'Tüm İlçeler (Bütün Tekirdağ Hatları)';
+                distSelect.appendChild(allOpt);
+                if (!distKeys.includes('Velimeşe')) distKeys.push('Velimeşe');
+            }
+            distKeys.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                distSelect.appendChild(opt);
+            });
+            if (activeDist === 'all' && cityName === 'Tekirdağ') {
+                distSelect.value = 'all';
+            } else if (distKeys.includes(activeDist)) {
+                distSelect.value = activeDist;
+            } else {
+                distSelect.value = distKeys[0];
+            }
+
+            if (!distSelect._nvdaBound) {
+                distSelect._nvdaBound = true;
+                distSelect.addEventListener('change', () => {
+                    const chosenCity = (citySelect && citySelect.value) || (typeof Game !== 'undefined' && Game.currentCity) || 'Tekirdağ';
+                    const nextDist = distSelect.value || 'Merkez';
+                    if (typeof Game !== 'undefined') {
+                        Game.currentCity = chosenCity;
+                        Game.activeDistrict = nextDist;
+                    }
+                    localStorage.setItem('currentCity', chosenCity);
+                    localStorage.setItem('activeDistrict', nextDist);
+                    if (typeof createOrGetFreeRoamRoute === 'function' && nextDist !== 'all') {
+                        createOrGetFreeRoamRoute(chosenCity, nextDist, nextDist + ' Genel İlçe Turu');
+                    }
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    const labelDist = nextDist === 'all' ? 'Tüm İlçeler' : nextDist;
+                    if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+                        audio.updateNvdaLiveRegion(chosenCity + ' ' + labelDist + ' bölgesi seçildi, hatlar listelendi.');
+                    }
+                    document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: chosenCity, district: nextDist } }));
+                });
+            }
+        }
 
         const isFreeDrive = (typeof Game !== 'undefined' && Game.playMode === 'free_drive');
         let cityRoutes = [];
         const seenRouteKeys = new Set();
 
-        // TEKİRDAĞ GTFS & AÇIK VERİ ENTEGRASYONU (SERBEST SÜRÜŞTE 278 GERÇEK HAT)
+        // TEKİRDAĞ GTFS & AÇIK VERİ ENTEGRASYONU (SERBEST SÜRÜŞTE GERÇEK HATLAR)
         if (isFreeDrive && cityName === "Tekirdağ" && typeof window !== 'undefined' && window.tekulasHatVeritabani) {
             const tekulasDb = window.tekulasHatVeritabani;
-            // Aktif ilçeye ait hatları eşle
-            let distLines = tekulasDb.filter(r => 
-                r && (r.district === activeDist || r.originDistrict === activeDist || r.destDistrict === activeDist || (r.name && r.name.toLowerCase().includes(activeDist.toLowerCase())))
-            );
+            let distLines = (activeDist === 'all')
+                ? tekulasDb.slice()
+                : tekulasDb.filter(r =>
+                    r && (r.district === activeDist || r.originDistrict === activeDist || r.destDistrict === activeDist || (r.name && r.name.toLowerCase().includes(activeDist.toLowerCase())))
+                );
             if (distLines.length === 0) {
-                distLines = tekulasDb;
+                distLines = tekulasDb.slice();
             }
             cityRoutes = distLines;
-            
-            const totalStopsCount = cityRoutes.reduce((sum, r) => sum + (r.stops ? r.stops.length : 0), 0);
-            if (titleEl) titleEl.innerText = `${activeDist} Belediye Hatları (GTFS - ${cityRoutes.length} Hat)`;
-            if (subtitleEl) subtitleEl.innerText = `Tekirdağ Büyükşehir Açık Veri & GTFS Sistemi • ${activeDist} bölgesine ait ${cityRoutes.length} hat ve ${totalStopsCount} durak listelendi.`;
-        } else {
-            if (titleEl) titleEl.innerText = `${activeDist} Sefer Görevleri (1 - 10. Seviye)`;
-            if (subtitleEl) subtitleEl.innerText = `${cityName} - ${activeDist} bölgesi canlı hat ve durak görevleri`;
+            cityRoutes.forEach(r => {
+                if (r && r.id && typeof routesData !== 'undefined' && !routesData[r.id]) {
+                    routesData[r.id] = r;
+                }
+            });
 
-            // Şehrin tüm görev rotalarını al (Kimlik ve isme göre tekilleştirilmiş)
+            const totalStopsCount = cityRoutes.reduce((sum, r) => sum + (r.stops ? r.stops.length : 0), 0);
+            const distTitle = activeDist === 'all' ? 'Tüm İlçeler' : activeDist;
+            if (titleEl) titleEl.innerText = distTitle + " Belediye Hatları (" + cityRoutes.length + " Hat)";
+            if (subtitleEl) subtitleEl.innerText = distTitle + " bölgesine ait " + cityRoutes.length + " hat ve " + totalStopsCount + " durak açılır-kapanır kategorilerde hazır.";
+        } else {
+            const distTitle = activeDist === 'all' ? 'Tüm İlçeler' : activeDist;
+            if (titleEl) titleEl.innerText = isFreeDrive ? (cityName + " - " + distTitle + " Serbest Hatları") : (distTitle + " Sefer Görevleri");
+            if (subtitleEl) subtitleEl.innerText = cityName + " - " + distTitle + " bölgesi açılır-kapanır hat ve görev menüsü";
+
+            if (isFreeDrive && typeof createOrGetFreeRoamRoute === 'function' && activeDist !== 'all') {
+                const freeR = createOrGetFreeRoamRoute(cityName, activeDist, activeDist + ' Genel İlçe Turu');
+                if (freeR && freeR.id) {
+                    seenRouteKeys.add(freeR.id);
+                    cityRoutes.push(freeR);
+                }
+            }
+
             Object.values(routesData).forEach(r => {
                 if (!r || !r.id) return;
-                const key = r.id;
-                if (seenRouteKeys.has(key)) return;
-                seenRouteKeys.add(key);
-                if (r.sehir === cityName && typeof r.taskIndex === 'number') {
+                if (seenRouteKeys.has(r.id)) return;
+                if (r.sehir === cityName && (isFreeDrive || typeof r.taskIndex === 'number')) {
+                    seenRouteKeys.add(r.id);
                     cityRoutes.push(r);
                 }
             });
-            
-            // Eğer görev rotası yoksa, normal hatları göster (Tekilleştirilmiş)
+
             if (cityRoutes.length === 0) {
                 seenRouteKeys.clear();
                 Object.values(routesData).forEach(r => {
                     if (!r || !r.id) return;
                     const key = r.name || r.id;
                     if (seenRouteKeys.has(key)) return;
-                    seenRouteKeys.add(key);
                     if (r.sehir === cityName || (cityName === "Tekirdağ" && (r.isDistrict || r.originDistrict === "Süleymanpaşa" || r.destDistrict))) {
+                        seenRouteKeys.add(key);
                         cityRoutes.push(r);
                     }
                 });
@@ -614,165 +739,379 @@ const UI = {
         }
 
         if (cityRoutes.length === 0) {
-            listEl.innerHTML = '<li style="text-align:center; color: white; padding: 20px;">Bu şehir için kayıtlı rota bulunamadı.</li>';
+            listEl.innerHTML = '<li style="text-align:center; color: white; padding: 20px;">Bu bölge için kayıtlı rota bulunamadı.</li>';
             return;
         }
 
-        // Aktif lisans seviyesi ve tamamlanan göreve göre kariyer sınıfı
         const currentLic = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
         const effectiveCareerLic = Math.max(currentLic, Math.floor((completedTasks || 0) / 10) + 1);
 
-        let routesToRender = cityRoutes;
+        let routesToRender = cityRoutes.slice();
         if (!isFreeDrive) {
-            // Görevleri doğal sayısal sırasına göre diz (Görev 1, Görev 2, ... Görev 100)
-            cityRoutes.sort((a, b) => (a.taskIndex || 0) - (b.taskIndex || 0));
-
-            // Oyuncunun görebileceği görevler: Mevcut kariyer sınıfı ve altındaki görevler
-            const visibleRoutes = cityRoutes.filter(r => {
-                if (typeof r.licenseLevel === 'number') {
-                    return r.licenseLevel <= effectiveCareerLic;
-                }
-                return true;
-            });
-            routesToRender = visibleRoutes.length > 0 ? visibleRoutes : cityRoutes;
-
-            // İLERLEME MODU GİZEM VE KADEMELİ AÇILMA PRENSİBİ:
+            routesToRender.sort((a, b) => (a.taskIndex || 0) - (b.taskIndex || 0));
+            const visibleRoutes = routesToRender.filter(r => (typeof r.licenseLevel === 'number') ? (r.licenseLevel <= effectiveCareerLic) : true);
+            routesToRender = visibleRoutes.length > 0 ? visibleRoutes : routesToRender;
             routesToRender = routesToRender.filter(r => {
                 const tIdx = (typeof r.taskIndex === 'number') ? r.taskIndex : 0;
                 return tIdx <= completedTasks + 1;
             });
         }
-        let activeTaskBtn = null;
 
-        routesToRender.forEach(route => {
-            const taskNum = (typeof route.taskIndex === 'number') ? (route.taskIndex + 1) : 1;
-            let isCurrentTask = false;
-            let isCompleted = false;
-            let isLocked = false;
-            
-            if (isFreeDrive) {
-                isLocked = false;
-            } else {
-                isCurrentTask = (route.taskIndex === completedTasks);
-                isCompleted = (typeof route.taskIndex === 'number' && route.taskIndex < completedTasks);
-                isLocked = (typeof route.taskIndex === 'number' && route.taskIndex > completedTasks);
-            }
-
-            const li = document.createElement("li");
-            li.style.marginBottom = "10px";
-            const btn = document.createElement("button");
-            
-            let btnClass = "menu-btn nav-item";
-            if (isCurrentTask) {
-                btnClass += " primary-btn pulse-anim";
-            } else if (isCompleted) {
-                btnClass += " secondary-btn";
-            } else if (isLocked) {
-                btnClass += " locked-route";
-            }
-
-            btn.className = btnClass;
-            btn.style.flexDirection = "column";
-            btn.style.alignItems = "stretch";
-            btn.style.textAlign = "left";
-            btn.style.padding = "16px 20px";
-            btn.style.lineHeight = "1.5";
-            btn.style.width = "100%";
-
-            if (isCurrentTask) {
-                btn.style.borderColor = "#22c55e";
-                btn.style.boxShadow = "0 0 16px rgba(34, 197, 94, 0.4)";
-                activeTaskBtn = btn;
-            } else if (isCompleted) {
-                btn.style.borderColor = "#10b981";
-            } else if (isLocked) {
-                btn.style.opacity = "0.75";
-                btn.style.border = "1.5px dashed rgba(239, 68, 68, 0.55)";
-                btn.style.background = "rgba(15, 23, 42, 0.85)";
-                btn.setAttribute("aria-disabled", "true");
-            }
-
-            let icon = isFreeDrive ? "🛣️" : (isCurrentTask ? "🟢" : (isCompleted ? "✅" : "🔒"));
-            let statusText = isFreeDrive
-                ? "(SERBEST SÜRÜŞE AÇIK - PRATİK YAPABİLİRSİNİZ)"
-                : (isCurrentTask 
-                    ? "(AÇIK - ŞU ANKİ GÖREVİNİZ)" 
-                    : (isCompleted ? "(TAMAMLANDI - GEÇİLDİ)" : `(KİLİTLİ - KAPALI: Önce Görev ${completedTasks + 1}'i Tamamlayın)`));
-            
-            const startStop = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "Kalkış Garajı");
-            const endStop = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Varış");
-            const intermediate = route.intermediateStops || (route.stops && route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
-            
-            const totalKmRoute = (route.totalKm) ? route.totalKm.toFixed(1) : ((route.stops && route.stops.length > 0) ? route.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0).toFixed(1) : 0);
-            const stopCount = (route.stops) ? route.stops.length : 0;
-            const badgeHtml = '<span style="background: rgba(56,189,248,0.2); color: #38bdf8; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">' + stopCount + ' Durak | ' + totalKmRoute + ' km</span>';
-            const cardSteps = (typeof MissionReader !== "undefined" && MissionReader.generateSteps) ? MissionReader.generateSteps(route) : [];
-            const cardStepsHtml = cardSteps.map(s => '<div style="margin: 3px 0;">• ' + s + '</div>').join('');
-            
-            let ariaDesc = isLocked 
-                ? (`Görev ${taskNum}: ${route.name}. KİLİTLİ VE KAPALI. Bu görevin açılması için önce Görev ${completedTasks + 1}'i başarıyla tamamlamalısınız. Kalkış: ${startStop}, Varış: ${endStop}.`)
-                : (isCurrentTask
-                    ? (`Görev ${taskNum}: ${route.name}. AÇIK - ŞU ANKİ GÖREVİNİZ. Başlamak için Enter veya Boşluk tuşuna basın. Kalkış: ${startStop}, Varış: ${endStop}. Toplam ${stopCount} durak, ${totalKmRoute} kilometre.`)
-                    : (`Görev ${taskNum}: ${route.name}. Tamamlandı ve geçildi. Sıradaki göreviniz: Görev ${completedTasks + 1}.`));
-            
-            btn.setAttribute("aria-label", ariaDesc);
-
-            const lockedNoticeHtml = isLocked ? 
-                ('<div style="font-size: 0.88rem; color: #f87171; background: rgba(239, 68, 68, 0.12); border-left: 3px solid #ef4444; padding: 8px 12px; border-radius: 4px; margin-top: 8px;">' +
-                 '    🔒 <strong>KİLİTLİ VE KAPALI:</strong> Bu görevin kilidini açmak için önce <strong>Görev ' + (completedTasks + 1) + '</strong> seferini başarıyla tamamlamalısınız.' +
-                 '</div>') : '';
-
-            btn.innerHTML = [
-                '<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 8px;">',
-                '    <strong style="color: ' + (isLocked ? '#f87171' : (isCurrentTask ? '#22c55e' : (route.color || '#38bdf8'))) + '; font-size: 1.15rem;">' + icon + ' ' + route.name + ' ' + statusText + '</strong>',
-                '    ' + badgeHtml,
-                '</div>',
-                '<div style="font-size: 1rem; color: #f1f5f9; margin-bottom: 5px;">',
-                '    📍 <strong>Kalkış (Başlangıç) Durağı:</strong> <span style="color: #38bdf8; font-weight: bold;">' + startStop + '</span>',
-                '</div>',
-                '<div style="font-size: 1rem; color: #f1f5f9; margin-bottom: 5px;">',
-                '    🏁 <strong>Gidilecek Hedef Son Durak:</strong> <span style="color: #22c55e; font-weight: bold;">' + endStop + '</span>',
-                '</div>',
-                (intermediate.length > 0 ? 
-                    '<div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 8px;">🛑 <strong>Durulacak Ara Duraklar:</strong> ' + intermediate.join(' ➔ ') + '</div>' : 
-                    '<div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 8px;">🛑 <strong>Durulacak Ara Duraklar:</strong> Ara durak yok (Doğrudan varış durağına kesintisiz sürüş)</div>'),
-                (isCurrentTask ? 
-                '<div style="font-size: 0.88rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 6px; width: 100%; border-left: 3px solid #22c55e; margin-top: 6px;">' +
-                '    📋 <strong>Görev Adımları (A: Harita Özeti | Shift + A: Adım Adım Dinle):</strong><br>' + cardStepsHtml +
-                '</div>' : ''),
-                lockedNoticeHtml
-            ].join("");
-
-            btn.onclick = () => {
-                if (isLocked) {
-                    if (typeof audio !== 'undefined' && audio.playWarning) {
-                        try { audio.playWarning(); } catch(e) {}
-                    } else if (typeof audio !== 'undefined' && audio.playSelect) {
-                        audio.playSelect();
-                    }
-                    const msg = "Kaptanım, Görev " + taskNum + " henüz kilitli ve kapalıdır. Bu görevi açmak için lütfen önce Görev " + (completedTasks + 1) + "'i başarıyla tamamlayın.";
-                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Görev " + taskNum + " Kilitli: Önce Görev " + (completedTasks + 1) + "'i tamamlayın.", "warning");
-                    if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(msg);
-                    return;
+        // Yardımcı: Rotayı güvenle başlat
+        const launchRouteByObj = (route, isLocked, taskNum) => {
+            if (!route) return;
+            if (isLocked) {
+                if (typeof audio !== 'undefined' && audio.playWarning) {
+                    try { audio.playWarning(); } catch (e) {}
+                } else if (typeof audio !== 'undefined' && audio.playSelect) {
+                    audio.playSelect();
                 }
-                if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
-                if (typeof Game !== 'undefined' && Game.startRoute) {
-                    Game.startRoute(route.id);
+                const msg = "Kaptanım, Görev " + taskNum + " henüz kilitli. Açmak için önce Görev " + (completedTasks + 1) + " seferini tamamlayın.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "warning");
+                if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(msg);
+                return;
+            }
+            if (typeof routesData !== 'undefined' && route.id && !routesData[route.id]) {
+                routesData[route.id] = route;
+            }
+            if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+            if (typeof Game !== 'undefined' && Game.startRoute) {
+                Game.startRoute(route.id);
+            }
+        };
+
+        // 2. HIZLI HAT / GÖREV AÇILIR SEÇİM KUTUSUNU (<select>) DOLDUR
+        const quickSelect = document.getElementById('nvda-quick-route-select');
+        const btnQuickLaunch = document.getElementById('btn-nvda-launch-selected-route');
+        const routeLookupMap = new Map();
+
+        if (quickSelect) {
+            quickSelect.innerHTML = '';
+            let defaultQuickId = '';
+            routesToRender.forEach(route => {
+                const isLocked = !isFreeDrive && (typeof route.taskIndex === 'number' && route.taskIndex > completedTasks);
+                const isCurrentTask = !isFreeDrive && (route.taskIndex === completedTasks);
+                const stopCount = (route.stops) ? route.stops.length : 0;
+                const totalKmRoute = (route.totalKm) ? Number(route.totalKm).toFixed(1) : ((route.stops && route.stops.length > 0) ? route.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0).toFixed(1) : '0.0');
+                routeLookupMap.set(route.id, { route, isLocked, taskNum: (typeof route.taskIndex === 'number') ? (route.taskIndex + 1) : 1 });
+
+                if (isLocked) return;
+                const opt = document.createElement('option');
+                opt.value = route.id;
+                const prefix = !isFreeDrive
+                    ? (isCurrentTask ? '[AKTİF GÖREV] ' : '[TAMAMLANDI] ')
+                    : (route.hatNo ? ('[Hat ' + route.hatNo + '] ') : '');
+                opt.textContent = prefix + route.name + ' (' + stopCount + ' Durak, ' + totalKmRoute + ' km)';
+                quickSelect.appendChild(opt);
+                if (isCurrentTask || !defaultQuickId) defaultQuickId = route.id;
+            });
+            if (defaultQuickId) quickSelect.value = defaultQuickId;
+
+            const triggerSelectedQuickRoute = () => {
+                const selId = quickSelect.value;
+                const entry = routeLookupMap.get(selId);
+                if (entry) {
+                    launchRouteByObj(entry.route, entry.isLocked, entry.taskNum);
                 }
             };
-
-            li.appendChild(btn);
-            listEl.appendChild(li);
-        });
-        
-        KeyboardNav.initForScreen();
-        if (activeTaskBtn) {
-            try {
-                activeTaskBtn.focus();
-            } catch(e) {}
+            quickSelect._launchSelected = triggerSelectedQuickRoute;
+            if (!quickSelect._nvdaKeyBound) {
+                quickSelect._nvdaKeyBound = true;
+                quickSelect.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        if (typeof quickSelect._launchSelected === 'function') quickSelect._launchSelected();
+                    }
+                });
+            }
+            if (btnQuickLaunch) {
+                btnQuickLaunch.onclick = () => {
+                    if (typeof quickSelect._launchSelected === 'function') quickSelect._launchSelected();
+                };
+            }
         }
-        const routeWelcome = isFreeDrive ? `${activeDist} serbest sürüş güzergahları listelendi.` : `İlerleme Modu açıldı. Aktif sefer emriniz hazır.`;
+
+        // 3. ROTALARI AÇILIR-KAPANIR (ACCORDION) KATEGORİLERE AYIR
+        const buildGroups = (filterText = '') => {
+            const q = (filterText || '').trim().toLowerCase();
+            const filtered = !q ? routesToRender : routesToRender.filter(r => {
+                const hay = [
+                    r.name || '',
+                    r.hatNo || '',
+                    r.startStop || '',
+                    r.endStop || '',
+                    r.district || '',
+                    (Array.isArray(r.stops) ? r.stops.map(s => s.name || '').join(' ') : '')
+                ].join(' ').toLowerCase();
+                return hay.includes(q);
+            });
+
+            const statusEl = document.getElementById('nvda-route-filter-status');
+            if (statusEl) {
+                statusEl.textContent = q
+                    ? ('"' + filterText + '" araması için ' + filtered.length + ' rota bulundu.')
+                    : ('Toplam ' + filtered.length + ' rota açılır-kapanır kategorilerde hazır.');
+            }
+
+            listEl.innerHTML = '';
+            if (filtered.length === 0) {
+                listEl.innerHTML = '<li style="text-align:center; color:#cbd5e1; padding:18px;">Aramanıza uygun hat veya durak bulunamadı.</li>';
+                KeyboardNav.initForScreen();
+                return null;
+            }
+
+            let groups = [];
+            if (!isFreeDrive) {
+                const curList = filtered.filter(r => r.taskIndex === completedTasks);
+                const doneList = filtered.filter(r => typeof r.taskIndex === 'number' && r.taskIndex < completedTasks);
+                const lockList = filtered.filter(r => typeof r.taskIndex === 'number' && r.taskIndex > completedTasks);
+                const otherList = filtered.filter(r => typeof r.taskIndex !== 'number');
+
+                if (curList.length > 0) groups.push({ id: 'grp-active-task', title: '🟢 Aktif Sefer Göreviniz', open: true, border: '#22c55e', items: curList });
+                if (otherList.length > 0) groups.push({ id: 'grp-other-task', title: '🚍 Mevcut Hatlar', open: curList.length === 0, border: '#38bdf8', items: otherList });
+                if (doneList.length > 0) groups.push({ id: 'grp-done-tasks', title: '✅ Tamamlanan Görevler', open: !!q, border: '#10b981', items: doneList });
+                if (lockList.length > 0) groups.push({ id: 'grp-locked-tasks', title: '🔒 Sıradaki Kilitli Görev', open: !!q, border: '#ef4444', items: lockList });
+            } else {
+                const mainHubs = [];
+                const industrial = [];
+                const interDistrict = [];
+                const localStreets = [];
+
+                filtered.forEach(r => {
+                    const nm = ((r.name || '') + ' ' + (r.startStop || '') + ' ' + (r.endStop || '')).toLowerCase();
+                    const totalKmVal = r.totalKm || 0;
+                    if (r.isDistrict || totalKmVal >= 25 || nm.includes('otogar') && (nm.includes('saray') || nm.includes('çorlu') || nm.includes('malkara') || nm.includes('şarköy') || nm.includes('çerkezköy') || nm.includes('hayrabolu') || nm.includes('ereğli'))) {
+                        interDistrict.push(r);
+                    } else if (nm.includes('sanayi') || nm.includes('osb') || nm.includes('toki') || nm.includes('fabrika') || nm.includes('organize')) {
+                        industrial.push(r);
+                    } else if (nm.includes('hastane') || nm.includes('üniversite') || nm.includes('kampüs') || nm.includes('değirmenaltı') || nm.includes('2/7') || nm.includes('genel ilçe turu')) {
+                        mainHubs.push(r);
+                    } else {
+                        localStreets.push(r);
+                    }
+                });
+
+                if (mainHubs.length > 0) groups.push({ id: 'grp-main-hubs', title: '⭐ Ana Hatlar, Üniversite & Hastane Güzergahları', open: true, border: '#22c55e', items: mainHubs });
+                if (localStreets.length > 0) groups.push({ id: 'grp-local-streets', title: '🏙️ Şehir İçi Mahalle, Çarşı & Ring Hatları', open: mainHubs.length === 0 || !!q, border: '#38bdf8', items: localStreets });
+                if (industrial.length > 0) groups.push({ id: 'grp-industrial', title: '🏭 Sanayi, OSB & TOKİ Hatları', open: (mainHubs.length === 0 && localStreets.length === 0) || !!q, border: '#f59e0b', items: industrial });
+                if (interDistrict.length > 0) groups.push({ id: 'grp-interdistrict', title: '🛣️ İlçeler Arası & Uzun Koridor Hatları', open: (mainHubs.length === 0 && localStreets.length === 0 && industrial.length === 0) || !!q, border: '#a855f7', items: interDistrict });
+            }
+
+            let activeTaskBtn = null;
+
+            groups.forEach((grp) => {
+                const groupLi = document.createElement('li');
+                groupLi.style.marginBottom = '12px';
+                groupLi.style.listStyle = 'none';
+
+                const heading = document.createElement('h2');
+                heading.style.margin = '0';
+                heading.style.fontSize = '1.05rem';
+
+                const headerBtn = document.createElement('button');
+                headerBtn.type = 'button';
+                headerBtn.className = 'menu-btn nav-item route-accordion-header';
+                headerBtn.setAttribute('aria-expanded', grp.open ? 'true' : 'false');
+                headerBtn.setAttribute('aria-controls', grp.id);
+                headerBtn.style.width = '100%';
+                headerBtn.style.display = 'flex';
+                headerBtn.style.justifyContent = 'space-between';
+                headerBtn.style.alignItems = 'center';
+                headerBtn.style.padding = '13px 18px';
+                headerBtn.style.background = 'rgba(15, 23, 42, 0.92)';
+                headerBtn.style.border = '1.8px solid ' + grp.border;
+                headerBtn.style.borderRadius = '10px';
+                headerBtn.style.cursor = 'pointer';
+
+                const updateHeaderVisual = (isOpen) => {
+                    headerBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                    headerBtn.setAttribute('aria-label', grp.title + ' (' + grp.items.length + ' rota). ' + (isOpen ? 'Açık menü, daraltmak için Enter tuşuna basın.' : 'Kapalı menü, rotaları görmek için Enter tuşuna basın.'));
+                    headerBtn.innerHTML =
+                        '<span style="font-weight:bold; color:#f8fafc; font-size:1.05rem;">' + grp.title + ' <span style="color:#94a3b8; font-size:0.9rem;">(' + grp.items.length + ' Rota)</span></span>' +
+                        '<span class="acc-arrow" style="color:' + grp.border + '; font-weight:bold; font-size:0.95rem;">' + (isOpen ? '▼ Kapat' : '▶ Aç') + '</span>';
+                };
+                updateHeaderVisual(grp.open);
+
+                const panelDiv = document.createElement('div');
+                panelDiv.id = grp.id;
+                panelDiv.setAttribute('role', 'region');
+                panelDiv.setAttribute('aria-label', grp.title);
+                panelDiv.style.marginTop = '8px';
+                panelDiv.style.paddingLeft = '6px';
+                if (!grp.open) panelDiv.classList.add('hidden');
+
+                headerBtn.onclick = () => {
+                    const willOpen = panelDiv.classList.contains('hidden');
+                    panelDiv.classList.toggle('hidden', !willOpen);
+                    updateHeaderVisual(willOpen);
+                    if (typeof audio !== 'undefined' && audio.playNav) audio.playNav();
+                    if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+                        audio.updateNvdaLiveRegion(grp.title + (willOpen ? (' açıldı, ' + grp.items.length + ' rota listelendi.') : ' kapatıldı.'));
+                    }
+                    KeyboardNav.initForScreen();
+                    headerBtn.focus();
+                };
+
+                grp.items.forEach((route, rIdx) => {
+                    const taskNum = (typeof route.taskIndex === 'number') ? (route.taskIndex + 1) : (rIdx + 1);
+                    const isCurrentTask = !isFreeDrive && (route.taskIndex === completedTasks);
+                    const isCompleted = !isFreeDrive && (typeof route.taskIndex === 'number' && route.taskIndex < completedTasks);
+                    const isLocked = !isFreeDrive && (typeof route.taskIndex === 'number' && route.taskIndex > completedTasks);
+
+                    const startStop = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "Kalkış Garajı");
+                    const endStop = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Varış");
+                    const stopCount = (route.stops) ? route.stops.length : 0;
+                    const totalKmRoute = (route.totalKm) ? Number(route.totalKm).toFixed(1) : ((route.stops && route.stops.length > 0) ? route.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0).toFixed(1) : '0.0');
+
+                    const itemWrap = document.createElement('div');
+                    itemWrap.style.marginBottom = '8px';
+                    itemWrap.style.background = 'rgba(30, 41, 59, 0.72)';
+                    itemWrap.style.border = isCurrentTask ? '2px solid #22c55e' : (isLocked ? '1.5px dashed rgba(239,68,68,0.55)' : '1px solid rgba(148,163,184,0.28)');
+                    itemWrap.style.borderRadius = '10px';
+                    itemWrap.style.padding = '8px 10px';
+
+                    const rowTop = document.createElement('div');
+                    rowTop.style.display = 'flex';
+                    rowTop.style.flexWrap = 'wrap';
+                    rowTop.style.gap = '8px';
+                    rowTop.style.alignItems = 'center';
+
+                    const launchBtn = document.createElement('button');
+                    launchBtn.type = 'button';
+                    launchBtn.className = 'menu-btn nav-item' + (isCurrentTask ? ' primary-btn' : '');
+                    launchBtn.style.flex = '1';
+                    launchBtn.style.minWidth = '230px';
+                    launchBtn.style.textAlign = 'left';
+                    launchBtn.style.padding = '10px 14px';
+                    launchBtn.style.margin = '0';
+                    launchBtn.style.display = 'flex';
+                    launchBtn.style.justifyContent = 'space-between';
+                    launchBtn.style.alignItems = 'center';
+                    if (isLocked) {
+                        launchBtn.style.opacity = '0.75';
+                        launchBtn.setAttribute('aria-disabled', 'true');
+                    }
+                    if (isCurrentTask && !activeTaskBtn) activeTaskBtn = launchBtn;
+
+                    const icon = isFreeDrive ? '🚍' : (isCurrentTask ? '🟢' : (isCompleted ? '✅' : '🔒'));
+                    const cleanLabel = isLocked
+                        ? ('Görev ' + taskNum + ': ' + route.name + '. Kilitli. Önce Görev ' + (completedTasks + 1) + ' tamamlanmalı.')
+                        : ((isFreeDrive ? '' : ('Görev ' + taskNum + ': ')) + route.name + '. Kalkış: ' + startStop + ', Varış: ' + endStop + ', ' + stopCount + ' durak, ' + totalKmRoute + ' kilometre. Seferi başlatmak için Enter tuşuna basın.');
+                    launchBtn.setAttribute('aria-label', cleanLabel);
+
+                    launchBtn.innerHTML =
+                        '<span style="display:block;">' +
+                            '<strong style="color:' + (isLocked ? '#f87171' : (isCurrentTask ? '#4ade80' : '#f8fafc')) + '; font-size:1.02rem;">' + icon + ' ' + route.name + '</strong>' +
+                            '<small style="display:block; color:#cbd5e1; font-size:0.86rem; margin-top:3px;">📍 ' + startStop + ' ➔ 🏁 ' + endStop + '</small>' +
+                        '</span>' +
+                        '<span style="background:rgba(56,189,248,0.18); color:#7dd3fc; padding:4px 9px; border-radius:6px; font-size:0.82rem; font-weight:bold; white-space:nowrap;">' + stopCount + ' Durak • ' + totalKmRoute + ' km</span>';
+
+                    launchBtn.onclick = () => launchRouteByObj(route, isLocked, taskNum);
+
+                    // Açılır-Kapanır Durak & Detay Düğmesi
+                    const detailPanelId = 'route-detail-' + grp.id + '-' + rIdx;
+                    const detailBtn = document.createElement('button');
+                    detailBtn.type = 'button';
+                    detailBtn.className = 'modern-btn nav-item';
+                    detailBtn.setAttribute('aria-expanded', 'false');
+                    detailBtn.setAttribute('aria-controls', detailPanelId);
+                    detailBtn.setAttribute('aria-label', route.name + ' durak listesini ve detaylarını göster (' + stopCount + ' durak)');
+                    detailBtn.style.padding = '9px 12px';
+                    detailBtn.style.fontSize = '0.84rem';
+                    detailBtn.style.background = 'rgba(56,189,248,0.12)';
+                    detailBtn.style.border = '1px solid rgba(56,189,248,0.4)';
+                    detailBtn.style.color = '#7dd3fc';
+                    detailBtn.style.borderRadius = '8px';
+                    detailBtn.style.cursor = 'pointer';
+                    detailBtn.textContent = '📋 Duraklar (' + stopCount + ')';
+
+                    const detailDiv = document.createElement('div');
+                    detailDiv.id = detailPanelId;
+                    detailDiv.className = 'hidden';
+                    detailDiv.style.marginTop = '8px';
+                    detailDiv.style.padding = '10px 14px';
+                    detailDiv.style.background = 'rgba(15, 23, 42, 0.85)';
+                    detailDiv.style.borderRadius = '8px';
+                    detailDiv.style.borderLeft = '3px solid #38bdf8';
+                    detailDiv.style.fontSize = '0.88rem';
+                    detailDiv.style.color = '#e2e8f0';
+
+                    detailBtn.onclick = () => {
+                        const openNow = detailDiv.classList.contains('hidden');
+                        if (openNow && !detailDiv._populated) {
+                            detailDiv._populated = true;
+                            const stopsArr = Array.isArray(route.stops) ? route.stops : [];
+                            const stopsItemsHtml = stopsArr.map((s, idx) => '<li>' + (idx + 1) + '. ' + (s.name || 'Durak') + '</li>').join('');
+                            const cardSteps = (typeof MissionReader !== "undefined" && MissionReader.generateSteps) ? MissionReader.generateSteps(route) : [];
+                            const stepsHtml = cardSteps.length > 0
+                                ? ('<div style="margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.1);"><strong>Görev Özeti:</strong><br>' + cardSteps.map(st => '• ' + st).join('<br>') + '</div>')
+                                : '';
+                            detailDiv.innerHTML =
+                                '<strong>🛑 Durak Sırası (' + stopsArr.length + ' Durak):</strong>' +
+                                '<ol style="margin:6px 0 0 18px; line-height:1.55;">' + stopsItemsHtml + '</ol>' +
+                                stepsHtml;
+                        }
+                        detailDiv.classList.toggle('hidden', !openNow);
+                        detailBtn.setAttribute('aria-expanded', openNow ? 'true' : 'false');
+                        detailBtn.textContent = openNow ? '🔼 Durakları Gizle' : ('📋 Duraklar (' + stopCount + ')');
+                        detailBtn.setAttribute('aria-label', route.name + (openNow ? ' durak listesini gizle' : (' durak listesini göster (' + stopCount + ' durak)')));
+                        if (typeof audio !== 'undefined' && audio.playNav) audio.playNav();
+                    };
+
+                    rowTop.appendChild(launchBtn);
+                    rowTop.appendChild(detailBtn);
+                    itemWrap.appendChild(rowTop);
+                    itemWrap.appendChild(detailDiv);
+                    panelDiv.appendChild(itemWrap);
+                });
+
+                heading.appendChild(headerBtn);
+                groupLi.appendChild(heading);
+                groupLi.appendChild(panelDiv);
+                listEl.appendChild(groupLi);
+            });
+
+            KeyboardNav.initForScreen();
+            return activeTaskBtn;
+        };
+
+        const filterInput = document.getElementById('nvda-route-filter-input');
+        if (filterInput) {
+            filterInput.value = '';
+            filterInput.oninput = () => {
+                buildGroups(filterInput.value);
+            };
+        }
+
+        const btnToggleAll = document.getElementById('btn-nvda-toggle-all-groups');
+        if (btnToggleAll) {
+            btnToggleAll.setAttribute('aria-expanded', 'false');
+            btnToggleAll.textContent = '📂 Tüm Kategorileri Aç';
+            btnToggleAll.onclick = () => {
+                const expandAll = btnToggleAll.getAttribute('aria-expanded') !== 'true';
+                btnToggleAll.setAttribute('aria-expanded', expandAll ? 'true' : 'false');
+                btnToggleAll.textContent = expandAll ? '📁 Tüm Kategorileri Kapat' : '📂 Tüm Kategorileri Aç';
+                const headers = listEl.querySelectorAll('.route-accordion-header');
+                headers.forEach(hb => {
+                    const isExp = hb.getAttribute('aria-expanded') === 'true';
+                    if (isExp !== expandAll) hb.click();
+                });
+                KeyboardNav.initForScreen();
+                btnToggleAll.focus();
+            };
+        }
+
+        const activeTaskBtn = buildGroups('');
+        if (activeTaskBtn) {
+            try { activeTaskBtn.focus(); } catch (e) {}
+        } else if (quickSelect) {
+            try { quickSelect.focus(); } catch (e) {}
+        }
+
+        const routeWelcome = isFreeDrive
+            ? (activeDist + ' serbest sürüş rotaları açılır-kapanır kategorilerde hazır.')
+            : 'Rota menüsü açıldı. Aktif sefer göreviniz hazır.';
         if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(routeWelcome);
     },
 
@@ -843,7 +1182,7 @@ const KeyboardNav = {
         elements.forEach(el => {
             if (seen.has(el)) return;
             seen.add(el);
-            if (el.disabled || el.classList.contains('hidden')) return;
+            if (el.disabled || el.classList.contains('hidden') || el.closest('.hidden')) return;
             const style = window.getComputedStyle(el);
             if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
                 this.items.push(el);
@@ -963,7 +1302,7 @@ function getVisibleFormControls(container) {
     candidates.forEach(el => {
         if (seen.has(el)) return;
         seen.add(el);
-        if (el.classList.contains('hidden') || el.disabled) return;
+        if (el.classList.contains('hidden') || el.disabled || el.closest('.hidden')) return;
         const style = window.getComputedStyle(el);
         if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
             result.push(el);
