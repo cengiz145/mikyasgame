@@ -6291,7 +6291,10 @@ const Game = {
                 return;
             }
             const status = this.getComfortStatus();
-            const msg = `Yolcu Konfor Endeksi: Yüzde ${Math.round(this.passengerComfort)}. Sürüş kalitesi ${status}.`;
+            const angerInfo = (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.getAngerStatusText === 'function')
+                ? (' ' + window.HumanNpcVoices.getAngerStatusText())
+                : '';
+            const msg = `Yolcu Konfor Endeksi: Yüzde ${Math.round(this.passengerComfort)}. Sürüş kalitesi ${status}.${angerInfo}`;
             if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, 'info');
             return;

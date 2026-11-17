@@ -503,7 +503,10 @@
                         interrupt: true,
                         nvdaText: riot.label + ' Yolcular kapıyı yumruklayıp Beyaz Masaya şikayet etti! Eksi 50 Lira konfor cezası!',
                         toastText: `🚨 ${riot.label} (-50 ₺ Beyaz Masa Cezası!)`,
-                        toastType: 'error'
+                        toastType: 'error',
+                        onend: () => {
+                            setTimeout(() => this.playRiotDispatchAlert(5), 350);
+                        }
                     });
                 }, 420);
                 return true;
@@ -525,6 +528,7 @@
                 this.playClip(CLIPS.sfxUproar, { pan: 0, volume: 0.45, backgroundSfx: true });
             }
 
+            const isLvl4Warn = (this.angerLevel === 4);
             const chosen = this.pickRandom(pool);
             const randomCabinPan = Number(((Math.random() - 0.5) * 0.55).toFixed(2));
             setTimeout(() => {
@@ -532,12 +536,50 @@
                     pan: randomCabinPan,
                     volume: this.angerLevel >= 4 ? 0.98 : 0.94,
                     interrupt: this.angerLevel >= 4,
-                    nvdaText: chosen.label,
-                    toastText: `${toastPrefix} ${chosen.label}`,
-                    toastType: toastLvl
+                    nvdaText: chosen.label + (isLvl4Warn ? ' Dikkat: Yolcu gerginliği 4. seviyede! Bir sarsıntı daha olursa 5. seviye kabin isyanı çıkacak!' : ''),
+                    toastText: `${toastPrefix} [Seviye ${this.angerLevel}/5] ${chosen.label}`,
+                    toastType: toastLvl,
+                    onend: () => {
+                        if (isLvl4Warn) {
+                            setTimeout(() => this.playRiotDispatchAlert(4), 380);
+                        }
+                    }
                 });
             }, 320);
             return true;
+        },
+
+        playRiotDispatchAlert: function (lvl) {
+            if (!this.canSpeakInCabin()) return;
+            const file = lvl >= 5 ? 'dispatch_riot_lvl5.mp3' : 'dispatch_riot_warn_lvl4.mp3';
+            if (typeof audio !== 'undefined' && typeof audio.playRadioSquelch === 'function') {
+                audio.playRadioSquelch(true);
+            }
+            setTimeout(() => {
+                this.playClip(file, {
+                    pan: -0.2,
+                    volume: 0.95,
+                    toastText: lvl >= 5
+                        ? '📻 [MERKEZ]: 5. Seviye Kabin İsyanı! Beyaz Masa şikayeti ve -50 ₺ ceza işlendi!'
+                        : '📻 [MERKEZ İKAZI]: Yolcu Gerginliği 4/5! 5. seviyede isyan çıkacak, Alt+V ile kolonya dağıtın veya yavaşlayın!',
+                    toastType: lvl >= 5 ? 'error' : 'warning',
+                    onend: () => {
+                        if (typeof audio !== 'undefined' && typeof audio.playRadioSquelch === 'function') {
+                            setTimeout(() => audio.playRadioSquelch(false), 85);
+                        }
+                    }
+                });
+            }, 160);
+        },
+
+        getAngerStatusText: function () {
+            const lvl = this.angerLevel || 0;
+            if (lvl === 0) return 'Yolcu gerginliği 5 üzerinden 0, herkes huzurlu.';
+            if (lvl === 1) return 'Yolcu gerginliği 5 üzerinden 1, hafif huzursuzluk var.';
+            if (lvl === 2) return 'Yolcu gerginliği 5 üzerinden 2, yolcular sitemli.';
+            if (lvl === 3) return 'Yolcu gerginliği 5 üzerinden 3, yolcular öfkeli.';
+            if (lvl === 4) return 'Dikkat! Yolcu gerginliği 5 üzerinden 4, kritik sınır! Bir sarsıntıda 5. seviye kabin isyanı çıkabilir, Alt ve V ile kolonya ikram edin!';
+            return 'Alarm! Yolcu gerginliği 5 üzerinden 5, kabinde isyan var!';
         },
 
         onRearDoorBanging: function () {
