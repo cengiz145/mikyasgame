@@ -261,6 +261,7 @@
 
         isPlayingNow: function () {
             try {
+                if (this._ptsPlayingUntil && performance.now() < this._ptsPlayingUntil) return true;
                 return !!(this.activeHowl && typeof this.activeHowl.playing === 'function' && this.activeHowl.playing());
             } catch (e) {
                 return false;
@@ -523,6 +524,9 @@
             if (this._demoFightInterval) {
                 clearInterval(this._demoFightInterval);
                 this._demoFightInterval = null;
+            }
+            if (typeof this._stopPtsVoiceSequence === 'function') {
+                this._stopPtsVoiceSequence();
             }
             if (typeof this.stopPolicePursuit === 'function') {
                 this.stopPolicePursuit();
@@ -1843,18 +1847,306 @@
             const rawName = (typeof Game !== 'undefined' && Game.username) ? String(Game.username).trim() : 'Kaptan';
             const isGen = /^kaptan(\s*\d+)?$/i.test(rawName);
             const first = rawName.split(/\s+/)[0] || 'Kaptan';
+            const addr = isGen ? 'Kaptan' : `${first} Kaptan`;
             return {
                 driverName: rawName,
                 firstWord: first,
                 isGenericCaptain: isGen,
-                politeAddress: isGen ? 'Kaptan' : `${first} Kaptan`,
-                sternAddress: isGen ? 'Şoför efendi' : `Şoför ${first}`,
-                recordHolder: isGen ? 'Kaptan Şoför' : rawName,
+                politeAddress: addr,
+                sternAddress: addr,
+                recordHolder: isGen ? 'Kaptan' : `${rawName} (Kaptan)`,
                 plate: '59 TKL 059',
                 busName: 'Yolcu Otobüsü',
-                licenseTitle: 'Kaptan Şoför',
+                licenseTitle: 'Kaptan',
                 cityName: 'Tekirdağ'
             };
+        },
+
+        // --- GERÇEK POLİS SESİYLE (ELEVENLABS POLİS ATAKAN) DİNAMİK PLAKA VE İSİM OKUMA MOTORU ---
+        _ptsBufferCache: {},
+        _activePtsNodes: [],
+        _ptsSequenceEndTimer: null,
+        _ptsPlayingUntil: 0,
+
+        _stopPtsVoiceSequence: function () {
+            if (this._ptsSequenceEndTimer) {
+                clearTimeout(this._ptsSequenceEndTimer);
+                this._ptsSequenceEndTimer = null;
+            }
+            if (Array.isArray(this._activePtsNodes) && this._activePtsNodes.length > 0) {
+                this._activePtsNodes.forEach(n => {
+                    try { n.stop(); n.disconnect(); } catch (e) {}
+                });
+                this._activePtsNodes = [];
+            }
+            this._ptsPlayingUntil = 0;
+        },
+
+        _slugifyTrName: function (word) {
+            const map = { 'ç': 'c', 'Ç': 'c', 'ğ': 'g', 'Ğ': 'g', 'ı': 'i', 'İ': 'i', 'i': 'i', 'ö': 'o', 'Ö': 'o', 'ş': 's', 'Ş': 's', 'ü': 'u', 'Ü': 'u' };
+            return String(word || '').split('').map(c => map[c] || c).join('').toLowerCase().replace(/[^a-z0-9]/g, '');
+        },
+
+        resolveNamePtsClip: function (driverName) {
+            const namesMap = (typeof window !== 'undefined' && window.POLICE_PTS_NAMES) ? window.POLICE_PTS_NAMES : null;
+            if (namesMap && driverName) {
+                const parts = String(driverName).trim().split(/\s+/);
+                for (let i = 0; i < parts.length; i++) {
+                    const slug = this._slugifyTrName(parts[i]);
+                    if (slug && slug !== 'kaptan' && namesMap[slug]) {
+                        return namesMap[slug];
+                    }
+                }
+            }
+            return 'nm_kaptan.mp3';
+        },
+
+        tokenizePlateToPtsClips: function (plateStr) {
+            const raw = String(plateStr || '59 TKL 059').trim();
+            const groups = raw.match(/[0-9]+|[A-Za-zÇĞİÖŞÜçğıöşü]+/g) || ['59', 'TKL', '059'];
+            const letterMap = {
+                'Ç': 'l_CC.mp3', 'Ğ': 'l_GG.mp3', 'I': 'l_I.mp3', 'İ': 'l_II.mp3',
+                'Ö': 'l_OO.mp3', 'Ş': 'l_SS.mp3', 'Ü': 'l_UU.mp3'
+            };
+            const seq = [];
+
+            groups.forEach(grp => {
+                if (/^[0-9]+$/.test(grp)) {
+                    const numParts = [];
+                    if (/^0+$/.test(grp)) {
+                        for (let z = 0; z < grp.length; z++) numParts.push('n_0.mp3');
+                    } else {
+                        let idx = 0;
+                        while (idx < grp.length - 1 && grp[idx] === '0') {
+                            numParts.push('n_0.mp3');
+                            idx++;
+                        }
+                        const remStr = grp.slice(idx);
+                        const val = parseInt(remStr, 10);
+                        if (!isNaN(val) && val > 0 && val <= 9999) {
+                            const th = Math.floor(val / 1000);
+                            const hu = Math.floor((val % 1000) / 100) * 100;
+                            const te = Math.floor((val % 100) / 10) * 10;
+                            const un = val % 10;
+                            if (th === 1) numParts.push('n_1000.mp3');
+                            else if (th >= 2) { numParts.push(`n_${th}.mp3`); numParts.push('n_1000.mp3'); }
+                            if (hu > 0) numParts.push(`n_${hu}.mp3`);
+                            if (te > 0) numParts.push(`n_${te}.mp3`);
+                            if (un > 0) numParts.push(`n_${un}.mp3`);
+                        } else {
+                            for (let d = 0; d < remStr.length; d++) {
+                                numParts.push(`n_${remStr[d]}.mp3`);
+                            }
+                        }
+                    }
+                    numParts.forEach((f, i) => {
+                        seq.push({ file: f, gap: (i === numParts.length - 1) ? 0.08 : 0.020 });
+                    });
+                } else {
+                    const upper = grp.toLocaleUpperCase('tr-TR');
+                    const chars = Array.from(upper);
+                    chars.forEach((ch, i) => {
+                        let f = letterMap[ch];
+                        if (!f && /^[A-Z]$/.test(ch)) f = `l_${ch}.mp3`;
+                        if (f) {
+                            seq.push({ file: f, gap: (i === chars.length - 1) ? 0.08 : 0.042 });
+                        }
+                    });
+                }
+            });
+            return seq;
+        },
+
+        _loadPtsBuffer: function (ctx, file) {
+            if (this._ptsBufferCache[file]) {
+                return Promise.resolve(this._ptsBufferCache[file]);
+            }
+            const url = 'sounds/police_pts/' + file + AUDIO_VER;
+            return fetch(url)
+                .then(r => {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.arrayBuffer();
+                })
+                .then(ab => ctx.decodeAudioData(ab))
+                .then(decoded => {
+                    this._ptsBufferCache[file] = decoded;
+                    return decoded;
+                });
+        },
+
+        playPolicePtsVoice: function (scenario, opts = {}) {
+            const force = !!opts.force;
+            if (!this.canSpeakInCabin(force)) {
+                if (opts.fallbackNvdaText && typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                    audio.updateNvdaLiveRegion(opts.fallbackNvdaText);
+                }
+                if (typeof opts.onend === 'function') opts.onend();
+                return false;
+            }
+
+            if (opts.toastText && typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
+                UI.showToast(opts.toastText, opts.toastType || 'info');
+            }
+
+            const ctx = (typeof audio !== 'undefined' && audio.ctx)
+                ? audio.ctx
+                : ((typeof Howler !== 'undefined' && Howler.ctx) ? Howler.ctx : null);
+
+            if (!ctx) {
+                if (opts.fallbackNvdaText && typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                    audio.updateNvdaLiveRegion(opts.fallbackNvdaText);
+                }
+                if (typeof opts.onend === 'function') opts.onend();
+                return false;
+            }
+            if (ctx.state === 'suspended') {
+                ctx.resume().catch(() => {});
+            }
+
+            const id = this.getPoliceIdentity();
+            const plateTokens = this.tokenizePlateToPtsClips(id.plate);
+            const nameClipPolite = this.resolveNamePtsClip(id.driverName, false);
+            const nameClipStern = this.resolveNamePtsClip(id.driverName, true);
+
+            let plan = [];
+            if (scenario === 'chase_start') {
+                plan = [
+                    { file: 'phr_dikkat.mp3', gap: 0.07 },
+                    ...plateTokens,
+                    { file: 'phr_plakali_otobus.mp3', gap: 0.07 },
+                    { file: nameClipPolite, gap: 0.07 },
+                    { file: 'phr_saga_cek.mp3', gap: 0.05 }
+                ];
+            } else if (scenario === 'chase_escalate') {
+                plan = [
+                    { file: 'phr_merkez.mp3', gap: 0.06 },
+                    ...plateTokens,
+                    { file: 'phr_plakali_otobus.mp3', gap: 0.06 },
+                    { file: 'phr_kaciyor_barikat.mp3', gap: 0.05 }
+                ];
+            } else if (scenario === 'pullover_stern') {
+                plan = [
+                    { file: nameClipStern, gap: 0.07 },
+                    ...plateTokens,
+                    { file: 'phr_plakali_otobus.mp3', gap: 0.07 },
+                    { file: 'phr_indir_cami_ceza.mp3', gap: 0.05 }
+                ];
+            } else if (scenario === 'roadblock_bust') {
+                plan = [
+                    { file: nameClipStern, gap: 0.07 },
+                    ...plateTokens,
+                    { file: 'phr_plakali_otobus.mp3', gap: 0.07 },
+                    { file: 'phr_barikat_yakalandi.mp3', gap: 0.05 }
+                ];
+            } else if (scenario === 'inspect_clean') {
+                plan = [
+                    ...plateTokens,
+                    { file: 'phr_plakali_otobus.mp3', gap: 0.06 },
+                    { file: nameClipPolite, gap: 0.06 },
+                    { file: 'phr_denetim_temiz.mp3', gap: 0.05 }
+                ];
+            } else if (scenario === 'inspect_fine') {
+                plan = [
+                    ...plateTokens,
+                    { file: 'phr_plakali_otobus.mp3', gap: 0.06 },
+                    { file: nameClipPolite, gap: 0.06 },
+                    { file: 'phr_denetim_ceza.mp3', gap: 0.05 }
+                ];
+            } else if (scenario === 'pts_warn') {
+                plan = [
+                    ...plateTokens,
+                    { file: 'phr_plakali_otobus.mp3', gap: 0.06 },
+                    { file: nameClipPolite, gap: 0.06 },
+                    { file: 'phr_pts_radar_uyari.mp3', gap: 0.05 }
+                ];
+            } else {
+                plan = [
+                    ...plateTokens,
+                    { file: 'phr_plakali_otobus.mp3', gap: 0.06 },
+                    { file: nameClipPolite, gap: 0.06 },
+                    { file: 'phr_pts_temiz.mp3', gap: 0.05 }
+                ];
+            }
+
+            if (opts.interrupt) {
+                this._stopPtsVoiceSequence();
+                if (this.activeHowl) {
+                    try { this.activeHowl.stop(); } catch (e) {}
+                }
+                if (typeof window !== 'undefined' && window.speechSynthesis && window.speechSynthesis.speaking) {
+                    try { window.speechSynthesis.cancel(); } catch (e) {}
+                }
+            }
+
+            const uniqueFiles = Array.from(new Set(plan.map(p => p.file)));
+            Promise.all(uniqueFiles.map(f => this._loadPtsBuffer(ctx, f)))
+                .then(() => {
+                    this._stopPtsVoiceSequence();
+                    const baseVol = this.getVolume(typeof opts.volume === 'number' ? opts.volume : 1.0);
+                    if (baseVol <= 0.01) {
+                        if (typeof opts.onend === 'function') opts.onend();
+                        return;
+                    }
+
+                    const outGain = ctx.createGain();
+                    outGain.gain.setValueAtTime(Math.min(1.35, baseVol * 1.22), ctx.currentTime);
+
+                    let destNode = outGain;
+                    if (typeof ctx.createStereoPanner === 'function' && typeof opts.pan === 'number') {
+                        const panner = ctx.createStereoPanner();
+                        panner.pan.setValueAtTime(Math.max(-1, Math.min(1, opts.pan)), ctx.currentTime);
+                        outGain.connect(panner);
+                        panner.connect(ctx.destination);
+                    } else {
+                        outGain.connect(ctx.destination);
+                    }
+
+                    let cursor = ctx.currentTime + 0.04;
+                    const nodes = [];
+                    plan.forEach(item => {
+                        const buf = this._ptsBufferCache[item.file];
+                        if (!buf) return;
+                        const src = ctx.createBufferSource();
+                        src.buffer = buf;
+                        src.connect(destNode);
+                        src.start(cursor);
+                        nodes.push(src);
+                        cursor += buf.duration + (item.gap || 0.05);
+                    });
+
+                    this._activePtsNodes = nodes;
+                    const totalMs = Math.max(300, Math.round((cursor - ctx.currentTime) * 1000) + 120);
+                    this._ptsPlayingUntil = performance.now() + totalMs;
+
+                    if (typeof audio !== 'undefined' && typeof audio.duckForAnnouncement === 'function') {
+                        audio.duckForAnnouncement(totalMs + 250);
+                    }
+                    if (opts.radioClick && typeof audio !== 'undefined' && typeof audio.playRadioSquelch === 'function') {
+                        audio.playRadioSquelch(true);
+                    }
+
+                    this._ptsSequenceEndTimer = setTimeout(() => {
+                        this._activePtsNodes = [];
+                        this._ptsPlayingUntil = 0;
+                        this._ptsSequenceEndTimer = null;
+                        if (opts.radioClick && typeof audio !== 'undefined' && typeof audio.playRadioSquelch === 'function') {
+                            audio.playRadioSquelch(false);
+                        }
+                        if (typeof opts.onend === 'function') opts.onend();
+                    }, totalMs);
+                })
+                .catch(() => {
+                    if (opts.fallbackClip) {
+                        this.playClip(opts.fallbackClip, opts);
+                    } else {
+                        if (opts.fallbackNvdaText && typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                            audio.updateNvdaLiveRegion(opts.fallbackNvdaText);
+                        }
+                        if (typeof opts.onend === 'function') opts.onend();
+                    }
+                });
+
+            return true;
         },
 
         triggerRoadsidePtsCheck: function (gameObj, isManual = false) {
@@ -1866,47 +2158,39 @@
                 audio.playPtsScanTone();
             }
 
-            let nvdaMsg = '';
-            let toastMsg = '';
-            let toastType = 'info';
+            const isSpeeding = (g && g.isDriving && curSpeed >= 96);
+            const toastMsg = isSpeeding
+                ? `⚠️🚓 [PTS Radar Uyarısı] "${id.plate} plakalı otobüs — ${id.politeAddress}, hızın ${curSpeed} km/s! Yavaşla!"`
+                : `🚓 [Bölge Trafik PTS] "${id.plate} plakalı otobüs • ${id.politeAddress} — Kayıt Temiz, Hayırlı Seferler!"`;
+            const fallbackNvda = isSpeeding
+                ? `${id.plate} plakalı otobüs, ${id.politeAddress}, radara girdin hızını düşür!`
+                : `${id.plate} plakalı otobüs, ${id.politeAddress}, kayıt temiz, hayırlı seferler!`;
 
-            if (isManual && (!g || !g.isDriving || curSpeed < 3)) {
-                nvdaMsg = `Bölge Trafik PTS Kaydı: ${id.plate} plakalı ${id.busName}, Şoför ${id.recordHolder}, Ünvan ${id.licenseTitle}. Plaka ve ehliyet kaydı temiz.`;
-                toastMsg = `🚓 [Bölge Trafik PTS] Plaka: ${id.plate} | Şoför: ${id.recordHolder} (${id.licenseTitle}) | Araç: ${id.busName} — Kayıt Temiz`;
-                toastType = 'success';
-            } else if (curSpeed >= 96) {
-                nvdaMsg = `Bölge Trafik PTS Radar Uyarısı! ${id.plate} plakalı otobüs, ${id.politeAddress} hızın ${curSpeed}! Radara girdin, yavaşla!`;
-                toastMsg = `⚠️🚓 [PTS Radar Uyarısı] "${id.plate} plakalı otobüs — ${id.politeAddress}, hızın ${curSpeed} km/s! Yavaşla!"`;
-                toastType = 'warning';
-            } else {
-                nvdaMsg = `Bölge Trafik PTS Noktası: ${id.plate} plakalı otobüs, ${id.politeAddress}, hız ${curSpeed}. Kayıt temiz, hayırlı yolculuklar.`;
-                toastMsg = `🚓 [PTS Plaka Okuma] ${id.plate} • ${id.politeAddress} (${curSpeed} km/s) — Kayıt Temiz, Hayırlı Seferler!`;
-                toastType = 'info';
-            }
-
-            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
-                UI.showToast(toastMsg, toastType);
-            }
-            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
-                audio.updateNvdaLiveRegion(nvdaMsg);
-            }
-            return true;
+            return this.playPolicePtsVoice(isSpeeding ? 'pts_warn' : 'pts_clean', {
+                force: !!isManual,
+                interrupt: !!isManual,
+                radioClick: true,
+                pan: -0.45,
+                volume: 1.0,
+                toastText: toastMsg,
+                toastType: isSpeeding ? 'warning' : 'success',
+                fallbackNvdaText: fallbackNvda
+            });
         },
 
         playPoliceInspectionResult: function (isOverSpeed, currentSpeed, force = false) {
-            if (!this.canSpeakInCabin(force)) return false;
             const id = this.getPoliceIdentity();
-            const file = isOverSpeed ? CLIPS.policeFine : CLIPS.policeClean;
-            this.playClip(file, {
-                pan: -0.55,
-                volume: 0.98,
-                force,
+            return this.playPolicePtsVoice(isOverSpeed ? 'inspect_fine' : 'inspect_clean', {
+                force: !!force,
                 interrupt: true,
-                nvdaText: isOverSpeed
-                    ? `Trafik polisi ${id.plate} plakalı otobüse ve ${id.recordHolder} adına, ${currentSpeed} hız tespiti nedeniyle 350 Lira ceza yazdı.`
-                    : `Trafik polisi baktı: ${id.plate} plakalı otobüs, ehliyet ve takograf tertemiz, hız ${currentSpeed}. Hayırlı yolculuklar ${id.politeAddress}! Artı 30 XP.`
+                radioClick: false,
+                pan: -0.55,
+                volume: 1.0,
+                fallbackClip: isOverSpeed ? CLIPS.policeFine : CLIPS.policeClean,
+                fallbackNvdaText: isOverSpeed
+                    ? `${id.plate} plakalı otobüs, ${id.politeAddress}, hız sınırını aşmışsın, 350 Lira ceza yazıldı.`
+                    : `${id.plate} plakalı otobüs, ${id.politeAddress}, ehliyet ve takograf tertemiz, hayırlı yolculuklar!`
             });
-            return true;
         },
 
         playCologneSequence: function (force = false) {
@@ -3387,6 +3671,9 @@
                 clearInterval(this._demoFightInterval);
                 this._demoFightInterval = null;
             }
+            if (typeof this._stopPtsVoiceSequence === 'function') {
+                this._stopPtsVoiceSequence();
+            }
             if (typeof this.stopPolicePursuit === 'function') {
                 this.stopPolicePursuit();
             }
@@ -3500,6 +3787,7 @@
 
         // 17. AŞAMA 14: GERÇEK ZAMANLI 3B POLİS KOVALAMACASI, MEGAFON İHTARI & BARİKAT KISKACI AKSİYON SAHNESİ!
         stopPolicePursuit: function () {
+            this._stopPtsVoiceSequence();
             if (this._policeChaseTimers && Array.isArray(this._policeChaseTimers)) {
                 this._policeChaseTimers.forEach(t => clearTimeout(t));
                 this._policeChaseTimers = [];
@@ -3588,23 +3876,21 @@
                     : (reason === 'hit_and_run' ? 'Kaza yerini terk ihbarı' : 'Bölge Trafik PTS takibi'));
 
             const startMsg = forceDemo
-                ? `🚨 [PTS EŞLEŞTİ: ${id.plate} • ${id.politeAddress}] Bölge Trafik Ekibi Sirenle Peşinize Düştü! Megafon İhtarı -> Kaçış -> Barikat Kıskacı!`
-                : `🚨 POLİS MEGAFONU (${reasonLabel}): "${id.plate} PLAKALI OTOBÜS! DERHAL SAĞA ÇEK DUR!"`;
+                ? `🚨 [PTS EŞLEŞTİ: ${id.plate} • ${id.politeAddress}] Bölge Trafik Ekibi Sirenle Peşinize Düştü!`
+                : `🚨 POLİS MEGAFONU (${reasonLabel}): "${id.plate} PLAKALI OTOBÜS! ${id.politeAddress.toUpperCase()}, DERHAL SAĞA ÇEK!"`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(startMsg, 'error');
-            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
-                audio.updateNvdaLiveRegion(`Polis megafonu: ${id.plate} plakalı otobüs, ${id.sternAddress}! ${reasonLabel} nedeniyle derhal sağa çek ve motoru durdur! Durmak için S tuşuna basın!`);
-            }
 
             this._policeChaseTimers.push(setTimeout(() => {
                 if (!chase.active) return;
-                this.playClip('police_chase_start.mp3', {
+                this.playPolicePtsVoice('chase_start', {
                     pan: -0.62,
                     volume: 1.0,
-                    isExterior: !forceDemo,
-                    priority: 4,
                     force: forceDemo,
                     interrupt: true,
-                    toastText: `📢🚓 Polis Megafonu: "${id.plate} PLAKALI OTOBÜS, DERHAL SAĞA ÇEK VE MOTORU DURDUR!!"`,
+                    radioClick: true,
+                    fallbackClip: 'police_chase_start.mp3',
+                    fallbackNvdaText: `Polis megafonu: ${id.plate} plakalı otobüs, ${id.politeAddress}, derhal sağa çek ve motoru durdur!`,
+                    toastText: `📢🚓 Polis Megafonu: "DİKKAT! ${id.plate} PLAKALI OTOBÜS! ${id.politeAddress.toUpperCase()}, DERHAL SAĞA ÇEK VE MOTORU DURDUR!!"`,
                     toastType: 'error',
                     onend: () => {
                         if (!chase.active || chase.resolved) return;
@@ -3648,13 +3934,14 @@
             const id = this.getPoliceIdentity();
             this._policeChaseTimers.push(setTimeout(() => {
                 if (!chase.active) return;
-                this.playClip('police_chase_escalate.mp3', {
+                this.playPolicePtsVoice('chase_escalate', {
                     pan: -0.82,
                     volume: 1.0,
-                    priority: 4,
                     force: true,
                     interrupt: true,
-                    nvdaText: `Ekip telsizi merkez anonsu: Merkez, ${id.plate} plakalı otobüs dur ihtarına uymuyor, kaçmaya devam ediyor! Önünü kesin barikat kurun!`,
+                    radioClick: true,
+                    fallbackClip: 'police_chase_escalate.mp3',
+                    fallbackNvdaText: `Merkez, ${id.plate} plakalı otobüs dur ihtarına uymuyor, önünü kesin barikat kurun!`,
                     toastText: `🚨🚓 Ekip Telsizi: "MERKEZ, ${id.plate} PLAKALI OTOBÜS KAÇIYOR, ÖNÜNÜ KESİN BARİKAT KURUN!!"`,
                     toastType: 'error',
                     onend: () => {
@@ -3679,14 +3966,15 @@
                                         if (this._policeSirenHowl) {
                                             try { this._policeSirenHowl.stop(); } catch (e) {}
                                         }
-                                        this.playClip('police_roadblock_bust.mp3', {
+                                        this.playPolicePtsVoice('roadblock_bust', {
                                             pan: -0.65,
                                             volume: 1.0,
-                                            priority: 4,
                                             force: true,
                                             interrupt: true,
-                                            nvdaText: `Polis barikatı ${id.plate} plakalı otobüsün önünü kesti! Başkomiser: ${id.sternAddress}, kontağı kapat ellerini direksiyondan çek hemen!`,
-                                            toastText: `🛑🚓 BARİKAT KISKACI (${id.plate})! Başkomiser: "${id.sternAddress.toUpperCase()}, KONTAĞI KAPAT ELLERİNİ DİREKSİYONDAN ÇEK!!"`,
+                                            radioClick: false,
+                                            fallbackClip: 'police_roadblock_bust.mp3',
+                                            fallbackNvdaText: `Polis barikatı ${id.plate} plakalı otobüsün önünü kesti! ${id.sternAddress}, kontağı kapat ellerini direksiyondan çek hemen!`,
+                                            toastText: `🛑🚓 BARİKAT KISKACI (${id.plate})! "${id.politeAddress.toUpperCase()}, KONTAĞI KAPAT ELLERİNİ DİREKSİYONDAN ÇEK!!"`,
                                             toastType: 'error',
                                             onend: () => {
                                                 chase.active = false;
@@ -3730,16 +4018,19 @@
                 this.adjustCityReputation(-6);
 
                 this._policeChaseTimers.push(setTimeout(() => {
-                    this.playClip('police_pullover_stern.mp3', {
+                    this.playPolicePtsVoice('pullover_stern', {
                         pan: -0.72,
                         volume: 1.0,
-                        isExterior: false,
-                        priority: 4,
                         interrupt: true,
-                        nvdaText: `Sağa çekip durdunuz. Sert Başkomiser ehliyete ve plakaya baktı: ${id.sternAddress}, indir camı kontağı kapat! ${id.plate} plakasına ${fineAmt} Lira ceza yazıldı, dikkatli devam et.`,
-                        toastText: `👮‍♂️ Başkomiser (${id.plate}): "${id.sternAddress}, indir camı kontağı kapat! Plakana ${fineAmt} ₺ ceza yazıldı!"`,
+                        radioClick: false,
+                        fallbackClip: 'police_pullover_stern.mp3',
+                        fallbackNvdaText: `${id.sternAddress}, indir camı kontağı kapat! ${id.plate} plakasına ${fineAmt} Lira ceza yazıldı.`,
+                        toastText: `👮‍♂️ Bölge Trafik (${id.plate}): "${id.politeAddress}, indir camı kontağı kapat! Plakana ${fineAmt} ₺ ceza yazıldı!"`,
                         toastType: 'warning',
                         onend: () => {
+                            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                                audio.updateNvdaLiveRegion(`${fineAmt} Lira trafik cezası kesildi.`);
+                            }
                             this.stopPolicePursuit();
                         }
                     });
@@ -3754,16 +4045,13 @@
                 if (siren && chase.sirenSid !== null) {
                     try { siren.rate(1.18, chase.sirenSid); } catch (e) {}
                 }
-                if (typeof audio !== 'undefined' && typeof audio.playRadioSquelch === 'function') {
-                    audio.playRadioSquelch(true);
-                }
-                this.playClip('police_chase_escalate.mp3', {
+                this.playPolicePtsVoice('chase_escalate', {
                     pan: -0.84,
                     volume: 1.0,
-                    isExterior: false,
-                    priority: 4,
                     interrupt: true,
-                    nvdaText: `Polisten kaçıyorsunuz! Merkez telsiz anonsu: Merkez, ${id.plate} plakalı otobüs dur ihtarına uymuyor, kaçmaya devam ediyor! Önünü kesin barikat kurun!`,
+                    radioClick: true,
+                    fallbackClip: 'police_chase_escalate.mp3',
+                    fallbackNvdaText: `Merkez, ${id.plate} plakalı otobüs dur ihtarına uymuyor, kaçmaya devam ediyor! Önünü kesin barikat kurun!`,
                     toastText: `🚨🚓 MERKEZ TELSİZİ: "MERKEZ, ${id.plate} PLAKALI OTOBÜS KAÇIYOR, ÖNÜNÜ KESİN BARİKAT KURUN!!"`,
                     toastType: 'error',
                     onend: () => {
@@ -3775,7 +4063,6 @@
                                     pan: 0.35,
                                     volume: 0.98,
                                     priority: 4,
-                                    nvdaText: 'Yolcular çığlık atıyor: Ayyy durmuyor hala gaza basıyor polis kovalıyor bizi! Durdur şu otobüsü indir bizi delirdin mi?!',
                                     toastText: '😱🗣️ Kabinde Çığlık: "Ayyy durmuyor hala gaza basıyor polis kovalıyor bizi!! Durdur şu otobüsü!!"',
                                     toastType: 'error'
                                 });
@@ -3808,16 +4095,19 @@
                     if (this._policeSirenHowl) {
                         try { this._policeSirenHowl.stop(); } catch (e) {}
                     }
-                    this.playClip('police_roadblock_bust.mp3', {
+                    this.playPolicePtsVoice('roadblock_bust', {
                         pan: -0.75,
                         volume: 1.0,
-                        isExterior: false,
-                        priority: 4,
                         interrupt: true,
-                        nvdaText: `İleride polis barikatı ${id.plate} plakalı otobüsün yolunu kesti! Başkomiser: ${id.sternAddress}, kontağı kapat ellerini direksiyondan çek hemen! ${id.plate} plakasına 950 Lira ağır ceza yazıldı!`,
-                        toastText: `🛑🚓 BARİKAT YOLU KESTİ (${id.plate})! "${id.sternAddress.toUpperCase()}, KONTAĞI KAPAT!!" (-950 ₺ Ağır Ceza)`,
+                        radioClick: false,
+                        fallbackClip: 'police_roadblock_bust.mp3',
+                        fallbackNvdaText: `Polis barikatı ${id.plate} plakalı otobüsün yolunu kesti! ${id.sternAddress}, kontağı kapat! 950 Lira ağır ceza yazıldı!`,
+                        toastText: `🛑🚓 BARİKAT YOLU KESTİ (${id.plate})! "${id.politeAddress.toUpperCase()}, KONTAĞI KAPAT!!" (-950 ₺ Ağır Ceza)`,
                         toastType: 'error',
                         onend: () => {
+                            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                                audio.updateNvdaLiveRegion('Barikat durdurdu. 950 Lira ağır ceza kesildi.');
+                            }
                             this.stopPolicePursuit();
                         }
                     });
