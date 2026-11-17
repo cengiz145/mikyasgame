@@ -1276,19 +1276,19 @@ const SoundGallery = {
         {
             id: "human_deniz_wheeze_laugh",
             category: "human",
-            icon: "🤣",
-            title: "Atarlı Mahalle Ablası Deniz Katıla Katıla Kahkaha Krizi ('Pazar Arabası Fırladı!')",
-            specs: "rude_traffic_f1 Karakteri Deniz'in Dalağı Şişerek Kahkaha Atışı!",
-            desc: "Kırmızı ışıkta bağıran o meşhur atarlı ablanın telefonda koca herifin pazar arabasıyla yere kapaklanışını anlatırken karnına kramp girerek gülme krizi!",
+            icon: "🫁",
+            title: "Atarlı Mahalle Ablası Deniz: 'Haa' Diyemeden Ciğeri Öterek Hırıltılı Gülme Krizi!",
+            specs: "Sıfır 'Ha-Ha' Sesi • Ciğerdeki Havayı Sonuna Kadar Boşaltan Hırıltılı Gülüş",
+            desc: "Deniz'in gülmekten sesi çıkmayıp ciğerindeki tüm havayı 'hhhhhhhhhh - hırr hırr' diye boşalttığı, nefes nefese fısıldayarak olayı anlattığı gülme krizi!",
             playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.playWheezeLaughPhoneDrama) window.HumanNpcVoices.playWheezeLaughPhoneDrama("deniz", true); }
         },
         {
             id: "human_deniz_shutup_laugh",
             category: "human",
             icon: "🤭",
-            title: "Atarlı Mahalle Ablası Q İkaz Anonsu Sonrası Gülmesini Zor Tutuyor!",
-            specs: "Deniz Karakteri Kıkırdayarak Telefon Kapatma (deniz_shutup_laugh.mp3)",
-            desc: "Şoför Q tuşuyla ikaz anonsu geçince gülmesini tutamayıp 'Ay tamam be yemeyin adamı sustuk işte, kız kapat otobüsten atacak şimdi beni hahaha!' deyişi.",
+            title: "Atarlı Mahalle Ablası Q İkaz Anonsu Sonrası Hırıldayarak Telefonu Kapatıyor!",
+            specs: "Deniz Karakteri Nefesi Kesilerek Telefon Kapatma (deniz_shutup_laugh.mp3)",
+            desc: "Şoför Q tuşuyla ikaz anonsu geçince hâlâ hırıldayarak 'Ay tamam be yemeyin adamı sustuk işte, kız kapat otobüsten atacak şimdi beni hhhhhh!' deyişi.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("deniz_shutup_laugh.mp3", { pan: 0.42, volume: 1.0, force: true, interrupt: true }); }
         },
         {

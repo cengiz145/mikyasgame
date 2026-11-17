@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p12';
+    const AUDIO_VER = '?v=20261117p13';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -2838,7 +2838,7 @@
                 : (choice === 'f' ? 'wheeze_laugh_phone_f1.mp3' : 'wheeze_laugh_phone_m1.mp3');
             const pan = choice === 'm' ? -0.42 : 0.44;
             const label = choice === 'deniz'
-                ? 'Mahalle Ablası (Katıla Katıla Kahkaha Krizi): "AHAHAHA!! Ay kız dur dalağım şişti nefes alamıyorum! Koca herif otobüsün peşinden koşarken pazar arabasının tekeri fırladı boylu boyunca yapıştı yere kız AHAHAHA!!"'
+                ? 'Mahalle Ablası (Sesi Çıkmadan Ciğeri Hırıldayarak Gülme Krizi): "Hhhhhhhhhh... hıh-hıh-hıh... Ay kız sesim çıkmıyor nefesim bitti! Koca herif pazar arabasıyla yere yapıştı kız... hhhhhhhhhh... ciğerim söndü boğuluyorum!!"'
                 : (choice === 'f'
                     ? 'Telefonda Katıla Katıla Gülen Kız: "AHAHAHA!! Ay kız dur nefes alamıyorum boğulacağım! Çocuğun çantası kapıya sıkıştı pantolonu cırt diye yırtıldı kız AHAHAHA!!"'
                     : 'Telefonda Ciğeri Sökülerek Gülen Yolcu: "AHAHAHA!! Ay dur nefesim kesildi! Adam otobüse yetişecem diye koşarken ayağından terlik uçtu lan AHAHAHA!!"');
