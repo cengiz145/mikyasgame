@@ -5257,12 +5257,14 @@ const Game = {
         const bellHudArrive = document.getElementById('hud-stop-request');
         if (bellHudArrive) bellHudArrive.style.display = 'none';
 
-        // Dakiklik değerlendirmesi
+        // Dakiklik değerlendirmesi ve Canlı Yolcu Manifestosu Senkronizasyonu
         let timingArrivalNotice = "";
+        let arrivalDelta = 0;
         if (stopData && stopData.scheduledMinutes !== undefined) {
             let delta = this.clockMinutes - (stopData.scheduledMinutes % 1440);
             if (delta < -720) delta += 1440;
             else if (delta > 720) delta -= 1440;
+            arrivalDelta = delta;
             this.timingDeviations.push(delta);
             if (delta < -1.2) {
                 const early = Math.abs(Math.round(delta));
@@ -5277,6 +5279,9 @@ const Game = {
             if (typeof window.HumanNpcVoices !== 'undefined') {
                 window.HumanNpcVoices.onStopPunctuality(delta, waiting);
             }
+        }
+        if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.syncStopArrival === 'function') {
+            window.HumanNpcVoices.syncStopArrival(alighting, this.passengersOnBoard, arrivalDelta);
         }
         
         // Tekerlekli sandalye yolcusu uyarısı

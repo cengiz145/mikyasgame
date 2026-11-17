@@ -2686,6 +2686,7 @@ startEngine() {
     playBusAnnouncement(phase, stopName, options = {}) {
         if (!stopName) return;
         this.playIBISChime();
+        if (typeof window.HumanNpcVoices !== "undefined" && typeof window.HumanNpcVoices.notifyBusAnnouncement === "function") { window.HumanNpcVoices.notifyBusAnnouncement(4800); }
         
         let anonsText = '';
         if (phase === 'depart') {
