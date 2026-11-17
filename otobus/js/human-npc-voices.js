@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p27';
+    const AUDIO_VER = '?v=20261117p28';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -524,6 +524,9 @@
                 clearInterval(this._demoFightInterval);
                 this._demoFightInterval = null;
             }
+            if (typeof this.stopPolicePursuit === 'function') {
+                this.stopPolicePursuit();
+            }
             if (this.activeStreetFight && Array.isArray(this.activeStreetFight.entries)) {
                 this.activeStreetFight.entries.forEach(en => {
                     try { if (en.howl) en.howl.stop(en.sid); } catch (e) {}
@@ -810,6 +813,9 @@
         },
 
         resetForNewRoute: function () {
+            if (typeof this.stopPolicePursuit === 'function') this.stopPolicePursuit();
+            this._majorTrafficOffenses = 0;
+            this._radarOverspeedSecs = 0;
             this.angerLevel = 0;
             this.allyPoints = 0;
             this.lastLateMinutes = 0;
@@ -921,6 +927,21 @@
                                 this.playEmergencyDispatchCrash();
                             }, 4600);
                         }
+                        if (!forceTest) {
+                            this._majorTrafficOffenses = (this._majorTrafficOffenses || 0) + 1;
+                            if (this._majorTrafficOffenses >= 2 && !(this.activePoliceChase && this.activePoliceChase.active)) {
+                                const nowCh = performance.now();
+                                if (!this._lastPoliceChaseTime || (nowCh - this._lastPoliceChaseTime > 95000)) {
+                                    this._majorTrafficOffenses = 0;
+                                    setTimeout(() => {
+                                        const gCur = this.getGameObj();
+                                        if (gCur && gCur.isDriving && gCur.speed > 18) {
+                                            this.startPolicePursuit('hit_and_run', false);
+                                        }
+                                    }, 3800);
+                                }
+                            }
+                        }
                     }
                 });
             }, 260);
@@ -970,10 +991,13 @@
             }, 380);
         },
 
-        // 3. KIRMIZI IŞIK İHLALİ (YAYA GEÇİDİ ÇIĞLIĞI & ÖFKELİ SÜRÜCÜ)
+        // 3. KIRMIZI IŞIK İHLALİ (YAYA GEÇİDİ ÇIĞLIĞI, ÖFKELİ SÜRÜCÜ & AĞIR İHLALDE POLİS KOVALAMACASI!)
         onRedLightViolation: function () {
             if (!this.canSpeakInCabin()) return false;
             this.angerLevel = Math.min(4, this.angerLevel + 1);
+            this._majorTrafficOffenses = (this._majorTrafficOffenses || 0) + 1;
+            const g = this.getGameObj();
+            const curSpeed = (g && typeof g.speed === 'number') ? g.speed : 30;
             this.playClip(CLIPS.sfxHorn, { pan: 0.65, volume: 0.78, isExterior: true, backgroundSfx: true });
             const chosen = this.pickRandom(CLIPS.redLight);
             setTimeout(() => {
@@ -987,6 +1011,18 @@
                     toastType: 'error'
                 });
             }, 300);
+
+            // Yüksek hızda kırmızı ışık ihlali veya üst üste 2. ağır ihlalde Bölge Trafik Ekibi peşinize düşer!
+            const nowCh = performance.now();
+            if ((curSpeed >= 48 || this._majorTrafficOffenses >= 2) && (!this._lastPoliceChaseTime || (nowCh - this._lastPoliceChaseTime > 90000))) {
+                this._majorTrafficOffenses = 0;
+                setTimeout(() => {
+                    const gNow = this.getGameObj();
+                    if (gNow && gNow.isDriving && !(this.activePoliceChase && this.activePoliceChase.active)) {
+                        this.startPolicePursuit('red_light', false);
+                    }
+                }, 4200);
+            }
             return true;
         },
 
@@ -2021,6 +2057,22 @@
         checkSmartCabinReminders: function (gameObj, deltaTime) {
             if (!gameObj || !gameObj.isDriving || !this.canSpeakInCabin()) return;
             const now = performance.now();
+
+            // 10-00. Aktif 3B Polis Kovalamacası & Radar Aşırı Hız Takibi!
+            if (this.activePoliceChase && this.activePoliceChase.active) {
+                this.updatePolicePursuit(gameObj, deltaTime);
+                return;
+            }
+            if (gameObj.speed >= 106) {
+                this._radarOverspeedSecs = (this._radarOverspeedSecs || 0) + deltaTime;
+                if (this._radarOverspeedSecs >= 6.5 && (!this._lastPoliceChaseTime || (now - this._lastPoliceChaseTime > 110000))) {
+                    this._radarOverspeedSecs = 0;
+                    this.startPolicePursuit('radar', false);
+                    return;
+                }
+            } else {
+                this._radarOverspeedSecs = 0;
+            }
 
             // 10-0. Yolda Kavga Eden 2 Adamın Yanından Geçiş 3B Fiziği & Doğal Karşılaşma Zamanlayıcısı!
             if (this.activeStreetFight && this.activeStreetFight.active) {
@@ -3266,6 +3318,9 @@
                 clearInterval(this._demoFightInterval);
                 this._demoFightInterval = null;
             }
+            if (typeof this.stopPolicePursuit === 'function') {
+                this.stopPolicePursuit();
+            }
             if (!this._stuntTimers) this._stuntTimers = [];
 
             this._fightVariantIdx = ((this._fightVariantIdx || 0) + 1) % 2;
@@ -3372,6 +3427,318 @@
                 }
             }, 1550));
             return true;
+        },
+
+        // 17. AŞAMA 14: GERÇEK ZAMANLI 3B POLİS KOVALAMACASI, MEGAFON İHTARI & BARİKAT KISKACI AKSİYON SAHNESİ!
+        stopPolicePursuit: function () {
+            if (this._policeChaseTimers && Array.isArray(this._policeChaseTimers)) {
+                this._policeChaseTimers.forEach(t => clearTimeout(t));
+                this._policeChaseTimers = [];
+            }
+            if (this._policeSirenHowl) {
+                try { this._policeSirenHowl.stop(); } catch (e) {}
+            }
+            if (this.activePoliceChase) {
+                this.activePoliceChase.active = false;
+                this.activePoliceChase = null;
+            }
+        },
+
+        ensurePoliceSirenHowl: function () {
+            if (!this._policeSirenHowl && typeof Howl !== 'undefined') {
+                this._policeSirenHowl = new Howl({
+                    src: ['sounds/freesound_police_siren.mp3'],
+                    loop: true,
+                    volume: 0.45
+                });
+            }
+            return this._policeSirenHowl || null;
+        },
+
+        applyFineToPlayer: function (amount) {
+            const g = this.getGameObj();
+            if (!g) return;
+            g.playerBudget = Math.max(0, (g.playerBudget || 0) - amount);
+            g.sessionPenalties = (g.sessionPenalties || 0) + amount;
+            if (typeof g.saveData === 'function') g.saveData();
+            if (typeof UI !== 'undefined' && typeof UI.updatePlayerStats === 'function') {
+                UI.updatePlayerStats(g.licenseLevel, g.completedTasks, g.playerBudget, typeof g.getLicenseTitle === 'function' ? g.getLicenseTitle() : 'Kaptan');
+            }
+        },
+
+        startPolicePursuit: function (reason = 'radar', forceDemo = false) {
+            if (!this.canSpeakInCabin(forceDemo)) return false;
+            if (this.activePoliceChase && this.activePoliceChase.active && !forceDemo) return false;
+            this.stopPolicePursuit();
+            this._policeChaseTimers = [];
+            this._lastPoliceChaseTime = performance.now();
+
+            const chase = {
+                active: true,
+                isDemo: !!forceDemo,
+                reason,
+                elapsed: 0,
+                escalated: false,
+                resolved: false,
+                sirenSid: null
+            };
+            this.activePoliceChase = chase;
+
+            const siren = this.ensurePoliceSirenHowl();
+            if (siren) {
+                const sid = siren.play();
+                chase.sirenSid = sid;
+                siren.volume(this.getVolume(forceDemo ? 0.36 : 0.42), sid);
+                siren.rate(1.0, sid);
+                if (typeof siren.stereo === 'function') siren.stereo(-0.58, sid);
+                if (!forceDemo) {
+                    try {
+                        const snd = typeof siren._soundById === 'function' ? siren._soundById(sid) : null;
+                        if (snd && snd._node && this.ensureExteriorFilter()) {
+                            this.updateExteriorOcclusion();
+                            snd._node.disconnect();
+                            snd._node.connect(this.exteriorFilter);
+                            snd._mikyasRoutedExterior = true;
+                        }
+                    } catch (e) {}
+                }
+            }
+
+            if (typeof audio !== 'undefined' && typeof audio.playRadioSquelch === 'function') {
+                audio.playRadioSquelch(true);
+            }
+
+            const startMsg = forceDemo
+                ? '🚨 [AKSİYON VİTRİNİ] Bölge Trafik Ekibi Sirenle Peşinize Düştü! Megafon İhtarı -> Kaçış -> Barikat Kıskacı!'
+                : '🚨 POLİS PEŞİNİZE DÜŞTÜ! S tuşuyla yavaşlayıp sağa çekin (8 sn)! Kaçmaya devam ederseniz ileride barikat kurulacak!';
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(startMsg, 'error');
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                audio.updateNvdaLiveRegion('Polis kovalamacası başladı! Arkadan ekip otosu sirenle yaklaşıyor: Derhal sağa çek ve motoru durdur! Durmak için S tuşuna basın, kaçarsanız barikat kurulacak!');
+            }
+
+            this._policeChaseTimers.push(setTimeout(() => {
+                if (!chase.active) return;
+                this.playClip('police_chase_start.mp3', {
+                    pan: -0.62,
+                    volume: 1.0,
+                    isExterior: !forceDemo,
+                    priority: 4,
+                    force: forceDemo,
+                    interrupt: true,
+                    toastText: '📢🚓 Polis Megafonu: "OTOBÜS SÜRÜCÜSÜ, DERHAL SAĞA ÇEK VE MOTORU DURDUR!!"',
+                    toastType: 'error',
+                    onend: () => {
+                        if (!chase.active || chase.resolved) return;
+                        const g = this.getGameObj();
+                        if (forceDemo || !g || (g.passengersOnBoard || 0) > 0) {
+                            this._policeChaseTimers.push(setTimeout(() => {
+                                if (!chase.active || chase.resolved) return;
+                                this.playClip('police_cabin_panic.mp3', {
+                                    pan: 0.28,
+                                    volume: 0.96,
+                                    priority: 3,
+                                    force: forceDemo,
+                                    nvdaText: 'Kabindeki yolcu panikledi: Eyvah eyvah polis peşimize düştü siren çalıyor arkadan! Çabuk sağa çek dur başımızı belaya sokma!',
+                                    toastText: '😱 Yolcu Paniği: "Eyvah polis peşimize düştü siren çalıyor! Çabuk sağa çek dur!!"',
+                                    toastType: 'warning',
+                                    onend: () => {
+                                        if (forceDemo && chase.active) {
+                                            this._runPoliceDemoEscalation(chase);
+                                        }
+                                    }
+                                });
+                            }, 280));
+                        }
+                    }
+                });
+            }, 380));
+
+            return true;
+        },
+
+        _runPoliceDemoEscalation: function (chase) {
+            if (!chase || !chase.active) return;
+            const siren = this._policeSirenHowl;
+            if (siren && chase.sirenSid !== null) {
+                try {
+                    siren.rate(1.18, chase.sirenSid);
+                    siren.volume(this.getVolume(0.46), chase.sirenSid);
+                    if (typeof siren.stereo === 'function') siren.stereo(-0.82, chase.sirenSid);
+                } catch (e) {}
+            }
+            this._policeChaseTimers.push(setTimeout(() => {
+                if (!chase.active) return;
+                this.playClip('police_chase_escalate.mp3', {
+                    pan: -0.82,
+                    volume: 1.0,
+                    priority: 4,
+                    force: true,
+                    interrupt: true,
+                    toastText: '🚨🚓 Ekip Telsizi: "DUR İHTARINA UYMUYOR KAÇMAYA DEVAM EDİYOR, ÖNÜNÜ KESİN BARİKAT KURUN!!"',
+                    toastType: 'error',
+                    onend: () => {
+                        if (!chase.active) return;
+                        this._policeChaseTimers.push(setTimeout(() => {
+                            if (!chase.active) return;
+                            this.playClip('police_cabin_scream.mp3', {
+                                pan: 0.35,
+                                volume: 0.98,
+                                priority: 4,
+                                force: true,
+                                toastText: '😱🗣️ Yolcu Çığlığı: "Ayyy durmuyor hala gaza basıyor polis kovalıyor bizi!! Durdur şu otobüsü!!"',
+                                toastType: 'error',
+                                onend: () => {
+                                    if (!chase.active) return;
+                                    if (typeof audio !== 'undefined' && typeof audio.playTireScreech === 'function') {
+                                        audio.playTireScreech(0.75);
+                                        setTimeout(() => { if (typeof audio.stopTireScreech === 'function') audio.stopTireScreech(); }, 850);
+                                    }
+                                    this._policeChaseTimers.push(setTimeout(() => {
+                                        if (!chase.active) return;
+                                        if (this._policeSirenHowl) {
+                                            try { this._policeSirenHowl.stop(); } catch (e) {}
+                                        }
+                                        this.playClip('police_roadblock_bust.mp3', {
+                                            pan: -0.65,
+                                            volume: 1.0,
+                                            priority: 4,
+                                            force: true,
+                                            interrupt: true,
+                                            nvdaText: 'Polis barikatı otobüsün önünü kesti! Başkomiser: Kontağı kapat ellerini direksiyondan çek hemen! Polisten kaçmak neymiş göstereceğim sana!',
+                                            toastText: '🛑🚓 BARİKAT KISKACI! Başkomiser: "KONTAĞI KAPAT ELLERİNİ DİREKSİYONDAN ÇEK HEMEN!!"',
+                                            toastType: 'error',
+                                            onend: () => {
+                                                chase.active = false;
+                                                this.activePoliceChase = null;
+                                            }
+                                        });
+                                    }, 750));
+                                }
+                            });
+                        }, 240));
+                    }
+                });
+            }, 350));
+        },
+
+        updatePolicePursuit: function (gameObj, deltaTime) {
+            const chase = this.activePoliceChase;
+            if (!chase || !chase.active || chase.isDemo || chase.resolved || !gameObj) return;
+
+            chase.elapsed += deltaTime;
+            const siren = this._policeSirenHowl;
+            if (siren && chase.sirenSid !== null) {
+                try {
+                    const approachRatio = Math.min(1.0, chase.elapsed / 10.0);
+                    const targetPan = -0.52 - (approachRatio * 0.34);
+                    const targetVol = 0.38 + (approachRatio * 0.22);
+                    siren.volume(this.getVolume(targetVol), chase.sirenSid);
+                    if (typeof siren.stereo === 'function') siren.stereo(targetPan, chase.sirenSid);
+                } catch (e) {}
+            }
+
+            // A) SÜRÜCÜ İHTARA UYUP SAĞA ÇEKTİ VE DURDU (speed <= 4 km/s)
+            if (chase.elapsed >= 1.4 && gameObj.speed <= 4) {
+                chase.resolved = true;
+                if (this._policeSirenHowl) {
+                    try { this._policeSirenHowl.stop(); } catch (e) {}
+                }
+                const fineAmt = chase.escalated ? 550 : 350;
+                this.applyFineToPlayer(fineAmt);
+                this.adjustCityReputation(-6);
+
+                this._policeChaseTimers.push(setTimeout(() => {
+                    this.playClip('police_pullover_stern.mp3', {
+                        pan: -0.72,
+                        volume: 1.0,
+                        isExterior: false,
+                        priority: 4,
+                        interrupt: true,
+                        nvdaText: `Sağa çekip durdunuz. Sert Başkomiser: İndir camı kontağı kapat! Koca otobüsle onca insanın canını taşıyorsun, bu ne biçim sürüş böyle?! ${fineAmt} Lira trafik cezası kesildi, dikkatli devam edin.`,
+                        toastText: `👮‍♂️ Sert Başkomiser: "İndir camı kontağı kapat! Bir daha görmeyeyim ehliyetine el koyarım!" (-${fineAmt} ₺ Ceza)`,
+                        toastType: 'warning',
+                        onend: () => {
+                            this.stopPolicePursuit();
+                        }
+                    });
+                }, 320));
+                return;
+            }
+
+            // B) 8.5 SANİYE GEÇTİ VE SÜRÜCÜ DURMAYIP KAÇMAYA DEVAM EDİYOR! (Barikat Anonsu + Çığlık!)
+            if (!chase.escalated && chase.elapsed >= 8.5 && gameObj.speed > 12) {
+                chase.escalated = true;
+                if (siren && chase.sirenSid !== null) {
+                    try { siren.rate(1.18, chase.sirenSid); } catch (e) {}
+                }
+                if (typeof audio !== 'undefined' && typeof audio.playRadioSquelch === 'function') {
+                    audio.playRadioSquelch(true);
+                }
+                this.playClip('police_chase_escalate.mp3', {
+                    pan: -0.84,
+                    volume: 1.0,
+                    isExterior: false,
+                    priority: 4,
+                    interrupt: true,
+                    nvdaText: 'Polisten kaçıyorsunuz! Ekip megafonu: Dur ihtarına uymuyor kaçmaya devam ediyor, merkez önünü kesin barikat kurun! Son uyarım derhal frene bas dur!',
+                    toastText: '🚨🚓 BARİKAT EMRİ VERİLDİ: "DUR İHTARINA UYMUYOR, MERKEZ ÖNÜNÜ KESİN BARİKAT KURUN!!"',
+                    toastType: 'error',
+                    onend: () => {
+                        if (!chase.active || chase.resolved) return;
+                        if ((gameObj.passengersOnBoard || 0) > 0) {
+                            this._policeChaseTimers.push(setTimeout(() => {
+                                if (!chase.active || chase.resolved) return;
+                                this.playClip('police_cabin_scream.mp3', {
+                                    pan: 0.35,
+                                    volume: 0.98,
+                                    priority: 4,
+                                    nvdaText: 'Yolcular çığlık atıyor: Ayyy durmuyor hala gaza basıyor polis kovalıyor bizi! Durdur şu otobüsü indir bizi delirdin mi?!',
+                                    toastText: '😱🗣️ Kabinde Çığlık: "Ayyy durmuyor hala gaza basıyor polis kovalıyor bizi!! Durdur şu otobüsü!!"',
+                                    toastType: 'error'
+                                });
+                            }, 240));
+                        }
+                    }
+                });
+                return;
+            }
+
+            // C) 16.5 SANİYE SONUNDA İLERİDE POLİS BARİKATI YOLU KESER VE OTOBÜSÜ DURDURUR!
+            if (chase.elapsed >= 16.5 && !chase.resolved) {
+                chase.resolved = true;
+                gameObj.speed = 0;
+                gameObj.acceleration = 0;
+                if (gameObj.keys) {
+                    gameObj.keys.w = false;
+                    gameObj.keys.arrowup = false;
+                }
+                if (typeof audio !== 'undefined' && typeof audio.playTireScreech === 'function') {
+                    audio.playTireScreech(0.85);
+                    setTimeout(() => { if (typeof audio.stopTireScreech === 'function') audio.stopTireScreech(); }, 900);
+                }
+                this.applyFineToPlayer(950);
+                this.adjustCityReputation(-16);
+                this.angerLevel = Math.min(8, (this.angerLevel || 0) + 2);
+
+                this._policeChaseTimers.push(setTimeout(() => {
+                    if (this._policeSirenHowl) {
+                        try { this._policeSirenHowl.stop(); } catch (e) {}
+                    }
+                    this.playClip('police_roadblock_bust.mp3', {
+                        pan: -0.75,
+                        volume: 1.0,
+                        isExterior: false,
+                        priority: 4,
+                        interrupt: true,
+                        nvdaText: 'İleride polis barikatı yolu kesti ve otobüs durduruldu! Başkomiser: Kontağı kapat ellerini direksiyondan çek hemen! Polisten kaçmak ve yolcu hayatını tehlikeye atmaktan 950 Lira ağır ceza kesildi!',
+                        toastText: '🛑🚓 POLİS BARİKATI YOLU KESTİ! "KONTAĞI KAPAT ELLERİNİ DİREKSİYONDAN ÇEK HEMEN!!" (-950 ₺ Ağır Ceza)',
+                        toastType: 'error',
+                        onend: () => {
+                            this.stopPolicePursuit();
+                        }
+                    });
+                }, 780));
+            }
         }
     };
 

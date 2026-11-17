@@ -1317,6 +1317,15 @@ const SoundGallery = {
             specs: "Gerçek Zamanlı 3B Yaklaşma -> Cam Yanından Geçiş -> Uzaklaşma + L Korna Etkileşimi",
             desc: "Yolda ilerlerken sağ kaldırımda kavga eden 2 adamın sesleri uzaktan yaklaşıp tam camınızın dibinden geçerek arkada kalır (Seferde L ile korna çalarsanız dönüp size de bağırır!), ardından otobüsteki yolcu yorum yapar!",
             playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.triggerRoadsideFight) window.HumanNpcVoices.triggerRoadsideFight(true); }
+        },
+        {
+            id: "human_stunt_police_chase",
+            category: "human",
+            icon: "🚨",
+            title: "3B Sert Polis Kovalamacası, Megafon İhtarı & Barikat Kıskacı Aksiyon Sahnesi!",
+            specs: "3B Siren Yaklaşması + Megafon İhtarı + Yolcu Çığlığı + Ön Barikat Kıskacı",
+            desc: "Ağır ihlalde veya 106+ km/s radarda arkadan ekip otosu sirenle yaklaşır ve megafondan 'DERHAL SAĞA ÇEK!' diye bağırır; S ile durursanız sert komiser fırçalar, kaçmaya devam ederseniz barikat kurulup otobüsün önü kesilir! (Kısayol: Alt + K)",
+            playFn: () => { if (window.HumanNpcVoices && window.HumanNpcVoices.startPolicePursuit) window.HumanNpcVoices.startPolicePursuit("demo", true); }
         }
     ],
 

@@ -190,6 +190,15 @@
             }, 1200);
         },
 
+        triggerPoliceChaseAction: function () {
+            if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.startPolicePursuit === 'function') {
+                window.HumanNpcVoices.setEnabled(true);
+                const isLiveDrive = (typeof Game !== 'undefined' && Game.isDriving && Game.speed > 5);
+                this.closeModal();
+                window.HumanNpcVoices.startPolicePursuit('manual_action', !isLiveDrive);
+            }
+        },
+
         // Rol 4: 👥 Kabin İçi Yolcu Mırıltısı Aç / Kapat
         togglePassengerMurmur: function () {
             if (this.isMurmurPlaying && this.murmurAudio) {
@@ -311,6 +320,9 @@
                     } else if (k === 'z' || e.code === 'KeyZ') {
                         e.preventDefault();
                         this.triggerPoliceInspection();
+                    } else if (k === 'k' || e.code === 'KeyK') {
+                        e.preventDefault();
+                        this.triggerPoliceChaseAction();
                     }
                 }
             });
@@ -413,18 +425,23 @@
                     </div>
                 </div>
 
-                <!-- 3. Bölge Trafik Polisi & Takograf -->
+                <!-- 3. Bölge Trafik Polisi & Aksiyon Kovalamacası -->
                 <div style="background: rgba(30, 41, 59, 0.8); border: 1.5px solid #eab308; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
-                        <div style="font-size: 1.25rem; font-weight: bold; color: #fef08a;">👮 Bölge Trafik & Takograf Denetimi</div>
-                        <p style="color: #cbd5e1; font-size: 0.85rem; margin: 6px 0 12px 0;">
-                            Polis düdüğü (Fiiüüütt!), megafonla sağa çekme ve takograf yazıcısının kağıt çıkarma sesi (Zzzzt-çat!).
+                        <div style="font-size: 1.25rem; font-weight: bold; color: #fef08a;">👮 Bölge Trafik & Polis Kovalamacası</div>
+                        <p style="color: #cbd5e1; font-size: 0.85rem; margin: 6px 0 10px 0;">
+                            Polis düdüğü & takograf kontrolü (Alt + Z) veya arkadan sirenle yaklaşan ekip, megafon ihtarı ve kaçarsanız barikat kıskacı aksiyonu (Alt + K)!
                         </p>
-                        <div style="color: #facc15; font-size: 0.8rem; font-weight: bold;">Hızlı Kısayol: Alt + Z</div>
+                        <div style="color: #facc15; font-size: 0.8rem; font-weight: bold;">Denetim: Alt + Z | Kovalamaca: Alt + K</div>
                     </div>
-                    <button id="rp-btn-police" class="modern-btn" style="margin-top: 14px; padding: 10px; background: #ca8a04; color: #000; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;" aria-label="Bölge trafik polisi denetimine gir">
-                        Düdük & Takograf Denetimi
-                    </button>
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+                        <button id="rp-btn-police" class="modern-btn" style="padding: 9px; background: #ca8a04; color: #000; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;" aria-label="Bölge trafik polisi takograf denetimine gir">
+                            👮 Düdük & Takograf Denetimi
+                        </button>
+                        <button id="rp-btn-police-chase" class="modern-btn" style="padding: 9px; background: #dc2626; color: #fff; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;" aria-label="Sert polis kovalamacası ve barikat aksiyon sahnesini başlat">
+                            🚨 Polis Kovalamacası Başlat!
+                        </button>
+                    </div>
                 </div>
 
                 <!-- 4. Kabin İçi Yolcu Mırıltısı -->
@@ -494,6 +511,8 @@
             const btnGong = document.getElementById('rp-btn-chime-gong');
             if (btnGong) btnGong.addEventListener('click', () => this.playAnnouncementChime('gong'));
             document.getElementById('rp-btn-police').addEventListener('click', () => this.triggerPoliceInspection());
+            const btnPoliceChase = document.getElementById('rp-btn-police-chase');
+            if (btnPoliceChase) btnPoliceChase.addEventListener('click', () => this.triggerPoliceChaseAction());
             document.getElementById('rp-btn-murmur').addEventListener('click', () => this.togglePassengerMurmur());
             document.getElementById('rp-btn-radio').addEventListener('click', () => this.triggerColleagueRadioChat());
             const btnRadioTest = document.getElementById('rp-btn-radio-test');
