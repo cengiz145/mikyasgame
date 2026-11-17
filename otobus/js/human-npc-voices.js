@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p8';
+    const AUDIO_VER = '?v=20261117p9';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -527,13 +527,39 @@
             return this.pickSmart(arr, ctx) || arr[Math.floor(Math.random() * arr.length)];
         },
 
+        getCityReputation: function () {
+            try {
+                const v = parseInt(localStorage.getItem('mikyas_city_driver_rep') || '0', 10);
+                return isNaN(v) ? 0 : Math.max(-100, Math.min(100, v));
+            } catch (e) {
+                return 0;
+            }
+        },
+
+        adjustCityReputation: function (delta) {
+            try {
+                const next = Math.max(-100, Math.min(100, this.getCityReputation() + delta));
+                localStorage.setItem('mikyas_city_driver_rep', String(next));
+                return next;
+            } catch (e) {
+                return 0;
+            }
+        },
+
         resetForNewRoute: function () {
             this.angerLevel = 0;
+            this.allyPoints = 0;
             this.lastLateMinutes = 0;
             this.announcementBusyUntil = 0;
             this.activePriority = 0;
             this.recentFiles = [];
             this.roster = { yasli: 0, ogrenci: 0, tam: 0, standing: 0, hasKid: false };
+            this.inspector = { crashes: 0, redLights: 0, roughCount: 0, kindness: 0, evaluated: false };
+            this._repRecognizedInRoute = false;
+            this._brokenWindowWarned = false;
+            this._brokenExhaustWarned = false;
+            this._loudPhoneTriggeredInRoute = false;
+            this.loudPhoneActiveUntil = 0;
             this.lastJoltVoiceTime = 0;
             this.lastNearMissTime = 0;
             this.lastGreetingStopIndex = -1;
@@ -544,6 +570,10 @@
         onCollision: function (direction, damageAmount, passengersOnBoard, damageSummaryText, forceTest = false) {
             if (!this.canSpeakInCabin(forceTest)) return false;
 
+            if (!forceTest) {
+                this.adjustCityReputation(-15);
+                if (this.inspector) this.inspector.crashes = (this.inspector.crashes || 0) + 1;
+            }
             // Hafif yan sürtmede metal sürtme efekti
             if (damageAmount < 22 && direction !== 'front') {
                 this.playClip(CLIPS.sfxScrape, {
@@ -788,7 +818,12 @@
             }
 
             const chosen = this.pickSmart(pool, smartCtx);
-            const randomCabinPan = Number(((Math.random() - 0.5) * 0.55).toFixed(2));
+            const randomCabinPan = -0.52;
+            const canAllyDefend = (this.angerLevel <= 3 && (this.allyPoints || 0) > 0 && (passengersOnBoard || 0) >= 3);
+            if (!canAllyDefend) {
+                this.adjustCityReputation(-4);
+                if (this.inspector) this.inspector.roughCount = (this.inspector.roughCount || 0) + 1;
+            }
             setTimeout(() => {
                 this.playClip(chosen.file, {
                     pan: randomCabinPan,
@@ -797,7 +832,30 @@
                     interrupt: this.angerLevel >= 3,
                     nvdaText: chosen.label,
                     toastText: `${toastPrefix} ${chosen.label}`,
-                    toastType: toastLvl
+                    toastType: toastLvl,
+                    onend: () => {
+                        // Dost Yolcu Savunması: Daha önce iyilik yaptıysan karşı koltuktan bir yolcu kaba zorbayı azarlar ve öfkeyi söndürür!
+                        if (canAllyDefend) {
+                            this.allyPoints = Math.max(0, (this.allyPoints || 0) - 1);
+                            this.angerLevel = Math.max(0, (this.angerLevel || 0) - 1);
+                            const allies = [
+                                { file: 'ally_defend_f1.mp3', role: 'yasli', label: 'Seni Savunan Teyze: "Şşt ağzını topla be terbiyesiz! Az önce yaşlıları bekledi o kadar iyilik yaptı şoför, trafikte olur o kadar fren!"' },
+                                { file: 'ally_defend_m1.mp3', role: 'yasli', label: 'Seni Savunan Amca: "Üstüne gitme lan şoförün! Sabahtan beri direksiyon sallıyor kolay mı sanıyorsun, beğenmiyorsan taksiye bin!"' },
+                                { file: 'ally_defend_f2.mp3', label: 'Seni Savunan Yolcu: "Ay ne anlayışsız insanlarsınız ya! Önüne araba kırmıştır belki, hemen ne yükleniyorsunuz şoföre!"' }
+                            ];
+                            const defender = this.pickSmart(allies, { passengersOnBoard });
+                            setTimeout(() => {
+                                this.playClip(defender.file, {
+                                    pan: 0.55,
+                                    volume: 0.95,
+                                    priority: 3,
+                                    nvdaText: defender.label,
+                                    toastText: `🛡️ ${defender.label} (Kabin Sakinleşti!)`,
+                                    toastType: 'success'
+                                });
+                            }, 340);
+                        }
+                    }
                 });
             }, 320);
             return true;
@@ -835,6 +893,48 @@
                 this.lastGreetingStopIndex = stopIndex;
                 this.greetingsAtCurrentStop = 0;
                 this.fullStopWarnedIndex = -1;
+            }
+
+            // Şehir İtibar Hafızası: Geçmiş seferlerdeki şoförlüğüne göre duraktaki yolcular otobüsünü tanır!
+            if (!this._repRecognizedInRoute && stopIndex <= 1 && this.greetingsAtCurrentStop === 0) {
+                const rep = this.getCityReputation();
+                if (rep <= -22) {
+                    this._repRecognizedInRoute = true;
+                    this.greetingsAtCurrentStop++;
+                    const badRep = this.pickSmart([
+                        { file: 'rep_bad_m1.mp3', label: 'Duraktaki Yolcu Seni Tanıdı: "Eyvah eyvah! Yine geçen sefer milleti haşat eden o kasap şoföre denk geldik, sıkı tutunun demirlere!"' },
+                        { file: 'rep_bad_f1.mp3', role: 'yasli', label: 'Teyze Seni Tanıdı: "Ayy bu geçen günkü deli süren otobüs değil mi?! İnşallah bugün sağ salim ineriz!"' }
+                    ]);
+                    setTimeout(() => {
+                        this.playClip(badRep.file, {
+                            pan: 0.35,
+                            volume: 0.94,
+                            priority: 2,
+                            nvdaText: badRep.label,
+                            toastText: `👀 ${badRep.label}`,
+                            toastType: 'warning'
+                        });
+                    }, 480);
+                    return;
+                } else if (rep >= 28) {
+                    this._repRecognizedInRoute = true;
+                    this.greetingsAtCurrentStop++;
+                    const goodRep = this.pickSmart([
+                        { file: 'rep_good_m1.mp3', role: 'yasli', label: 'Yolcu Seni Tanıdı: "Ooo maşallah, hattın en usta şoförüne denk geldik bugün! Rahat rahat gideriz artık!"' },
+                        { file: 'rep_good_f1.mp3', label: 'Yolcu Seni Tanıdı: "Ne güzel ya, şehrin en temiz ve sarsmadan süren otobüsü bu, iyi yolculuklar!"' }
+                    ]);
+                    setTimeout(() => {
+                        this.playClip(goodRep.file, {
+                            pan: 0.35,
+                            volume: 0.92,
+                            priority: 2,
+                            nvdaText: goodRep.label,
+                            toastText: `🌟 ${goodRep.label}`,
+                            toastType: 'success'
+                        });
+                    }, 480);
+                    return;
+                }
             }
             if (isStanding && this.greetingsAtCurrentStop === 0) {
                 this.greetingsAtCurrentStop++;
@@ -1168,10 +1268,14 @@
         onRunningPassengerBoarded: function () {
             if (!this.canSpeakInCabin()) return false;
             this.angerLevel = Math.max(0, this.angerLevel - 1);
+            this.allyPoints = (this.allyPoints || 0) + 1;
+            this.adjustCityReputation(10);
+            if (this.inspector) this.inspector.kindness = (this.inspector.kindness || 0) + 1;
             setTimeout(() => {
                 this.playClip(CLIPS.runnerBoarded, {
                     pan: 0.3,
                     volume: 0.95,
+                    priority: 3,
                     nvdaText: 'Koşan yolcu bindi: Oh be, helal olsun size, işe yetiştim sayenizde! Artı 60 Lira ve 30 XP.'
                 });
             }, 320);
@@ -1205,9 +1309,13 @@
             if (!this.canSpeakInCabin()) return false;
             if (allowed) {
                 this.angerLevel = Math.max(0, (this.angerLevel || 0) - 1);
+                this.allyPoints = (this.allyPoints || 0) + 1;
+                this.adjustCityReputation(8);
+                if (this.inspector) this.inspector.kindness = (this.inspector.kindness || 0) + 1;
                 this.playClip(CLIPS.studentThankFree, {
                     pan: 0.3,
                     volume: 0.95,
+                    priority: 3,
                     interrupt: true,
                     nvdaText: 'Yolcuya izin verdiniz: Çok teşekkür ederim, hayatımı kurtardınız! Artı 50 Lira hoşgörü primi.'
                 });
@@ -1216,6 +1324,7 @@
                 this.playClip(useRudeReject ? 'rude_student_reject.mp3' : 'balance_reject_rage.mp3', {
                     pan: 0.3,
                     volume: 0.96,
+                    priority: 3,
                     interrupt: true,
                     nvdaText: useRudeReject
                         ? 'Yolcuyu indirdiniz. Kaba tepki: Al otobüsünü başına çal be! İki kuruşluk bilet için yaptığın triplere bak, sanki özel uçak kaldırıyor cimri!'
@@ -1228,10 +1337,14 @@
         onRampThank: function () {
             if (!this.canSpeakInCabin()) return false;
             this.angerLevel = Math.max(0, this.angerLevel - 1);
+            this.allyPoints = (this.allyPoints || 0) + 1;
+            this.adjustCityReputation(8);
+            if (this.inspector) this.inspector.kindness = (this.inspector.kindness || 0) + 1;
             setTimeout(() => {
                 this.playClip(CLIPS.rampThank, {
                     pan: 0.35,
                     volume: 0.95,
+                    priority: 3,
                     nvdaText: 'Tekerlekli sandalye rampası açıldı. Yolcu: Allah razı olsun evladım, ellerin dert görmesin. Artı 30 XP.'
                 });
             }, 550);
@@ -1301,6 +1414,8 @@
             if (!this.canSpeakInCabin(force)) return false;
             // Yolcuların sinirini yumuşat!
             this.angerLevel = 0;
+            this.allyPoints = (this.allyPoints || 0) + 1; // cologne
+            this.adjustCityReputation(6);
             const reply = this.pickRandom(CLIPS.cologneReplies);
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast(`🧴 [İkram Servisi] Yolcu: "${reply.text}" (+12 Konfor, Yolcular Sakinleşti!)`, 'success');
@@ -1582,6 +1697,71 @@
                 }
             } else {
                 this._bickerSecs = 0;
+            }
+
+            // 10c-bis. Kırık Cam & Kopuk Egzoz Hasar Farkındalığı!
+            if ((gameObj.passengersOnBoard || 0) > 0 && gameObj.busDamage && gameObj.speed > 30) {
+                const leftBroken = (gameObj.busDamage.leftWindow || 0) >= 100;
+                const rightBroken = (gameObj.busDamage.rightWindow || 0) >= 100;
+                if ((leftBroken || rightBroken) && !this._brokenWindowWarned && (!this.lastSmartRemindTime || (now - this.lastSmartRemindTime > 24000))) {
+                    this._brokenWindowWarned = true;
+                    this.lastSmartRemindTime = now;
+                    this.playClip('dmg_window_wind.mp3', {
+                        pan: leftBroken ? -0.65 : 0.65,
+                        volume: 0.96,
+                        priority: 3,
+                        nvdaText: 'Yolcu tepkisi: Kırık camdan fırtına giriyor içeriye dondum be! Bu hurdayla sefere mi çıkılır, sanayiye götürsene şu otobüsü!',
+                        toastText: '🪟 Yolcu: "Kırık camdan fırtına giriyor içeriye dondum be! Sanayiye götürsene şu otobüsü!!"',
+                        toastType: 'warning'
+                    });
+                    return;
+                }
+                if (((gameObj.busDamage.exhaust || 0) >= 65 || (gameObj.busDamage.engine || 0) >= 65) && !this._brokenExhaustWarned && (!this.lastSmartRemindTime || (now - this.lastSmartRemindTime > 24000))) {
+                    this._brokenExhaustWarned = true;
+                    this.lastSmartRemindTime = now;
+                    this.playClip('dmg_exhaust_noise.mp3', {
+                        pan: -0.25,
+                        volume: 0.96,
+                        priority: 3,
+                        nvdaText: 'Yolcu tepkisi: Ulan otobüsün altından pancar motoru gibi gürültü geliyor, egzozu mu kopardın ne yaptın?!',
+                        toastText: '🔧 Yolcu: "Otobüsün altından pancar motoru gibi gürültü geliyor, egzozu mu kopardın?!"',
+                        toastType: 'warning'
+                    });
+                    return;
+                }
+            }
+
+            // 10c-ter. Otobüste Avaz Avaz Telefonla Konuşan Görgüsüz Yolcu Olayı (Q Tuşu ile Hizaya Getirme!)
+            if (!this._loudPhoneTriggeredInRoute && (gameObj.passengersOnBoard || 0) >= 5 && gameObj.speed >= 24 && (typeof gameObj.currentDistanceToNext !== 'number' || gameObj.currentDistanceToNext > 280)) {
+                this._phoneEventSecs = (this._phoneEventSecs || 0) + deltaTime;
+                if (this._phoneEventSecs >= 36 && (!this.lastSmartRemindTime || (now - this.lastSmartRemindTime > 25000))) {
+                    this._loudPhoneTriggeredInRoute = true;
+                    this.lastSmartRemindTime = now;
+                    this.loudPhoneActiveUntil = now + 22000;
+                    this.playClip('annoy_phone_loud.mp3', {
+                        pan: -0.35,
+                        volume: 0.95,
+                        priority: 2,
+                        nvdaText: 'Arkada görgüsüz bir yolcu avaz avaz telefonla konuşuyor!',
+                        toastText: '📱 Görgüsüz Yolcu: "ALOOO! OTOBÜSTEYİM DİYORUM SANA, AKŞAMA HALISAHA MAÇI AYARLADIM!!"',
+                        toastType: 'warning',
+                        onend: () => {
+                            if (performance.now() < (this.loudPhoneActiveUntil || 0)) {
+                                setTimeout(() => {
+                                    this.playClip('annoy_passengers_complain.mp3', {
+                                        pan: 0.35,
+                                        volume: 0.94,
+                                        priority: 2,
+                                        nvdaText: 'Yolcu şikayeti: Arkadaki adam avaz avaz telefonla konuşuyor, Q tuşuyla ikaz anonsu geçer misiniz?',
+                                        toastText: '🗣️ Yolcu: "Başımız şişti, Q tuşuyla kabin ikaz anonsu geçer misiniz şuna?!" (Kısayol: Q)',
+                                        toastType: 'info'
+                                    });
+                                }, 300);
+                            }
+                        }
+                    });
+                    return;
+                }
             }
 
             // 10d. Sarsıntısız sürüşte yolcu sinirinin kademeli yatışması
@@ -1881,7 +2061,159 @@
             else if (s.includes('bursa otogar') || s.includes('bursa büyükşehir')) file = 'stop_bursa_otogar.mp3';
 
             if (!file) return false;
-            this.playClip(file, { pan: 0, volume: 0.94, interrupt: true });
+            this.playClip(file, { pan: 0, volume: 0.94, priority: 2, interrupt: true });
+            return true;
+        },
+
+        // 13. YÜZE KAPI ÇARPMA, İNECEK VAR İKEN KALKMA, DURAKTA BOŞ BEKLEME, GİZLİ MÜFETTİŞ VE Q KABİN İKAZI
+        onDoorSlammedInFace: function () {
+            if (!this.canSpeakInCabin()) return false;
+            this.adjustCityReputation(-8);
+            if (this.inspector) this.inspector.roughCount = (this.inspector.roughCount || 0) + 1;
+            this.playClip(CLIPS.sfxDoorBang, { pan: 0.72, volume: 0.88, backgroundSfx: true });
+            setTimeout(() => {
+                this.playClip('door_slammed_face.mp3', {
+                    pan: 0.70,
+                    volume: 0.98,
+                    priority: 3,
+                    interrupt: true,
+                    nvdaText: 'Durakta bekleyen yolcunun yüzüne kapıyı kapattınız! Yolcu: Hooop yüzümüze kapıyı çarptın be! Daha sırada bekleyen yolcu var, açsana şu ön kapıyı! (PageUp)',
+                    toastText: '🚪 Yüzüne Kapı Çarpılan Yolcu: "HOOOP YÜZÜMÜZE KAPIYI ÇARPTIN BE!! Daha bekleyen yolcu var, aç şu ön kapıyı!!" (PageUp)',
+                    toastType: 'error'
+                });
+            }, 340);
+            return true;
+        },
+
+        onMissedAlightBlock: function () {
+            if (!this.canSpeakInCabin()) return false;
+            this.angerLevel = Math.min(8, (this.angerLevel || 0) + 1);
+            this.adjustCityReputation(-6);
+            this.playClip(CLIPS.sfxDoorBang, { pan: -0.55, volume: 0.90, backgroundSfx: true });
+            setTimeout(() => {
+                this.playClip('missed_alight_rage.mp3', {
+                    pan: -0.50,
+                    volume: 1.0,
+                    priority: 4,
+                    interrupt: true,
+                    nvdaText: 'İnecek yolcular varken arka kapıyı açmadınız! Yolcu: Dur kalkma sakın kalkma! Daha arka kapıyı açmadın inemedik, aç şu arka kapıyı! (PageDown)',
+                    toastText: '🛑 İnecek Yolcu: "DUR KALKMA SAKIN KALKMA!! Daha arka kapıyı açmadın inemedik, aç şu arka kapıyı!!" (PageDown)',
+                    toastType: 'error'
+                });
+            }, 320);
+            return true;
+        },
+
+        onStopIdleScold: function () {
+            if (!this.canSpeakInCabin()) return false;
+            this.playClip('stop_idle_scold.mp3', {
+                pan: -0.30,
+                volume: 0.95,
+                priority: 2,
+                nvdaText: 'Yolcu: Herkes bindi indi hala neyi bekliyorsun durakta be?! Kapat şu kapıları da yürü artık!',
+                toastText: '⏳ Sabırsız Yolcu: "Herkes bindi indi hala neyi bekliyorsun durakta?! Kapat kapıları da yürü artık!!"',
+                toastType: 'warning'
+            });
+            return true;
+        },
+
+        triggerCabinQuietAnons: function (gameObj) {
+            if (!this.canSpeakInCabin()) return false;
+            const now = performance.now();
+            if (this._lastQuietAnonsTime && (now - this._lastQuietAnonsTime < 9000)) return false;
+            this._lastQuietAnonsTime = now;
+
+            if (typeof audio !== 'undefined' && typeof audio.playIBISChime === 'function') {
+                audio.playIBISChime();
+            }
+            const wasLoudPhone = now < (this.loudPhoneActiveUntil || 0);
+            this.loudPhoneActiveUntil = 0;
+
+            setTimeout(() => {
+                this.playClip('cabin_quiet_anons.mp3', {
+                    pan: 0,
+                    volume: 0.94,
+                    priority: 3,
+                    interrupt: true,
+                    nvdaText: 'Kabin içi sessizlik ve düzen anonsu yapıldı.',
+                    toastText: '🎙️ [Kabin İkaz Anonsu]: "Lütfen telefon görüşmelerinizi alçak sesle yapınız..."',
+                    toastType: 'info',
+                    onend: () => {
+                        if (wasLoudPhone) {
+                            this.allyPoints = (this.allyPoints || 0) + 1;
+                            this.adjustCityReputation(6);
+                            if (gameObj && typeof gameObj.addMoney === 'function') gameObj.addMoney(30);
+                            if (gameObj && typeof gameObj.addXP === 'function') gameObj.addXP(20);
+                            setTimeout(() => {
+                                this.playClip('annoy_phone_shutup.mp3', {
+                                    pan: -0.35,
+                                    volume: 0.94,
+                                    priority: 3,
+                                    nvdaText: 'Görgüsüz yolcu telefonu kapattı! Artı 30 Lira Kabin Huzuru Primi ve 20 XP!',
+                                    toastText: '📵 Görgüsüz Yolcu: "Tamam be amma büyüttünüz kapatıyoruz işte telefonu!" (+30 ₺ / +20 XP)',
+                                    toastType: 'success'
+                                });
+                            }, 350);
+                        } else if (gameObj && (gameObj.passengersOnBoard || 0) > 0 && (this.angerLevel || 0) >= 4) {
+                            // Şoför çok kötü sürüp üstüne yolculara "sessiz olun" anonsu açarsa ters cevap alır!
+                            setTimeout(() => {
+                                this.playClip('rude_mock_anons.mp3', {
+                                    pan: -0.40,
+                                    volume: 0.96,
+                                    priority: 3,
+                                    nvdaText: 'Öfkeli Yolcu: Banttan kibar anons açacağına önce doğru düzgün araba sürmeyi öğren sen be!',
+                                    toastText: '🤬 Yolcu: "Banttan kibar anons açacağına önce araba sürmeyi öğren sen be!!"',
+                                    toastType: 'warning'
+                                });
+                            }, 350);
+                        }
+                    }
+                });
+            }, 680);
+            return true;
+        },
+
+        evaluateInspectorAtFinalStop: function (gameObj) {
+            if (!this.canSpeakInCabin() || !gameObj || !this.inspector || this.inspector.evaluated) return false;
+            if (gameObj.activeRouteData && (gameObj.activeRouteData.isTraining || gameObj.activeRouteData.emptyBus)) return false;
+            this.inspector.evaluated = true;
+
+            const inf = this.inspector;
+            let file = 'insp_warn.mp3';
+            let toast = '🕵️ [Sivil Belediye Müfettişi]: "Birkaç noktada sarsıntı kaydettim; bu seferlik ceza yazmıyorum, daha özenli sürün."';
+            let tType = 'info';
+
+            if (inf.crashes === 0 && inf.redLights === 0 && inf.roughCount <= 1) {
+                file = 'insp_perfect.mp3';
+                toast = '🕵️ [Sivil Müfettiş Ödülü]: "Kusursuz sürüş ve nezaket! +150 ₺ Üstün Hizmet İkramiyesi & +60 XP!"';
+                tType = 'success';
+                this.adjustCityReputation(18);
+                if (typeof gameObj.addMoney === 'function') gameObj.addMoney(150);
+                if (typeof gameObj.addXP === 'function') gameObj.addXP(60);
+            } else if (inf.crashes > 0 || inf.redLights > 0 || inf.roughCount >= 4) {
+                file = 'insp_fail.mp3';
+                toast = '🕵️ [Sivil Müfettiş Cezası]: "Bütün ihlallerinizi kaydettim! -120 ₺ Ağır Disiplin Tutanağı!"';
+                tType = 'error';
+                this.adjustCityReputation(-15);
+                if (typeof gameObj.money === 'number') {
+                    gameObj.money = Math.max(0, gameObj.money - 120);
+                    const moneyEl = document.getElementById('hud-money');
+                    if (moneyEl) moneyEl.innerText = `${Math.floor(gameObj.money)} ₺`;
+                }
+            }
+
+            setTimeout(() => {
+                if (gameObj.isDriving) return;
+                this.playClip(file, {
+                    pan: 0.20,
+                    volume: 0.98,
+                    priority: 3,
+                    interrupt: true,
+                    nvdaText: toast,
+                    toastText: toast,
+                    toastType: tType
+                });
+            }, 4600);
             return true;
         }
     };

@@ -1164,6 +1164,42 @@ const SoundGallery = {
             specs: "Kaba Klima & Sıcaklık Tepkisi",
             desc: "Otobüs ısındığında kibar rica yerine mazot cimriliğiyle suçlayan kaba yolcu.",
             playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("rude_ac_hot.mp3", { pan: -0.25, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_smart_ally",
+            category: "human",
+            icon: "🛡️",
+            title: "Şoförü Savunan Tonton Teyze vs Kaba Zorba (Çift Cephe)",
+            specs: "Akıllı Dost Yolcu Savunma Sistemi",
+            desc: "Daha önce yaşlılara ve öğrencilere iyilik yaptığınızda, kaba bir zorba size bağırınca karşı koltuktan teyze zorbayı azarlayıp sizi korur!",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("rude_mild_m1.mp3", { pan: -0.55, volume: 0.96, force: true, interrupt: true, onend: () => { setTimeout(() => window.HumanNpcVoices.playClip("ally_defend_f1.mp3", { pan: 0.55, volume: 1.0, force: true }), 320); } }); } }
+        },
+        {
+            id: "human_smart_inspector",
+            category: "human",
+            icon: "🕵️",
+            title: "Gizli Sivil Belediye Müfettişi (Ağır Disiplin Tutanağı)",
+            specs: "Sefer Boyu Gizli Denetim & Son Durak Karnesi",
+            desc: "Normal yolcu gibi binip tüm kaza, kırmızı ışık ve sarsıntılarınızı not alan sivil müfettişin son duraktaki baskını.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("insp_fail.mp3", { pan: 0.2, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_smart_phone",
+            category: "human",
+            icon: "📱",
+            title: "Telefonda Halısaha Maçı Bağıran Görgüsüz & Q İkazı",
+            specs: "Canlı Kabin Gürültü Olayı (Q Tuşu)",
+            desc: "Otobüste avaz avaz bağıra bağıra telefonla konuşup diğer yolcuları çıldırtan görgüsüz yolcu.",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("annoy_phone_loud.mp3", { pan: -0.35, volume: 1.0, force: true, interrupt: true, onend: () => { setTimeout(() => window.HumanNpcVoices.playClip("annoy_passengers_complain.mp3", { pan: 0.35, volume: 0.95, force: true }), 280); } }); } }
+        },
+        {
+            id: "human_smart_doorslam",
+            category: "human",
+            icon: "🚪",
+            title: "Yüzüne Kapı Çarpılan Durak Yolcusu",
+            specs: "Akıllı Erken Kapı Kapatma Algılayıcısı",
+            desc: "Durakta sırada bekleyen yolcu varken ön kapıyı erken kapattığınızda dışarıdan cama vurup bağıran vatandaş.",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("sfx_door_fist_bang.mp3", { pan: 0.7, volume: 0.9, force: true, backgroundSfx: true }); setTimeout(() => window.HumanNpcVoices.playClip("door_slammed_face.mp3", { pan: 0.7, volume: 1.0, force: true, interrupt: true }), 320); } }
         }
     ],
 

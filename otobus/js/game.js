@@ -5380,6 +5380,9 @@ const Game = {
                 }
             }, 13500);
         }
+        if (isFinalArrive && typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.evaluateInspectorAtFinalStop === 'function') {
+            window.HumanNpcVoices.evaluateInspectorAtFinalStop(this);
+        }
         // Durağa varış tamamlandı; kapılar henüz açılmadı. Kalkış işlemi yolcular binip kapılar kapandıktan sonra tetiklenir.
     },
 
@@ -5396,7 +5399,16 @@ const Game = {
             return;
         }
 
+        const remAlightEl = document.getElementById('stop-alighting-count');
+        const remAlightCount = remAlightEl ? (parseInt(remAlightEl.innerText, 10) || 0) : 0;
+        if (remAlightCount > 0 && this.activeRouteData && Array.isArray(this.activeRouteData.stops) && this.currentStopIndex < this.activeRouteData.stops.length - 1) {
+            if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onMissedAlightBlock === 'function') {
+                window.HumanNpcVoices.onMissedAlightBlock();
+            }
+            return;
+        }
         if (!this.frontDoorOpen && !this.rearDoorOpen && audio.isEngineRunning) {
+            if (this.stopIdleTimer) { clearTimeout(this.stopIdleTimer); this.stopIdleTimer = null; }
             this.departStop();
         }
     },
@@ -5545,6 +5557,23 @@ const Game = {
                 this.boardingTimer = null;
             }
 
+            // YÜZE KAPI ÇARPMA ZEKASI: Sırada bekleyen yolcu varken ve otobüste boş yer varken ön kapı erken kapatılırsa!
+            const curStopCheck = (!this.isDriving && this.activeRouteData && Array.isArray(this.activeRouteData.stops)) ? this.activeRouteData.stops[this.currentStopIndex] : null;
+            const activeBusCheck = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
+            const totalCapCheck = (activeBusCheck ? (activeBusCheck.seatCapacity + (activeBusCheck.standingCapacity || 15)) : 55);
+            if (curStopCheck && curStopCheck.bekleyenYolcu > 0 && this.passengersOnBoard < totalCapCheck) {
+                if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onDoorSlammedInFace === 'function') {
+                    window.HumanNpcVoices.onDoorSlammedInFace();
+                }
+                if (this.slammedDoorDepartTimer) clearTimeout(this.slammedDoorDepartTimer);
+                this.slammedDoorDepartTimer = setTimeout(() => {
+                    if (!this.isDriving && !this.frontDoorOpen && !this.rearDoorOpen) {
+                        this.checkAutoDepart();
+                    }
+                }, 4200);
+                return;
+            }
+
             // KOŞAN YOLCU OLAYI (Akıllı Durak Etkileşimi)
             // Seferdeyken ve kapı kapandığı anda %35 ihtimalle son anda yetişmeye çalışan yolcu belirir
             if (!this.isDriving && !this.runningPassengerTriggeredAtStop && this.activeRouteData && Array.isArray(this.activeRouteData.stops) && (this.currentStopIndex < this.activeRouteData.stops.length - 1)) {
@@ -5597,6 +5626,14 @@ const Game = {
                 this.boardingTimer = null;
                 document.getElementById('passenger-dialog').innerText = '"Tüm yolcular bindi."';
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak("Binişler tamamlandı. Tüm yolcular bindi.");
+                if (this.stopIdleTimer) clearTimeout(this.stopIdleTimer);
+                this.stopIdleTimer = setTimeout(() => {
+                    if (!this.isDriving && this.passengersOnBoard > 0 && !this.activePassengerEvent && !this.activeRunningPassenger && (this.frontDoorOpen || this.rearDoorOpen || !audio.isEngineRunning)) {
+                        if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onStopIdleScold === 'function') {
+                            window.HumanNpcVoices.onStopIdleScold();
+                        }
+                    }
+                }, 12500);
                 return;
             }
 
@@ -6254,6 +6291,16 @@ const Game = {
                 Multiplayer.openRadarModal();
             }
             return;
+        }
+
+        if (k === 'q' || e.code === 'KeyQ') {
+            if (!e.ctrlKey && !e.altKey && !e.shiftKey) {
+                e.preventDefault();
+                if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.triggerCabinQuietAnons === 'function') {
+                    window.HumanNpcVoices.triggerCabinQuietAnons(this);
+                }
+                return;
+            }
         }
 
         if (k === 'j') {
