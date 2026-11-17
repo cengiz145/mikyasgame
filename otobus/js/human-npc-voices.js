@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p19';
+    const AUDIO_VER = '?v=20261117p20';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -2838,12 +2838,12 @@
                 : (choice === 'f' ? 'wheeze_laugh_phone_f1.mp3' : 'wheeze_laugh_phone_m1.mp3');
             const pan = choice === 'm' ? -0.42 : 0.44;
             const label = choice === 'deniz'
-                ? 'Deniz Abla (Silecek Gibi Viu-Viu Öterek Gülme Krizi): "Kız dur kapatma dinle hahaha! Koca herif pazar arabasıyla boylu boyunca yapıştı yere kız — hahaha-VİU-VİU-VİU-VİU!! Ay ciğerim söküldü nefes alamıyorum — VİU-VİU-VİU! Şoför aynadan ters ters bakıyor kapat kapat!!"'
+                ? 'Deniz Abla (1 Dakika Boyunca Utanıp Ağzını Kapatarak Ciğerden Viyaklama Krizi): "Pffft... Kız sus otobüsteyim rezil olacağım ağzımı kapattım... VİU-VİU-VİU!! Ses çıkmasın diye dudaklarımı ısırıyorum ciğerimden düdük ötüyor... VİU-VİU-VİU!! Ön koltuktaki teyze ters ters bakıyor utancımdan yerin dibine girdim!!"'
                 : (choice === 'f'
                     ? 'Telefonda Katıla Katıla Gülen Kız: "AHAHAHA!! Ay kız dur nefes alamıyorum boğulacağım! Çocuğun çantası kapıya sıkıştı pantolonu cırt diye yırtıldı kız AHAHAHA!!"'
                     : 'Telefonda Ciğeri Sökülerek Gülen Yolcu: "AHAHAHA!! Ay dur nefesim kesildi! Adam otobüse yetişecem diye koşarken ayağından terlik uçtu lan AHAHAHA!!"');
 
-            this.wheezeLaughActiveUntil = performance.now() + 56000;
+            this.wheezeLaughActiveUntil = performance.now() + 74000;
             this.playClip(file, {
                 pan,
                 volume: 0.98,
