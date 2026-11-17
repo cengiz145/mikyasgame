@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p16';
+    const AUDIO_VER = '?v=20261117p17';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -2838,12 +2838,12 @@
                 : (choice === 'f' ? 'wheeze_laugh_phone_f1.mp3' : 'wheeze_laugh_phone_m1.mp3');
             const pan = choice === 'm' ? -0.42 : 0.44;
             const label = choice === 'deniz'
-                ? 'Tiryaki Mahalle Ablası (Ciğerleri Hır Hır Öterek Öksürük-Gülme Krizi): "Öhhö-öhhö-hhhh! Ay kız dur ciğerlerim söküldü gülmekten, şu meret sigarayı bırakmam lazım tıkanıyorum! Koca herif pazar arabasıyla yere yapıştı kız! Öhhö-hhhh! Göğsüm hır hır ötüyor boğulacağım gülmekten!!"'
+                ? 'Mahalle Ablası Deniz (Kısıktan Zirveye Katıla Katıla Kahkaha Tufanı): "Pffft-hı-hı... Kız sus güldürme otobüsteyim... Hahhhhhhh! Koca herif pazar arabasıyla boylu boyunca yapıştı yere kız — hahhhhhhhhhhhh — öhhö-hhhhhhh! Katıldım gülmekten ciğerlerim söküldü kız!!"'
                 : (choice === 'f'
                     ? 'Telefonda Katıla Katıla Gülen Kız: "AHAHAHA!! Ay kız dur nefes alamıyorum boğulacağım! Çocuğun çantası kapıya sıkıştı pantolonu cırt diye yırtıldı kız AHAHAHA!!"'
                     : 'Telefonda Ciğeri Sökülerek Gülen Yolcu: "AHAHAHA!! Ay dur nefesim kesildi! Adam otobüse yetişecem diye koşarken ayağından terlik uçtu lan AHAHAHA!!"');
 
-            this.wheezeLaughActiveUntil = performance.now() + 38000;
+            this.wheezeLaughActiveUntil = performance.now() + 56000;
             this.playClip(file, {
                 pan,
                 volume: 0.98,
