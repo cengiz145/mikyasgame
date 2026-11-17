@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p20';
+    const AUDIO_VER = '?v=20261117p21';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -2843,7 +2843,7 @@
                     ? 'Telefonda Katıla Katıla Gülen Kız: "AHAHAHA!! Ay kız dur nefes alamıyorum boğulacağım! Çocuğun çantası kapıya sıkıştı pantolonu cırt diye yırtıldı kız AHAHAHA!!"'
                     : 'Telefonda Ciğeri Sökülerek Gülen Yolcu: "AHAHAHA!! Ay dur nefesim kesildi! Adam otobüse yetişecem diye koşarken ayağından terlik uçtu lan AHAHAHA!!"');
 
-            this.wheezeLaughActiveUntil = performance.now() + 74000;
+            this.wheezeLaughActiveUntil = performance.now() + 80000;
             this.playClip(file, {
                 pan,
                 volume: 0.98,
