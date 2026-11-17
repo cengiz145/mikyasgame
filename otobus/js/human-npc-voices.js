@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p22';
+    const AUDIO_VER = '?v=20261117p23';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
