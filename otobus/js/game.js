@@ -668,10 +668,13 @@ const Game = {
         }
 
         const prefix = isLastStop ? "Son durak: " : "Sıradaki durak: ";
-        const msg = `${prefix}${stopName}. Kalan mesafe: ${distStr}. Tahmini varış süresi: ${etaStr}. ${headingStr}`.trim();
+        const msg = `${prefix}${stopName}, ${distStr}. ${headingStr}`.trim();
 
-        if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
-        if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+        if (typeof audio !== 'undefined' && typeof audio.speakNavigation === 'function') {
+            audio.speakNavigation(msg);
+        } else if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+            audio.updateNvdaLiveRegion(msg);
+        }
         if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast(msg, 'info');
     },
 
@@ -685,8 +688,7 @@ const Game = {
 
         const r = this.activeRouteData;
         if (!r || !r.stops || r.stops.length === 0) {
-            const msg = "Aktif bir sefer rotası bulunmuyor kaptanım.";
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            const msg = "Aktif sefer rotası yok.";
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
             return;
         }
@@ -695,13 +697,12 @@ const Game = {
         const endStopName = r.endStop || (lastStopObj ? lastStopObj.name : "Son Durak");
         const remainingStopsCount = Math.max(1, r.stops.length - this.currentStopIndex);
 
-        // Kalan toplam hat mesafesi (Sıradaki durağa kalan + sonraki tüm duraklar arasındaki mesafeler)
         let totalRemMeters = Math.max(0, Math.round(this.currentDistanceToNext || 0));
         for (let i = this.currentStopIndex; i < r.stops.length - 1; i++) {
             const st = r.stops[i];
             const dKm = (st && typeof st.gercekMesafeSonraki === 'number' && st.gercekMesafeSonraki > 0)
                 ? st.gercekMesafeSonraki
-                : 1.1; // Ortalama 1.1 km
+                : 1.1;
             totalRemMeters += Math.round(dKm * 1000);
         }
 
@@ -709,9 +710,8 @@ const Game = {
             ? (totalRemMeters / 1000).toFixed(1) + " kilometre" 
             : totalRemMeters + " metre";
 
-        // Sefer sonuna toplam tahmini varış süresi (Şehir içi sürüş + ara durak bekleme süreleri)
-        const totalDriveSec = Math.round(totalRemMeters / (30 * 1000 / 3600)); // 30 km/s ortalama
-        const stopDwellSec = Math.max(0, (remainingStopsCount - 1) * 25); // Her durak için ~25 sn
+        const totalDriveSec = Math.round(totalRemMeters / (30 * 1000 / 3600));
+        const stopDwellSec = Math.max(0, (remainingStopsCount - 1) * 25);
         const totalSec = totalDriveSec + stopDwellSec;
         const totalMins = Math.max(1, Math.round(totalSec / 60));
         const totalEtaStr = totalMins + " dakika";
@@ -723,19 +723,19 @@ const Game = {
             if (s1.lat && s1.lon && sEnd.lat && sEnd.lon) {
                 const b = CompassSystem.calculateBearing(s1.lat, s1.lon, sEnd.lat, sEnd.lon);
                 const c = CompassSystem.getCardinalFromBearing(b);
-                destHeadingStr = ` Sefer genel yönü: ${c.name}.`;
+                destHeadingStr = ` Yön: ${c.name}.`;
             }
         }
 
-        let msg = "";
-        if (remainingStopsCount <= 1) {
-            msg = `Sefer son durağındasınız: ${endStopName}. Kalan mesafe: ${totalDistStr}. Tahmini varış süresi: ${totalEtaStr}.${destHeadingStr} Hat: ${r.name || "Aktif Hat"}.`;
-        } else {
-            msg = `Sefer son durağı: ${endStopName}. Kalan toplam hat mesafesi: ${totalDistStr}. Kalan durak sayısı: ${remainingStopsCount} durak. Tahmini toplam varış süresi: ${totalEtaStr}.${destHeadingStr} Hat: ${r.name || "Aktif Hat"}.`;
-        }
+        let msg = remainingStopsCount <= 1
+            ? `Son durak: ${endStopName}, kalan ${totalDistStr}, yaklaşık ${totalEtaStr}.${destHeadingStr}`
+            : `Hedef son durak: ${endStopName}, kalan ${totalDistStr}, ${remainingStopsCount} durak, yaklaşık ${totalEtaStr}.${destHeadingStr}`;
 
-        if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
-        if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+        if (typeof audio !== 'undefined' && typeof audio.speakNavigation === 'function') {
+            audio.speakNavigation(msg);
+        } else if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+            audio.updateNvdaLiveRegion(msg);
+        }
         if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast(msg, 'info');
     },
 
@@ -2497,15 +2497,7 @@ const Game = {
         this.nextNavSoundTime = this.lastFrameTime + 10000 + Math.random() * 20000;
         if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
         this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
-        this.copilotFirstStopWarned = false;
-        if (window.voiceAssistant && window.voiceAssistant.isCopilotEnabled) {
-            setTimeout(() => {
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("Seferiniz başladı. Boşluk tuşu ile motoru çalıştırıp W tuşuna basılı tutarak hareket ediniz. Pusula için Y tuşuna, yardım için F1 tuşuna basabilirsiniz.");
-                }
-            }, 1800);
-        }
-        
+        this.copilotFirstStopWarned = true;
         this.planNextStop(true); // "true" pass to indicate resume, so it doesn't read the whole start sequence again
     },
 
@@ -2782,14 +2774,8 @@ const Game = {
             this.routeBumps = [];
             this.isFetchingRoute = true;
 
-            // OSRM HESAPLAMASI (Arka planda çalışır, aracı duraklatmaz)
+            // OSRM HESAPLAMASI (Arka planda sessizce çalışır, sürücüyü gereksiz sesle bölmez)
             const wasDriving = this.isDriving;
-            
-            // Eğer sanayi menüsünde falan değilsek, sesli ve görsel bilgi ver
-            if (!document.getElementById('garage-screen').classList.contains('hidden') === false) {
-                if (typeof audio.speak === 'function') audio.speak("Rota hesaplanıyor, lütfen bekleyin.");
-                if (typeof UI !== 'undefined') UI.showToast("Gerçek yol ve kasis bilgileri indiriliyor...", "info");
-            }
 
             let lat1, lon1, lat2, lon2;
             if (this.currentStopIndex === 0) {
@@ -3048,17 +3034,10 @@ const Game = {
 
                 if (typeof audio !== 'undefined') {
                     if (audio.setTunnelMode) audio.setTunnelMode(true);
-                    if (audio.speak) audio.speak(`${tunnelName} girişine ulaşıldı. Tünel uzunluğu ${tunnelLen} metre. Farlarınızı açık tutunuz.`);
+                    if (audio.speakNavigation) audio.speakNavigation(`${tunnelName}, ${tunnelLen} metre.`);
                 }
                 if (typeof UI !== 'undefined' && UI.showToast) {
                     UI.showToast(`🚇 ${tunnelName || 'Tünel'} (${tunnelLen || 0} m)`, "info");
-                }
-                if (!this.isHeadlightsOn) {
-                    setTimeout(() => {
-                        if (this.isInsideTunnel && !this.isHeadlightsOn && typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                            audio.speak("Tünel karanlık, lütfen F tuşuna basarak farları açınız.");
-                        }
-                    }, 2500);
                 }
             }
         } else if (this.isInsideTunnel) {
@@ -3072,7 +3051,7 @@ const Game = {
                 }
                 if (typeof audio !== 'undefined') {
                     if (audio.setTunnelMode) audio.setTunnelMode(false);
-                    if (audio.speak) audio.speak("Tünelden çıkıldı, açık hava.");
+                    if (audio.speakNavigation) audio.speakNavigation("Tünelden çıkıldı.");
                 }
             }
         }
@@ -3089,8 +3068,8 @@ const Game = {
                 this.bridgeLengthRemaining = bridgeLen;
                 this.bridgeJointTraveled = 0;
 
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak(`${bridgeName} geçişi başladı. Uzunluk ${bridgeLen} metre. Şiddetli yan rüzgara dikkat ediniz.`);
+                if (typeof audio !== 'undefined' && audio.speakNavigation) {
+                    audio.speakNavigation(`${bridgeName}, ${bridgeLen} metre.`);
                 }
                 if (typeof UI !== 'undefined' && UI.showToast) {
                     UI.showToast(`🌉 ${bridgeName || 'Köprü'} (${bridgeLen || 0} m)`, "info");
@@ -3099,14 +3078,12 @@ const Game = {
         } else if (this.isInsideBridge) {
             this.bridgeLengthRemaining -= traveled;
             this.bridgeJointTraveled += traveled;
-            // Her 35 metrede bir gerçekçi çelik derz genleşme vuruntusu (tak-tak)
             if (this.bridgeJointTraveled >= 35) {
                 this.bridgeJointTraveled = 0;
                 if (typeof audio !== 'undefined' && audio.playBridgeJoint) {
                     audio.playBridgeJoint(this.speed);
                 }
             }
-            // Köprüde şiddetli yan rüzgar savrulması (direksiyon hissi)
             const windStrength = (this.activeRealBridge && this.activeRealBridge.crosswindIntensity) ? this.activeRealBridge.crosswindIntensity : 2.5;
             this.driftVelocity += (Math.sin(totalDist / 45) * windStrength) * deltaTime;
 
@@ -3117,8 +3094,8 @@ const Game = {
                     this.completedBridges.push(this.activeRealBridge.id);
                     this.activeRealBridge = null;
                 }
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("Köprü geçildi.");
+                if (typeof audio !== 'undefined' && audio.speakNavigation) {
+                    audio.speakNavigation("Köprü geçildi.");
                 }
             }
         }
@@ -3134,10 +3111,9 @@ const Game = {
             this.potholeDistance -= traveled;
             if (this.potholeDistance <= 70 && !this.potholeWarned) {
                 this.potholeWarned = true;
-                const yon = (this.potholeSide === 'right') ? "SAĞDA" : "SOLDA";
-                const kacin = (this.potholeSide === 'right') ? "sola" : "sağa";
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak(`Dikkat! 70 metre ileride ${yon} çukur var, ${kacin} kaçının!`);
+                const yon = (this.potholeSide === 'right') ? "sağda" : "solda";
+                if (typeof audio !== 'undefined' && audio.speakNavigation) {
+                    audio.speakNavigation(`70 metre ileride ${yon} çukur var.`);
                 }
             }
             if (this.potholeDistance <= 0) {
@@ -3201,8 +3177,8 @@ const Game = {
 
             if (this.trafficLightDistance <= 110 && !this.trafficLightWarned) {
                 this.trafficLightWarned = true;
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("İleride trafik ışığı var, kırmızı yanıyor.");
+                if (typeof audio !== 'undefined' && audio.speakNavigation) {
+                    audio.speakNavigation("İleride kırmızı ışık var.");
                 }
             }
 
@@ -3221,7 +3197,7 @@ const Game = {
                 this.trafficLightState = 'green';
                 if (typeof audio !== 'undefined') {
                     if (audio.playTrafficLightTone) audio.playTrafficLightTone('green');
-                    if (audio.speak) audio.speak("Trafik ışığı yeşil yandı, hareket edebilirsiniz.");
+                    if (audio.speakNavigation) audio.speakNavigation("Yeşil yandı.");
                 }
             }
 
@@ -3238,7 +3214,7 @@ const Game = {
                     }
                     if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onRedLightViolation())) {
                         if (typeof audio !== 'undefined' && audio.speak) {
-                            audio.speak("DİKKAT: Kırmızı ışıkta geçtiniz! Yüz elli lira trafik cezası kesildi.");
+                            audio.speak("Kırmızı ışık cezası: 150 lira.");
                         }
                     }
                 }
@@ -3257,7 +3233,7 @@ const Game = {
                     setTimeout(() => {
                         if (audio.stopTireScreech) audio.stopTireScreech();
                         if (audio.playDistantCrash) audio.playDistantCrash(0.4);
-                        if (audio.speak) audio.speak("Dikkat! İleride iki araç kaza yaptı, araçlar yol kenarına savruldu. Orta şeritten yavaşça geçiniz.");
+                        if (audio.speakNavigation) audio.speakNavigation("İleride yol kenarında kaza var, orta şeritten geçin.");
                     }, 900);
                 }
                 setTimeout(() => {
@@ -3350,7 +3326,7 @@ const Game = {
 
         // Kasis Yaklaşma Sesli Uyarısı (60m kala)
         if (this.kasisDistance !== null && this.kasisDistance <= 60 && this.kasisDistance > 0 && !this.kasisWarned) {
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak("İleride kasis var, yavaşlayınız.");
+            if (typeof audio !== 'undefined' && audio.speakNavigation) audio.speakNavigation("İleride kasis var.");
             this.kasisWarned = true;
         }
 
@@ -3425,7 +3401,7 @@ const Game = {
                 this.steeringAngle = 0;
                 audio.speak("Sanayiye vardık. Araç indiriliyor. Geçmiş olsun usta.");
                 document.getElementById('nav-feedback').innerText = "TEKİRDAĞ SANAYİ - VARIŞ";
-                document.getElementById('hud-speed').innerText = `Hız: 0 km/s`;
+                document.getElementById('hud-speed').innerText = `0`;
                 
                 // Sanayi moduna geç
                 SanayiMechanic.start();
@@ -3444,9 +3420,9 @@ const Game = {
         }
         */
 
-        // --- Etkileşimli Navigasyon (Mesafe ve Dönüş Takibi) ---
+        // --- Etkileşimli Navigasyon (Mesafe ve Dönüş Takibi: Yalnızca Google Navigasyon Sesi!) ---
         if (this.upcomingIntersection && !this.intersectionAnnounced && this.currentDistanceToNext < 300 && this.speed > 0) {
-            audio.speak("İleride kavşak var, lütfen yavaşlayın.");
+            if (typeof audio.speakNavigation === 'function') audio.speakNavigation("İleride kavşak var.");
             this.intersectionAnnounced = true;
         }
 
@@ -3487,21 +3463,23 @@ const Game = {
                     if (typeof audio.playNavChime === 'function') audio.playNavChime();
                     
                     if (triggeredMilestone === 0) {
+                        const turnDirOnly = currentTurn.isRight === true ? "sağa" : (currentTurn.isRight === false ? "sola" : (currentTurn.direction || "ileri"));
                         let speechText = currentTurn.isRealTurkeyCurve
-                            ? (currentTurn.speechWarning || `Şimdi ${currentTurn.name || currentTurn.direction} dönün. Gazı dengeli tutun.`)
+                            ? (currentTurn.speechWarning || `Şimdi ${turnDirOnly} dönün.`)
                             : (currentTurn.isSpecial ? `Şimdi ${currentTurn.direction}` : `Şimdi ${currentTurn.direction} dönün.`);
                         
-                        setTimeout(() => audio.speak(speechText), 400);
+                        setTimeout(() => { if (typeof audio.speakNavigation === 'function') audio.speakNavigation(speechText); }, 350);
                         
                         currentTurn.state = "waiting";
                         currentTurn.lastWarningTime = currentTime;
                     } else {
                         let distText = triggeredMilestone === 1000 ? "1 kilometre" : `${triggeredMilestone} metre`;
+                        const navTarget = currentTurn.direction || currentTurn.name || "dönüş";
                         let speechText = currentTurn.isRealTurkeyCurve
-                            ? `${distText} sonra ${currentTurn.name || currentTurn.direction}. Tavsiye edilen azami hız ${currentTurn.advisorySpeed || 50} kilometre.`
-                            : (currentTurn.isSpecial ? `${distText} sonra ${currentTurn.direction}` : `${distText} sonra ${currentTurn.direction} dönün.`);
+                            ? `${distText} sonra ${navTarget}.`
+                            : (currentTurn.isSpecial ? `${distText} sonra ${currentTurn.direction}.` : `${distText} sonra ${currentTurn.direction} dönün.`);
                             
-                        setTimeout(() => audio.speak(speechText), 400);
+                        setTimeout(() => { if (typeof audio.speakNavigation === 'function') audio.speakNavigation(speechText); }, 350);
                     }
                 }
             } 
@@ -3635,9 +3613,9 @@ const Game = {
 
                         const cName = currentTurn.name || "Viraj";
                         const turnMsg = newHeadingName 
-                            ? `${cName} tamamlandı. Yeni istikamet ${newHeadingName}. Şimdi devam edin.`
-                            : `${cName} başarıyla geçildi, şimdi devam edin.`;
-                        audio.speak(turnMsg);
+                            ? `İstikamet ${newHeadingName}.`
+                            : `Düz devam edin.`;
+                        if (typeof audio.speakNavigation === 'function') audio.speakNavigation(turnMsg);
                         if (navFeedbackEl) {
                             navFeedbackEl.innerText = `${cName} Başarılı! ${newHeadingName ? '(' + newHeadingName + ')' : ''}`;
                             navFeedbackEl.style.color = '#22c55e'; // Green
@@ -4048,13 +4026,9 @@ const Game = {
                 }
             }
 
-            // Balata aşırı ısınma ve fren şişmesi uyarısı
-            // Dik inişte ayak frenine yüklenilirse erken eğitici uyarı
+            // Balata aşırı ısınma ve fren şişmesi uyarısı (Yalnızca görsel/NVDA ikaz, gereksiz tuş dersi yok)
             if (this.currentSlopePct <= -3.5 && isFootBraking && (!this.retarderLevel || this.retarderLevel === 0) && (currentTime - (this.lastDownhillRetarderTipTime || 0) > 14000)) {
                 this.lastDownhillRetarderTipTime = currentTime;
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("Kaptan, dik inişte ayak frenine yüklenmeyin, balatalar şişer. B tuşuna basarak Retarder yokuş frenini devreye sokunuz.");
-                }
                 if (typeof UI !== 'undefined' && UI.showToast) {
                     UI.showToast("💡 İpucu: Dik inişte B tuşuyla Retarder (Yokuş Freni) kullanınız.", "info");
                 }
@@ -4227,12 +4201,7 @@ const Game = {
                 }
             }
 
-            if (this.currentDistanceToNext <= 220 && !this.copilotFirstStopWarned && this.currentStopIndex === 0 && this.speed > 5) {
-                this.copilotFirstStopWarned = true;
-                if (window.voiceAssistant && window.voiceAssistant.isCopilotEnabled && typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("İlk durağınıza yaklaşıyorsunuz. S tuşuna basarak yavaşlayınız. Tam durduğunuzda Sayfa Yukarı ve Sayfa Aşağı tuşlarıyla kapıları açınız.");
-                }
-            }
+            this.copilotFirstStopWarned = true;
             // FAZ 1: DURAKTAN KALKIŞ ANONSU (Araç hareket edip hızlanınca)
             if (this.speed > 6 && !this.departAnnounced) {
                 this.departAnnounced = true;
@@ -4258,8 +4227,8 @@ const Game = {
                 const stopName = nextStop ? nextStop.name : 'Sıradaki Durak';
                 if (typeof audio !== 'undefined' && typeof audio.playBusAnnouncement === 'function') {
                     audio.playBusAnnouncement('approach', stopName, { isFinal: isFinalStop });
-                } else if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                    audio.speak(`${stopName} durağına yaklaşıyorsunuz. İnecek yolcular lütfen hazırlansın.`);
+                } else if (typeof audio !== 'undefined' && typeof audio.speakNavigation === 'function') {
+                    audio.speakNavigation(`${stopName} durağına 100 metre.`);
                 }
             }
             const distanceScale = 1.0; // 1:1 Gerçek Fizik (Metre / Saniye)
@@ -4349,7 +4318,7 @@ const Game = {
                     
                     if (typeof audio.speak === 'function') audio.speak("Sanayiye yavaşça park ettik. Motor kapatıldı. Geçmiş olsun usta.");
                     document.getElementById('nav-feedback').innerText = "TEKİRDAĞ SANAYİ - VARIŞ";
-                    document.getElementById('hud-speed').innerText = `Hız: 0 km/s`;
+                    document.getElementById('hud-speed').innerText = `0`;
                     
                     // Sanayi moduna geç
                     if (typeof SanayiMechanic !== 'undefined') SanayiMechanic.start();
@@ -4478,7 +4447,7 @@ const Game = {
                     this.routeBumps[nextBumpIndex].passed = true;
                     this.kasisDistance = 300;
                     foundRealBump = true;
-                    if (typeof audio.speak === 'function') audio.speak("300 metre ileride gerçek kasis var, hızınızı otuzun altına düşürün.");
+                    if (typeof audio.speakNavigation === 'function') audio.speakNavigation("300 metre ileride kasis var.");
                 }
             }
             
@@ -4488,7 +4457,7 @@ const Game = {
             if (!foundRealBump && (this.totalDistanceCovered - this.lastRandomKasisDistance >= 2200)) {
                 this.lastRandomKasisDistance = this.totalDistanceCovered; // En az 1 km sonra tekrar çıkabilir
                 this.kasisDistance = 300; // 300 metre ileride kasis
-                if (typeof audio.speak === 'function') audio.speak("300 metre ileride kasis var, hızınızı otuzun altına düşürün.");
+                if (typeof audio.speakNavigation === 'function') audio.speakNavigation("300 metre ileride kasis var.");
             }
         }
         
@@ -4872,31 +4841,30 @@ const Game = {
                 }
             }
 
-            // --- TEHLİKE VE ERKEN SESLİ UYARILAR ---
+            // --- TEHLİKE VE ERKEN YOL NAVİGASYONU UYARILARI ---
             if (!npc.hasCollided) {
                 if (npc.type === 'hazard' && npc.y < 350 && npc.y > 100 && !npc.warned) {
                     npc.warned = true;
                     if (audio.playNPCHorn) audio.playNPCHorn((npc.x - this.lanePosition) / 30);
-                    if (typeof audio.speak === 'function') {
-                        audio.speak("Dikkat! Karşıdan hatalı sollama yapan araç geliyor, sağ şeride yanaşın!");
+                    if (typeof audio.speakNavigation === 'function') {
+                        audio.speakNavigation("Karşıdan araç geliyor, sağ şeride geçin.");
                     }
                 }
                 if (npc.type === 'ahead' && npc.y < 120 && npc.y > 40 && !npc.warned && Math.abs(npc.x - this.lanePosition) < 22) {
                     npc.warned = true;
-                    if (typeof audio.speak === 'function') {
-                        audio.speak("Önünüzde yavaş seyreden araç var, sollayabilirsiniz.");
+                    if (typeof audio.speakNavigation === 'function') {
+                        audio.speakNavigation("Önde yavaş araç var.");
                     }
                 }
 
                 // AKILLI NEZAKET VE OYUNU TIKAMAMA KORUMASI (Anti-Gridlock Courtesy Yield)
-                // Eğer oyuncu arkadan yaklaşırsa, öndeki araç dikiz aynasından otobüsü görüp sağa emniyet şeridine kaçar ve yol verir
                 if (npc.type === 'ahead' && npc.y < 45 && npc.y > 10 && Math.abs(npc.x - this.lanePosition) < 20) {
                     npc.targetX = 82; // Sağa çekilir
                     npc.targetSpeed = Math.max(npc.targetSpeed, this.speed + 15); // Gaz verip uzaklaşır
                     if (!npc.yielded) {
                         npc.yielded = true;
-                        if (typeof audio.speak === 'function') {
-                            audio.speak("Öndeki araç sağa çekilip yol verdi, geçebilirsiniz.");
+                        if (typeof audio.speakNavigation === 'function') {
+                            audio.speakNavigation("Yol açıldı.");
                         }
                     }
                 }
@@ -5187,13 +5155,6 @@ const Game = {
                 const goodbyeMsg = "Yolcular: 'Eline sağlık kaptan, çok rahat bir seferdi. Hayırlı günler.'";
                 if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.canSpeakInCabin())) {
                     if (typeof audio !== 'undefined' && audio.speak) audio.speak(goodbyeMsg);
-                }
-                if (window.voiceAssistant && window.voiceAssistant.isCopilotEnabled) {
-                    setTimeout(() => {
-                        if (typeof audio !== 'undefined' && audio.speak) {
-                            audio.speak("Son durağa vardınız. Tüm yolcular indikten sonra J tuşuna basarak kabin teftişi yapınız.");
-                        }
-                    }, 3500);
                 }
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("👋 " + goodbyeMsg, "info");
             }, 1200);
@@ -6555,8 +6516,8 @@ const Game = {
             if (typeof BusConceptGuide !== 'undefined' && BusConceptGuide.announceAction('retarder', isEngaged, { level: this.retarderLevel })) {
                 return;
             }
-            const msg = isEngaged ? `Retarder Kademe ${this.retarderLevel}. Yokuş iniş freni devrede, balataları yakmadan şanzımandan yavaşlatır.` : "Retarder kapatıldı, serbest sürüş.";
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            const msg = isEngaged ? `Retarder ${this.retarderLevel}` : "Retarder kapalı";
+            if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(msg);
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast(isEngaged ? `⚡ Retarder Kademe ${this.retarderLevel} Devrede` : `⚡ Retarder Devre Dışı`, isEngaged ? "success" : "info");
             }
@@ -6577,8 +6538,11 @@ const Game = {
                 }
                 return;
             }
-            let msg = `Hızınız saatte ${Math.floor(this.speed)} kilometre.`;
-            if (typeof audio.speak === 'function') audio.speak(msg);
+            // SADECE RAKAMSAL HIZ ("65", "0", "82") - Ekran okuyucuda hızlı ve net!
+            const speedOnly = String(Math.round(this.speed || 0));
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                audio.updateNvdaLiveRegion(speedOnly);
+            }
             return;
         }
 
@@ -6674,10 +6638,8 @@ const Game = {
             if (typeof BusConceptGuide !== 'undefined' && typeof BusConceptGuide.announceAction === 'function' && BusConceptGuide.announceAction('handbrake', this.isHandbrakeOn)) {
                 return;
             }
-            const hbMsg = this.isHandbrakeOn
-                ? "İmdat park freni çekildi. Arka dingil yayları kilitlendi."
-                : "İmdat park freni indirildi. Araç kalkışa hazır.";
-            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(hbMsg);
+            const hbMsg = this.isHandbrakeOn ? "İmdat çekildi" : "İmdat indirildi";
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(hbMsg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(this.isHandbrakeOn ? "🅿️ İmdat Freni Çekildi" : "🅿️ İmdat Freni İndirildi", this.isHandbrakeOn ? "warning" : "info");
             return;
         }

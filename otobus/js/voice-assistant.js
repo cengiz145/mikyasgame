@@ -8,7 +8,7 @@ class VoiceAssistant {
     constructor() {
         this.recognition = null;
         this.isListening = false;
-        this.isCopilotEnabled = (localStorage.getItem('copilot_enabled') !== 'false');
+        this.isCopilotEnabled = (localStorage.getItem('copilot_enabled') === 'true');
         this.currentStageFilter = 'lab'; // 'all', 1, 2, 3, 4, 'karne'
 
         // 4 Aşamada Toplam 12 Sade ve Pratik Sürüş Dersi (Tamamen Oyuncuya Oyunu Anlatan Dil)
@@ -2317,9 +2317,12 @@ class VoiceAssistant {
             return;
         }
 
-        // --- NAVİGASYON BİLGİSİ ---
+        // --- HIZ BİLGİSİ (SADECE RAKAMSAL) ---
         if (command.includes("hız") || command.includes("kaçla") || command.includes("yavaş mı")) {
-            audio.speak(`Şu anki hızımız saatte ${Math.floor(Game.speed)} kilometre.`);
+            const spdNum = String(Math.round(Game.speed || 0));
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                audio.updateNvdaLiveRegion(spdNum);
+            }
             return;
         }
 

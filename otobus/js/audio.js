@@ -397,21 +397,34 @@ class AudioSystem {
         return false;
     }
 
+    isAnyModalOverlayOpen() {
+        if (typeof document === 'undefined') return false;
+        const modals = document.querySelectorAll('.modal:not(.hidden), .modal-overlay:not(.hidden)');
+        for (let i = 0; i < modals.length; i++) {
+            const st = window.getComputedStyle(modals[i]);
+            if (st.display !== 'none' && st.visibility !== 'hidden') return true;
+        }
+        return false;
+    }
+
     updateNvdaLiveRegion(text) {
         let liveRegion = document.getElementById('nvda-live-region');
         if (!liveRegion) {
             liveRegion = document.createElement('div');
             liveRegion.id = 'nvda-live-region';
-            liveRegion.setAttribute('aria-live', 'polite');
+            liveRegion.setAttribute('aria-live', 'assertive');
             liveRegion.setAttribute('aria-atomic', 'true');
             liveRegion.setAttribute('role', 'status');
             liveRegion.style.position = 'absolute';
             liveRegion.style.left = '-9999px';
             document.body.appendChild(liveRegion);
         }
-        const clean = this.cleanSpeechText ? this.cleanSpeechText(text) : text;
+        const clean = this.cleanSpeechText ? this.cleanSpeechText(text) : String(text || '');
+        if (!clean) return;
+        this._nvdaToggleBit = !this._nvdaToggleBit;
+        const payload = clean + (this._nvdaToggleBit ? '\u200B' : '');
         liveRegion.textContent = '';
-        setTimeout(() => { liveRegion.textContent = clean; }, 40);
+        setTimeout(() => { liveRegion.textContent = payload; }, 30);
     }
 
     stopSpeech() {
@@ -2688,52 +2701,38 @@ startEngine() {
         } catch (e) {}
     }
 
-    // --- AKILLI VE GERÇEKÇİ BELEDİYE OTOBÜSÜ ANONS SİSTEMİ (IBIS / TEKULAŞ / İETT STANDARDI) ---
+    // --- AKILLI VE GERÇEKÇİ BELEDİYE OTOBÜSÜ ANONS SİSTEMİ (SADECE DURAK NAVİGASYONU / HOSTES MP3) ---
     playBusAnnouncement(phase, stopName, options = {}) {
         if (!stopName) return;
-        this.duckForAnnouncement(6500);
+        this.duckForAnnouncement(5500);
         this.playIBISChime();
-        if (typeof window.HumanNpcVoices !== "undefined" && typeof window.HumanNpcVoices.notifyBusAnnouncement === "function") { window.HumanNpcVoices.notifyBusAnnouncement(5500); }
-        
-        let anonsText = '';
-        if (phase === 'depart') {
-            if (options.isInitial) {
-                const lineInfo = options.routeName ? (options.routeName + ' ') : '';
-                anonsText = 'Sayın yolcularımız, ' + lineInfo + 'seferimiz başlamıştır. İlk durağımız: ' + stopName + '.';
-            } else if (options.isFinal) {
-                anonsText = 'Sonraki durak: ' + stopName + '. Son duraktır.';
-            } else {
-                anonsText = 'Sonraki durak: ' + stopName + '.';
-            }
-        } else if (phase === 'approach') {
-            anonsText = stopName + ' durağına yaklaşıyorsunuz. İnecek yolcular lütfen hazırlansın.';
-        } else if (phase === 'arrive') {
-            if (options.isFinal) {
-                anonsText = 'Son durağımız: ' + stopName + '. Araçtan ayrılırken lütfen eşyalarınızı kontrol ediniz. TEKULAŞ iyi günler diler.';
-            } else {
-                anonsText = 'Durağımız: ' + stopName + '. Kapılar açılıyor.';
-            }
+        if (typeof window.HumanNpcVoices !== "undefined" && typeof window.HumanNpcVoices.notifyBusAnnouncement === "function") {
+            window.HumanNpcVoices.notifyBusAnnouncement(5000);
         }
 
-        if (anonsText) {
-            // 3'lü zil melodisi (Dı - Dı - Dııın) biter bitmez net konuşma başlasın (750 ms)
+        let navStopText = '';
+        if (phase === 'depart') {
+            navStopText = options.isFinal ? ('Son durak: ' + stopName + '.') : ('Sonraki durak: ' + stopName + '.');
+        } else if (phase === 'approach') {
+            navStopText = stopName + ' durağına 100 metre.';
+        } else if (phase === 'arrive') {
+            navStopText = options.isFinal ? ('Son durak: ' + stopName + '.') : ('Durak: ' + stopName + '.');
+        }
+
+        if (navStopText) {
+            // 3'lü zil melodisi biter bitmez yalnızca hostes MP3 veya saf durak navigasyonu konuşur (NVDA ile üst üste binmez!)
             setTimeout(() => {
                 if (typeof window.HumanNpcVoices !== 'undefined') {
                     if (phase === 'depart' && options && options.isInitial) {
-                        this.updateNvdaLiveRegion(anonsText);
                         if (window.HumanNpcVoices.playIbisWelcome()) return;
                     } else if (phase === 'arrive' && options && options.isFinal) {
-                        this.updateNvdaLiveRegion(anonsText);
                         if (window.HumanNpcVoices.playIbisFinalStop()) return;
                     } else if (phase === 'arrive' && stopName) {
-                        if (window.HumanNpcVoices.playStopHubAnnouncement(stopName)) {
-                            this.updateNvdaLiveRegion(anonsText);
-                            return;
-                        }
+                        if (window.HumanNpcVoices.playStopHubAnnouncement(stopName)) return;
                     }
                 }
-                this.speak(anonsText);
-            }, 750);
+                this.speakNavigation(navStopText);
+            }, 700);
         }
     }
 
@@ -3619,22 +3618,48 @@ startEngine() {
         }
     }
 
+    // KULLANICI KURALI:
+    // Google sesi (Google Cloud TTS / speechSynthesis) YALNIZCA yol navigasyonuna (speakNavigation) karışır!
+    // Menüleri, araç tuşlarını, uyarıları ve durum bildirimlerini zaten ekran okuyucu (NVDA) okur;
+    // iki sesin üst üste binip kafa karıştırmaması için speak() sadece NVDA live-region günceller.
     async speak(text, onEndCallback = null) {
+        if (!text) {
+            if (typeof onEndCallback === 'function') {
+                try { onEndCallback(); } catch (e) {}
+            }
+            return;
+        }
+        this.updateNvdaLiveRegion(text);
+        if (typeof onEndCallback === 'function') {
+            setTimeout(() => {
+                try { onEndCallback(); } catch (e) {}
+            }, 60);
+        }
+    }
+
+    async speakSequence(textArray) {
+        if (!textArray || textArray.length === 0) return;
+        this.updateNvdaLiveRegion(textArray.join(" "));
+    }
+
+    // SADECE YOL NAVİGASYONU İÇİN GOOGLE SESİ (NVDA live-region'ı tetiklemez, çift ses yapmaz!)
+    async speakNavigation(text, onEndCallback = null) {
         if (!text) {
             if (typeof onEndCallback === 'function') onEndCallback();
             return;
         }
-        
-        // Ekran okuyucu (NVDA) erişilebilirliği için live region'ı her zaman güncelle
-        this.updateNvdaLiveRegion(text);
 
-        // KULLANICI KURALI:
-        // Sadece otobüsün içindeyken (sürüş veya durak) Google Cloud TTS ve sesli sentezleyici konuşsun.
-        // Ana menüde ve menülerde Google altyapısı ya da herhangi bir sentezleyici KONUŞMASIN.
-        if (!this.isInBusCabin()) {
+        // Sadece aktif sürüş/durak ekranındayken ve üstte herhangi bir modal pencere açık değilken konuşur
+        if (!this.isInBusCabin() || this.isAnyModalOverlayOpen()) {
             if (typeof onEndCallback === 'function') {
-                try { onEndCallback(); } catch(e){}
+                try { onEndCallback(); } catch (e) {}
             }
+            return;
+        }
+
+        const cleanNavText = this.cleanSpeechText(text);
+        if (!cleanNavText) {
+            if (typeof onEndCallback === 'function') onEndCallback();
             return;
         }
 
@@ -3657,14 +3682,14 @@ startEngine() {
         }
 
         // Önbellekte varsa çal
-        const cacheKey = "tts_ai_leda_" + text;
+        const cacheKey = "tts_ai_leda_" + cleanNavText;
         try {
             const cachedAudio = localStorage.getItem(cacheKey);
             if (cachedAudio) {
                 if (this.sequenceId !== currentSeqId) return;
                 const ttsAudio = new Audio("data:audio/mp3;base64," + cachedAudio);
                 this.boostSpeechAudioElement(ttsAudio, 1.95);
-                this.duckForAnnouncement(Math.min(12000, Math.max(3500, text.length * 85)));
+                this.duckForAnnouncement(Math.min(9000, Math.max(2500, cleanNavText.length * 75)));
                 this.currentTTSAudio = ttsAudio;
                 ttsAudio.onended = () => {
                     this.unduckAnnouncement();
@@ -3678,19 +3703,19 @@ startEngine() {
             }
         } catch (e) {}
 
-        // Google Cloud TTS denemesi (Otobüs içinde en yüksek kalitede anonslar)
+        // Google Cloud TTS (Yalnızca yol navigasyonu için)
         if (!this.googleTtsDisabled || (this.googleTtsDisabledUntil && Date.now() > this.googleTtsDisabledUntil)) {
             try {
                 const apiKey = "AIzaSyAMgbeG7kuhowlmPKh2nsgm_vYzL6lpgHs";
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 1800);
+                const timeoutId = setTimeout(() => controller.abort(), 1600);
 
                 const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     signal: controller.signal,
                     body: JSON.stringify({
-                        input: { text: text },
+                        input: { text: cleanNavText },
                         voice: { languageCode: "tr-TR", name: "tr-TR-Chirp3-HD-Leda" },
                         audioConfig: { audioEncoding: "MP3" }
                     })
@@ -3703,7 +3728,7 @@ startEngine() {
                     try { localStorage.setItem(cacheKey, data.audioContent); } catch (e) {}
                     const ttsAudio = new Audio("data:audio/mp3;base64," + data.audioContent);
                     this.boostSpeechAudioElement(ttsAudio, 1.95);
-                    this.duckForAnnouncement(Math.min(12000, Math.max(3500, text.length * 85)));
+                    this.duckForAnnouncement(Math.min(9000, Math.max(2500, cleanNavText.length * 75)));
                     this.currentTTSAudio = ttsAudio;
                     ttsAudio.onended = () => {
                         this.unduckAnnouncement();
@@ -3723,72 +3748,9 @@ startEngine() {
             }
         }
 
-        // Yerel tarayıcı sesiyle anons yap (Otobüs içinde sıfır gecikmeli yedek)
+        // Yerel tarayıcı sesiyle sıfır gecikmeli yedek navigasyon
         if (this.sequenceId !== currentSeqId) return;
-        this.speakBrowserVoice(text, onEndCallback);
-    }
-
-    async speakSequence(textArray) {
-        if (!textArray || textArray.length === 0) return;
-
-        this.updateNvdaLiveRegion(textArray.join(" "));
-
-        // KULLANICI KURALI: Ana menüde ve menülerde sesli sentezleyici konuşmasın
-        if (!this.isInBusCabin()) {
-            return;
-        }
-
-        this.sequenceId = (this.sequenceId || 0) + 1;
-        const currentSeqId = this.sequenceId;
-
-        if (this.currentSequenceAudio) {
-            try { this.currentSequenceAudio.pause(); } catch(e){}
-            this.currentSequenceAudio = null;
-        }
-        if (this.currentTTSAudio) {
-            try { this.currentTTSAudio.pause(); } catch(e){}
-            this.currentTTSAudio = null;
-        }
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-            window.speechSynthesis.resume();
-        }
-
-        let index = 0;
-        const playNext = () => {
-            if (this.sequenceId !== currentSeqId) return;
-            if (index >= textArray.length) return;
-
-            const text = textArray[index];
-            index++;
-
-            const cacheKey = "tts_ai_leda_" + text;
-            let cachedAudio = null;
-            try { cachedAudio = localStorage.getItem(cacheKey); } catch (e) {}
-
-            if (cachedAudio) {
-                const aud = new Audio("data:audio/mp3;base64," + cachedAudio);
-                this.boostSpeechAudioElement(aud, 1.95);
-                this.duckForAnnouncement(Math.min(12000, Math.max(3500, text.length * 85)));
-                this.currentSequenceAudio = aud;
-                aud.onended = () => {
-                    if (this.sequenceId !== currentSeqId) return;
-                    if (index >= textArray.length) this.unduckAnnouncement();
-                    setTimeout(playNext, 120);
-                };
-                aud.play().catch(e => {
-                    this.speakBrowserVoice(text, () => {
-                        if (this.sequenceId === currentSeqId) setTimeout(playNext, 120);
-                    });
-                });
-            } else {
-                this.speakBrowserVoice(text, () => {
-                    if (this.sequenceId === currentSeqId) setTimeout(playNext, 120);
-                });
-            }
-        };
-
-        playNext();
+        this.speakBrowserVoice(cleanNavText, onEndCallback);
     }
 
     placeAmbientSources(routeData, licenseLevel) {

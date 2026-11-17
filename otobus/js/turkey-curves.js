@@ -639,8 +639,8 @@
                 : this._generateRealisticTurkishCurveName(context, dirText, advisorySpeed);
 
             const speechText = matchedPass 
-                ? matchedPass.speechWarning 
-                : (curveName + ". Tavsiye edilen azami hız " + advisorySpeed + " kilometre.");
+                ? (matchedPass.name + ", " + dirText + ".")
+                : ("Şimdi " + (isRight ? "sağa" : "sola") + " dönün.");
 
             const pan = isRight ? 0.70 : -0.70;
 
@@ -775,7 +775,7 @@
                         currentProgress: 0,
                         curveType: matchedPass ? matchedPass.curveType : 'tatli_viraj',
                         passSign: matchedPass ? matchedPass.passSign : ("↪️ " + curveName.toUpperCase() + " [" + advisorySpeed + " km/s]"),
-                        speechWarning: matchedPass ? matchedPass.speechWarning : ("Şimdi " + dirText + ". Tavsiye edilen hız " + advisorySpeed + " kilometre."),
+                        speechWarning: matchedPass ? (matchedPass.name + ", " + dirText + ".") : ("Şimdi " + (isRight ? "sağa" : "sola") + " dönün."),
                         pan: isRight ? 0.70 : -0.70,
                         milestones: milestones,
                         state: "approaching",
@@ -956,7 +956,7 @@
                 lastWarningTime: 0,
                 isRealTurkeyCurve: true,
                 pan: isRight ? 0.70 : -0.70,
-                speechWarning: `Şimdi ${isRight ? 'sağa' : 'sola'} dönün. Tavsiye edilen hız ${advSpeed} kilometre.`,
+                speechWarning: `Şimdi ${isRight ? 'sağa' : 'sola'} dönün.`,
                 passSign: `📐 ${stopLabel.toUpperCase()} - ${typeName.toUpperCase()} [${advSpeed} km/s]`
             }];
         },
@@ -971,23 +971,20 @@
             let speech = "";
             if (upcoming && upcoming.state !== "completed") {
                 const curveName = upcoming.name || upcoming.direction || "kavis";
-                const advSpeed = upcoming.advisorySpeed || 45;
                 const dir = upcoming.isRight ? "sağa" : (upcoming.isRight === false ? "sola" : upcoming.direction);
-                const gForceExpected = (upcoming.curveIntensity || 25) > 30 ? "Yüksek merkezkaç savrulması bekleniyor, hızı düşürün." : "Dengeli kavis.";
-
-                speech = `Viraj ve Geometri Raporu: Yaklaşan viraj: ${curveName}. İstikamet: ${dir}. Tavsiye edilen azami hız: ${advSpeed} kilometre. ${gForceExpected}`;
+                const rem = Math.max(0, Math.round((game.currentDistanceToNext || 0) - (upcoming.distance || 0)));
+                speech = `${rem} metre sonra ${curveName}, ${dir}.`;
             } else {
-                speech = "Viraj ve Geometri Raporu: Güzergah düz seyrediyor. Önünüzde sert bir viraj bulunmuyor.";
+                speech = "Yol düz devam ediyor.";
             }
 
-            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                audio.speak(speech);
-            }
-            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+            if (typeof audio !== 'undefined' && typeof audio.speakNavigation === 'function') {
+                audio.speakNavigation(speech);
+            } else if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
                 audio.updateNvdaLiveRegion(speech);
             }
             if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
-                UI.showToast(`📐 ${speech.split(':')[1] ? speech.split(':')[1].trim() : speech}`, 'info');
+                UI.showToast(`📐 ${speech}`, 'info');
             }
         }
     };

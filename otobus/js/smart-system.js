@@ -232,32 +232,9 @@ const AkilliSistem = {
         return false;
     },
 
-    // 4. SÜRÜŞ ESNASINDA AKILLI KO-PİLOT UYARILARI
+    // 4. SÜRÜŞ ESNASINDA AKILLI KO-PİLOT UYARILARI (Yalnızca yol navigasyonu kalacak şekilde ekstra tuş/hız yönlendirmeleri kapatıldı)
     onCoPilotUpdate: function(game) {
         if (!game || !game.isDriving) return;
-
-        const dist = game.currentDistanceToNext;
-        const speed = game.speed;
-
-        // Durağa 100 metre yaklaşıldığında hız uyarısı
-        if (dist > 80 && dist <= 120 && speed > 50 && !game._copilotSlowWarned) {
-            game._copilotSlowWarned = true;
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak("Durağa yüz metre kaldı, hızınızı düşürün.");
-            }
-        } else if (dist > 150) {
-            game._copilotSlowWarned = false;
-        }
-
-        // Durakta tam durulduğunda kapı hatırlatması
-        if (dist <= 15 && speed === 0 && !game.frontDoorOpen && !game._copilotDoorWarned) {
-            game._copilotDoorWarned = true;
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak("Durağa yanaştınız. Yolcu binişi için ön kapıyı açabilirsiniz.");
-            }
-        } else if (speed > 5) {
-            game._copilotDoorWarned = false;
-        }
     }
 };
 

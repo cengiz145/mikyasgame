@@ -106,7 +106,7 @@ OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
     ];
 
     const BusConceptGuide = {
-        isEducationalMode: true, // Varsayılan: Açıp kapatırken detaylı eğitici anlatım
+        isEducationalMode: (typeof localStorage !== 'undefined' && localStorage.getItem('edu_mode_enabled') === 'true'), // Varsayılan: Kapalı (yalnızca Shift+O ile açılırsa detaylı anlatır)
         concepts: BUS_CONCEPTS,
         activeFilter: "all",
 
@@ -115,6 +115,11 @@ OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
          */
         toggleEducationalMode: function () {
             this.isEducationalMode = !this.isEducationalMode;
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem('edu_mode_enabled', this.isEducationalMode ? 'true' : 'false');
+                }
+            } catch (e) {}
             const modeText = this.isEducationalMode
                 ? "Eğitici Kaptan Modu AÇIK. Tuşlara bastığınızda kavramların ne işe yaradığı detaylıca seslendirilir."
                 : "Hızlı Kaptan Modu AÇIK. Kısaltılmış durum bildirimleri devrede.";

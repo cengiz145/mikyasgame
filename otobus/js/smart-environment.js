@@ -175,15 +175,15 @@
 
             this.kasisDistance -= traveledMeters;
 
-            // 70 metre kala sesli navigasyon ikazı
+            // 70 metre kala sadece yalın yol navigasyonu ikazı
             if (this.kasisDistance <= 70 && this.kasisDistance > 0 && !this.kasisWarned) {
                 this.kasisWarned = true;
-                const warnMsg = "70 metre sonra hız kesici kasis var. Hızınızı yirmi beşe düşürünüz.";
-                if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                    audio.speak(warnMsg);
+                const warnMsg = "70 metre sonra kasis var.";
+                if (typeof audio !== 'undefined' && typeof audio.speakNavigation === 'function') {
+                    audio.speakNavigation(warnMsg);
                 }
                 if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
-                    UI.showToast("⚠️ 70m Kasis Var (Azami Hız: 25 km/s)", "warning");
+                    UI.showToast("⚠️ 70m Kasis Var", "warning");
                 }
             }
 
