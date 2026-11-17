@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hafızana Güven - Veri ve Takma Ad Silme</title>
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --card: #151c2c;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --accent: #ffb703;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --border: #2a3942;
+        }
+        body {
+            margin: 0;
+            padding: 24px 16px 60px 16px;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            line-height: 1.6;
+        }
+        main {
+            max-width: 680px;
+            margin: 0 auto;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px 24px;
+        }
+        h1 {
+            color: var(--accent);
+            margin-top: 0;
+            font-size: 1.65rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 12px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+        input, textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #0f172a;
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+        button {
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            padding: 14px 22px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+        }
+        a.btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+        }
+        #status-box {
+            margin-top: 18px;
+            padding: 14px;
+            border-radius: 10px;
+            display: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <a class="btn" href="index.html" aria-label="Oyuna geri dön">&larr; Oyuna Dön</a>
+        <h1>Hafızana Güven — Veri ve Takma Ad Silme</h1>
+        <p>Bu sayfa üzerinden <strong>Hafızana Güven</strong> sunucularında kayıtlı olan takma adınızı, çevrimiçi durum kaydınızı, bildirim anahtarınızı ve yerel tarayıcı verilerinizi silebilir veya başka bir cihazdan silme talebi oluşturabilirsiniz.</p>
+
+        <form id="delete-form">
+            <label for="nickname-input">Oyundaki Takma Adınız:</label>
+            <input type="text" id="nickname-input" required placeholder="Örn: MuzikUstasi" aria-label="Silinecek takma adınızı yazın">
+
+            <label for="note-input">Ek Açıklama (İsteğe Bağlı):</label>
+            <textarea id="note-input" rows="3" placeholder="Farklı bir cihazdan talep gönderiyorsanız belirtebilirsiniz."></textarea>
+
+            <button type="submit" id="delete-submit-btn">Verilerimi Sil / Silme Talebi Gönder</button>
+        </form>
+
+        <div id="status-box" role="status" aria-live="assertive"></div>
+
+        <p style="margin-top: 24px; color: var(--muted); font-size: 0.95rem;">
+            Silinen veriler: Takma ad kaydı (<code>registeredUsers</code>), çevrimiçi görünürlük (<code>presence</code>), bildirim adresi (<code>bildirim_adresleri</code>), gelen kutusu (<code>inbox</code>) ve bu tarayıcıdaki yerel oyun kayıtları. Gizlilik detayları için <a href="gizlilik.html" style="color:#38bdf8;">Gizlilik Politikası</a> sayfasını inceleyebilirsiniz.
+        </p>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="js/firebase.js"></script>
+    <script>
+        (function () {
+            const nickInput = document.getElementById('nickname-input');
+            const savedNick = localStorage.getItem('chatUsername') || localStorage.getItem('hafizaGuvenUserNickname') || '';
+            if (savedNick && savedNick !== 'Bilinmeyen' && savedNick !== 'Misafir') {
+                nickInput.value = savedNick;
+            }
+
+            const statusBox = document.getElementById('status-box');
+            const showStatus = (msg, isOk) => {
+                statusBox.style.display = 'block';
+                statusBox.style.background = isOk ? 'rgba(34, 197, 94, 0.18)' : 'rgba(239, 68, 68, 0.18)';
+                statusBox.style.border = isOk ? '1px solid #22c55e' : '1px solid #ef4444';
+                statusBox.textContent = msg;
+            };
+
+            document.getElementById('delete-form').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const rawNick = nickInput.value.trim();
+                const note = document.getElementById('note-input').value.trim();
+                if (!rawNick || /[.#$\[\]\/]/.test(rawNick)) {
+                    showStatus('Lütfen geçerli bir takma ad girin.', false);
+                    return;
+                }
+                const btn = document.getElementById('delete-submit-btn');
+                btn.disabled = true;
+                const myDevId = localStorage.getItem('hafizaGuvenDeviceId') || '';
+                const safeId = rawNick.replace(/[.#$\[\]\/]/g, '_');
+
+                try {
+                    if (window.db) {
+                        const ownerSnap = await window.db.ref('registeredUsers/' + rawNick).once('value');
+                        const ownerVal = ownerSnap.val();
+                        if (ownerVal && myDevId && ownerVal === myDevId) {
+                            await Promise.all([
+                                window.db.ref('registeredUsers/' + rawNick).remove(),
+                                window.db.ref('presence/' + safeId).remove(),
+                                window.db.ref('bildirim_adresleri/' + rawNick).remove(),
+                                window.db.ref('inbox/' + rawNick).remove()
+                            ]);
+                            localStorage.removeItem('chatUsername');
+                            localStorage.removeItem('hafizaGuvenUserNickname');
+                            sessionStorage.removeItem('chatNickname');
+                            showStatus('Başarılı! "' + rawNick + '" takma adına ait sunucu kayıtlarınız ve yerel takma ad bilginiz anında silindi.', true);
+                        } else {
+                            await window.db.ref('feedbacks').push({
+                                name: rawNick,
+                                nickname: rawNick,
+                                category: 'Veri Silme Talebi',
+                                message: '[VERİ SİLME TALEBİ] Takma Ad: ' + rawNick + (note ? (' | Not: ' + note) : ''),
+                                timestamp: firebase.database.ServerValue.TIMESTAMP
+                            });
+                            localStorage.removeItem('chatUsername');
+                            localStorage.removeItem('hafizaGuvenUserNickname');
+                            showStatus('Silme talebiniz sunucuya başarıyla kaydedildi! "' + rawNick + '" kaydınız en geç 48 saat içinde kalıcı olarak silinecektir.', true);
+                        }
+                    } else {
+                        showStatus('Sunucu bağlantısı kurulamadı. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.', false);
+                    }
+                } catch (err) {
+                    showStatus('İşlem sırasında bir bağlantı hatası oluştu: ' + err.message, false);
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

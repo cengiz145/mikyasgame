@@ -1239,6 +1239,13 @@ window.handlePracticeInput = function(key) {
     if (exitBtn) {
         exitBtn.addEventListener('click', function () {
             if (window.menuCloseSound) window.menuCloseSound.play();
+            if (window.AndroidAppBridge && typeof window.AndroidAppBridge.closeApp === 'function') {
+                if (window.announceToScreenReader) window.announceToScreenReader('Oyun kapatılıyor.');
+                window.hgfzZamanlayici.setTimeout(() => {
+                    try { window.AndroidAppBridge.closeApp(); } catch (e) {}
+                }, 600);
+                return;
+            }
             if (window.announceToScreenReader) window.announceToScreenReader('Oyun kapatılıyor. Lütfen tarayıcı sekmenizi veya pencerenizi kapatın.');
             
             window.hgfzZamanlayici.setTimeout(() => { 

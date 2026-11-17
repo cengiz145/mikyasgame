@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $dir = $PSScriptRoot
 if (-not $dir) { $dir = ".\" }
-$newVersion = "0.98.1.5"
+$newVersion = "0.98.1.6"
 
 Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"

@@ -4604,7 +4604,151 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Gizlilik Politikası & Sunucudaki Verilerimi Sil (Play Store Uyumluluğu)
+    const btnPrivacyPolicy = document.getElementById('btn-privacy-policy');
+    if (btnPrivacyPolicy) {
+        btnPrivacyPolicy.addEventListener('click', () => {
+            if (window.menuEnterSound) window.menuEnterSound.play();
+            window.location.href = 'gizlilik.html';
+        });
+    }
+
+    const btnDeleteCloudData = document.getElementById('btn-delete-cloud-data');
+    if (btnDeleteCloudData) {
+        btnDeleteCloudData.addEventListener('click', () => {
+            let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
+            if (!myName || myName === 'Bilinmeyen' || myName === 'Misafir') {
+                if (window.announceToScreenReader) window.announceToScreenReader('Sunucuda kayıtlı bir takma adınız bulunmuyor.', true);
+                if (window.showToastNotification) window.showToastNotification('Sunucuda kayıtlı takma ad yok.');
+                return;
+            }
+            if (!confirm(`"${myName}" takma adınızı ve sunucudaki çevrimiçi/bildirim kayıtlarınızı kalıcı olarak silmek istediğinize emin misiniz?`)) {
+                return;
+            }
+            const safeId = myName.replace(/[.#$\[\]\/]/g, '_');
+            const finishLocalCleanup = () => {
+                localStorage.removeItem('chatUsername');
+                localStorage.removeItem('hafizaGuvenUserNickname');
+                sessionStorage.removeItem('chatNickname');
+                window.currentChatUser = 'Misafir';
+                const nameEl = document.getElementById('profile-player-name');
+                if (nameEl) nameEl.innerText = 'Bilinmeyen';
+                const chatNickEl = document.getElementById('chat-nickname');
+                if (chatNickEl) { chatNickEl.value = ''; chatNickEl.style.display = ''; }
+                if (window.correctSound) window.correctSound.play();
+                if (window.showToastNotification) window.showToastNotification('Sunucu verileriniz silindi.');
+                if (window.announceToScreenReader) window.announceToScreenReader('Sunucudaki takma adınız ve verileriniz başarıyla silindi.', true);
+            };
+            if (window.db) {
+                Promise.all([
+                    window.db.ref('registeredUsers/' + myName).remove(),
+                    window.db.ref('presence/' + safeId).remove(),
+                    window.db.ref('bildirim_adresleri/' + myName).remove(),
+                    window.db.ref('inbox/' + myName).remove()
+                ]).then(finishLocalCleanup).catch(finishLocalCleanup);
+            } else {
+                finishLocalCleanup();
+            }
+        });
+    }
+
 });
+
+// --- ANDROID ARKA PLAN SES DURAKLATMA VE GERİ TUŞU ENTEGRASYONU ---
+window._hgWasMutedBeforeBg = null;
+window.pauseAudioForBackground = function () {
+    try {
+        if (typeof Howler !== 'undefined' && window._hgWasMutedBeforeBg === null) {
+            window._hgWasMutedBeforeBg = Boolean(Howler._muted);
+            Howler.mute(true);
+        }
+        if (window.currentStoryVoiceAudio && !window.currentStoryVoiceAudio.paused) {
+            window._hgStoryVoicePausedByBg = true;
+            window.currentStoryVoiceAudio.pause();
+        }
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+    } catch (e) {}
+};
+
+window.resumeAudioFromBackground = function () {
+    try {
+        if (typeof Howler !== 'undefined' && window._hgWasMutedBeforeBg !== null) {
+            Howler.mute(window._hgWasMutedBeforeBg);
+            window._hgWasMutedBeforeBg = null;
+        }
+        if (window._hgStoryVoicePausedByBg && window.currentStoryVoiceAudio && !window.gameIsPaused) {
+            window._hgStoryVoicePausedByBg = false;
+            window.currentStoryVoiceAudio.play().catch(() => {});
+        }
+    } catch (e) {}
+};
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        window.pauseAudioForBackground();
+    } else {
+        window.resumeAudioFromBackground();
+    }
+});
+
+window.handleAndroidBackButton = function () {
+    if (window.isPrivateChatOpen && typeof window.closePrivateChat === 'function') {
+        window.closePrivateChat();
+        return true;
+    }
+    if (window.currentActiveMenu === 'social-action' && typeof window.closeSocialActionModal === 'function') {
+        window.closeSocialActionModal();
+        return true;
+    }
+    if (window.currentActiveMenu === 'achievement_modal') {
+        const closeAch = document.getElementById('btn-ach-close');
+        if (closeAch) { closeAch.click(); return true; }
+    }
+    if (window.gameIsPaused && typeof window.resumeFromPause === 'function') {
+        window.resumeFromPause();
+        return true;
+    }
+    if (window.isChatOpen && typeof window.toggleChat === 'function') {
+        window.toggleChat();
+        return true;
+    }
+    if (window.currentActiveMenu === 'social' || window.currentActiveMenu === 'profile') {
+        const homeBtn = document.getElementById('nav-btn-home');
+        if (homeBtn) { homeBtn.click(); return true; }
+    }
+    const menusWithBackBtns = {
+        'store': 'store-back-btn',
+        'practice': 'practice-back-btn',
+        'difficulty': 'difficulty-back-btn',
+        'scoreboard': 'scoreboard-back-btn',
+        'achievements': 'achievements-back-btn',
+        'feedback': 'feedback-back-btn',
+        'stats': 'stats-back-btn',
+        'play-mode': 'play-mode-back-btn',
+        'multiplayer-select': 'multiplayer-select-back-btn',
+        'pvp-rooms': 'pvp-rooms-back-btn',
+        'pvp-lobby': 'pvp-lobby-cancel-btn',
+        'settings': 'settings-back-btn',
+        'saved-games': 'saved-games-back-btn',
+        'terminology_categories': 'terminology-categories-back-btn',
+        'terminology': 'terminology-back-btn',
+        'learning': 'learning-back-btn',
+        'exam': 'btn-terminology-exam-quit'
+    };
+    if (window.currentActiveMenu && menusWithBackBtns[window.currentActiveMenu]) {
+        const backBtn = document.getElementById(menusWithBackBtns[window.currentActiveMenu]);
+        if (backBtn) { backBtn.click(); return true; }
+    }
+    if (window.currentActiveMenu === 'game' || window.currentActiveMenu === 'story') {
+        const mobileGameBackBtn = document.getElementById('mobile-game-back-btn');
+        const gameBackBtn = document.getElementById('game-back-btn');
+        if (mobileGameBackBtn) { mobileGameBackBtn.click(); return true; }
+        if (gameBackBtn) { gameBackBtn.click(); return true; }
+    }
+    return false;
+};
 
 
 

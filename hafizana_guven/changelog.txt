@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.98.1.6] - 17.11.2026
+
+Google Play Store Hazırlık Paketi:
+- Google Play Store uyumluluğu eklendi: Gizlilik Politikası (gizlilik.html), Sunucu Verilerini Silme (veri-silme.html + Profil menüsü düğmesi), Android arka plan ses duraklatma ve geri tuşu desteği.
+
+
 [v0.98.1.5] - 17.11.2026
 
 Kapsamlı Yazım ve Kod Hataları Onarımı:

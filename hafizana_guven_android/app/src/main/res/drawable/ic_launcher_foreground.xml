@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Altın Halka -->
+    <path
+        android:fillColor="#FFB703"
+        android:pathData="M54,20A34,34 0 1,1 53.99,20ZM54,23.5A30.5,30.5 0 1,0 54.01,23.5Z" />
+    <!-- Bağlı Çift Sekizlik Nota -->
+    <path
+        android:fillColor="#FFB703"
+        android:pathData="M45,36L69,31L69,63A7.5,6 0 1,1 65,58L65,38L49,41.3L49,67A7.5,6 0 1,1 45,62Z" />
+</vector>

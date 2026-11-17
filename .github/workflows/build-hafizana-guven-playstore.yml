@@ -1,0 +1,108 @@
+name: Build Hafizana Guven Play Store AAB and APK
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'hafizana_guven/index.html'
+      - 'hafizana_guven/yardim.html'
+      - 'hafizana_guven/portal.html'
+      - 'hafizana_guven/gizlilik.html'
+      - 'hafizana_guven/veri-silme.html'
+      - 'hafizana_guven/manifest.json'
+      - 'hafizana_guven/version.json'
+      - 'hafizana_guven/css/**'
+      - 'hafizana_guven/js/**'
+      - 'hafizana_guven/sounds/**'
+      - 'hafizana_guven_android/**'
+      - '.github/workflows/build-hafizana-guven-playstore.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-playstore-bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Ensure Upload Keystore Exists
+        run: |
+          if [ ! -f hafizana_guven_android/app/hafizana-guven-upload.jks ]; then
+            keytool -genkeypair -v \
+              -keystore hafizana_guven_android/app/hafizana-guven-upload.jks \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -alias hafizana_guven_upload \
+              -storepass mikyas2026hg -keypass mikyas2026hg \
+              -dname "CN=Hafizana Guven, OU=Oyun Gelistirme, O=Mikyas Studio, L=Istanbul, ST=Istanbul, C=TR"
+          fi
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
+
+      - name: Install Android 16 (API 36) SDK Platform
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36"
+
+      - name: Sync Clean Web Assets into Android Offline Assets
+        run: |
+          DEST="hafizana_guven_android/app/src/main/assets/www"
+          rm -rf "$DEST"
+          mkdir -p "$DEST/css" "$DEST/js" "$DEST/sounds"
+
+          for f in index.html yardim.html portal.html gizlilik.html veri-silme.html manifest.json version.json changelog.txt bildirim_mesajlari.json icon.png icon-512.png; do
+            if [ -f "hafizana_guven/$f" ]; then
+              cp "hafizana_guven/$f" "$DEST/$f"
+            fi
+          done
+
+          cp hafizana_guven/css/style.css "$DEST/css/style.css"
+
+          for jf in firebase.js guncelleme.js autoRepair.js achievements_data.js audio.js story.js game.js pvp.js terminology.js game_terminology.js ui.js yardim.js; do
+            if [ -f "hafizana_guven/js/$jf" ]; then
+              cp "hafizana_guven/js/$jf" "$DEST/js/$jf"
+            fi
+          done
+
+          cd hafizana_guven/sounds
+          find . -type f \( -iname "*.wav" -o -iname "*.mp3" -o -iname "*.ogg" \) -exec cp --parents {} "../../$DEST/sounds/" \;
+          cd ../..
+
+      - name: Build Signed Play Store AAB and Test APK
+        working-directory: hafizana_guven_android
+        run: |
+          gradle bundleRelease assembleRelease --no-daemon
+
+      - name: Upload Play Store Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: HafizanaGuven-PlayStore-Paketleri
+          path: |
+            hafizana_guven_android/app/build/outputs/bundle/release/app-release.aab
+            hafizana_guven_android/app/build/outputs/apk/release/app-release.apk
+            hafizana_guven_android/app/hafizana-guven-upload.jks
+
+      - name: Publish Signed AAB and APK to Repository
+        run: |
+          mkdir -p hafizana_guven/play_store_paketi
+          cp hafizana_guven_android/app/build/outputs/bundle/release/app-release.aab hafizana_guven/play_store_paketi/HafizanaGuven-release.aab
+          cp hafizana_guven_android/app/build/outputs/apk/release/app-release.apk hafizana_guven/play_store_paketi/HafizanaGuven-test.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add -A hafizana_guven/play_store_paketi/HafizanaGuven-release.aab hafizana_guven/play_store_paketi/HafizanaGuven-test.apk hafizana_guven_android/app/hafizana-guven-upload.jks
+          if ! git diff --staged --quiet; then
+            git commit -m "build(playstore): Update signed HafizanaGuven AAB and APK (API 36) [skip ci]"
+            git push origin HEAD:main
+          fi

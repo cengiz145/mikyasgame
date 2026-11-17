@@ -1,0 +1,50 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'tr.com.mikyasstudio.hafizanaguven'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "tr.com.mikyasstudio.hafizanaguven"
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("hafizana-guven-upload.jks")
+            storePassword System.getenv("HG_KEYSTORE_CRED") ?: "mikyas2026hg"
+            keyAlias "hafizana_guven_upload"
+            keyPassword System.getenv("HG_KEY_CRED") ?: "mikyas2026hg"
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core:1.12.0'
+    implementation 'androidx.activity:activity:1.8.2'
+    implementation 'androidx.webkit:webkit:1.10.0'
+}

@@ -1,5 +1,5 @@
 {
-    "version": "0.98.1.5",
-    "buildId": 1794943947,
-    "changelog": "Oyun genelindeki tüm yazım, kodlama (UTF-8), odak tuzağı, Başarılar menüsü, Ritim Avcısı, Terminoloji Sınavı, 5 haneli PvP oda kodu ve mobil Tekrar Dinle hataları giderildi."
+    "version": "0.98.1.6",
+    "buildId": 1794945577,
+    "changelog": "Google Play Store uyumluluğu eklendi: Gizlilik Politikası (gizlilik.html), Sunucu Verilerini Silme (veri-silme.html + Profil menüsü düğmesi), Android arka plan ses duraklatma ve geri tuşu desteği."
 }
