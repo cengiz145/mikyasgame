@@ -2965,13 +2965,12 @@ const Game = {
         this.upcomingIntersection = nextStop.kavsakVar || false;
         this.intersectionAnnounced = false;
         
-        // Hız limitini yola göre ayarla
-        if (this.currentRoadType === "Mahalle Sokağı") {
-            this.maxSpeed = 50;
-        } else if (this.currentRoadType === "Toprak Yol" || this.currentRoadType === "Kumlu Yol" || this.currentRoadType === "Çimenli Yol") {
-            this.maxSpeed = 40;
+        // Azami hız: Seçili otobüsün gerçek fabrika son süratine izin ver (yapay 50/90 kilidi kaldırıldı)
+        const busMaxSpd = (activeBusObj && typeof activeBusObj.maxSpeed === 'number') ? activeBusObj.maxSpeed : 120;
+        if (this.currentRoadType === "Toprak Yol" || this.currentRoadType === "Kumlu Yol" || this.currentRoadType === "Çimenli Yol") {
+            this.maxSpeed = Math.min(80, busMaxSpd);
         } else {
-            this.maxSpeed = 90; // Asfalt, Sahil Şeridi vb.
+            this.maxSpeed = Math.max(115, busMaxSpd);
         }
 
         // FİZİKSEL GÖRÜŞ CEZASI (Visibility Penalty) - KÖR OYUNCULAR İÇİN KALDIRILDI
@@ -3018,7 +3017,7 @@ const Game = {
     // =========================================================================
     updateRoadEnvironment(deltaTime, currentTime) {
         if (!this.isDriving || this.speed <= 0) return;
-        const traveled = (this.speed / 3.6) * deltaTime; // Metre cinsinden kat edilen yol
+        const traveled = (this.speed / 3.6) * deltaTime * 2.8; // Gerçek sürat ölçeğiyle senkron mesafe akışı
         const totalDist = this.totalDistanceCovered || 0;
 
         // 1. TÜRKİYE KARAYOLLARI RESMÎ TÜNEL GEÇİŞLERİ (SADECE GERÇEK KORİDORDA VARSA)
@@ -3824,12 +3823,12 @@ const Game = {
                 const isBrake = (this.keys.s || this.keys.arrowdown);
 
                 if (isThrottle) {
-                    // GERÇEKÇİ AĞIR VASITA DİZEL TORK KONVERTÖRÜ (1. ve 2. Vites Yüksek Kalkış Torku)
-                    let baseAccel = 11.2 * busAccelFactor * enginePowerHealth;
-                    if (this.speed > 25) baseAccel = 7.6 * busAccelFactor * enginePowerHealth;
-                    if (this.speed > 55) baseAccel = 5.0 * busAccelFactor * enginePowerHealth;
-                    if (this.speed > 80) baseAccel = 3.2 * busAccelFactor * enginePowerHealth;
-                    this.acceleration = baseAccel * Math.max(0.75, weightMultiplier);
+                    // GÜÇLÜ VE CANLI AĞIR VASITA DİZEL ÇEKİŞİ: 100+ km/s'ye kadar tıkanmadan ivmelenir!
+                    let baseAccel = 14.5 * busAccelFactor * enginePowerHealth;
+                    if (this.speed > 30) baseAccel = 10.8 * busAccelFactor * enginePowerHealth;
+                    if (this.speed > 60) baseAccel = 8.2 * busAccelFactor * enginePowerHealth;
+                    if (this.speed > 85) baseAccel = 6.0 * busAccelFactor * enginePowerHealth;
+                    this.acceleration = baseAccel * Math.max(0.82, weightMultiplier);
                 } else if (isBrake) {
                     // SERVİS VE HAVALI FREN KALİBRASYONU (Araç fren gücü + 2. Grup balata kondisyonu)
                     let baseBrake = -10.5 * busBrakeFactor * brakePartHealth;
@@ -3878,28 +3877,28 @@ const Game = {
         // Direksiyon açısı sınırları (-30 ile +30 arası)
         this.steeringAngle = Math.max(-30, Math.min(30, this.steeringAngle));
         
-        // Rastgele Doğal Kayma Kuvveti (Drift)
-        // Rüzgar ve yol eğimi her 2 saniyede bir hafif değişebilir
-        if (!this.lastDriftChangeTime || currentTime > this.lastDriftChangeTime + 2000) {
-            // -2 ile +2 arasında rastgele bir çekim kuvveti
-            this.targetDriftVelocity = (Math.random() - 0.5) * 6;
+        // Doğal Şerit Dengesi (Düz yolda gaza basarken kendi kendine bariyere çarpıp hızı 30'a düşürmemesi için sakin tutuldu!)
+        if (!this.lastDriftChangeTime || currentTime > this.lastDriftChangeTime + 2500) {
+            this.targetDriftVelocity = (Math.random() - 0.5) * 1.1;
             this.lastDriftChangeTime = currentTime;
         }
-        // driftVelocity'yi yavaşça target'a yaklaştır
         this.driftVelocity += (this.targetDriftVelocity - this.driftVelocity) * 2 * deltaTime;
+        // Direksiyona dokunulmuyorsa ve viraj yoksa şerit ortasına (50) hafif doğal dengeleme
+        const isSteeringHeld = !!(this.keys.a || this.keys.arrowleft || this.keys.d || this.keys.arrowright);
+        const gentleCenterPull = (!isSteeringHeld && Math.abs(this.roadCurvature || 0) < 0.05)
+            ? ((50 - this.lanePosition) * 0.14)
+            : 0;
         
-        // Hızla orantılı olarak şerit pozisyonunu güncelle (Kalkışta da direksiyon tepki versin, bariyere yapışmasın!)
+        // Hızla orantılı olarak şerit pozisyonunu güncelle
         const activeSteerSpeed = Math.max(this.speed, (this.keys.w || this.keys.arrowup) ? 18 : 0);
-        let speedFactor = activeSteerSpeed / 50; // 50 km/h baz alındı
+        let speedFactor = Math.min(1.65, activeSteerSpeed / 50); // 100 km/s'de aşırı savrulmayı önler
         
         let roadCurvature = this.roadCurvature || 0;
         
-        // Görüş kötüyse (far/silecek yok) ve hız limiti aşılmışsa araç kontrolden çıkar
         let visDriftMultiplier = 1;
         if (this.hasPoorVisibility && this.speed > this.maxSpeed + 10) {
-            visDriftMultiplier = 3.5; // Kötü görüşte aşırı hız inanılmaz bir savrulma yaratır
+            visDriftMultiplier = 3.5;
         }
-        // Süspansiyon körükleri ve ana şasi hasarı varsa yanal salınım artar; yerleşik denge algoritması salınımı sönümler
         const suspDmg = (this.busDamage && this.busDamage.suspension) ? this.busDamage.suspension : 0;
         const chassisDmg = (this.busDamage && this.busDamage.chassis) ? this.busDamage.chassis : 0;
         const swayChip = (typeof BusFleet !== 'undefined' && BusFleet.getBusChip) ? BusFleet.getBusChip(null, this) : null;
@@ -3907,7 +3906,7 @@ const Game = {
         const suspensionSwayMult = (1.0 + (suspDmg * 0.01) + (chassisDmg * 0.015)) * stabilityDamping;
         const effectiveDrift = (this.speed > 14) ? (this.driftVelocity * visDriftMultiplier * suspensionSwayMult) : 0;
         
-        let lateralVelocity = (this.steeringAngle + effectiveDrift + (this.speed > 5 ? roadCurvature : 0)) * speedFactor;
+        let lateralVelocity = ((this.steeringAngle + effectiveDrift + (this.speed > 5 ? roadCurvature : 0)) * speedFactor) + gentleCenterPull;
         
         this.lanePosition += lateralVelocity * deltaTime;
 
@@ -4111,6 +4110,19 @@ const Game = {
         if (typeof audio.updateWeatherSound === 'function') audio.updateWeatherSound(this.speed, this.weather);
 
         document.getElementById('hud-speed').innerText = Math.floor(this.speed);
+        // Şerit çizgilerinin görsel akış hızını otobüsün gerçek süratine bağla (0 km/s'de durur, 100 km/s'de hızla akar!)
+        const laneLines = document.querySelectorAll('.lane-line');
+        if (laneLines && laneLines.length > 0) {
+            if (this.speed < 2) {
+                laneLines.forEach(ll => { ll.style.animationPlayState = 'paused'; });
+            } else {
+                const durSec = Math.max(0.11, Math.min(1.1, 22 / Math.max(10, this.speed))).toFixed(2) + 's';
+                laneLines.forEach(ll => {
+                    ll.style.animationPlayState = 'running';
+                    ll.style.animationDuration = durSec;
+                });
+            }
+        }
         // Canlı Yakıt HUD Göstergesi
         const hudFuelVal = document.getElementById('hud-fuel-val');
         if (hudFuelVal) {
@@ -4139,14 +4151,14 @@ const Game = {
             audio.updateBusPosition(this.lanePosition);
         }
 
-        // Yol kenarı koruyucu şerit asistanı: Aracı asla 0 km/s'ye kilitlemez, yumuşakça şerit içine (20 / 80) toplar!
+        // Yol kenarı koruyucu şerit asistanı: Hızı 30'a gömmek yerine yumuşakça şerit içine (22 / 78) toplar!
         if (this.lanePosition <= 15 || this.lanePosition >= 85) {
             const hitLeft = (this.lanePosition <= 15);
-            this.lanePosition = hitLeft ? 19.0 : 81.0;
+            this.lanePosition = hitLeft ? 22.0 : 78.0;
             this.driftVelocity = 0;
             this.targetDriftVelocity = 0;
-            if (this.speed > 30) {
-                this.speed = Math.max(30, this.speed - (12 * deltaTime));
+            if (this.speed > 65) {
+                this.speed = Math.max(65, this.speed - (6 * deltaTime));
             }
 
             // Tırtıklı Emniyet Şeridi (Rumble Strips) Titreşim Sesi
@@ -4231,7 +4243,7 @@ const Game = {
                     audio.speakNavigation(`${stopName} durağına 100 metre.`);
                 }
             }
-            const distanceScale = 1.0; // 1:1 Gerçek Fizik (Metre / Saniye)
+            const distanceScale = 2.8; // Gerçekçi oyun sürat ölçeği (100 km/s'de mesafe, duraklar ve trafik canlı akar!)
             const distanceCovered = (this.speed / 3.6) * deltaTime * distanceScale; 
             this.currentDistanceToNext -= distanceCovered;
             this.totalDistanceCovered += distanceCovered;
@@ -4335,12 +4347,12 @@ const Game = {
                 document.getElementById('hud-distance').innerText = remMeters + " m";
             }
             
-            // ETA (Tahmini Varış Süresi) Hesaplama
+            // ETA (Tahmini Varış Süresi - gerçek sürüş ölçeğine uyumlu)
             if (this.speed < 5 || !remMeters) {
                 document.getElementById('hud-eta').innerText = "--:--";
             } else {
-                let timeInHours = (remMeters / 1000) / this.speed;
-                let timeInSeconds = Math.floor(timeInHours * 3600);
+                let timeInHours = (remMeters / 1000) / (this.speed * 2.8);
+                let timeInSeconds = Math.max(1, Math.floor(timeInHours * 3600));
                 let mins = Math.floor(timeInSeconds / 60);
                 let secs = timeInSeconds % 60;
                 document.getElementById('hud-eta').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -4462,7 +4474,7 @@ const Game = {
         }
         
         if (this.kasisDistance !== null) {
-            let traveled = (this.speed / 3.6) * deltaTime; // metre cinsinden alınan yol
+            let traveled = (this.speed / 3.6) * deltaTime * 2.8; // gerçek sürat ölçeğiyle uyumlu mesafe
             this.kasisDistance -= traveled;
             
             if (this.kasisDistance <= 0) {

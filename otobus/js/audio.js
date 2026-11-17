@@ -1049,20 +1049,24 @@ startEngine() {
 
         const windowVolBoost = this.isWindowOpen ? 0.15 : 0;
 
-                // 0. DOĞAL ÇEVRE & ŞEHİR AMBİYANSI (Kuş sesleri, sakin cadde)
+        // 0. DOĞAL ÇEVRE & ŞEHİR AMBİYANSI (Yalnızca düşük hızda duyulur; 40 km/s üstünde kuş/park sesi tamamen susar ki yüksek hız hissi kırılmasın!)
         if (this.sounds && this.sounds.cityAmbience) {
-            if (!this.sounds.cityAmbience.playing()) {
-                this.sounds.cityAmbience.volume(0);
-                this.sounds.cityAmbience.play();
+            if (speed >= 42) {
+                if (this.sounds.cityAmbience.playing()) {
+                    this.sounds.cityAmbience.volume(0);
+                    this.sounds.cityAmbience.pause();
+                }
+            } else {
+                if (!this.sounds.cityAmbience.playing()) {
+                    this.sounds.cityAmbience.volume(0);
+                    this.sounds.cityAmbience.play();
+                }
+                const fadeRatio = Math.max(0, 1 - (speed / 42));
+                const baseAmb = this.isWindowOpen ? 0.36 : 0.18;
+                this.sounds.cityAmbience.volume(baseAmb * fadeRatio);
             }
-            let targetAmbienceVol = this.isWindowOpen ? 0.45 : 0.25;
-            if (speed > 35) {
-                targetAmbienceVol = Math.max(0.08, targetAmbienceVol - ((speed - 35) / 60) * 0.15);
-            }
-            this.sounds.cityAmbience.volume(targetAmbienceVol);
         }
 
-        
         // Otobüs İçi Klima / Havalandırma Ambiyansı (Yalnızca klima açıkken çok hafif üfler; tıslama yapmaz)
         if (this.sounds && this.sounds.cabinAmbience) {
             const acActive = (typeof Game !== 'undefined' && !!Game.isACOn);
@@ -1080,10 +1084,11 @@ startEngine() {
             }
         }
 
-        // 1. ASFALT YOL SESİ (freesound_road_asphalt.mp3 - tıslama yapmayan yumuşak lastik yuvarlanması)
+        // 1. ASFALT YOL SESİ (Hızla birlikte belirginleşen ve hızlanan tok lastik yuvarlanması - 100 km/s'de gerçek sürat hissi verir, tıslama yapmaz!)
         if (isAsphalt && this.sounds.roadAsphalt) {
-            const targetAsphaltVol = Math.min(0.18, (speed / 100) * 0.14 + (this.isWindowOpen ? 0.06 : 0));
-            const targetAsphaltRate = Math.min(1.18, Math.max(0.78, 0.78 + (speed / 110) * 0.35));
+            const speedNorm = Math.min(1.2, Math.max(0, speed / 100));
+            const targetAsphaltVol = Math.min(0.34, 0.04 + (speedNorm * 0.24) + (this.isWindowOpen ? 0.06 : 0));
+            const targetAsphaltRate = Math.min(1.62, Math.max(0.75, 0.75 + (speedNorm * 0.76)));
             if (!this.sounds.roadAsphalt.playing()) {
                 this.sounds.roadAsphalt.volume(0);
                 this.sounds.roadAsphalt.play();
@@ -1678,31 +1683,42 @@ startEngine() {
         }
 
         const now = this.ctx.currentTime;
+        const safeSpeed = Math.max(0, Number(speed) || 0);
         const safeRpm = (typeof rpm === 'number' && !isNaN(rpm)) ? rpm : 800;
-        const rpmRatio = Math.max(0, Math.min(1, (safeRpm - 800) / 1600));
+        const rpmRatio = Math.max(0, Math.min(1.15, (safeRpm - 800) / 1600));
+        const speedRatio = Math.max(0, Math.min(1.25, safeSpeed / 100));
 
-        // DOĞAL DİZEL TORK TEPKİSİ: Gaza basıldığında motor tok bir şekilde devirlenir (1.00 -> 1.23), sıfır tıslama!
-        const targetRate = 1.0 + (rpmRatio * 0.18) + (isThrottle ? 0.05 : 0.0);
+        // GERÇEK YÜKSEK SÜRAT VE DEVİR HİSSİ:
+        // Rölantide 1.00x sakin dizel; hızlandıkça ve 100 km/s'ye köklendiğinde 1.85x'e kadar canlı ve güçlü motor kükremesi (sıfır tıslama!)
+        const targetRate = 1.0 + (rpmRatio * 0.46) + (speedRatio * 0.34) + (isThrottle ? 0.07 : 0.0);
         if (this.idleSource.playbackRate) {
-            this.idleSource.playbackRate.setTargetAtTime(targetRate, now, 0.12);
+            this.idleSource.playbackRate.setTargetAtTime(targetRate, now, 0.09);
         }
         this.currentIdleRate = targetRate;
 
-        // Rölantide sakin (0.54), gaza basıldığında tok ve güçlü (0.76); hostes anonsunda otomatik kısılır
+        // Rölantide sakin (0.50), 100 km/s tam gazda tok ve doygun (0.86); anons sırasında otomatik kısılır
         const duckMult = this._isDuckedForAnnouncement ? 0.38 : 1.0;
-        const targetEngineGain = (0.54 + (isThrottle ? 0.16 : 0.0) + (rpmRatio * 0.06)) * duckMult;
+        const targetEngineGain = (0.50 + (isThrottle ? 0.16 : 0.0) + (rpmRatio * 0.10) + (speedRatio * 0.10)) * duckMult;
         if (this.idleGain && this.idleGain.gain) {
-            this.idleGain.gain.setTargetAtTime(targetEngineGain, now, 0.10);
+            this.idleGain.gain.setTargetAtTime(targetEngineGain, now, 0.09);
+        }
+
+        if (this.engineCabinFilter) {
+            const nvh = (typeof this.activeBusNvh === 'number') ? this.activeBusNvh : 70;
+            const normNvh = Math.max(0, Math.min(1, (nvh - 55) / 45));
+            const baseCutoff = 2800 - (normNvh * 900);
+            const dynamicCutoff = Math.min(3700, baseCutoff + (speedRatio * 650) + (isThrottle ? 300 : 0));
+            this.engineCabinFilter.frequency.setTargetAtTime(dynamicCutoff, now, 0.12);
         }
 
         if (this.engineBassFilter) {
             const baseBoost = (this.activeSoundProfile && typeof this.activeSoundProfile.bassBoost === 'number') ? this.activeSoundProfile.bassBoost : 0;
-            this.engineBassFilter.gain.setTargetAtTime(baseBoost + (isThrottle ? 2.8 : 0), now, 0.14);
+            this.engineBassFilter.gain.setTargetAtTime(baseBoost + (isThrottle ? 3.2 : 0) + (speedRatio * 1.4), now, 0.12);
         }
 
         // Retarder kontrolü (Frenleme esnasında)
         const isBrakingNow = (typeof Game !== 'undefined') && (Game.isBrakeKeyDown || (Game.keys && (Game.keys.s || Game.keys.arrowdown)) || (Game.retarderLevel && Game.retarderLevel > 0));
-        this.updateRetarder(speed, isBrakingNow);
+        this.updateRetarder(safeSpeed, isBrakingNow);
     }
 
     // --- HAVA DURUMU VE SİLECEK (YENİ) ---
