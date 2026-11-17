@@ -1092,6 +1092,42 @@ const SoundGallery = {
             specs: "Çift Katmanlı Panik & Acil Tahliye Alarmı",
             desc: "Sosyal medyada canlı yayın açıp bağıran öğrenci ile tansiyonu fırlayıp imdat isteyen teyzenin üst üste binen feryadı.",
             playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("sfx_emergency_valve_alarm.mp3", { pan: -0.45, volume: 0.8, force: true, backgroundSfx: true }); setTimeout(() => window.HumanNpcVoices.playClip("berserk_live_f1.mp3", { pan: -0.55, volume: 1.0, force: true, interrupt: true }), 220); setTimeout(() => window.HumanNpcVoices.playClip("berserk_faint_f1.mp3", { pan: 0.55, volume: 0.95, force: true, backgroundSfx: true }), 2200); } }
+        },
+        {
+            id: "human_slang_terlik",
+            category: "human",
+            icon: "🥿",
+            title: "Terlik Fırlatmakla Tehdit Eden Mahalle Teyzesi",
+            specs: "Mahalle Argosu & Kaba İsyan",
+            desc: "Ayağından terliği çıkarıp şoför tarafına fırlatmakla tehdit eden zıvanadan çıkmış teyze.",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("sfx_door_fist_bang.mp3", { pan: -0.45, volume: 0.85, force: true, backgroundSfx: true }); setTimeout(() => window.HumanNpcVoices.playClip("slang_riot_f2.mp3", { pan: 0.3, volume: 1.0, force: true, interrupt: true }), 350); } }
+        },
+        {
+            id: "human_slang_bakkal",
+            category: "human",
+            icon: "🪪",
+            title: "Ehliyeti Bakkaldan Promosyon mu Aldın?! (Ters Esnaf)",
+            specs: "Mahalle Argosu Fren Tepkisi",
+            desc: "Sert frende duvara mı tosladın at arabası mı sürüyorsun diye çıkışan kaba mahalle esnafı.",
+            playFn: () => { if (window.HumanNpcVoices) window.HumanNpcVoices.playClip("slang_jolt_m2.mp3", { pan: -0.35, volume: 1.0, force: true, interrupt: true }); }
+        },
+        {
+            id: "human_slang_kabadayi",
+            category: "human",
+            icon: "🤜",
+            title: "Şoför Mahalline Dalmaya Kalkan Kabadayı + Mahalle Ablası",
+            specs: "Çift Sesli Mahalle Kavgası Kaosu",
+            desc: "Sağa çekmezsen şoför kabinine dalacağını söyleyen bıçkın yolcu ve bilet parasını haram eden abla.",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("sfx_door_fist_bang.mp3", { pan: -0.55, volume: 0.9, force: true, backgroundSfx: true }); window.HumanNpcVoices.playClip("sfx_cabin_uproar.mp3", { pan: 0, volume: 0.65, force: true, backgroundSfx: true }); setTimeout(() => window.HumanNpcVoices.playClip("slang_riot_m1.mp3", { pan: -0.6, volume: 1.0, force: true, interrupt: true }), 260); setTimeout(() => window.HumanNpcVoices.playClip("slang_riot_f1.mp3", { pan: 0.6, volume: 0.95, force: true, backgroundSfx: true }), 2200); } }
+        },
+        {
+            id: "human_slang_bicker",
+            category: "human",
+            icon: "💢",
+            title: "Ensende Boza Pişirtme Adama! (Arka Sıra Mahalle Kavgası)",
+            specs: "Kaba Yolcu İtiş Kakış Tartışması",
+            desc: "Kalabalık ve sarsıntılı otobüste arka sırada birbirine papaz olan mahalleliler.",
+            playFn: () => { if (window.HumanNpcVoices) { window.HumanNpcVoices.playClip("slang_bicker_m1.mp3", { pan: -0.5, volume: 1.0, force: true, interrupt: true }); setTimeout(() => window.HumanNpcVoices.playClip("slang_bicker_f1.mp3", { pan: 0.5, volume: 0.96, force: true, backgroundSfx: true }), 2600); } }
         }
     ],
 

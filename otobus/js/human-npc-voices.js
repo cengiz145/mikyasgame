@@ -8,7 +8,7 @@
     'use strict';
 
     const BASE_PATH = 'sounds/npc_human/';
-    const AUDIO_VER = '?v=20261117p6';
+    const AUDIO_VER = '?v=20261117p7';
 
     const CLIPS = {
         // Özel Ses Efektleri (ElevenLabs Sound Generation)
@@ -37,16 +37,19 @@
         policeClean: 'police_clean.mp3',
         policeFine: 'police_fine.mp3',
 
-        // Dış Trafik & Yaya Çarpışma / Tehlike Tepkileri (3B Sağ/Sol Yönlü)
+        // Dış Trafik & Yaya Çarpışma / Tehlike Tepkileri (3B Sağ/Sol Yönlü + Mahalle Argosu)
         crashLeft: [
+            { file: 'slang_crash_out_m1.mp3', label: 'Sol Şerit Sürücüsü: "OHA LAN KÖR MÜSÜN NESİN?! Koca otobüsü üstümüze çıkardın, haşat ettin arabayı! İn aşağı hesap ver!!"' },
             { file: 'npc_crash_left_01.mp3', label: 'Sol Şerit Sürücüsü: "Hooop! Sol aynaya hiç mi bakmıyorsun yahu?! Boydan boya çizdin güzelim arabayı!"' },
             { file: 'npc_crash_left_02.mp3', label: 'Sol Şerit Sürücüsü: "Yuh artık ya! Koca otobüsü sol şeride üstümüze kırdın, sinyal de mi yok?!"' }
         ],
         crashRight: [
+            { file: 'slang_crash_out_f1.mp3', label: 'Kaldırımdaki Mahalleli: "YUH BE GÖZÜNÜ TOPRAK DOYURSUN!! Kaldırıma çıktın be manyak, ezip geçecektin bizi, önüne baksana!!"' },
             { file: 'npc_crash_right_01.mp3', label: 'Sağ Şerit Taksicisi: "Hoop! Sağ şeritte taksi var görmüyor musun, çamurluğu dağıttın!"' },
             { file: 'npc_pedestrian_right_01.mp3', label: 'Kaldırımdaki Yaya: "Ayyy! Önünüze baksanıza lütfen, kaldırıma çıkacaksınız, az kalsın eziliyorduk!"' }
         ],
         crashFront: [
+            { file: 'slang_crash_out_m1.mp3', label: 'Öndeki Sürücü: "OHA LAN KÖR MÜSÜN NESİN?! Koca otobüsü üstümüze çıkardın, haşat ettin arabayı! İn aşağı hesap ver!!"' },
             { file: 'npc_crash_front_01.mp3', label: 'Öndeki Sürücü: "Eyvaaah! Frenin mi patladı yahu?! Dümdüz tampona girdin!"' }
         ],
         nearMiss: [
@@ -70,66 +73,61 @@
             { file: 'warn_mild_04.mp3', label: 'Öğrenci Genç: "Hoop! Telefon elimden uçuyordu az kalsın, ne sert fren oldu öyle ya!"' }
         ],
         patienceMedium: [
+            { file: 'slang_jolt_f4.mp3', label: 'Atarlı Genç: "ÇÜŞ ARTIK YA HARBİDEN ÇÜŞ!! Burnum cama yapıştı resmen, patates çuvalı mı var arkada, ne bu kabalık be?!"' },
+            { file: 'slang_jolt_m3.mp3', label: 'Bıçkın Yolcu: "HOOOP YAVAŞ OL LAN BİRAZ!! Kafamızı demire gömdük senin yüzünden, artistlik mi yapıyorsun şoförlük mü belli değil be!!"' },
             { file: 'warn_medium_01.mp3', label: 'Emekli Amca: "Yeter ama artık yahu! Az önce de sarsıldık, çuval mı taşıyorsunuz insan mı taşıyorsunuz?!"' },
-            { file: 'warn_medium_02.mp3', label: 'Yolcu: "Lütfen biraz daha dikkatli sürer misiniz, üst üste ani fren yapıyorsunuz, ayaktaki yolcular düşecek!"' },
-            { file: 'warn_medium_03.mp3', label: 'Yolcu: "Pardon ama gömleğime kahve döküldü sarsıntıdan, biraz daha özenli kullanalım lütfen!"' },
-            { file: 'warn_medium_04.mp3', label: 'Bebekli Anne: "Rica ediyorum bu kadar sert sarsmayın aracı, bebek ağlayacak şimdi arkada!"' }
+            { file: 'warn_medium_03.mp3', label: 'Yolcu: "Pardon ama gömleğime kahve döküldü sarsıntıdan, biraz daha özenli kullanalım lütfen!"' }
         ],
         patienceAngry: [
-            { file: 'warn_angry_01.mp3', label: 'Tansiyonlu Teyze: "İndir beni ilk durakta lütfen! Bu ne biçim araba kullanmak böyle, tansiyonum fırladı valla!"' },
-            { file: 'warn_angry_02.mp3', label: 'Sinirli Amca: "Yavaş sür biraz şu otobüsü! Her çukura kasise küt küt giriyorsun, sabrımız taştı artık!"' },
-            { file: 'warn_angry_03.mp3', label: 'Öfkeli Yolcu: "Beyaz Masayı arayıp plakanızı vereceğim şimdi! Lunapark mı burası, savura savura götürüyorsunuz bizi!"' },
-            { file: 'warn_angry_04.mp3', label: 'Öfkeli Teyze: "Tövbe estağfurullah! Evladım bu ne sert sürüş böyle, yüreğimiz ağzımıza geldi kaçıncı sarsıntı bu!"' }
+            { file: 'slang_jolt_m2.mp3', label: 'Ters Esnaf: "ÇÜŞŞ BE ÇÜŞ!! Ehliyeti bakkaldan promosyon mu aldın sen, at arabası mı sürüyorsun lan?!"' },
+            { file: 'slang_jolt_f2.mp3', label: 'Terslenen Teyze: "TÜH KALIBINA YAZIKLAR OLSUN BE!! Traktör mü sürüyorsun tarlada, haşat ettin koca otobüsteki milleti!!"' },
+            { file: 'slang_jolt_f3.mp3', label: 'Cırlayan Yolcu: "MANYAK MISIN NESİN BE?! Ödümüz patladı şurada, babanın çiftliği mi burası kafana göre fren köklüyorsun?!"' },
+            { file: 'warn_angry_03.mp3', label: 'Öfkeli Yolcu: "Beyaz Masayı arayıp plakanızı vereceğim şimdi! Lunapark mı burası, savura savura götürüyorsunuz bizi!"' }
         ],
-        // 4. Kademe: Şiddetli Agresif Çıkış & Sert Kavga Tonu
         patienceFurious: [
+            { file: 'slang_jolt_m1.mp3', label: 'Mahalleli Yolcu: "OHA BE OHA!! Odun mu taşıyorsun çuval mı taşıyorsun lan?! Adam gibi sür şunu tepemin tasını attırma benim!!"' },
+            { file: 'slang_jolt_f1.mp3', label: 'Mahalle Ablası: "AY YETER BE ASABIMI BOZMA BENİM!! Şoför müsün kasap mısın nesin sen ya?! Doğru sür şu tenekeyi!!"' },
+            { file: 'slang_jolt_m4.mp3', label: 'Kavgacı Emekli: "ULAN YETER BE SABRIMIZI MI SINIYORSUN?! Süremiyorsan in koltuktan biz sürelim be!!"' },
             { file: 'agg_lvl4_m1.mp3', label: 'Çileden Çıkan Yolcu: "YETER ARTIK YETER!! Canımızı sokakta mı bulduk biz yahu?! Doğru düzgün sür şu otobüsü!!"' },
             { file: 'agg_lvl4_m2.mp3', label: 'Bağıran Emekli: "NE YAPIYORSUNUZ SİZ YAHU?! Fren değil balyoz mübarek, boynumuz kırılacaktı az kalsın!!"' },
             { file: 'agg_lvl4_f1.mp3', label: 'Öfkeli Yolcu: "YETER AMA ARTIK YA!! Çantalar bir yana uçtu biz bir yana savrulduk, insan taşıyorsunuz burada İNSAN!!"' },
-            { file: 'agg_lvl4_f2.mp3', label: 'Öfkeli Anne: "ÇOCUĞUM AĞLIYOR KORKUDAN GÖRÜYOR MUSUNUZ?! Hiç mi insafınız yok sizin, YAVAŞLAYIN ARTIK!!"' },
-            { file: 'agg_lvl4_m3.mp3', label: 'Sert Çıkışan Genç: "ŞAKA MI YAPIYORSUNUZ SİZ YA?! Lunapark çarpışan arabası mı bu, KENDİNİZE GELİN!!"' },
-            { file: 'agg_lvl4_f3.mp3', label: 'Bağıran Teyze: "EL İNSAF BE EVLADIM EL İNSAF!! İçimiz dışımıza çıktı, kemiklerimiz birbirine geçti!!"' },
-            { file: 'agg_lvl4_m4.mp3', label: 'Gürleyen Yolcu: "HOOOP KENDİNİZE GELİN ARTIK!! Koca otobüsü oyuncak gibi savuruyorsunuz, can güvenliğimiz kalmadı!!"' },
-            { file: 'agg_lvl4_f4.mp3', label: 'Öfkeli Üniversiteli: "YUH ARTIK GERÇEKTEN YUH!! Az kalsın koridora kapaklanıyordum, şikayet edeceğim sizi!!"' }
+            { file: 'agg_lvl4_f2.mp3', label: 'Öfkeli Anne: "ÇOCUĞUM AĞLIYOR KORKUDAN GÖRÜYOR MUSUNUZ?! Hiç mi insafınız yok sizin, YAVAŞLAYIN ARTIK!!"' }
         ],
-        // 5. Kademe: KABİN İSYANI & OTOBÜSÜ DURDURUP İNME KRİZİ!
         cabinRiot: [
-            { file: 'riot_stop_m1.mp3', label: 'KABİN İSYANI: "ÇEK SAĞA DURDUR ŞU OTOBÜSÜ HEMEN!! İniyoruz yahu yürüyerek gideriz daha iyi, AÇ ŞU KAPIYI!!"' },
-            { file: 'riot_stop_f1.mp3', label: 'KABİN İSYANI: "DURDURUN OTOBÜSÜ İNECEĞİM ŞİMDİ!! Hat numaranızı da aldım doğrudan müdürlüğe şikayet ediyorum!!"' },
-            { file: 'riot_stop_m2.mp3', label: 'KABİN İSYANI: "AÇIN KAPIYI İNDİRİN BİZİ ŞURADA!! Sizin yüzünüzden hastanelik mi olacağız, YAZIKLAR OLSUN!!"' },
-            { file: 'riot_stop_f2.mp3', label: 'KABİN İSYANI: "AÇ ŞU KAPIYI EVLADIM İNECEĞİM!! Kalbim sıkıştı vallahi billahi, İNDİR BENİ HEMEN!!"' },
-            { file: 'riot_stop_m3.mp3', label: 'KABİN İSYANI: "ARAÇ KODUNU ÇEKTİM VİDEOYA ALDIM, BİTTİ BU İŞ!! Açın kapıyı iniyoruz!!"' },
-            { file: 'riot_stop_m4.mp3', label: 'Öfkeli Yolcu: "YETER BE KAPIYI AÇIN İNİYORUM!! Kırk yıldır otobüse biniyorum böyle rezalet sürüş görmedim!!"' }
+            { file: 'slang_riot_m1.mp3', label: 'Kabadayı Yolcu: "ÇEK LAN SAĞA ÇEK DİYORUM SANA!! Vallahi şoför mahalline dalacağım şimdi ha! Aç şu kapıyı zırdeli!!"' },
+            { file: 'slang_riot_f2.mp3', label: 'Terlikli Teyze: "İNDİR BİZİ ŞURADA ZIRDELİ!! Vallahi ayağımdan terliği çıkarıp fırlatacağım şimdi ön tarafa, aç şu kapıyı be!!"' },
+            { file: 'slang_riot_f1.mp3', label: 'Mahalle Ablası: "AÇ KAPIYI AÇ!! Cırlatacaksın şimdi beni burada, indir bizi şurada, haram zıkkım olsun verdiğimiz bilet parası!!"' },
+            { file: 'slang_riot_m2.mp3', label: 'Gürleyen Esnaf: "ULAN AÇ ŞU KAPIYI DELİRTME ADAMI!! Çek sağa yoksa camı çerçeveyi indireceğim şimdi aşağı!!"' },
+            { file: 'slang_riot_m3.mp3', label: 'Bıçkın Genç: "LAN DURDUR ŞU KÜLÜSTÜRÜ İNECEĞİZ!! Kafayı peynir ekmekle yemiş bu şoför ya, AÇ LAN KAPIYI!!"' },
+            { file: 'slang_riot_m4.mp3', label: 'Öfkeli Emekli: "BAŞLARIM ŞİMDİ SENİN YAPACAĞIN ŞOFÖRLÜĞE HA!! Bütün mahalle şahidim olsun, ÇEK SAĞA AÇ ŞU KAPIYI!!"' }
         ],
-        // TAM ÇILDIRMA & SİNİR KRİZİ KAOSU (Üst Üste Binen Çığlıklar, 112 İhbarı, Pazar Arabası Devrilmesi, Canlı Yayın!)
+        // TAM ÇILDIRMA & SİNİR KRİZİ KAOSU (Üst Üste Binen Çığlıklar + Kaba Mahalle İsyancıları + 112 İhbarı + Devrilen Pazar Arabası!)
         berserkMeltdown: [
+            { file: 'slang_riot_m1.mp3', label: 'Kabadayı Yolcu: "ÇEK LAN SAĞA ÇEK DİYORUM SANA!! Vallahi şoför mahalline dalacağım şimdi ha! Aç şu kapıyı zırdeli!!"' },
+            { file: 'slang_riot_f2.mp3', label: 'Terlikli Teyze: "İNDİR BİZİ ŞURADA ZIRDELİ!! Vallahi ayağımdan terliği çıkarıp fırlatacağım şimdi ön tarafa, aç şu kapıyı be!!"' },
+            { file: 'slang_riot_m2.mp3', label: 'Gürleyen Esnaf: "ULAN AÇ ŞU KAPIYI DELİRTME ADAMI!! Çek sağa yoksa camı çerçeveyi indireceğim şimdi aşağı!!"' },
+            { file: 'slang_riot_f1.mp3', label: 'Mahalle Ablası: "AÇ KAPIYI AÇ!! Cırlatacaksın şimdi beni burada, haram zıkkım olsun verdiğimiz bilet parası!!"' },
             { file: 'berserk_valve_m1.mp3', label: 'Çıldıran Yolcu: "NEREDE BU ACİL KAPI MANDALI ÇEKİN KOPARIN ŞUNU!! Camı kırıp atlayacağım şimdi, DURDUR ŞU OTOBÜSÜ DURDUUUR!!"' },
             { file: 'berserk_112_f1.mp3', label: '112\'yi Arayan Yolcu: "ALO YÜZ ON İKİ ACİL Mİ?! Yetişin polis gönderin çabuk, gözü dönmüş bir şoförün eline düştük, İMDAAAT!!"' },
             { file: 'berserk_eggs_m1.mp3', label: 'Çıldıran Emekli: "PAZAR ARABASI DEVRİLDİ BÜTÜN YUMURTALAR KIRILDI KORİDORDA!! Savaş alanına çevirdin otobüsü, DURDUR ARTIK ŞUNU!!"' },
             { file: 'berserk_faint_f1.mp3', label: 'Sinir Krizi Geçiren Teyze: "YETİŞİN KOMŞULAR BAYILACAĞIM ŞİMDİ AYYY!! Tansiyonum yirmiye fırladı, AÇIN KAPILARI İMDAAAT!!"' },
             { file: 'berserk_cabin_m1.mp3', label: 'Kabin Camını Yumruklayan Yolcu: "ŞOFÖR KABİNİNİN CAMINI İNDİRECEĞİM ŞİMDİ!! Çek sağa diyorum sana, YOK MU BU OTOBÜSÜ DURDURACAK BİRİ?!"' },
-            { file: 'berserk_live_f1.mp3', label: 'Canlı Yayın Açan Öğrenci: "CANLI YAYINI AÇTIM ŞU AN HERKES İZLİYOR BU DELİLİĞİ!! Durdurun hemen bu aracı İMDAAAT!!"' },
-            { file: 'berserk_aisle_f1.mp3', label: 'Koridora Düşen Yolcu: "KORİDORA YUVARLANDIM DİZİM KANADI AYYY!! Ambulans çağırın çabuk, FRENE BASIN DURUN ARTIK!!"' },
-            { file: 'berserk_roar_m1.mp3', label: 'Gürleyen Yolcu: "ÇILDIRDINIZ MI SİZ YAHU KENDİNİZE GELİN!! Millet üst üste yıkıldı, ÇEKİN SAĞA DURUN HEMEN!!"' },
-            { file: 'berserk_heart_m1.mp3', label: 'Fenalaşan Yolcu: "NEFES ALAMIYORUM KALBİM SIKIŞTI İMDAT!! Şu kapıları açın yoksa elimden kaza çıkacak, DURDUR ŞU ARABAYI!!"' },
-            { file: 'berserk_mom_f1.mp3', label: 'Çıldıran Anne: "BEBEĞİM KATILDI AĞLAMAKTAN DUYMUYOR MUSUNUZ?! Gözünüz döndü sizin resmen, İNDİRİN BİZİ HEMEN!!"' },
-            { file: 'berserk_chant_m1.mp3', label: 'İsyancı Yolcu: "MİLLET HEP BERABER CAMA VURUP BAĞIRIN!! DURDUR ŞU OTOBÜSÜ ARTIK, AÇ ŞU KAPILARI HEMEN!!"' },
-            { file: 'berserk_kid_cry.mp3', label: 'Ağlayan Çocuk: "ANNEEE ÇOK KORKUYORUM DURDURUN OTOBÜSÜÜÜ!! İnmek istiyorum ben anneee, imdaaat!!"' }
+            { file: 'berserk_live_f1.mp3', label: 'Canlı Yayın Açan Öğrenci: "CANLI YAYINI AÇTIM ŞU AN HERKES İZLİYOR BU DELİLİĞİ!! Durdurun hemen bu aracı İMDAAAT!!"' }
         ],
-        // Kaza Sonrası Kabin İçinden Şoföre Çok Sert Öfke Patlaması
+        // Kaza Sonrası Kabin İçinden Şoföre Kaba & Sert Öfke Patlaması
         crashRage: [
+            { file: 'slang_crash_in_m1.mp3', label: 'Öfkeli Esnaf: "ULAN GÖZÜNÜN ÖNÜNDEKİ ARABAYI DA MI GÖRMÜYORSUN?! Bostan korkuluğu musun o koltukta, darmadağın ettin milleti be!!"' },
+            { file: 'slang_crash_in_f1.mp3', label: 'Mahalle Ablası: "ALLAH CEZANI VERMESİN EMİ, GİTTİ GÜZELİM BURNUM CAMA GİRDİ!! Kör müsün nesin be, nasıl çarptın koca yolda?!"' },
             { file: 'crash_rage_m1.mp3', label: 'Öfkeli Yolcu: "GÖZÜNÜZ MÜ KÖR YAHU?! Koca otobüsle göz göre göre çarptınız, kırk tane can var bu arabada!!"' },
-            { file: 'crash_rage_f1.mp3', label: 'Öfkeli Yolcu: "İNANAMIYORUM YA KAZA YAPTIK!! Yola hiç mi bakmıyorsunuz siz?! Ödümüz koptu, REZALET BU!!"' },
-            { file: 'crash_rage_m2.mp3', label: 'Öfkeli Emekli: "ALLAH AKIL FİKİR VERSİN!! Koca yolu tutturamadınız gittiniz arabaya vurdunuz, perişan ettiniz hepimizi!!"' },
-            { file: 'crash_rage_f2.mp3', label: 'Öfkeli Yolcu: "ÇILDIRACAĞIM ŞİMDİ KAZA YAPTINIZ RESMEN!! Başımızı cama çarptık, derhal polis çağırın!!"' }
+            { file: 'crash_rage_f1.mp3', label: 'Öfkeli Yolcu: "İNANAMIYORUM YA KAZA YAPTIK!! Yola hiç mi bakmıyorsunuz siz?! Ödümüz koptu, REZALET BU!!"' }
         ],
-        // Arka Kapıyı Yumruklayarak Bağıran Yolcular
+        // Arka Kapıyı Yumruklayarak Kaba Mahalle Ağzıyla Bağıran Yolcular
         rearDoorRage: [
-            { file: 'reardoor_rage_m1.mp3', label: 'Kapıyı Yumruklayan Yolcu: "ARKA KAPIYI AÇSANIZA YAHU!! Durağı geçirteceksiniz bize, AÇIN ŞU KAPIYI!!"' },
-            { file: 'reardoor_rage_f1.mp3', label: 'Bağıran Yolcu: "ARKA KAPI DİYORUZ ARKA KAPI!! Görmüyor musunuz aynadan, AÇSANIZA ŞU KAPIYI ARTIK!!"' },
+            { file: 'slang_door_m1.mp3', label: 'Kapıyı Yumruklayan Yolcu: "LAN ARKA KAPIYI AÇSANA SAĞIR SULTAN BİLE DUYDU BE!! Turşu mu kuracaksın bizimle otobüste, aç şu kapıyı!!"' },
+            { file: 'slang_door_f1.mp3', label: 'Mahalle Ablası: "HOOOP UYUYOR MUSUN ÖN TARAFTA?! Arka kapıyı açsana be, taa öbür mahalleye götürdün bizi!!"' },
             { file: 'reardoor_rage_m2.mp3', label: 'Öfkeli Genç: "HOOOP KAPIYI UNUTTUNUZ KAPIYI!! Esir mi aldınız bizi otobüste, açsanıza şu arka kapıyı!!"' }
         ],
-        // 100+ km/s Ölüm Korkusu & Sert Viraj Öfkesi & Yolcuların Kendi Arasında Kavgası
+        // 100+ km/s Ölüm Korkusu & Sert Viraj Öfkesi & Yolcuların Kendi Arasında Mahalle Kavgası
         speedRage: [
             { file: 'speed_rage_m1.mp3', label: 'Bağıran Yolcu: "YÜZÜ GEÇTİNİZ YÜZÜ!! Uçurumdan mı atacaksınız bizi, çekin ayağınızı şu gazdan hemen!!"' },
             { file: 'speed_rage_f1.mp3', label: 'Çığlık Atan Yolcu: "YAVAŞLAYIN DİYORUM SİZE YAVAŞLAYIN!! Kalp krizi geçireceğiz arkada, İMDAAAT!!"' }
@@ -139,8 +137,8 @@
             { file: 'curve_rage_f1.mp3', label: 'Bağıran Yolcu: "AYYY YERE DÜŞTÜK ARKADA!! Virajda hepimiz üst üste yığıldık, ne biçim savuruyorsunuz YA!!"' }
         ],
         bickerCrowd: [
-            { file: 'bicker_crowd_m1.mp3', pan: -0.35, label: 'Yolcu Tartışması: "Üstüme üstüme abanmasana be arkadaşım! Zaten otobüs beşik gibi sallanıyor, ayağıma bastın kaç kere!"' },
-            { file: 'bicker_crowd_f1.mp3', pan: 0.35, label: 'Yolcu Tartışması: "İtmesenize arkadan ya! Görmüyor musunuz tıklım tıklım otobüs, üst üste mi çıkalım?!"' },
+            { file: 'slang_bicker_m1.mp3', pan: -0.35, label: 'Arka Sıra Kavgası: "Lan ensende boza pişirtme adama, itip durma arkadan! Bir de seninle papaz olmayalım akşam akşam!"' },
+            { file: 'slang_bicker_f1.mp3', pan: 0.35, label: 'Arka Sıra Kavgası: "Ne üflüyorsun be enseme körük gibi?! Çekil şuradan azıcık öteye, patavatsız herif!"' },
             { file: 'bicker_ac_pair.mp3', pan: -0.25, label: 'Yolcu Kavgası: "İçerisi hamam gibi oldu nefes alamıyoruz, hala camı kapat diyorsunuz! Şu klimayı açın artık!!"' }
         ],
 
@@ -164,6 +162,7 @@
         ],
         alightAngry: { file: 'alight_angry_01.mp3', label: 'Sitemli İnen Yolcu: "Oh be nihayet indik, içimiz dışımıza çıktı valla bu nasıl sürüş!"' },
         waitLong: [
+            { file: 'slang_wait_m1.mp3', label: 'Atarlı Yolcu: "Lan ağaç olduk kök saldık şurada be! Kaplumbağa bile geçti yanımızdan, sürsene şu arabayı artık uyukluyor musun?!"' },
             { file: 'wait_long_01.mp3', label: 'Sabırsız Yolcu: "Of ya, ne bitmez trafikmiş arkadaş! Önümüzde yol mu tıkandı acaba, niye hiç kıpırdamıyoruz?"' },
             { file: 'wait_long_02.mp3', label: 'Öğrenci Kız: "Eyvah derse geç kaldık yine, saat kaç oldu hâlâ kıpırdamadık!"' },
             { file: 'wait_long_03.mp3', label: 'Tonton Teyze: "Sabır çekin evladım sabır, uçacak hali yok ya şoförün, açılır şimdi yol!"' }
@@ -174,6 +173,7 @@
             { file: 'overspeed_kid.mp3', label: 'Heyecanlı Çocuk: "Vaaay baba bak, otobüs yarış arabası gibi gidiyor vıııınn!"' }
         ],
         hornSpam: [
+            { file: 'slang_horn_m1.mp3', label: 'Ters Emekli: "ÇALMA ŞU KORNAYI ZIRT PIRT BE!! Beynimizi ütüledin sabahtan beri, elinin altında oyuncak mı buldun çek elini şundan!!"' },
             { file: 'horn_spam_01.mp3', label: 'Emekli Amca: "Kulağımızın pası silindi valla, düğün konvoyunda mıyız yahu, basma şu kornaya bu kadar!"' },
             { file: 'horn_spam_02.mp3', label: 'Bebekli Anne: "Rica ediyorum basmayın şu kornaya artık, kucağımda bebek uyuyor, sıçrattınız çocuğu!"' }
         ],
