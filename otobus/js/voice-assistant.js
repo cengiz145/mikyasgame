@@ -1180,34 +1180,40 @@ class VoiceAssistant {
             },
             {
                 step: 4,
-                soundDuration: 2000,
-                title: "4. Adım: Otobüsü Sağa Eğme (Kaldırıma Yaklaştırma)",
-                tip: "Yaşlı ve engelli yolcular basamağa rahat çıksın diye otobüsü sağa eğiyoruz.",
-                instruction: "Durakta yaşlı bir yolcumuz bekliyor. Otobüsü kaldırıma doğru eğmek için klavyeden K tuşuna basınız.",
-                targetKey: "k",
-                soundName: "🦼 Kneeling Süspansiyon Yana Yatış Tıslaması",
+                soundDuration: 2200,
+                title: "4. Adım: Ön Kapıyı Açma ve Yana Yatma (PageUp)",
+                tip: "Ön kapıyı açtığınızda otobüs kaldırıma otomatik eğilir (Kneeling) ve bekleyen yolcular kart okutup biner.",
+                instruction: "Durakta bekleyen yolcuların binmesi ve otobüsün kaldırıma eğilmesi için klavyeden PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açınız.",
+                targetKey: "pageup",
+                soundName: "🚪 Ön Kapı Pnömatik Açılışı, Kneeling & 💳 Akbil Bip Sesi",
                 playSound: () => {
                     if (typeof audio !== 'undefined') {
-                        if (audio.playKneeling) audio.playKneeling(true);
-                        else if (audio.playKneelingSound) audio.playKneelingSound();
+                        if (audio.playKneelingSound) audio.playKneelingSound();
+                        else if (audio.playKneeling) audio.playKneeling(true);
+                        if (audio.playDoorOpenWithAkbil) audio.playDoorOpenWithAkbil();
+                        else {
+                            if (audio.playDoorOpen) audio.playDoorOpen();
+                            setTimeout(() => { if (audio.playAkbilTam) audio.playAkbilTam(); }, 750);
+                        }
                     }
                 },
-                actionBtnText: "⬇️ Otobüsü Sağa Eğ (K)",
-                actionBtnStyle: "background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8;",
-                successFeedback: "Aferin çok doğru! Hava körükleri tıslayarak otobüs yana yattı, basamak kaldırım seviyesine indi.",
-                failFeedback: "Otobüsü eğmek için lütfen K tuşuna basınız. Tekrar dene!",
+                actionBtnText: "🚪 Ön Kapıyı Aç (PageUp / Sayfa Yukarı)",
+                actionBtnStyle: "background: linear-gradient(135deg, #7c3aed, #6d28d9); border: 1.5px solid #a78bfa;",
+                successFeedback: "Aferin çok doğru! Ön kapı açıldı, körükler otobüsü kaldırıma eğdi ve yolcular kartlarını okutup bindi.",
+                failFeedback: "Ön kapıyı açmak için lütfen PageUp (Sayfa Yukarı) tuşuna basınız.",
                 execute: () => {
                     const s = this.guidedSteps[3];
                     if (s && s.playSound) s.playSound();
+                    this.labFrontDoor = true;
                     this.labKneeling = true;
                 }
             },
             {
                 step: 5,
                 soundDuration: 2200,
-                title: "5. Adım: Engelli Rampasını Açma",
-                tip: "Tekerlekli sandalyeli yolcumuzun binmesi için rampayı açıyoruz.",
-                instruction: "Tekerlekli sandalyeli yolcumuzun rahatça binmesi için klavyeden U tuşuna basarak rampayı açınız.",
+                title: "5. Adım: Engelli Rampasını Açma (U)",
+                tip: "Ön kapı açıkken tekerlekli sandalyeli yolcumuzun binmesi için rampayı açıyoruz.",
+                instruction: "Durakta tekerlekli sandalyeli yolcumuz bekliyor. Rahatça binmesi için klavyeden U tuşuna basarak engelli rampasını açınız.",
                 targetKey: "u",
                 soundName: "🛹 Freesound Hidrolik Rampa İniş & Kaldırım Klankı",
                 playSound: () => {
@@ -1218,7 +1224,7 @@ class VoiceAssistant {
                 },
                 actionBtnText: "🛹 Engelli Rampasını Aç (U)",
                 actionBtnStyle: "background: linear-gradient(135deg, #d97706, #b45309); border: 1.5px solid #facc15;",
-                successFeedback: "Harikasın! Rampa hidrolik sesle indi ve kaldırıma kilitlendi. Yolcumuz bindi: Çok teşekkür ederim kaptanım!",
+                successFeedback: "Harikasın! Rampa hidrolik sesle indi ve kaldırıma kilitlendi. Yolcumuz güvenle bindi: Çok teşekkür ederim kaptanım!",
                 failFeedback: "Rampayı açmak için lütfen U tuşuna basınız.",
                 execute: () => {
                     const s = this.guidedSteps[4];
@@ -1229,9 +1235,9 @@ class VoiceAssistant {
             {
                 step: 6,
                 soundDuration: 2200,
-                title: "6. Adım: Rampayı Geri Kapatma",
-                tip: "Yolcumuz bindi, sefere devam etmek için rampayı geri topluyoruz.",
-                instruction: "Yolcumuz bindi. Tekrar yola çıkabilmek için lütfen tekrar U tuşuna basarak rampayı kapatınız.",
+                title: "6. Adım: Rampayı Geri Kapatma (U)",
+                tip: "Yolcumuz bindi, rampa açıkken otobüs hareket edemeyeceği için rampayı geri topluyoruz.",
+                instruction: "Tekerlekli sandalyeli yolcumuz bindi. Güvenlik kilidini açmak için tekrar U tuşuna basarak rampayı kapatınız.",
                 targetKey: "u",
                 soundName: "⬆️ Freesound Rampa Toplanma & Şasi Kilidi",
                 playSound: () => {
@@ -1240,65 +1246,64 @@ class VoiceAssistant {
                         else if (audio.playRamp) audio.playRamp(false);
                     }
                 },
-                actionBtnText: "⬆️ Rampayı Kapat ve Otobüsü Doğrult (U)",
+                actionBtnText: "⬆️ Rampayı Kapat (U)",
                 actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
-                successFeedback: "Çok güzel! Rampa motorla toplanıp şasiye kilitlendi ve körükler otobüsü doğrulttu.",
+                successFeedback: "Çok güzel! Rampa motorla toplanıp şasiye kilitlendi.",
                 failFeedback: "Rampayı kapatmak için lütfen tekrar U tuşuna basınız.",
                 execute: () => {
                     const s = this.guidedSteps[5];
                     if (s && s.playSound) s.playSound();
                     this.labRampOpen = false;
-                    this.labKneeling = false;
                 }
             },
             {
                 step: 7,
-                soundDuration: 2200,
-                title: "7. Adım: Ön Kapıyı Açma (Yolcuları Alma)",
-                tip: "Durakta bekleyen diğer yolcuların binmesi için ön kapıyı açıyoruz.",
-                instruction: "Duraktaki diğer yolcuların binmesi için klavyeden PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açınız.",
-                targetKey: "pageup",
-                soundName: "🚪 Ön Kapı Pnömatik Açılışı & 💳 Akbil Bip Sesi",
+                soundDuration: 2000,
+                title: "7. Adım: Arka Kapıyı Açma (İnecek Yolcular - PageDown)",
+                tip: "Duracak zili çaldığında veya son durakta inecek yolcular için arka kapıyı açıyoruz.",
+                instruction: "İnecek yolcuların güvenle inmesi için klavyeden PageDown (Sayfa Aşağı) tuşuna basarak arka kapıyı açınız.",
+                targetKey: "pagedown",
+                soundName: "🚪 Arka Kapı Pnömatik Açılışı & Yolcu İnişi",
                 playSound: () => {
                     if (typeof audio !== 'undefined') {
-                        if (audio.playDoorOpenWithAkbil) audio.playDoorOpenWithAkbil();
-                        else {
-                            if (audio.playDoorOpen) audio.playDoorOpen();
-                            setTimeout(() => { if (audio.playAkbilTam) audio.playAkbilTam(); }, 750);
-                        }
+                        if (audio.playPneumaticDoorOpen) audio.playPneumaticDoorOpen();
+                        else if (audio.playDoorOpen) audio.playDoorOpen();
                     }
                 },
-                actionBtnText: "🚪 Ön Kapıyı Aç (PageUp / Sayfa Yukarı)",
-                actionBtnStyle: "background: linear-gradient(135deg, #7c3aed, #6d28d9); border: 1.5px solid #a78bfa;",
-                successFeedback: "Aferin doğru yaptın! Pnömatik kapı açıldı, yolcular kartlarını okutup bindi.",
-                failFeedback: "Ön kapıyı açmak için lütfen PageUp (Sayfa Yukarı) tuşuna basınız.",
+                actionBtnText: "🚪 Arka Kapıyı Aç (PageDown / Sayfa Aşağı)",
+                actionBtnStyle: "background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8;",
+                successFeedback: "Harika! Arka kapı açıldı ve inecek yolcular teşekkür ederek indi.",
+                failFeedback: "Arka kapıyı açmak için lütfen PageDown (Sayfa Aşağı) tuşuna basınız.",
                 execute: () => {
                     const s = this.guidedSteps[6];
                     if (s && s.playSound) s.playSound();
-                    this.labFrontDoor = true;
+                    this.labRearDoor = true;
                 }
             },
             {
                 step: 8,
                 soundDuration: 1800,
-                title: "8. Adım: Ön Kapıyı Kapatma",
-                tip: "Yolcular bindi, güvenle sürmek için kapıyı kapatıyoruz.",
-                instruction: "Yolcular bindi. Yola çıkmak için lütfen tekrar PageUp (Sayfa Yukarı) tuşuna basarak kapıyı kapatınız.",
+                title: "8. Adım: Kapıları Kapatma (PageUp / PageDown)",
+                tip: "Biniş ve inişler tamamlandı; güvenle yola çıkmak için kapıları kapatıyoruz (Klima/Kalorifer için sürüşte K tuşunu kullanabilirsiniz).",
+                instruction: "Yolcular bindi ve indi. Yola çıkmak için lütfen PageUp veya PageDown tuşuna basarak kapıları kapatınız.",
                 targetKey: "pageup",
-                soundName: "🔒 Ön Kapı Pnömatik Kapanış & Kauçuk Fitil",
+                altTargetKey: "pagedown",
+                soundName: "🔒 Kapı Pnömatik Kapanış & Kauçuk Fitil",
                 playSound: () => {
                     if (typeof audio !== 'undefined' && audio.playDoorClose) {
                         audio.playDoorClose();
                     }
                 },
-                actionBtnText: "🔒 Ön Kapıyı Kapat (PageUp / Sayfa Yukarı)",
+                actionBtnText: "🔒 Kapıları Kapat (PageUp / PageDown)",
                 actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
-                successFeedback: "Tebrikler! Kapılar hava sesiyle kapandı ve kilitlendi, artık güvenle sürebilirsin.",
-                failFeedback: "Kapıyı kapatmak için lütfen PageUp (Sayfa Yukarı) tuşuna basınız.",
+                successFeedback: "Tebrikler! Kapılar hava sesiyle kapandı, otobüs doğruldu ve kilitlendi, artık güvenle sürebilirsin.",
+                failFeedback: "Kapıları kapatmak için lütfen PageUp veya PageDown tuşuna basınız.",
                 execute: () => {
                     const s = this.guidedSteps[7];
                     if (s && s.playSound) s.playSound();
                     this.labFrontDoor = false;
+                    this.labRearDoor = false;
+                    this.labKneeling = false;
                 }
             },
             {
@@ -1350,15 +1355,15 @@ class VoiceAssistant {
             labContainer.innerHTML = `
                 <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(2, 132, 199, 0.35)); border: 2px solid #38bdf8; border-radius: 14px; padding: 26px; text-align: center; box-shadow: 0 0 30px rgba(56, 189, 248, 0.25);">
                     <div style="font-size: 3.8rem; margin-bottom: 8px;">🏆</div>
-                    <span style="font-size: 0.9rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;">TEBRİKLER ŞOFÖR KARDEŞİM!</span>
+                    <span style="font-size: 0.9rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;">TEBRİKLER KAPTANIM!</span>
                     <h3 style="color: #ffffff; font-size: 1.8rem; margin: 6px 0 12px 0;">🎉 Bütün Kontrolleri Öğrendin!</h3>
                     
                     <div style="background: rgba(56, 189, 248, 0.12); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 16px; margin: 16px auto; max-width: 580px; text-align: left;">
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
                             <span style="font-size: 2rem;">🚍</span>
                             <div>
-                                <strong style="color: #38bdf8; font-size: 1.15rem; display: block;">Artık Gerçek Bir Otobüs Şoförüsün!</strong>
-                                <span style="color: #cbd5e1; font-size: 0.9rem;">Motoru çalıştırmayı, yumuşak durmayı, kapıları ve engelli rampasını öğrendin.</span>
+                                <strong style="color: #38bdf8; font-size: 1.15rem; display: block;">Artık Gerçek Bir Otobüs Kaptanısın!</strong>
+                                <span style="color: #cbd5e1; font-size: 0.9rem;">Motoru çalıştırmayı, yumuşak durmayı, ön/arka kapıları ve engelli rampasını öğrendin.</span>
                             </div>
                         </div>
                         <p style="color: #f1f5f9; font-size: 0.95rem; line-height: 1.5; margin: 8px 0 0 0;">
@@ -1950,10 +1955,22 @@ class VoiceAssistant {
             this.setAcademyTab('karne');
             const level = Game.licenseLevel || 1;
             const xp = Game.playerXP || 0;
-            const title = (typeof Game.getLicenseTitle === 'function' && Game.getLicenseTitle()) ? Game.getLicenseTitle() : '1. Sınıf Sürücü';
-            const nextXP = (typeof Game.getNextLevelXP === 'function') ? Game.getNextLevelXP(level) : 250;
+            const title = (typeof Game.getLicenseTitle === 'function' && Game.getLicenseTitle()) ? Game.getLicenseTitle() : '1. Sınıf Kaptan';
+            const nextXP = (typeof Game.getNextLevelXP === 'function' ) ? Game.getNextLevelXP(level) : 250;
             const remaining = Math.max(0, nextXP - xp);
-            audio.speak(`Şoförlük durumunuz açıldı. Şu an Seviye ${level}, ${title} durumundasınız. Toplam tecrübeniz ${xp} puandır. Seviye ${level + 1}'e kalan: ${remaining} puan.`);
+            audio.speak(`Kaptanlık durumunuz açıldı. Şu an Seviye ${level}, ${title} durumundasınız. Toplam tecrübeniz ${xp} puandır. Seviye ${level + 1}'e kalan: ${remaining} puan.`);
+            return;
+        }
+
+        // Doğrudan Engelli Rampası Aç / Kapat Sesli Komutu
+        if (command.includes("rampa") && (command.includes("aç") || command.includes("kapat") || command.includes("indir") || command.includes("topla"))) {
+            if (command.includes("aç") || command.includes("indir")) {
+                if (!Game.isRampDeployed) Game.toggleWheelchairRamp();
+                else audio.speak("Engelli rampası zaten açık.");
+            } else {
+                if (Game.isRampDeployed) Game.toggleWheelchairRamp();
+                else audio.speak("Engelli rampası zaten kapalı.");
+            }
             return;
         }
 
@@ -2301,19 +2318,55 @@ class VoiceAssistant {
             return;
         }
 
-        if (command.includes("ön kapı") || command.includes("önü aç")) {
-            Game.toggleFrontDoor();
+        if (command.includes("ön kapı") || command.includes("önü aç") || command.includes("önü kapat")) {
+            if (command.includes("aç") && Game.frontDoorOpen) {
+                audio.speak("Ön kapı zaten açık.");
+            } else if (command.includes("kapat") && !Game.frontDoorOpen) {
+                audio.speak("Ön kapı zaten kapalı.");
+            } else {
+                Game.toggleFrontDoor();
+            }
             return;
         }
 
-        if (command.includes("arka kapı") || command.includes("arkayı aç")) {
-            Game.toggleRearDoor();
+        if (command.includes("arka kapı") || command.includes("arkayı aç") || command.includes("arkayı kapat")) {
+            if (command.includes("aç") && Game.rearDoorOpen) {
+                audio.speak("Arka kapı zaten açık.");
+            } else if (command.includes("kapat") && !Game.rearDoorOpen) {
+                audio.speak("Arka kapı zaten kapalı.");
+            } else {
+                Game.toggleRearDoor();
+            }
             return;
         }
 
         if (command.includes("kapı") && (command.includes("aç") || command.includes("kapat")) && !command.includes("bagaj")) {
-            Game.toggleFrontDoor();
-            setTimeout(() => Game.toggleRearDoor(), 500);
+            if (command.includes("kapat")) {
+                if (!Game.frontDoorOpen && !Game.rearDoorOpen) {
+                    audio.speak("Kapılar zaten kapalı.");
+                } else {
+                    if (Game.frontDoorOpen) Game.toggleFrontDoor();
+                    setTimeout(() => { if (Game.rearDoorOpen) Game.toggleRearDoor(); }, 450);
+                }
+            } else {
+                if (Game.frontDoorOpen && Game.rearDoorOpen) {
+                    audio.speak("Kapılar zaten açık.");
+                } else {
+                    if (!Game.frontDoorOpen) Game.toggleFrontDoor();
+                    setTimeout(() => { if (!Game.rearDoorOpen) Game.toggleRearDoor(); }, 450);
+                }
+            }
+            return;
+        }
+
+        // --- YOLCU SAYISI VE KABİN DURUMU SORGUSU ---
+        if (command.includes("kaç yolcu") || command.includes("yolcu sayısı") || command.includes("yolcu durumu") || command.includes("yolcu raporu") || command.includes("yolcular nasıl")) {
+            if (typeof window !== 'undefined' && window.HumanNpcVoices && typeof window.HumanNpcVoices.speakLivePassengerReport === 'function') {
+                window.HumanNpcVoices.speakLivePassengerReport(Game);
+            } else {
+                const capInfo = (typeof Game.getSeatAndTotalCapacity === 'function') ? Game.getSeatAndTotalCapacity() : { totalCapacity: 55 };
+                audio.speak(`Araçta şu an ${Game.passengersOnBoard || 0} yolcu var, toplam kapasite ${capInfo.totalCapacity}.`);
+            }
             return;
         }
 
@@ -2383,18 +2436,27 @@ class VoiceAssistant {
                 audio.speak("Gümüşhane, Doğu Karadeniz'in iç kesiminde Harşit Vadisi boyunca uzanan dağlar arasındaki tarihi maden ve kültür kentimizdir. 14.5 kilometrelik Yeni Zigana Tüneli, Karaca Mağarası, Tomara Şelalesi, Torul Kalesi Cam Terası, meşhur pestili ve kömesiyle tanınır. Koordinatları 40 derece 27 dakika Kuzey, 39 derece 28 dakika Doğudur. Komşuları Trabzon, Bayburt, Erzincan ve Giresun'dur.");
                 return;
             }
-                        if (command.includes("tesis") || command.includes("mola") || command.includes("dinlenme tesisi") || command.includes("çorba") || command.includes("tost")) {
-                            if (command.includes("rol yapma") || command.includes("kolonya") || command.includes("ikram") || command.includes("polis") || command.includes("takograf")) {
-                if (typeof RoleplaySystem !== 'undefined') {
-                    RoleplaySystem.openModal();
-                }
+        if (command.includes("rol yapma") || command.includes("kolonya") || command.includes("ikram") || command.includes("polis") || command.includes("takograf")) {
+            if (command.includes("kolonya") && (command.includes("dağıt") || command.includes("tut") || command.includes("servis")) && typeof RoleplaySystem !== 'undefined' && typeof RoleplaySystem.triggerCologneService === 'function') {
+                RoleplaySystem.triggerCologneService();
                 return;
             }
+            if (command.includes("ikram") && !command.includes("menü") && !command.includes("panel") && typeof Game !== 'undefined' && typeof Game.serveCatering === 'function') {
+                Game.serveCatering();
+                return;
+            }
+            if (typeof RoleplaySystem !== 'undefined') {
+                RoleplaySystem.openModal();
+            }
+            return;
+        }
+
+        if (command.includes("tesis") || command.includes("mola") || command.includes("dinlenme tesisi") || command.includes("çorba") || command.includes("tost")) {
             if (typeof HighwayFacilities !== 'undefined') {
-                    HighwayFacilities.openFacilityModal();
-                }
-                return;
+                HighwayFacilities.openFacilityModal();
             }
+            return;
+        }
             if (command.includes("hgs") || command.includes("gişe") || command.includes("otoyol ücreti") || command.includes("bakiye")) {
                 if (typeof HighwayFacilities !== 'undefined') {
                     HighwayFacilities.openHgsModal();
@@ -2620,36 +2682,43 @@ class VoiceAssistant {
             return;
         }
 
-        // --- KLİMA KONTROLÜ ---
-        if (command.includes("klima") || command.includes("sıcak") || command.includes("soğuk") || command.includes("üşü") || command.includes("yan")) {
+        // --- KLİMA VE KALORİFER KONTROLÜ ---
+        if (command.includes("klima") || command.includes("kalorifer") || command.includes("ısıtıcı") || command.includes("sıcak") || command.includes("soğuk") || command.includes("üşü") || command.includes("yan")) {
+            const extTemp = (typeof Game.temperature === 'number' && !isNaN(Game.temperature)) ? Game.temperature : 18;
+            const inTemp = (typeof Game.busTemperature === 'number' && !isNaN(Game.busTemperature)) ? Math.floor(Game.busTemperature) : 22;
+            const isColdMode = command.includes("kalorifer") || command.includes("ısıtıcı") || inTemp < 20 || extTemp <= 16;
+            const unitLabel = isColdMode ? "Kalorifer" : "Klima";
+
             if (command.includes("kaç derece") || command.includes("sıcaklık") || command.includes("hava") || command.includes("yağmur") || command.includes("yağış")) {
                 let durum = (Game.weather === 'sunny') 
                     ? (Game.isNight ? 'açık gece' : 'güneşli') 
                     : (Game.weather === 'rainy' ? `yağmurlu, saatte ${Game.rainMmPerHour || 5} milimetre yağış var` : 'karlı');
-                const extTemp = (typeof Game.temperature === 'number' && !isNaN(Game.temperature)) ? Game.temperature : 18;
-            const inTemp = (typeof Game.busTemperature === 'number' && !isNaN(Game.busTemperature)) ? Math.floor(Game.busTemperature) : 22;
-            audio.speak(`Dış sıcaklık ${extTemp} derece, araç içi ${inTemp} derece. Hava ${durum}. ${Game.isACOn ? "Klima açık." : "Klima kapalı."}`);
-                return;
-            }
-
-            if (command.includes("aç") || command.includes("çalıştır") || command.includes("sıcak") || command.includes("soğuk") || command.includes("üşü") || command.includes("yan")) {
-                if (!Game.isACOn) {
-                    Game.isACOn = true;
-                    audio.speak("Klima açıldı. Hedef sıcaklık 22 derece.");
-                    if (typeof UI !== 'undefined') UI.showToast("Klima Açıldı", "info");
-                } else {
-                    audio.speak("Klima zaten açık.");
-                }
+                audio.speak(`Dış sıcaklık ${extTemp} derece, araç içi ${inTemp} derece. Hava ${durum}. ${Game.isACOn ? unitLabel + " açık." : unitLabel + " kapalı."}`);
                 return;
             }
 
             if (command.includes("kapat") || command.includes("durdur")) {
                 if (Game.isACOn) {
                     Game.isACOn = false;
-                    audio.speak("Klima kapatıldı.");
-                    if (typeof UI !== 'undefined') UI.showToast("Klima Kapatıldı", "info");
+                    audio.speak(`${unitLabel} kapatıldı.`);
+                    if (typeof UI !== 'undefined') UI.showToast(`${unitLabel} Kapatıldı`, "info");
                 } else {
-                    audio.speak("Klima zaten kapalı.");
+                    audio.speak(`${unitLabel} zaten kapalı.`);
+                }
+                return;
+            }
+
+            if (command.includes("aç") || command.includes("çalıştır") || command.includes("sıcak") || command.includes("soğuk") || command.includes("üşü") || command.includes("yan")) {
+                if (!Game.isACOn) {
+                    const prevBusTemp = Game.busTemperature;
+                    Game.isACOn = true;
+                    if (typeof window !== 'undefined' && window.HumanNpcVoices && typeof window.HumanNpcVoices.onAcTurnedOn === 'function') {
+                        window.HumanNpcVoices.onAcTurnedOn(prevBusTemp);
+                    }
+                    audio.speak(`${unitLabel} açıldı. Hedef sıcaklık 22 derece.`);
+                    if (typeof UI !== 'undefined') UI.showToast(`${unitLabel} Açıldı`, "info");
+                } else {
+                    audio.speak(`${unitLabel} zaten açık.`);
                 }
                 return;
             }

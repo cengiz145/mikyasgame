@@ -1410,6 +1410,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? window.midPoints[destCity]
                     : ((typeof midPoints !== 'undefined' && midPoints[destCity]) ? midPoints[destCity] : null);
 
+                routesData[intercityRouteId].biletFiyat = Math.max(120, Math.round(realDistKm * 1.5));
+
                 if (realDistKm >= 200 && midArr && midArr.length > 0) {
                     const passName = midArr[0];
                     const midLat = Number((lat1 + (lat2 - lat1) * 0.50).toFixed(4));
@@ -1419,13 +1421,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     routesData[intercityRouteId].intermediateStops = [passName];
                     routesData[intercityRouteId].stops = [
-                        { name: startStop, lat: lat1, lon: lon1, anons: `${startStop} kalkış peronundayız. ${destCity} seferi başlıyor.`, bekleyenYolcu: 28, inenYolcu: 0, gercekMesafeSonraki: dist1 },
-                        { name: passName, lat: midLat, lon: midLon, anons: `Önemli geçiş noktası: ${passName}. Yolcularımızın emniyet kemerlerini takmaları rica olunur.`, bekleyenYolcu: 0, inenYolcu: 0, gercekMesafeSonraki: dist2 },
+                        { name: startStop, lat: lat1, lon: lon1, anons: `${startStop} kalkış peronundayız. ${destCity} seferi başlıyor.`, bekleyenYolcu: 28, inenYolcu: 0, garajMesafeKm: 0.85, gercekMesafeSonraki: dist1 },
+                        { name: passName, lat: midLat, lon: midLon, anons: `Önemli geçiş noktası: ${passName}. Yolcularımızın emniyet kemerlerini takmaları rica olunur.`, bekleyenYolcu: 0, inenYolcu: 0, isTransitPass: true, gercekMesafeSonraki: dist2 },
                         { name: endStop, lat: lat2, lon: lon2, anons: `Son durak: ${endStop}. Şehirlerarası seferimiz sona ermiştir.`, bekleyenYolcu: 0, inenYolcu: 28, gercekMesafeSonraki: 0 }
                     ];
                 } else {
                     routesData[intercityRouteId].stops = [
-                        { name: startStop, lat: lat1, lon: lon1, anons: startStop + " kalkış peronundayız. " + destCity + " seferi başlıyor.", bekleyenYolcu: 28, inenYolcu: 0, gercekMesafeSonraki: realDistKm },
+                        { name: startStop, lat: lat1, lon: lon1, anons: startStop + " kalkış peronundayız. " + destCity + " seferi başlıyor.", bekleyenYolcu: 28, inenYolcu: 0, garajMesafeKm: 0.85, gercekMesafeSonraki: realDistKm },
                         { name: endStop, lat: lat2, lon: lon2, anons: "Son durak: " + endStop + ". Şehirlerarası seferimiz sona ermiştir.", bekleyenYolcu: 0, inenYolcu: 28, gercekMesafeSonraki: 0 }
                     ];
                 }
@@ -1723,6 +1725,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-rear-door').addEventListener('click', (e) => {
         Game.toggleRearDoor();
     });
+
+    const btnRamp = document.getElementById('btn-wheelchair-ramp');
+    if (btnRamp) {
+        btnRamp.addEventListener('click', () => {
+            if (typeof Game !== 'undefined' && typeof Game.toggleWheelchairRamp === 'function') {
+                Game.toggleWheelchairRamp();
+            }
+        });
+    }
 
     const btnAllow = document.getElementById('btn-passenger-allow');
     if (btnAllow) {

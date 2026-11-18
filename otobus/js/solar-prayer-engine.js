@@ -97,12 +97,15 @@
 
     const SolarPrayerEngine = {
         apiCache: {},
+        fallbackCache: {},
+        fetchingByCity: {},
+        lastFetchAttemptByCity: {},
         lastAnnouncedVakitKey: null,
         lastAmbiencePlayTime: 0,
-        isFetching: false,
 
         /**
-         * İl için kesin vakitleri hesaplar (Öncelik: Canlı API, Yedek: Astronomik Model)
+         * İl için kesin vakitleri hesaplar (Öncelik: Canlı API Önbelleği, Yedek: Önbellekli Astronomik Model)
+         * Not: 60 FPS gameLoop içinde çağrıldığı için her karede yeniden nesne üretmez ve çevrimdışıyken 60 Hz HTTP isteği atmaz!
          */
         getPrayerTimesForCity: function(cityName) {
             const city = cityName || "Tekirdağ";
@@ -110,13 +113,14 @@
                 return this.apiCache[city];
             }
 
-            // Astronomik yedek model (Matematiksel kesinlik)
-            const fallback = this.calculateAstronomicalTimes(city);
+            if (!this.fallbackCache[city]) {
+                this.fallbackCache[city] = this.calculateAstronomicalTimes(city);
+            }
             
-            // Arka planda Aladhan API'den güncel Diyanet vakitlerini çek
+            // Arka planda Aladhan API'den güncel Diyanet vakitlerini çek (en fazla 10 dakikada 1 deneme)
             this.fetchOnlineTimings(city);
 
-            return fallback;
+            return this.fallbackCache[city];
         },
 
         /**
@@ -176,11 +180,15 @@
          * Aladhan Açık API Entegrasyonu (Diyanet İşleri Başkanlığı Metodu - Method 13)
          */
         fetchOnlineTimings: function(cityName) {
-            if (this.isFetching || this.apiCache[cityName]) return;
+            const city = cityName || "Tekirdağ";
+            if (this.fetchingByCity[city] || this.apiCache[city]) return;
+            const nowMs = Date.now();
+            if (this.lastFetchAttemptByCity[city] && (nowMs - this.lastFetchAttemptByCity[city] < 600000)) return;
             if (typeof fetch === 'undefined') return;
 
-            this.isFetching = true;
-            const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(cityName)}&country=Turkey&method=13`;
+            this.fetchingByCity[city] = true;
+            this.lastFetchAttemptByCity[city] = nowMs;
+            const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=Turkey&method=13`;
             const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
             const timeoutId = controller ? setTimeout(() => {
                 try { controller.abort(); } catch (e) {}
@@ -189,68 +197,74 @@
             fetch(url, controller ? { signal: controller.signal } : undefined)
                 .then(r => r.json())
                 .then(res => {
-                    this.isFetching = false;
                     if (res && res.data && res.data.timings) {
                         const t = res.data.timings;
-                        const parseToMin = (str) => {
-                            if (!str) return 0;
-                            const parts = str.split(':');
-                            return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+                        const cleanHHMM = (str, fallbackStr) => {
+                            const m = String(str || '').match(/(\d{1,2}):(\d{2})/);
+                            if (!m) return fallbackStr || "00:00";
+                            return `${m[1].padStart(2, '0')}:${m[2]}`;
                         };
+                        const parseToMin = (str, fallbackMin) => {
+                            const m = String(str || '').match(/(\d{1,2}):(\d{2})/);
+                            if (!m) return fallbackMin || 0;
+                            return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+                        };
+                        const fb = this.fallbackCache[city] || this.calculateAstronomicalTimes(city);
 
-                        this.apiCache[cityName] = {
-                            city: cityName,
+                        this.apiCache[city] = {
+                            city: city,
                             source: "aladhan_diyanet_api",
                             rawMinutes: {
-                                imsak: parseToMin(t.Fajr),
-                                gunes: parseToMin(t.Sunrise),
-                                ogle: parseToMin(t.Dhuhr),
-                                ikindi: parseToMin(t.Asr),
-                                aksam: parseToMin(t.Maghrib),
-                                yatsi: parseToMin(t.Isha)
+                                imsak: parseToMin(t.Fajr, fb.rawMinutes.imsak),
+                                gunes: parseToMin(t.Sunrise, fb.rawMinutes.gunes),
+                                ogle: parseToMin(t.Dhuhr, fb.rawMinutes.ogle),
+                                ikindi: parseToMin(t.Asr, fb.rawMinutes.ikindi),
+                                aksam: parseToMin(t.Maghrib, fb.rawMinutes.aksam),
+                                yatsi: parseToMin(t.Isha, fb.rawMinutes.yatsi)
                             },
                             timings: {
-                                İmsak: t.Fajr,
-                                Güneş: t.Sunrise,
-                                Öğle: t.Dhuhr,
-                                İkindi: t.Asr,
-                                Akşam: t.Maghrib,
-                                Yatsı: t.Isha
+                                İmsak: cleanHHMM(t.Fajr, fb.timings.İmsak),
+                                Güneş: cleanHHMM(t.Sunrise, fb.timings.Güneş),
+                                Öğle: cleanHHMM(t.Dhuhr, fb.timings.Öğle),
+                                İkindi: cleanHHMM(t.Asr, fb.timings.İkindi),
+                                Akşam: cleanHHMM(t.Maghrib, fb.timings.Akşam),
+                                Yatsı: cleanHHMM(t.Isha, fb.timings.Yatsı)
                             }
                         };
                     }
                 })
-                .catch(() => {
-                    this.isFetching = false;
-                })
+                .catch(() => {})
                 .finally(() => {
                     if (timeoutId) clearTimeout(timeoutId);
-                    this.isFetching = false;
+                    this.fetchingByCity[city] = false;
                 });
         },
 
         /**
-         * Oyun döngüsünde (gameLoop) her saniye çağrılır
+         * Oyun döngüsünde (gameLoop) her karede çağrılır
          * Vakit girdiğinde durakta veya şehir içinde otantik uzak minare akustiği çalar
          */
         update: function(clockMinutes, cityName, speed, doorsOpen) {
-            const data = this.getPrayerTimesForCity(cityName);
+            const city = cityName || "Tekirdağ";
+            const data = this.getPrayerTimesForCity(city);
             if (!data || !data.rawMinutes) return;
 
-            const curMin = Math.floor(clockMinutes || 0);
+            const curMin = ((Math.floor(clockMinutes || 0) % 1440) + 1440) % 1440;
             const now = Date.now();
 
-            // Gün içi ana ezan vakitleri: Öğle, İkindi, Akşam
+            // Saat penceresinin dışına çıkıldığında bir sonraki gün aynı vaktin tekrar bildirilmesine izin ver
             const prayerWindows = [
                 { key: "ogle", name: "Öğle", min: data.rawMinutes.ogle },
                 { key: "ikindi", name: "İkindi", min: data.rawMinutes.ikindi },
                 { key: "aksam", name: "Akşam", min: data.rawMinutes.aksam }
             ];
 
+            let insideAnyWindow = false;
             for (let pw of prayerWindows) {
                 // Vaktin girdiği ilk 4 dakika içinde tetiklenir
                 if (curMin >= pw.min && curMin <= pw.min + 4) {
-                    const uniqueKey = `${cityName}_${pw.key}_${Math.floor(curMin / 1440)}`;
+                    insideAnyWindow = true;
+                    const uniqueKey = `${city}_${pw.key}`;
                     if (this.lastAnnouncedVakitKey !== uniqueKey) {
                         this.lastAnnouncedVakitKey = uniqueKey;
 
@@ -263,7 +277,7 @@
                         }
 
                         // Ekran okuyucu ve Toast bildirimi
-                        const notice = `🕌 ${cityName}: ${pw.name} vakti girdi.`;
+                        const notice = `🕌 ${city}: ${pw.name} vakti girdi.`;
                         if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
                             audio.updateNvdaLiveRegion(notice);
                         }
@@ -274,6 +288,9 @@
                     break;
                 }
             }
+            if (!insideAnyWindow && this.lastAnnouncedVakitKey && this.lastAnnouncedVakitKey.startsWith(city + '_')) {
+                this.lastAnnouncedVakitKey = null;
+            }
         },
 
         /**
@@ -281,7 +298,8 @@
          */
         speakVakitReport: function(game) {
             const cityName = (game && game.currentCity) ? game.currentCity : "Tekirdağ";
-            const clockMin = (game && typeof game.clockMinutes === 'number') ? game.clockMinutes : 720;
+            const rawClock = (game && typeof game.clockMinutes === 'number' && !isNaN(game.clockMinutes)) ? game.clockMinutes : 720;
+            const clockMin = ((Math.floor(rawClock) % 1440) + 1440) % 1440;
             const data = this.getPrayerTimesForCity(cityName);
 
             const curHH = String(Math.floor(clockMin / 60)).padStart(2, '0');
@@ -312,9 +330,10 @@
                 diffMin = (1440 - clockMin) + nextVakit.min;
             }
 
-            const remHours = Math.floor(diffMin / 60);
-            const remMins = Math.floor(diffMin % 60);
-            const remText = remHours > 0 ? `${remHours} saat ${remMins} dakika` : `${remMins} dakika`;
+            const totalRem = Math.max(1, Math.round(diffMin));
+            const remHours = Math.floor(totalRem / 60);
+            const remMins = totalRem % 60;
+            const remText = remHours > 0 ? (remMins > 0 ? `${remHours} saat ${remMins} dakika` : `${remHours} saat`) : `${remMins} dakika`;
 
             // Güneş Azimutu ve Pozisyonu
             let solarStatus = "";

@@ -519,7 +519,7 @@
             return this.howlCache[filename] || null;
         },
 
-        stopAll: function () {
+        stopTimersOnly: function () {
             this._demoForceOcclusion = null;
             if (this._demoFightInterval) {
                 clearInterval(this._demoFightInterval);
@@ -545,6 +545,10 @@
                 this._stuntTimers.forEach(t => clearTimeout(t));
                 this._stuntTimers = [];
             }
+        },
+
+        stopAll: function () {
+            this.stopTimersOnly();
             if (this.activeHowl) {
                 try { this.activeHowl.stop(); } catch (e) {}
                 this.activeHowl = null;
@@ -817,7 +821,7 @@
         },
 
         resetForNewRoute: function () {
-            if (typeof this.stopPolicePursuit === 'function') this.stopPolicePursuit();
+            this.stopAll();
             this._majorTrafficOffenses = 0;
             this._radarOverspeedSecs = 0;
             this.angerLevel = 0;
@@ -998,9 +1002,14 @@
         // 3. KIRMIZI IŞIK İHLALİ (YAYA GEÇİDİ ÇIĞLIĞI, ÖFKELİ SÜRÜCÜ & AĞIR İHLALDE POLİS KOVALAMACASI!)
         onRedLightViolation: function () {
             if (!this.canSpeakInCabin()) return false;
-            this.angerLevel = Math.min(4, this.angerLevel + 1);
-            this._majorTrafficOffenses = (this._majorTrafficOffenses || 0) + 1;
             const g = this.getGameObj();
+            if (g && (g.passengersOnBoard || 0) > 0) {
+                this.angerLevel = Math.min(4, (this.angerLevel || 0) + 1);
+            }
+            if (this.inspector) {
+                this.inspector.redLights = (this.inspector.redLights || 0) + 1;
+            }
+            this._majorTrafficOffenses = (this._majorTrafficOffenses || 0) + 1;
             const curSpeed = (g && typeof g.speed === 'number') ? g.speed : 30;
             this.playClip(CLIPS.sfxHorn, { pan: 0.65, volume: 0.78, isExterior: true, backgroundSfx: true });
             const chosen = this.pickRandom(CLIPS.redLight);
@@ -1061,8 +1070,12 @@
                 const b2 = this.pickSmart(CLIPS.berserkMeltdown.filter(x => x.file !== b1.file), smartCtx) || b1;
 
                 const gRiot1 = this.getGameObj();
-                if (gRiot1 && typeof gRiot1.playerBudget === 'number' && gRiot1.playerBudget >= 50) {
+                const isRiotTraining1 = !!(gRiot1 && gRiot1.activeRouteData && (gRiot1.activeRouteData.isTraining || gRiot1.activeRouteData.emptyBus));
+                let riotPenaltySuffix1 = '';
+                if (gRiot1 && !isRiotTraining1 && typeof gRiot1.playerBudget === 'number' && gRiot1.playerBudget >= 50) {
                     gRiot1.playerBudget -= 50;
+                    gRiot1.sessionPenalties = (gRiot1.sessionPenalties || 0) + 50;
+                    riotPenaltySuffix1 = ' (-50 ₺ Şikayet Cezası)';
                     if (typeof gRiot1.saveData === 'function') gRiot1.saveData();
                     if (typeof UI !== 'undefined' && typeof UI.updatePlayerStats === 'function') {
                         UI.updatePlayerStats(gRiot1.licenseLevel, gRiot1.completedTasks, gRiot1.playerBudget, typeof gRiot1.getLicenseTitle === 'function' ? gRiot1.getLicenseTitle() : 'Kaptan');
@@ -1075,8 +1088,8 @@
                         volume: 1.0,
                         priority: 4,
                         interrupt: true,
-                        nvdaText: ((passengersOnBoard || 0) >= 2 && b2.file !== b1.file) ? (b1.label + ' ' + b2.label) : b1.label,
-                        toastText: `🔥 ${b1.label}`,
+                        nvdaText: (((passengersOnBoard || 0) >= 2 && b2.file !== b1.file) ? (b1.label + ' ' + b2.label) : b1.label) + riotPenaltySuffix1,
+                        toastText: `🔥 ${b1.label}${riotPenaltySuffix1}`,
                         toastType: 'error'
                     });
                 }, 280);
@@ -1105,8 +1118,12 @@
                     this.playClip(CLIPS.sfxUproar, { pan: 0, volume: 0.62, backgroundSfx: true });
                 }
                 const gRiot1 = this.getGameObj();
-                if (gRiot1 && typeof gRiot1.playerBudget === 'number' && gRiot1.playerBudget >= 50) {
+                const isRiotTraining2 = !!(gRiot1 && gRiot1.activeRouteData && (gRiot1.activeRouteData.isTraining || gRiot1.activeRouteData.emptyBus));
+                let riotPenaltySuffix2 = '';
+                if (gRiot1 && !isRiotTraining2 && typeof gRiot1.playerBudget === 'number' && gRiot1.playerBudget >= 50) {
                     gRiot1.playerBudget -= 50;
+                    gRiot1.sessionPenalties = (gRiot1.sessionPenalties || 0) + 50;
+                    riotPenaltySuffix2 = ' (-50 ₺ Şikayet Cezası)';
                     if (typeof gRiot1.saveData === 'function') gRiot1.saveData();
                     if (typeof UI !== 'undefined' && typeof UI.updatePlayerStats === 'function') {
                         UI.updatePlayerStats(gRiot1.licenseLevel, gRiot1.completedTasks, gRiot1.playerBudget, typeof gRiot1.getLicenseTitle === 'function' ? gRiot1.getLicenseTitle() : 'Kaptan');
@@ -1118,8 +1135,8 @@
                         volume: 1.0,
                         priority: 4,
                         interrupt: true,
-                        nvdaText: riot.label,
-                        toastText: `🚨 ${riot.label}`,
+                        nvdaText: riot.label + riotPenaltySuffix2,
+                        toastText: `🚨 ${riot.label}${riotPenaltySuffix2}`,
                         toastType: 'error'
                     });
                 }, 400);
@@ -1215,8 +1232,14 @@
             return true;
         },
 
+        getDuePassengerCount: function (upcomingStopIndex) {
+            if (!Array.isArray(this.simulatedPassengers) || this.simulatedPassengers.length === 0) return null;
+            const idx = typeof upcomingStopIndex === 'number' ? upcomingStopIndex : 0;
+            return this.simulatedPassengers.filter(ag => ag.targetStopIndex <= idx).length;
+        },
+
         // 5. CANLI KABİN YOLCU MANİFESTOSU GÜNCELLEMELİ AKILLI DURAK ETKİLEŞİMLERİ
-        onPassengerBoarded: function (pType, stopIndex, isStanding, clockMinutes) {
+        onPassengerBoarded: function (pType, stopIndex, isStanding, clockMinutes, opts) {
             if (!this.roster) this.roster = { yasli: 0, ogrenci: 0, tam: 0, standing: 0, hasKid: false };
             const roleKey = (pType === 'yasli' || pType === 'ogrenci') ? pType : 'tam';
             this.roster[roleKey] = (this.roster[roleKey] || 0) + 1;
@@ -1226,9 +1249,25 @@
             // Bireysel Simüle Yolcu Ajanı Oluştur (Gerçek 3B Koltuk Konumu, Kişilik ve İneceği Hedef Durak!)
             if (!Array.isArray(this.simulatedPassengers)) this.simulatedPassengers = [];
             const g = this.getGameObj();
-            const totalStops = (g && g.activeRouteData && Array.isArray(g.activeRouteData.stops)) ? g.activeRouteData.stops.length : ((stopIndex || 0) + 4);
+            const stopsList = (g && g.activeRouteData && Array.isArray(g.activeRouteData.stops)) ? g.activeRouteData.stops : null;
+            const totalStops = stopsList ? stopsList.length : ((stopIndex || 0) + 4);
             const minDest = Math.min(totalStops - 1, (stopIndex || 0) + 1);
-            const targetStopIndex = minDest + Math.floor(Math.random() * Math.max(1, totalStops - minDest));
+            let targetStopIndex = totalStops - 1;
+            if (stopsList) {
+                const isIntercityTrip = !!(g && g.activeRouteData && g.activeRouteData.isIntercity);
+                const validStops = [];
+                for (let sIdx = minDest; sIdx < totalStops; sIdx++) {
+                    const stObj = stopsList[sIdx];
+                    const isFinalSt = (sIdx === totalStops - 1);
+                    const isPassOnly = !isFinalSt && stObj && (stObj.isTransitPass || (stObj.inenYolcu === 0 && (isIntercityTrip || stObj.bekleyenYolcu === 0)));
+                    if (!isPassOnly) validStops.push(sIdx);
+                }
+                targetStopIndex = validStops.length > 0
+                    ? validStops[Math.floor(Math.random() * validStops.length)]
+                    : (totalStops - 1);
+            } else {
+                targetStopIndex = minDest + Math.floor(Math.random() * Math.max(1, totalStops - minDest));
+            }
             let seatPan = 0;
             if (isStanding) seatPan = Number(((Math.random() - 0.5) * 0.36).toFixed(2));
             else if (roleKey === 'yasli') seatPan = Number(((Math.random() < 0.5 ? -1 : 1) * (0.20 + Math.random() * 0.22)).toFixed(2));
@@ -1248,7 +1287,7 @@
                 stress: (this.angerLevel || 0) * 6
             });
 
-            if (!this.canSpeakInCabin()) return;
+            if ((opts && opts.silentGreeting) || !this.canSpeakInCabin()) return;
             if (stopIndex !== this.lastGreetingStopIndex) {
                 this.lastGreetingStopIndex = stopIndex;
                 this.greetingsAtCurrentStop = 0;
@@ -1659,7 +1698,11 @@
         onCaptainTeaSip: function (passengersOnBoard) {
             if (!this.canSpeakInCabin() || (passengersOnBoard || 0) <= 0) return false;
             const useRudeTea = !this.isDriverRespected();
+            const hasKidWithParent = !!(this.roster && this.roster.hasKid && (passengersOnBoard || 0) >= 2);
+            if (!useRudeTea && !hasKidWithParent) return false;
             setTimeout(() => {
+                const gCur = this.getGameObj();
+                if (gCur && (gCur.passengersOnBoard || 0) <= 0) return;
                 if (useRudeTea) {
                     this.playClip('rude_tea_scold.mp3', {
                         pan: -0.3,
@@ -1683,7 +1726,7 @@
                             }
                         }
                     });
-                } else {
+                } else if (hasKidWithParent) {
                     this.playClip('tea_smell_kid.mp3', {
                         pan: 0.25,
                         volume: 0.92,
@@ -2384,13 +2427,27 @@
 
         onAcTurnedOn: function (busTemp) {
             if (!this.canSpeakInCabin()) return;
-            if (typeof busTemp === 'number' && (busTemp >= 26 || busTemp <= 15)) {
+            const g = this.getGameObj();
+            if (!g || (g.passengersOnBoard || 0) <= 0) return;
+            if (typeof busTemp === 'number' && busTemp >= 26) {
                 setTimeout(() => {
                     this.playClip('ac_thank.mp3', {
                         pan: -0.2,
                         volume: 0.88,
-                        nvdaText: 'Yolcu: Ohh be dünya varmış, içerisi ne güzel ferahladı, çok teşekkürler!'
+                        nvdaText: 'Yolcu: Ohh be dünya varmış, içerisi ne güzel ferahladı, çok teşekkürler!',
+                        toastText: '❄️ Yolcu: "Ohh be dünya varmış, içerisi ne güzel ferahladı, çok teşekkürler!"',
+                        toastType: 'success'
                     });
+                }, 1400);
+            } else if (typeof busTemp === 'number' && busTemp <= 15) {
+                setTimeout(() => {
+                    const warmReply = 'Yolcu: Ohh şükürler olsun kalorifer açıldı, içerisi ısınmaya başladı, sağ olun kaptanım!';
+                    if (typeof UI !== 'undefined' && UI.showToast) {
+                        UI.showToast('🔥 ' + warmReply, 'success');
+                    }
+                    if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                        audio.updateNvdaLiveRegion(warmReply);
+                    }
                 }, 1400);
             }
         },
@@ -2455,14 +2512,17 @@
                 }
             }
 
-            // 10b. Aşırı hız tepkisi (92+ km/s korku, 100+ km/s veya yüksek gerginlikte agresif öfke!)
-            if ((gameObj.passengersOnBoard || 0) > 0 && gameObj.speed >= 92) {
+            // 10b. Aşırı hız tepkisi (Şehir içi 92/100 km/s, Otoyol & Şehirlerarası 116/126 km/s!)
+            const isIntercityOrHighway = !!(gameObj.activeRouteData && (gameObj.activeRouteData.isIntercity || gameObj.activeRouteData.isDistrict)) || (typeof audio !== 'undefined' && audio.currentTerrain === 'otoyol');
+            const overspeedWarnLimit = isIntercityOrHighway ? 116 : 92;
+            const overspeedRageLimit = isIntercityOrHighway ? 126 : 100;
+            if ((gameObj.passengersOnBoard || 0) > 0 && gameObj.speed >= overspeedWarnLimit) {
                 this._overspeedSecs = (this._overspeedSecs || 0) + deltaTime;
                 if (this._overspeedSecs >= 5.0 && (!this._lastOverspeedTime || (now - this._lastOverspeedTime > 32000))) {
                     this._overspeedSecs = 0;
                     this._lastOverspeedTime = now;
                     this.lastSmartRemindTime = now;
-                    const useRage = (gameObj.speed >= 100 || (this.angerLevel || 0) >= 2);
+                    const useRage = (gameObj.speed >= overspeedRageLimit || (this.angerLevel || 0) >= 2);
                     if (useRage) {
                         this.angerLevel = Math.min(8, (this.angerLevel || 0) + 1);
                         const rage = this.pickSmart(CLIPS.speedRage, { passengersOnBoard: gameObj.passengersOnBoard });
@@ -2534,8 +2594,9 @@
                 this._bickerSecs = 0;
             }
 
-            // 10c-quater. Yanlış Otobüse Binen Telaşlı Yolcu (Koridordan Koşarak Şoförün Yanına Gelme!)
-            if (!this._wrongBusDoneInRoute && (gameObj.currentStopIndex === 1 || gameObj.currentStopIndex === 2) && (gameObj.passengersOnBoard || 0) >= 3 && gameObj.speed >= 25 && (this.angerLevel || 0) <= 1) {
+            // 10c-quater. Yanlış Otobüse Binen Telaşlı Yolcu (Yalnızca şehir içi hatlarda, şehirlerarası biletli seferde olmaz!)
+            const isIntercityTripNow = !!(gameObj.activeRouteData && gameObj.activeRouteData.isIntercity);
+            if (!isIntercityTripNow && !this._wrongBusDoneInRoute && (gameObj.currentStopIndex === 1 || gameObj.currentStopIndex === 2) && (gameObj.passengersOnBoard || 0) >= 3 && gameObj.speed >= 25 && (this.angerLevel || 0) <= 1) {
                 this._wrongBusDriveSecs = (this._wrongBusDriveSecs || 0) + deltaTime;
                 if (this._wrongBusDriveSecs >= 17 && (!this.lastSmartRemindTime || (now - this.lastSmartRemindTime > 20000))) {
                     this._wrongBusDoneInRoute = true;
@@ -2607,8 +2668,11 @@
                         toastText: '📱 Görgüsüz Yolcu: "ALOOO! OTOBÜSTEYİM DİYORUM SANA, AKŞAMA HALISAHA MAÇI AYARLADIM!!"',
                         toastType: 'warning',
                         onend: () => {
-                            if (performance.now() < (this.loudPhoneActiveUntil || 0)) {
+                            const gAfterPhone = this.getGameObj();
+                            if (gAfterPhone && (gAfterPhone.passengersOnBoard || 0) >= 2 && performance.now() < (this.loudPhoneActiveUntil || 0)) {
                                 setTimeout(() => {
+                                    const gStill = this.getGameObj();
+                                    if (!gStill || (gStill.passengersOnBoard || 0) < 2 || performance.now() >= (this.loudPhoneActiveUntil || 0)) return;
                                     this.playClip('annoy_passengers_complain.mp3', {
                                         pan: 0.35,
                                         volume: 0.94,
@@ -2663,7 +2727,10 @@
                             this._goalShoutDoneInRoute = true;
                             this.playGoalRadioDrama(false);
                         } else {
-                            const slice = this.pickSmart(CLIPS.ambientSlice, { passengersOnBoard: gameObj.passengersOnBoard, clockMinutes: gameObj.clockMinutes });
+                            const ambientPool = isIntercityTripNow
+                                ? CLIPS.ambientSlice.filter(x => x.file !== 'ambient_route_ask.mp3')
+                                : CLIPS.ambientSlice;
+                            const slice = this.pickSmart(ambientPool, { passengersOnBoard: gameObj.passengersOnBoard, clockMinutes: gameObj.clockMinutes });
                             if (slice) {
                                 if (slice.file === 'ambient_route_ask.mp3') {
                                     this._centralStopWaiter = { seatPan: slice.pan || 0.30 };
@@ -3004,6 +3071,14 @@
         triggerCabinQuietAnons: function (gameObj) {
             if (!this.canSpeakInCabin()) return false;
             const now = performance.now();
+            const gChk = gameObj || this.getGameObj();
+            const hasActiveHawker = now < (this.hawkerActiveUntil || 0);
+            if (gChk && (gChk.passengersOnBoard || 0) <= 0 && !hasActiveHawker) {
+                const emptyMsg = "Otobüste şu an yolcu bulunmuyor kaptanım; kabin düzen anonsuna gerek yok.";
+                if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(emptyMsg);
+                if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast("🎙️ " + emptyMsg, "info");
+                return false;
+            }
             if (this._lastQuietAnonsTime && (now - this._lastQuietAnonsTime < 9000)) return false;
             this._lastQuietAnonsTime = now;
 
@@ -3100,33 +3175,39 @@
         evaluateInspectorAtFinalStop: function (gameObj) {
             if (!this.canSpeakInCabin() || !gameObj || !this.inspector || this.inspector.evaluated) return false;
             if (gameObj.activeRouteData && (gameObj.activeRouteData.isTraining || gameObj.activeRouteData.emptyBus)) return false;
+            if ((gameObj.totalPassengersBoardedInRoute || 0) <= 0) return false;
             this.inspector.evaluated = true;
 
+            const isIntercityInsp = !!(gameObj.activeRouteData && gameObj.activeRouteData.isIntercity);
+            const inspTitle = isIntercityInsp ? 'Sivil Bakanlık Ulaşım Müfettişi' : 'Sivil Belediye Müfettişi';
             const inf = this.inspector;
             let file = 'insp_warn.mp3';
-            let toast = '🕵️ [Sivil Belediye Müfettişi]: "Birkaç noktada sarsıntı kaydettim; bu seferlik ceza yazmıyorum, daha özenli sürün."';
+            let toast = `🕵️ [${inspTitle}]: "Birkaç noktada sarsıntı kaydettim; bu seferlik ceza yazmıyorum, daha özenli sürün."`;
             let tType = 'info';
 
             if (inf.crashes === 0 && inf.redLights === 0 && inf.roughCount <= 1) {
                 file = 'insp_perfect.mp3';
-                toast = '🕵️ [Sivil Müfettiş Ödülü]: "Kusursuz sürüş ve nezaket! +150 ₺ Üstün Hizmet İkramiyesi & +60 XP!"';
+                toast = `🕵️ [${inspTitle} Ödülü]: "Kusursuz sürüş ve nezaket! +150 ₺ Üstün Hizmet İkramiyesi & +60 XP!"`;
                 tType = 'success';
                 this.adjustCityReputation(18);
                 if (typeof gameObj.addMoney === 'function') gameObj.addMoney(150);
                 if (typeof gameObj.addXP === 'function') gameObj.addXP(60);
             } else if (inf.crashes > 0 || inf.redLights > 0 || inf.roughCount >= 4) {
                 file = 'insp_fail.mp3';
-                toast = '🕵️ [Sivil Müfettiş Cezası]: "Bütün ihlallerinizi kaydettim! -120 ₺ Ağır Disiplin Tutanağı!"';
+                toast = `🕵️ [${inspTitle} Cezası]: "Bütün ihlallerinizi kaydettim! -120 ₺ Ağır Disiplin Tutanağı!"`;
                 tType = 'error';
                 this.adjustCityReputation(-15);
-                if (typeof gameObj.money === 'number') {
-                    gameObj.money = Math.max(0, gameObj.money - 120);
-                    const moneyEl = document.getElementById('hud-money');
-                    if (moneyEl) moneyEl.innerText = `${Math.floor(gameObj.money)} ₺`;
+                if (typeof gameObj.playerBudget === 'number') {
+                    gameObj.playerBudget = Math.max(0, gameObj.playerBudget - 120);
+                    gameObj.sessionPenalties = (gameObj.sessionPenalties || 0) + 120;
+                    if (typeof gameObj.saveData === 'function') gameObj.saveData();
+                    if (typeof UI !== 'undefined' && typeof UI.updatePlayerStats === 'function') {
+                        UI.updatePlayerStats(gameObj.licenseLevel, gameObj.completedTasks, gameObj.playerBudget, typeof gameObj.getLicenseTitle === 'function' ? gameObj.getLicenseTitle() : 'Kaptan');
+                    }
                 }
             }
 
-            setTimeout(() => {
+            const inspTimer = setTimeout(() => {
                 if (gameObj.isDriving) return;
                 this.playClip(file, {
                     pan: 0.20,
@@ -3137,7 +3218,9 @@
                     toastText: toast,
                     toastType: tType
                 });
-            }, 4600);
+            }, 1900);
+            if (!this._stuntTimers) this._stuntTimers = [];
+            this._stuntTimers.push(inspTimer);
             return true;
         },
 
@@ -3288,6 +3371,8 @@
                 : 2900;
 
             const t1 = setTimeout(() => {
+                const gT1 = this.getGameObj();
+                if (!force && (!gT1 || (gT1.passengersOnBoard || 0) < 3 || gT1.isACOn)) return;
                 const h2 = this.playClip('trio_2_hot.mp3', {
                     pan: 0.60,
                     volume: 0.97,
@@ -3300,6 +3385,8 @@
                     ? Math.max(1500, Math.round(h2.duration() * 1000) - 360)
                     : 3100;
                 const t2 = setTimeout(() => {
+                    const gT2 = this.getGameObj();
+                    if (!force && (!gT2 || (gT2.passengersOnBoard || 0) < 3 || gT2.isACOn)) return;
                     this.playClip('trio_3_shutup.mp3', {
                         pan: -0.05,
                         volume: 1.0,
@@ -3380,6 +3467,8 @@
         triggerStopHawker: function (stopIndex, force = false) {
             if (!this.canSpeakInCabin(force)) return false;
             if (!force) {
+                const gH = this.getGameObj();
+                if (gH && gH.activeRouteData && gH.activeRouteData.isIntercity) return false;
                 if (this._hawkerTriggeredInRoute || (stopIndex || 0) < 1) return false;
                 if (Math.random() > 0.24) return false;
                 this._hawkerTriggeredInRoute = true;
@@ -3427,8 +3516,11 @@
                 toastText: `🤣📱 ${label}`,
                 toastType: 'warning',
                 onend: () => {
-                    if (force || performance.now() < (this.wheezeLaughActiveUntil || 0)) {
+                    const gAfterLaugh = this.getGameObj();
+                    if (force || (gAfterLaugh && (gAfterLaugh.passengersOnBoard || 0) >= 2 && performance.now() < (this.wheezeLaughActiveUntil || 0))) {
                         const t = setTimeout(() => {
+                            const gStillLaugh = this.getGameObj();
+                            if (!force && (!gStillLaugh || (gStillLaugh.passengersOnBoard || 0) < 2 || performance.now() >= (this.wheezeLaughActiveUntil || 0))) return;
                             this.playClip('wheeze_laugh_scold_f1.mp3', {
                                 pan: -pan,
                                 volume: 0.95,
@@ -3563,12 +3655,12 @@
             const r = this.roster || { yasli: 0, ogrenci: 0, tam: 0, standing: 0 };
             const rep = this.getCityReputation();
             const repTitle = rep >= 45
-                ? `Şehir Efsanesi Usta (+${rep})`
+                ? `Şehir Efsanesi Baş Kaptan (+${rep})`
                 : (rep >= 18
-                    ? `Sevilen Şoför (+${rep})`
+                    ? `Sevilen Kaptan (+${rep})`
                     : (rep <= -35
-                        ? `Sabıkalı Hırçın Şoför (${rep})`
-                        : (rep <= -12 ? `Şikayet Edilen Şoför (${rep})` : `Standart Şoför (${rep})`)));
+                        ? `Sabıkalı Hırçın Kaptan (${rep})`
+                        : (rep <= -12 ? `Şikayet Edilen Kaptan (${rep})` : `Standart Kaptan (${rep})`)));
 
             const anger = this.angerLevel || 0;
             const moodText = total === 0
@@ -3580,9 +3672,14 @@
                         : (anger <= 4 ? 'Kabin oldukça gergin!' : 'Yolcular isyan eşiğinde!')));
 
             const curIdx = g ? (g.currentStopIndex || 0) : 0;
-            const dueCount = Array.isArray(this.simulatedPassengers)
-                ? this.simulatedPassengers.filter(ag => ag.targetStopIndex <= curIdx).length
-                : 0;
+            const upcomingIdx = (g && !g.isDriving) ? (curIdx + 1) : curIdx;
+            const totalStopsLen = (g && g.activeRouteData && Array.isArray(g.activeRouteData.stops)) ? g.activeRouteData.stops.length : (upcomingIdx + 1);
+            const isNextFinal = upcomingIdx >= (totalStopsLen - 1);
+            const dueCount = isNextFinal
+                ? total
+                : (Array.isArray(this.simulatedPassengers) && this.simulatedPassengers.length > 0
+                    ? this.simulatedPassengers.filter(ag => ag.targetStopIndex <= upcomingIdx).length
+                    : Math.min(total, Math.max(0, Math.round(total / (Math.max(1, totalStopsLen - upcomingIdx - 1) + 1)))));
             const allies = this.allyPoints || 0;
 
             const report = total === 0

@@ -288,10 +288,25 @@ const UI = {
             console.warn("Harita ekranı 10 seviye geçilmeden açılamaz.");
             screenId = 'title-screen';
         }
-        // Eğer menü ekranına geçiliyorsa açık kalan sesli konuşmaları anında sustur
+        // Eğer menü veya sonuç ekranına geçiliyorsa açık kalan sesli konuşmaları ve durak/yolcu zamanlayıcılarını anında temizle
         if (screenId !== 'driving-screen' && screenId !== 'stop-screen') {
-            if (typeof audio !== 'undefined' && audio.stopSpeech) {
-                audio.stopSpeech();
+            if (typeof Game !== 'undefined' && typeof Game.cleanupPassengerTimersAndState === 'function') {
+                Game.cleanupPassengerTimersAndState();
+            }
+            if (typeof window !== 'undefined' && window.HumanNpcVoices) {
+                if (screenId === 'results-screen' && typeof window.HumanNpcVoices.stopTimersOnly === 'function') {
+                    window.HumanNpcVoices.stopTimersOnly();
+                } else if (typeof window.HumanNpcVoices.stopAll === 'function') {
+                    window.HumanNpcVoices.stopAll();
+                }
+            }
+            if (typeof audio !== 'undefined') {
+                if (audio.stopSpeech) audio.stopSpeech();
+                if (typeof audio.updateCrowdAmbience === 'function') audio.updateCrowdAmbience(0, false, false);
+                if (typeof audio.updatePassengerCabinMurmur === 'function') audio.updatePassengerCabinMurmur(0, false);
+            }
+            if (typeof RoleplaySystem !== 'undefined' && typeof RoleplaySystem.stopPassengerMurmurIfNeeded === 'function') {
+                RoleplaySystem.stopPassengerMurmurIfNeeded();
             }
         }
         document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));

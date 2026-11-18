@@ -1297,9 +1297,13 @@ class AudioSystem {
             }
         }, wheelbaseDelay);
 
-        // 3. Sert geçişte yolcu sarsılma iniltisi
-        if (isFast && typeof this.playPassengerShock === 'function') {
-            setTimeout(() => { this.playPassengerShock(); }, wheelbaseDelay + 80);
+        // 3. Sert geçişte yolcu sarsılma iniltisi (yalnızca araçta yolcu varken)
+        if (isFast && typeof this.playPassengerShock === 'function' && (typeof Game === 'undefined' || (Game.passengersOnBoard || 0) > 0)) {
+            setTimeout(() => {
+                if (typeof Game === 'undefined' || (Game.passengersOnBoard || 0) > 0) {
+                    this.playPassengerShock();
+                }
+            }, wheelbaseDelay + 80);
         }
     }
 

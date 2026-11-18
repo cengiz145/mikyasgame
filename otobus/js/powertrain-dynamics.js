@@ -126,14 +126,26 @@
                 this._lastPassCount = passCount;
             }
 
-            // Uzun yol otobüslerinde seyir halindeyken muavinin çay/kek servisi yapması (her 4-5 dakikada bir doğal yaşam)
-            if (isCoach && game.isDriving && game.speed > 55 && passCount >= 8) {
+            // Uzun yol otobüslerinde seyir halindeyken muavinin çay/kek servisi yapması (manuel I ikramıyla senkronize, her 4-5 dakikada bir doğal yaşam)
+            const isTrainingTrip = !!(game.activeRouteData && (game.activeRouteData.isTraining || game.activeRouteData.emptyBus));
+            if (isCoach && !isTrainingTrip && game.isDriving && game.speed > 55 && passCount >= 8 && !doorsOpen) {
                 const nowMs = Date.now();
                 if (!this._lastRefreshmentTime) this._lastRefreshmentTime = nowMs;
-                if (nowMs - this._lastRefreshmentTime > 260000) {
+                const lastAnyCatering = Math.max(this._lastRefreshmentTime, game.lastCateringTime || 0);
+                if (nowMs - lastAnyCatering > 260000) {
                     this._lastRefreshmentTime = nowMs;
+                    game.lastCateringTime = nowMs;
                     if (typeof audio !== 'undefined' && typeof audio.playFullRefreshmentService === 'function') {
                         audio.playFullRefreshmentService();
+                    }
+                    if (typeof game.passengerComfort === 'number') {
+                        game.passengerComfort = Math.min(100, game.passengerComfort + 3);
+                    }
+                    if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.boostSatisfaction === 'function') {
+                        CompanySystem.boostSatisfaction(0.05);
+                    }
+                    if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
+                        UI.showToast("☕ Muavin yolculara otomatik çay ve kek ikramı yaptı (+3 Konfor)", "info");
                     }
                 }
             }

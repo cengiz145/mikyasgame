@@ -561,6 +561,35 @@
 
         // 30 Dk Yolcu İhtiyaç Molası Başlat & Muavin Anonsu
         startPassengerBreak: function () {
+            if (typeof Game !== 'undefined') {
+                if (Game.isDriving && Game.speed > 3) {
+                    const moveWarn = "Güvenlik: Otobüs hareket halindeyken yolcu ihtiyaç molası verilemez! Önce aracı güvenli biçimde durdurunuz.";
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛑 " + moveWarn, "warning");
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(moveWarn);
+                    return;
+                }
+                if ((Game.passengersOnBoard || 0) <= 0) {
+                    const emptyWarn = "Otobüste şu an yolcu bulunmuyor. İhtiyaç molası yalnızca yolculu seferlerde verilebilir.";
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("👥 " + emptyWarn, "info");
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(emptyWarn);
+                    return;
+                }
+                if (this.isBreakActive) {
+                    const activeWarn = "Yolcu ihtiyaç molası zaten devam ediyor.";
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⏳ " + activeWarn, "info");
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(activeWarn);
+                    return;
+                }
+                const stopKey = `${Game.activeRouteId || 'route'}_${Game.currentStopIndex || 0}`;
+                if (this._lastBreakStopKey === stopKey) {
+                    const repeatWarn = "Bu etapta yolcular zaten mola yaptı. Bir sonraki durak veya etapta tekrar mola verebilirsiniz.";
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("☕ " + repeatWarn, "info");
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(repeatWarn);
+                    return;
+                }
+                this._lastBreakStopKey = stopKey;
+            }
+
             const fac = this.facilities[this.currentFacilityIndex] || this.facilities[0];
             this.isBreakActive = true;
             this.data.visitedFacilitiesCount++;
@@ -583,6 +612,10 @@
             }
             this.saveData();
 
+            const companyLabel = (typeof CompanySystem !== 'undefined' && CompanySystem.data && CompanySystem.data.companyName)
+                ? CompanySystem.data.companyName
+                : ((typeof Game !== 'undefined' && Game.currentCity) ? `${Game.currentCity} Seyahat` : 'Şehirlerarası Otobüs');
+
             // Klasik Efsane Muavin Anonsu
             const muavinText = `Sayın yolcularımız, ${fac.name}'ne varmış bulunmaktayız. Kaptanımız 30 dakika ihtiyaç molası vermiştir. Lütfen peron numaranızı ve araç plakanızı unutmayınız. Hayırlı dinlenmeler dileriz.`;
             
@@ -598,7 +631,7 @@
             // 12 saniye sonra kalkış anonsunu hazırla
             if (this.breakTimer) clearTimeout(this.breakTimer);
             this.breakTimer = setTimeout(() => {
-                const departAnnounce = `Tekirdağ Seyahat yolcuları, ihtiyaç molanız sona ermiştir. Aracınız hareket etmek üzeredir, lütfen yerlerinizi alınız!`;
+                const departAnnounce = `${companyLabel} yolcuları, ihtiyaç molanız sona ermiştir. Aracınız hareket etmek üzeredir, lütfen yerlerinizi alınız!`;
                 if (typeof UI !== 'undefined' && UI.showToast) {
                     UI.showToast("🔔 [Peron Anonsu] Otobüs hareket etmek üzere! Lütfen yerlerinizi alınız.", "info");
                 }

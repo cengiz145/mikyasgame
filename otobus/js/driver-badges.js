@@ -1316,12 +1316,12 @@ const DriverBadges = {
             lifetime.totalTrips = (lifetime.totalTrips || 0) + 1;
         }
 
-        // 2. Taşınan Yolcular: Gerçek sefer verisi ve alighting sonrası sıfırlanma bugı onarıldı
+        // 2. Taşınan Yolcular: Gerçek sefer verisi (boş seferlerde hayali 15 yolcu eklenmez)
         const carried = (typeof stats.passengersCarried === 'number')
-            ? stats.passengersCarried
-            : ((typeof Game !== 'undefined' && typeof Game.totalPassengersBoardedInRoute === 'number' && Game.totalPassengersBoardedInRoute > 0)
-                ? Game.totalPassengersBoardedInRoute
-                : ((typeof Game !== 'undefined' && typeof Game.passengersOnBoard === 'number' && Game.passengersOnBoard > 0) ? Game.passengersOnBoard : 15));
+            ? Math.max(0, stats.passengersCarried)
+            : ((typeof Game !== 'undefined' && typeof Game.totalPassengersBoardedInRoute === 'number')
+                ? Math.max(0, Game.totalPassengersBoardedInRoute)
+                : ((typeof Game !== 'undefined' && typeof Game.passengersOnBoard === 'number') ? Math.max(0, Game.passengersOnBoard) : 0));
         lifetime.totalPassengers += carried;
         
         const xpEarned = (typeof stats.earnedXP === 'number') ? stats.earnedXP : 150;

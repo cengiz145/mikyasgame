@@ -14,34 +14,45 @@ const StopDiscovery = {
         "Velimeşe": []
     },
 
+    escapeHtml: function (str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    },
+
     initKnownStops: function () {
         if (typeof SuleymanpasaNavigasyon !== 'undefined') {
             if (Array.isArray(SuleymanpasaNavigasyon.sokaklar)) {
-                this.knownStops["Süleymanpaşa"] = SuleymanpasaNavigasyon.sokaklar.map(s => s.name);
+                this.knownStops["Süleymanpaşa"] = Array.from(new Set(SuleymanpasaNavigasyon.sokaklar.filter(s => s && s.name).map(s => String(s.name).trim())));
             } else if (SuleymanpasaNavigasyon.veritabani && SuleymanpasaNavigasyon.veritabani.mahalleler) {
                 const spSet = new Set();
                 Object.values(SuleymanpasaNavigasyon.veritabani.mahalleler).forEach(m => {
                     if (m && Array.isArray(m.sokaklar)) {
-                        m.sokaklar.forEach(s => { if (s && s.name) spSet.add(s.name.trim()); });
+                        m.sokaklar.forEach(s => { if (s && s.name) spSet.add(String(s.name).trim()); });
                     }
                 });
                 this.knownStops["Süleymanpaşa"] = Array.from(spSet);
             }
         }
         if (typeof SarayNavigasyon !== 'undefined' && Array.isArray(SarayNavigasyon.sokaklar)) {
-            this.knownStops["Saray"] = SarayNavigasyon.sokaklar.map(s => s.name.trim());
+            this.knownStops["Saray"] = Array.from(new Set(SarayNavigasyon.sokaklar.filter(s => s && s.name).map(s => String(s.name).trim())));
         }
         if (typeof VelimeseNavigasyon !== 'undefined' && Array.isArray(VelimeseNavigasyon.sokaklar)) {
-            this.knownStops["Velimeşe"] = VelimeseNavigasyon.sokaklar.map(s => s.name.trim());
+            this.knownStops["Velimeşe"] = Array.from(new Set(VelimeseNavigasyon.sokaklar.filter(s => s && s.name).map(s => String(s.name).trim())));
         }
 
         // Keşfedilen duraklardan (TEKULAŞ / Kariyer hatları dahil) ilgili ilçede olanları listeye dahil et
         const discovered = this.getDiscoveredData();
         Object.values(discovered).forEach(d => {
             if (d && d.district && d.name) {
-                if (!this.knownStops[d.district]) this.knownStops[d.district] = [];
-                if (!this.knownStops[d.district].includes(d.name)) {
-                    this.knownStops[d.district].push(d.name);
+                const cleanDist = String(d.district).trim();
+                const cleanStop = String(d.name).trim();
+                if (!this.knownStops[cleanDist]) this.knownStops[cleanDist] = [];
+                if (!this.knownStops[cleanDist].includes(cleanStop)) {
+                    this.knownStops[cleanDist].push(cleanStop);
                 }
             }
         });
@@ -93,23 +104,25 @@ const StopDiscovery = {
             const districtDiscoveredCount = Object.values(data).filter(d => d.district === activeDist).length;
             const totalCount = districtKnown.length > 0 ? districtKnown.length : 25;
 
-            // Sesli kutlama ve anons
+            const isEmptyTraining = !!(typeof Game !== 'undefined' && (Game.isTrainingRoute || (Game.activeRouteData && (Game.activeRouteData.isTraining || Game.activeRouteData.emptyBus))));
+
+            // Sesli kutlama ve anons (Durak varış anonsunu kesmemek için ekran okuyucu canlı bölgesi ve görsel bildirim öncelikli)
             if (typeof audio !== 'undefined' && audio.playSuccess) {
                 try { audio.playSuccess(); } catch (e) { }
             }
 
-            const speechText = `Yeni durak keşfedildi: ${cleanName}! ${activeDist} keşfi: ${districtDiscoveredCount} de ${totalCount}.`;
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak(speechText);
+            const speechText = `Yeni durak keşfedildi: ${cleanName}! ${activeDist} keşfi: ${districtDiscoveredCount} / ${totalCount}.`;
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                audio.updateNvdaLiveRegion(speechText);
             }
 
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast(`✨ YENİ DURAK KEŞFEDİLDİ: ${cleanName} (${districtDiscoveredCount}/${totalCount})`, "success");
             }
 
-            // Keşif Primi (+50 ₺ ve +25 XP tecrübe)
+            // Keşif Primi (+50 ₺ ve +25 XP tecrübe; boş eğitim seferlerinde nakit verilmez)
             if (typeof Game !== 'undefined') {
-                if (Game.addMoney) Game.addMoney(50, true);
+                if (!isEmptyTraining && Game.addMoney) Game.addMoney(50, true);
                 if (Game.addXP) Game.addXP(25, "Yeni Durak Keşfi");
             }
 
@@ -215,9 +228,10 @@ const StopDiscovery = {
                 li.setAttribute('tabindex', '0');
                 li.setAttribute('aria-label', ariaTxt);
 
+                const safeStopHtml = this.escapeHtml(stopName);
                 li.innerHTML = isDisc ? `
                     <div>
-                        <div style="font-weight: bold; color: #22c55e; font-size: 1.05rem;">✅ ${stopName}</div>
+                        <div style="font-weight: bold; color: #22c55e; font-size: 1.05rem;">✅ ${safeStopHtml}</div>
                         <div style="font-size: 0.85rem; color: #cbd5e1; margin-top: 3px;">🏆 ${info.visitCount || 1} kez sefer yapıldı • Hafızaya kaydedildi</div>
                     </div>
                     <span style="font-size: 0.9rem; color: #facc15; font-weight: bold;">+50 ₺ Alındı</span>
@@ -252,6 +266,9 @@ const StopDiscovery = {
     },
 
     init: function () {
+        if (this._initialized) return;
+        this._initialized = true;
+
         const btnOpen = document.getElementById('btn-open-stop-collection');
         if (btnOpen) {
             btnOpen.addEventListener('click', () => {
@@ -275,11 +292,19 @@ const StopDiscovery = {
         const tabVelimese = document.getElementById('tab-collect-velimese');
         if (tabVelimese) tabVelimese.addEventListener('click', () => this.renderModal('Velimeşe'));
 
-        // Klavye kısayolu: [K] tuşu ile albümü açma
+        // Klavye kısayolu: [K] tuşu ile albümü açma (Metin kutularında yazı yazarken veya başka bir modal açıkken devreye girmez!)
         window.addEventListener('keydown', (e) => {
+            const targetTag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
+            if (targetTag === 'INPUT' || targetTag === 'TEXTAREA' || targetTag === 'SELECT' || (e.target && e.target.isContentEditable)) {
+                return;
+            }
+            if (e.ctrlKey || e.altKey || e.metaKey) return;
+
             if (e.key === 'k' || e.key === 'K') {
                 const titleScreen = document.getElementById('title-screen');
                 if (titleScreen && !titleScreen.classList.contains('hidden')) {
+                    const anyOpenModal = document.querySelector('.modal:not(.hidden), .modal-overlay:not(.hidden)');
+                    if (anyOpenModal) return;
                     const modal = document.getElementById('stop-collection-modal');
                     if (modal && modal.classList.contains('hidden')) {
                         const activeDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : "Süleymanpaşa";

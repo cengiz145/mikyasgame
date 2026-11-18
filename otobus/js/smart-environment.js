@@ -47,13 +47,18 @@
         kasisWarned: false,
         foghornTimer: null,
 
+        normTr: function(str) {
+            if (!str) return "";
+            return String(str).replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase();
+        },
+
         /**
          * İl, ilçe veya durak adına göre ortam türünü belirler
          */
         detectEnvironment: function(cityName, districtName = "", stopName = "") {
             const city = cityName || "Tekirdağ";
-            const dist = (districtName || "").toLowerCase();
-            const stop = (stopName || "").toLowerCase();
+            const dist = this.normTr(districtName);
+            const stop = this.normTr(stopName);
 
             // 1. Dağlık kontrolü
             if (REGIONAL_ENVIRONMENTS.mountainAreas.some(m => dist.includes(m) || stop.includes(m))) {
@@ -81,12 +86,12 @@
          * İlçe ve durağa göre yol zemin türünü belirler
          */
         detectRoadSurface: function(districtName = "", stopName = "", routeName = "") {
-            const d = (districtName || "").toLowerCase();
-            const s = (stopName || "").toLowerCase();
-            const r = (routeName || "").toLowerCase();
+            const d = this.normTr(districtName);
+            const s = this.normTr(stopName);
+            const r = this.normTr(routeName);
 
             // Köy, yayla ve orman yolları -> Stabilize / Çakıl
-            if (s.includes("köy") || s.includes("yayla") || s.includes("orman") || d.includes("uçmakdere") || s.includes("tarla")) {
+            if (s.includes("köy") || s.includes("yayla") || s.includes("orman") || d.includes("uçmakdere") || s.includes("tarla") || r.includes("köy")) {
                 return "stabilize";
             }
 
@@ -97,6 +102,21 @@
 
             // Ana caddeler, bulvarlar, çevre yolları ve otoyollar -> Asfalt
             return "asfalt";
+        },
+
+        stopAllAmbience: function() {
+            if (this.foghornTimer) {
+                clearInterval(this.foghornTimer);
+                this.foghornTimer = null;
+            }
+            if (typeof audio !== 'undefined' && audio.sounds) {
+                if (audio.sounds.beachShore && audio.sounds.beachShore.playing()) {
+                    audio.sounds.beachShore.pause();
+                }
+                if (audio.sounds.roadGravelAsphalt && audio.sounds.roadGravelAsphalt.playing()) {
+                    audio.sounds.roadGravelAsphalt.pause();
+                }
+            }
         },
 
         /**
@@ -127,13 +147,21 @@
                 }
             }
 
-            // 2. Sahildeyken Periyodik Uzak Sis Düdüğü (freesound_distant_foghorn.mp3)
+            // 2. Sahildeyken Periyodik Uzak Sis Düdüğü (Canlı cam/kapı ve aktif oyun ekranı kontrolüyle!)
             if (isCoast && !this.foghornTimer) {
                 this.foghornTimer = setInterval(() => {
+                    const drvScreen = (typeof document !== 'undefined') ? document.getElementById('driving-screen') : null;
+                    const stpScreen = (typeof document !== 'undefined') ? document.getElementById('stop-screen') : null;
+                    const inGameplay = (drvScreen && !drvScreen.classList.contains('hidden')) || (stpScreen && !stpScreen.classList.contains('hidden'));
+                    if (!inGameplay) {
+                        this.stopAllAmbience();
+                        return;
+                    }
                     if (this.currentEnv === 'coast' && Math.random() < 0.35 && audio.sounds && audio.sounds.distantFoghorn) {
                         try {
+                            const liveOpen = Boolean((typeof audio.isWindowOpen === 'boolean' && audio.isWindowOpen) || (typeof Game !== 'undefined' && (Game.frontDoorOpen || Game.rearDoorOpen)));
                             const id = audio.sounds.distantFoghorn.play();
-                            audio.sounds.distantFoghorn.volume(isOpen ? 0.75 : 0.35, id);
+                            audio.sounds.distantFoghorn.volume(liveOpen ? 0.75 : 0.35, id);
                         } catch(e) {}
                     }
                 }, 45000);
@@ -154,15 +182,21 @@
             const boost = isOpen ? 0.15 : 0;
 
             // Parke Taşı Tıkırtısı (freesound_road_joints_tikir.mp3 veya roadJointHit)
-            if (surfaceType === 'parke_tas' && speed > 15) {
+            if ((surfaceType === 'parke_tas' || surfaceType === 'stabilize') && speed > 15) {
                 if (audio.sounds.roadGravelAsphalt) {
                     const vol = Math.min(0.60, (speed / 70) * 0.45 + boost);
                     if (!audio.sounds.roadGravelAsphalt.playing()) audio.sounds.roadGravelAsphalt.play();
                     audio.sounds.roadGravelAsphalt.volume(vol);
                 }
             } else {
-                if (audio.sounds.roadGravelAsphalt && audio.sounds.roadGravelAsphalt.playing() && surfaceType !== 'stabilize') {
+                if (audio.sounds.roadGravelAsphalt && audio.sounds.roadGravelAsphalt.playing()) {
                     audio.sounds.roadGravelAsphalt.fade(audio.sounds.roadGravelAsphalt.volume(), 0, 500);
+                    setTimeout(() => {
+                        const curSpd = (typeof Game !== 'undefined' && typeof Game.speed === 'number') ? Game.speed : 0;
+                        if (audio.sounds && audio.sounds.roadGravelAsphalt && (curSpd <= 15 || (this.currentSurface !== 'parke_tas' && this.currentSurface !== 'stabilize'))) {
+                            audio.sounds.roadGravelAsphalt.pause();
+                        }
+                    }, 520);
                 }
             }
         },
@@ -204,6 +238,7 @@
                 audio.playSpeedBump(speed);
             }
 
+            const hasPassengers = !!(gameInstance && (gameInstance.passengersOnBoard || 0) > 0);
             // Hız Analizi ve Yolcu / Araç Tepkisi
             if (speed <= 25) {
                 // Mükemmel Yumuşak Geçiş
@@ -216,25 +251,27 @@
                 }
             } else if (speed <= 40) {
                 // Sert Geçiş: Yolcu Sarsıntısı
-                if (gameInstance) {
+                if (gameInstance && hasPassengers) {
                     gameInstance.passengerComfort = Math.max(20, (gameInstance.passengerComfort || 90) - 8);
                 }
-                if (typeof audio !== 'undefined' && typeof audio.playPassengerShock === 'function') {
+                if (hasPassengers && typeof audio !== 'undefined' && typeof audio.playPassengerShock === 'function') {
                     audio.playPassengerShock();
                 }
                 if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
-                    UI.showToast("⚠️ Sert Kasis Geçişi (-8 Konfor)", "warning");
+                    UI.showToast(hasPassengers ? "⚠️ Sert Kasis Geçişi (-8 Konfor)" : "⚠️ Sert Kasis Geçişi", "warning");
                 }
             } else {
                 // Aşırı Hızlı Geçiş: Egzoz ve Alt Sürtmesi Hasarı
                 if (gameInstance) {
-                    gameInstance.passengerComfort = Math.max(10, (gameInstance.passengerComfort || 90) - 20);
+                    if (hasPassengers) {
+                        gameInstance.passengerComfort = Math.max(10, (gameInstance.passengerComfort || 90) - 20);
+                    }
                     if (gameInstance.busDamage) {
                         gameInstance.busDamage.exhaust = Math.min(100, (gameInstance.busDamage.exhaust || 0) + 15);
                         gameInstance.busDamage.health = Math.max(10, (gameInstance.busDamage.health || 100) - 8);
                     }
                 }
-                if (typeof audio !== 'undefined' && typeof audio.playPassengerGroan === 'function') {
+                if (hasPassengers && typeof audio !== 'undefined' && typeof audio.playPassengerGroan === 'function') {
                     audio.playPassengerGroan();
                 }
                 const dmgMsg = "Kasise aşırı hızlı girdiniz! Alt takımı çok sert vurdunuz, egzoz hasar aldı.";
@@ -242,7 +279,7 @@
                     audio.speak(dmgMsg);
                 }
                 if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
-                    UI.showToast("🛑 ALT VURUNTUSU! Egzoz Hasar Aldı (-20 Konfor)", "error");
+                    UI.showToast(hasPassengers ? "🛑 ALT VURUNTUSU! Egzoz Hasar Aldı (-20 Konfor)" : "🛑 ALT VURUNTUSU! Egzoz Hasar Aldı", "error");
                 }
             }
         },
@@ -255,8 +292,16 @@
             const dist = (game && game.activeDistrict) || "";
             const locStr = dist ? `${city} / ${dist}` : city;
 
+            const blackSeaCities = ["Trabzon", "Samsun", "Sinop", "Giresun", "Rize", "Ordu", "Zonguldak", "Bartın", "Artvin", "Kastamonu", "Düzce"];
+            const aegeanCities = ["İzmir", "Aydın", "Muğla"];
+            const medCities = ["Antalya", "Mersin", "Adana", "Hatay"];
+            let coastSeaName = "Marmara";
+            if (blackSeaCities.includes(city)) coastSeaName = "Karadeniz";
+            else if (aegeanCities.includes(city)) coastSeaName = "Ege";
+            else if (medCities.includes(city)) coastSeaName = "Akdeniz";
+
             let envDesc = "Şehir içi yerleşim bölgesi";
-            if (this.currentEnv === "coast") envDesc = "Marmara kıyı şeridi (Liman ve deniz dalga akustiği aktif)";
+            if (this.currentEnv === "coast") envDesc = `${coastSeaName} kıyı şeridi (Liman ve deniz dalga akustiği aktif)`;
             else if (this.currentEnv === "industry") envDesc = "Sanayi ve üretim koridoru (Fabrika ve demiryolu yankısı)";
             else if (this.currentEnv === "mountain") envDesc = "Dağ ve vadi geçidi (Rüzgar uğultusu)";
 

@@ -41,11 +41,16 @@ const MapEngine = {
     // İndeks Tabanlı Durak Kontrolü (Index-Based Lookup - O(1))
     // busPosition: Otobüsün kümülatif katettiği metre
     checkNextStop: function(busPosition) {
-        if (!this.activeRoute || !this.activeRoute.stops) return null;
+        if (!this.activeRoute || !Array.isArray(this.activeRoute.stops) || this.activeRoute.stops.length === 0) return null;
         if (this.currentStopIndex >= this.activeRoute.stops.length) return { finished: true };
 
+        const safeBusPos = (typeof busPosition === 'number' && !isNaN(busPosition)) ? busPosition : 0;
         const targetStop = this.activeRoute.stops[this.currentStopIndex];
-        const distance = targetStop.pos - busPosition;
+        if (!targetStop) return { finished: true };
+        const targetPos = (typeof targetStop.pos === 'number' && !isNaN(targetStop.pos))
+            ? targetStop.pos
+            : ((this.currentStopIndex + 1) * 850);
+        const distance = targetPos - safeBusPos;
 
         // Durağa 100 metre kala bip-bip sinyali ver (Sadece 1 kez)
         if (distance <= 100 && distance > 15 && !this.approachBeepPlayed) {
@@ -59,7 +64,8 @@ const MapEngine = {
 
         // Durağa gelindi
         if (distance <= 0) {
-            this.announceStop(targetStop.name);
+            const isFinal = (this.currentStopIndex + 1 >= this.activeRoute.stops.length);
+            this.announceStop(targetStop.name, isFinal);
             this.approachBeepPlayed = false;
             this.currentStopIndex++;
             
@@ -67,7 +73,7 @@ const MapEngine = {
                 arrived: true,
                 stop: targetStop,
                 nextIndex: this.currentStopIndex,
-                isFinal: (this.currentStopIndex >= this.activeRoute.stops.length)
+                isFinal: isFinal
             };
         }
 
@@ -80,9 +86,12 @@ const MapEngine = {
 
     // Web Audio Synthesized Bip Sinyali (0 KB RAM, dosya yükleme yok)
     playApproachingBeep: function() {
-        if (typeof audio !== 'undefined' && audio.ctx) {
+        if (typeof audio !== 'undefined' && audio.ctx && !audio.isMuted) {
             try {
                 const ctx = audio.ctx;
+                if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+                    ctx.resume().catch(() => {});
+                }
                 const now = ctx.currentTime;
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
@@ -94,19 +103,23 @@ const MapEngine = {
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
                 osc.connect(gain);
-                gain.connect(ctx.destination);
+                gain.connect(audio.masterGain || ctx.destination);
+                osc.onended = () => {
+                    try { osc.disconnect(); gain.disconnect(); } catch (e) {}
+                };
                 osc.start(now);
-                osc.stop(now + 0.12);
+                osc.stop(now + 0.13);
             } catch (e) {}
         }
     },
 
     // Ekran Okuyucu ve TTS Anonsu (Sıfır önceden yüklenmiş ses dosyası)
-    announceStop: function(stopName) {
+    announceStop: function(stopName, isFinal = false) {
+        const safeName = stopName || 'Durak';
         if (typeof audio !== 'undefined' && typeof audio.playBusAnnouncement === 'function') {
-            audio.playBusAnnouncement('arrive', stopName);
+            audio.playBusAnnouncement('arrive', safeName, { isFinal: !!isFinal });
         } else {
-            const msg = `Durağımız: ${stopName}. Kapılar açılıyor.`;
+            const msg = isFinal ? `Son durak: ${safeName}.` : `Durağımız: ${safeName}.`;
             if (typeof audio !== 'undefined') {
                 if (typeof audio.playStopChime === 'function') audio.playStopChime();
                 if (typeof audio.speak === 'function') audio.speak(msg);

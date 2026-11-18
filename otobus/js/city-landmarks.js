@@ -6,7 +6,7 @@
    - Shift + P Kısayolu: Yakındaki simge noktanın adını anında tek kelime/cümleyle oku
    ========================================================================== */
 
-(function(window) {
+(function (window) {
     'use strict';
 
     // 81 İL VE TEKİRDAĞ ÖNEMLİ SİMGE NOKTALAR LİSTESİ
@@ -18,7 +18,7 @@
         { id: "tk_liman", name: "Ceyport Tekirdağ Uluslararası Limanı", city: "Tekirdağ", district: "Süleymanpaşa", keywords: ["liman", "iskele", "yat limanı"] },
         { id: "tk_otogar", name: "Tekirdağ Şehirlerarası Otobüs Terminali", city: "Tekirdağ", district: "Süleymanpaşa", keywords: ["otogar", "terminal", "otobüs terminali"] },
         { id: "tk_namik_kemal_ev", name: "Namık Kemal Evi", city: "Tekirdağ", district: "Süleymanpaşa", keywords: ["namık kemal", "namık kemal evi"] },
-        
+
         // Çorlu
         { id: "corlu_tren_gar", name: "Çorlu Tarihi Tren Garı", city: "Tekirdağ", district: "Çorlu", keywords: ["tren garı", "istasyon", "gar"] },
         { id: "corlu_devlet_hastane", name: "Çorlu Devlet Hastanesi", city: "Tekirdağ", district: "Çorlu", keywords: ["devlet hastanesi", "çorlu hastane"] },
@@ -33,7 +33,7 @@
 
         // Ergene & Velimeşe
         { id: "velimese_sanayi", name: "Velimeşe Sanayi Meydanı", city: "Tekirdağ", district: "Ergene", keywords: ["velimeşe", "bozacı", "sağlık mah"] },
-        
+
         // Şarköy, Malkara, Saray, Muratlı, Hayrabolu, Marmaraereğlisi
         { id: "sarkoy_iskele", name: "Şarköy Tarihi Sahil İskelesi", city: "Tekirdağ", district: "Şarköy", keywords: ["şarköy iskele", "sahil", "kordon"] },
         { id: "malkara_meydan", name: "Malkara Hükümet Meydanı", city: "Tekirdağ", district: "Malkara", keywords: ["malkara meydan", "hükümet"] },
@@ -134,10 +134,31 @@
         lastAnnouncedId: null,
         currentNearby: null,
 
+        normTr: function (str) {
+            if (!str) return "";
+            return String(str).replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase();
+        },
+
+        keywordMatchesStop: function (stopNorm, kw) {
+            const k = this.normTr(kw);
+            if (!k) return false;
+            if (k.includes(' ') || k.length >= 5) {
+                return stopNorm.includes(k);
+            }
+            // "gar", "sur", "asi", "gül" gibi kısa kelimelerde "otogar", "hastanesi", "gülistan" kazalarını önlemek için kelime sınırı kontrolü
+            const escaped = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            return new RegExp(`(?:^|[^a-zçğıöşü0-9])${escaped}(?:$|[^a-zçğıöşü0-9])`).test(stopNorm);
+        },
+
+        resetForNewRoute: function () {
+            this.lastAnnouncedId = null;
+            this.currentNearby = null;
+        },
+
         /**
          * Durağa henüz yaklaşırken rota hazırlığında çağrılır (SESLENDİRME YAPMAZ, sessizce hafızaya alır)
          */
-        prepareStop: function(cityName, districtName, stopName) {
+        prepareStop: function (cityName, districtName, stopName) {
             this.currentNearby = this.matchLandmark(cityName, districtName, stopName);
         },
 
@@ -145,58 +166,61 @@
          * Yalnızca durağa tam varılınca (arriveAtStop anında) çağrılır
          * Kural: Sadece yerin adını ekran okuyucu sesli okur. Bilgi/ders vermez.
          */
-        onArriveAtStop: function(cityName, districtName, stopName) {
+        onArriveAtStop: function (cityName, districtName, stopName) {
             const matched = this.matchLandmark(cityName, districtName, stopName);
             this.currentNearby = matched;
 
             if (matched && matched.id !== this.lastAnnouncedId) {
                 this.lastAnnouncedId = matched.id;
-                this.announceLandmark(matched);
+                this.announceLandmark(matched, true);
             }
         },
 
         /**
          * Geriye uyumluluk için durak kontrol fonksiyonu
          */
-        checkStopForLandmark: function(cityName, districtName, stopName) {
+        checkStopForLandmark: function (cityName, districtName, stopName) {
             this.onArriveAtStop(cityName, districtName, stopName);
         },
 
         /**
          * İl, ilçe ve durak adına göre simge noktayı eşleştirir
          */
-        matchLandmark: function(cityName, districtName, stopName) {
+        matchLandmark: function (cityName, districtName, stopName) {
             const city = cityName || "Tekirdağ";
-            const dist = (districtName || "").toLowerCase();
-            const sName = (stopName || "").toLowerCase();
+            const dist = this.normTr(districtName);
+            const sName = this.normTr(stopName);
+            if (!sName) return null;
 
             let matched = null;
             // 1. Şehir + İlçe eşleşmesi
             for (let l of CITY_LANDMARKS) {
                 if (l.city && l.city !== city) continue;
-                if (l.district && dist && l.district.toLowerCase() !== dist) continue;
+                if (l.district && dist && this.normTr(l.district) !== dist) continue;
 
-                if (l.keywords && l.keywords.some(k => sName.includes(k))) {
+                if (l.keywords && l.keywords.some(k => this.keywordMatchesStop(sName, k))) {
                     matched = l;
                     break;
                 }
             }
 
-            // 2. Şehir bazlı genel eşleşme
+            // 2. Şehir bazlı genel eşleşme (farklı bir ilçeye özel simgeyi yanlış ilçede eşleştirme!)
             if (!matched) {
                 for (let l of CITY_LANDMARKS) {
                     if (l.city && l.city !== city) continue;
-                    if (l.keywords && l.keywords.some(k => sName.includes(k))) {
+                    if (l.district && dist && this.normTr(l.district) !== dist) continue;
+                    if (l.keywords && l.keywords.some(k => this.keywordMatchesStop(sName, k))) {
                         matched = l;
                         break;
                     }
                 }
             }
 
-            // 3. İsim içinde doğrudan il/nokta geçiyorsa
+            // 3. İsim içinde doğrudan simge nokta tam adı geçiyorsa
             if (!matched) {
                 for (let l of CITY_LANDMARKS) {
-                    if (sName.includes(l.name.toLowerCase())) {
+                    if (l.city && l.city !== city) continue;
+                    if (sName.includes(this.normTr(l.name))) {
                         matched = l;
                         break;
                     }
@@ -210,7 +234,7 @@
          * Kullanıcı kuralı: "Sadece gelince oraları ekran okuyucu sesli okusun. Bilgi vermesin."
          * Sadece yerin temiz adını anons eder; ansiklopedik rehberlik/bilgi vermez.
          */
-        announceLandmark: function(landmark) {
+        announceLandmark: function (landmark, fromStopArrival = false) {
             if (!landmark) return;
 
             const cleanName = landmark.name;
@@ -220,21 +244,30 @@
                 audio.updateNvdaLiveRegion("📍 " + cleanName);
             }
 
-            // Sesli okuma (TTS)
-            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                audio.speak(cleanName);
-            }
-
             // Görsel HUD Toast bildirimi
             if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
                 UI.showToast("📍 " + cleanName, "info");
+            }
+
+            // Durak varış anonsunu yarıda kesmemek için varış anında kısa gecikmeyle veya doğrudan seslendir
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
+                if (fromStopArrival) {
+                    setTimeout(() => {
+                        const busyAnons = (typeof window !== 'undefined' && window.HumanNpcVoices && typeof window.HumanNpcVoices.isPlayingNow === 'function' && window.HumanNpcVoices.isPlayingNow());
+                        if (!busyAnons && typeof audio !== 'undefined' && typeof audio.speak === 'function') {
+                            audio.speak(cleanName);
+                        }
+                    }, 2600);
+                } else {
+                    audio.speak(cleanName);
+                }
             }
         },
 
         /**
          * Shift + P Kısayolu: Kaptan istediğinde yakındaki simge noktayı tek net isimle bildirir
          */
-        speakNearbyLandmark: function(game) {
+        speakNearbyLandmark: function (game) {
             if (this.currentNearby) {
                 const cleanName = this.currentNearby.name;
                 if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {

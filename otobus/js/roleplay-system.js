@@ -63,6 +63,13 @@
 
         // Rol 1: 🧴 Kolonya & Yolcu İkram Servisi
         triggerCologneService: function () {
+            if (typeof Game !== 'undefined' && (Game.passengersOnBoard || 0) <= 0) {
+                const noPassMsg = "Otobüste şu an yolcu bulunmuyor. Kolonya ve ikram servisi yolcular bindikten sonra yapılabilir.";
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🧴 " + noPassMsg, "info");
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(noPassMsg);
+                return;
+            }
+
             this.playSound('spray', 0.85);
 
             // 0.4 sn sonra ikinci bir fıs fıs
@@ -72,9 +79,12 @@
                 Game.passengerComfort = Math.min(100, (Game.passengerComfort || 90) + 12);
             }
 
+            const compName = (typeof CompanySystem !== 'undefined' && CompanySystem.data && CompanySystem.data.companyName)
+                ? CompanySystem.data.companyName
+                : ((typeof Game !== 'undefined' && Game.currentCity) ? `${Game.currentCity} Seyahat` : 'Firmamızın');
             const passengerReplies = [
                 "Teşekkürler muavin oğlum, limon kolonyası çok ferahlattı.",
-                "Elinize sağlık kaptanım, Tekirdağ Seyahat kalitesi bir başka.",
+                `Elinize sağlık kaptanım, ${compName} kalitesi bir başka.`,
                 "Sağ olasın evladım, ferahladık valla.",
                 "İkram için teşekkür ederiz, hayırlı yolculuklar."
             ];
@@ -95,6 +105,20 @@
 
         // Rol 2: 🎟️ Otogar Peron Anonsu & Bagaj Fişi Zımbalama (3'lü Zil veya Tekli Gong)
         triggerLuggageAndTerminal: function (chimeType = '3tone') {
+            if (typeof Game !== 'undefined' && Game.isDriving && Game.speed > 3) {
+                const moveWarn = "Otobüs seyir halindeyken bagaj fişi zımbalanamaz! Yalnızca durakta veya peronda dururken uygulanabilir.";
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🎟️ " + moveWarn, "warning");
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(moveWarn);
+                return;
+            }
+            const isEmptyTraining = !!(typeof Game !== 'undefined' && Game.activeRouteData && (Game.activeRouteData.emptyBus || Game.activeRouteData.isTraining || Game.activeRouteData.passengersAllowed === false));
+            if (isEmptyTraining) {
+                const emptyWarn = "Bu görev yolcusuz eğitim intikalidir; bagaj kuponu işlemi uygulanmaz.";
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🎟️ " + emptyWarn, "info");
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(emptyWarn);
+                return;
+            }
+
             if (chimeType === 'gong') {
                 if (typeof audio !== 'undefined' && audio.playDeepGongChime) {
                     audio.playDeepGongChime();
@@ -114,15 +138,26 @@
                 this.playSound('stapler', 0.9);
                 setTimeout(() => this.playSound('stapler', 0.85), 320);
 
+                let earnedNow = false;
                 if (typeof Game !== 'undefined') {
-                    Game.addMoney(45);
+                    const stopKey = `${Game.activeRouteId || 'menu'}_${Game.currentStopIndex || 0}`;
+                    const hasPassengersContext = (Game.passengersOnBoard || 0) > 0 || (Game.activeRouteData && Array.isArray(Game.activeRouteData.stops));
+                    if (hasPassengersContext && this._lastLuggageBonusKey !== stopKey) {
+                        this._lastLuggageBonusKey = stopKey;
+                        Game.addMoney(45);
+                        earnedNow = true;
+                    }
                 }
 
-                const msg = "🎟️ [Otogar Anonsu] 3'lü zil çaldı (Dı-dı-dııın), bagaj kuponları zımbalandı (+45 ₺ Bagaj Geliri).";
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
+                const msg = earnedNow
+                    ? "🎟️ [Otogar Anonsu] 3'lü zil çaldı (Dı-dı-dııın), bagaj kuponları zımbalandı (+45 ₺ Bagaj Geliri)."
+                    : "🎟️ [Otogar Anonsu] Peron zili ve bagaj zımbası çaldı (Bu durak için bagaj geliri zaten işlendi).";
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, earnedNow ? "success" : "info");
                 if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playLuggageStapled())) {
                     if (typeof audio !== 'undefined' && audio.speak) {
-                        audio.speak("Otogar anonsu yapıldı. Bagaj kuponları zımbalanarak yolculara teslim edildi. Kasanıza kırk beş lira eklendi.");
+                        audio.speak(earnedNow
+                            ? "Otogar anonsu yapıldı. Bagaj kuponları zımbalanarak yolculara teslim edildi. Kasanıza kırk beş lira eklendi."
+                            : "Otogar anonsu ve bagaj fişi zımbası çaldı.");
                     }
                 }
             }, 1100);
@@ -225,7 +260,21 @@
         },
 
         // Rol 4: 👥 Kabin İçi Yolcu Mırıltısı Aç / Kapat
+        stopPassengerMurmurIfNeeded: function () {
+            if (this.isMurmurPlaying && this.murmurAudio) {
+                try { this.murmurAudio.pause(); } catch (e) {}
+                this.isMurmurPlaying = false;
+                this.renderModalContent();
+            }
+        },
+
         togglePassengerMurmur: function () {
+            if (!this.isMurmurPlaying && typeof Game !== 'undefined' && (Game.passengersOnBoard || 0) <= 0) {
+                const emptyMsg = "Otobüste şu an yolcu yok. Kabin mırıltısı yolcular otobüse bindikten sonra başlatılabilir.";
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`👥 ${emptyMsg}`, "info");
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(emptyMsg);
+                return;
+            }
             if (this.isMurmurPlaying && this.murmurAudio) {
                 this.murmurAudio.pause();
                 this.isMurmurPlaying = false;
