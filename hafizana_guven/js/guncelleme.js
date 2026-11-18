@@ -9,6 +9,18 @@ window.globalChangelogVersion = null;
 window.globalChangelogMessage = null;
 
 window.guncellemeKontrolEt = function (isManual = false) {
+    if (window.location && window.location.protocol === 'file:') {
+        const localVer = window.UYGULAMA_SURUMU || window.mevcutSurum || '0.98.1.6';
+        window.mevcutSurum = localVer;
+        const visualVersion = document.getElementById("intro-version-display");
+        if (visualVersion) visualVersion.textContent = "Sürüm: " + localVer;
+        const updateBtn = document.getElementById('check-updates-btn');
+        if (updateBtn) {
+            updateBtn.innerText = "Sürüm: " + localVer + " (Yerel Paket)";
+            updateBtn.setAttribute('aria-label', "Sürüm " + localVer + ". Yerel uygulama paketi aktif.");
+        }
+        return;
+    }
     if (isManual && typeof window.announceToScreenReader === 'function') {
         window.announceToScreenReader('Güncellemeler denetleniyor...');
     }
