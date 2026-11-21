@@ -281,6 +281,105 @@
             box-shadow: 0 8px 28px rgba(236, 72, 153, 0.6);
         }
 
+        .smart-dj-banner {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #e0f2fe;
+            padding: 0.55rem 1.2rem;
+            border-radius: 999px;
+            font-size: 0.94rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .live-pulse-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+            display: inline-block;
+        }
+
+        /* Sticky Bottom Mini-Radio & Subscribe Bar */
+        .sticky-royalty-bar {
+            position: fixed;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(760px, 94%);
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 999px;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.65rem;
+            z-index: 50;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+        }
+
+        .sticky-bar-status {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-left: 0.4rem;
+        }
+
+        .sticky-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .btn-mini {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 0.42rem 0.85rem;
+            border-radius: 999px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.84rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-mini:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-mini-yt {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-color: transparent;
+            font-weight: 800;
+        }
+
+        body {
+            padding-bottom: 5.2rem;
+        }
+
+        @media (max-width: 600px) {
+            .sticky-bar-status {
+                font-size: 0.8rem;
+            }
+            .btn-mini {
+                padding: 0.38rem 0.7rem;
+                font-size: 0.78rem;
+            }
+        }
+
         .category-title {
             text-align: left;
             font-size: 1.3rem;
@@ -799,9 +898,16 @@
         <!-- Karşılama ve Başlık -->
         <div class="suits-decoration" aria-hidden="true">🎹 🎵 🌍</div>
         <h1 class="portal-title" data-tr="ÜMİT EKREM MİKYAS • MİKYAS STUDIO" data-en="ÜMİT EKREM MİKYAS • MIKYAS STUDIO">ÜMİT EKREM MİKYAS • MİKYAS STUDIO</h1>
-        <p class="welcome-text" id="welcome-message" aria-live="polite">
+        <p class="welcome-text" id="welcome-message" aria-live="polite" style="margin-bottom: 0.9rem;">
             <span data-tr="Hoş Geldiniz. Saat şu an " data-en="Welcome. Local time: ">Hoş Geldiniz. Saat şu an </span><span id="current-time-display"></span>
         </p>
+
+        <!-- Günün Saatine Duyarlı Akıllı DJ & Canlı Sayaç Rozeti -->
+        <div class="smart-dj-banner" role="status">
+            <span class="live-pulse-dot" aria-hidden="true"></span>
+            <span id="smart-time-dj">🎹 Güne özel enstrümantal seçkim hazır!</span>
+            <span id="live-stats-pill" style="opacity: 0.85; font-size: 0.85rem;"></span>
+        </div>
 
         <!-- Hızlı Kesintisiz Radyo, Abone Ol & Dinle Çağrısı -->
         <div class="hero-cta-row">
@@ -1157,8 +1263,27 @@
                data-en="Special thanks to Gaddar Bilgi infrastructure for hosting and supporting Mikyas Studio.">
                 Bu site, <strong>Gaddar Bilgi</strong> altyapısı sayesinde ayakta durmaktadır. Sunucu maliyetlerini üstlendikleri ve karşılaştığım her türlü soruna özveriyle çözüm buldukları için kendilerine sonsuz teşekkürlerimi sunarım. Bu sitenin hayatta kalmasında ve sizlere ulaşmasında onların emekleri çok büyük.
             </p>
+            <p style="text-align: center; color: #94a3b8; font-size: 0.88rem; margin-top: 0.75rem;"
+               data-tr="Klavye Kısayolları: Alt+R (Radyoyu Başlat), Alt+S (Sıradaki Şarkı), Alt+Y (YouTube Abone Ol), Alt+D (Dil Değiştir)"
+               data-en="Keyboard Shortcuts: Alt+R (Start Radio), Alt+S (Next Track), Alt+Y (Subscribe on YouTube), Alt+D (Switch Language)">
+               Klavye Kısayolları: Alt+R (Radyoyu Başlat), Alt+S (Sıradaki Şarkı), Alt+Y (YouTube Abone Ol), Alt+D (Dil Değiştir)
+            </p>
         </section>
     </main>
+
+    <!-- Sayfa Altı Sabit Akıllı Mini-Radyo & Abone Çubuğu -->
+    <aside class="sticky-royalty-bar" aria-label="Hızlı Müzik Radyosu ve Abone Çubuğu">
+        <div class="sticky-bar-status" id="sticky-now-playing" data-tr="🎵 Ümit Ekrem Mikyas Radyosu Hazır" data-en="🎵 Ümit Ekrem Mikyas Radio Ready">🎵 Ümit Ekrem Mikyas Radyosu Hazır</div>
+        <div class="sticky-bar-actions">
+            <button type="button" class="btn-mini" id="sticky-play-btn" onclick="startNonStopRoyaltyRadio()"
+                data-tr="📻 Çal" data-en="📻 Play" aria-label="Kesintisiz sanatçı radyosunu başlat">📻 Çal</button>
+            <button type="button" class="btn-mini" onclick="nextJukeboxTrack()"
+                data-tr="⏭ Sıradaki" data-en="⏭ Next" aria-label="Sıradaki şarkıya geç">⏭ Sıradaki</button>
+            <a href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer"
+               onclick="trackRoyaltyAction('youtube_sub')" class="btn-mini btn-mini-yt"
+               data-tr="▶️ Abone Ol" data-en="▶️ Subscribe" aria-label="YouTube kanalıma tek tıkla abone ol">▶️ Abone Ol</a>
+        </div>
+    </aside>
 
     <script>
         var currentLang = 'tr';
@@ -1409,19 +1534,24 @@
             }
         }
 
+        var JUKEBOX_ORDER = ['meyve', 'yarim', 'suhedai'];
+        var currentJukeboxKey = 'meyve';
         var JUKEBOX_STREAMS = {
             meyve: {
                 id: 'jb-meyve',
+                title: 'Meyve Dalında Güzel',
                 vid: 'h6IzlHhS7I4',
                 order: 'h6IzlHhS7I4,XCyKBkxWnOk,Q1S96xzlQ0U'
             },
             yarim: {
                 id: 'jb-yarim',
+                title: 'Yarim Gitti Gelmeyecek',
                 vid: 'XCyKBkxWnOk',
                 order: 'XCyKBkxWnOk,h6IzlHhS7I4,Q1S96xzlQ0U'
             },
             suhedai: {
                 id: 'jb-suhedai',
+                title: 'Şühedai Gaza',
                 vid: 'Q1S96xzlQ0U',
                 order: 'Q1S96xzlQ0U,h6IzlHhS7I4,XCyKBkxWnOk'
             }
@@ -1455,19 +1585,31 @@
             stopActivePreview();
             var item = JUKEBOX_STREAMS[key];
             if (!item) return;
+            currentJukeboxKey = key;
             var frame = document.getElementById('yt-jukebox-iframe');
             if (frame) {
                 var params = '?rel=0&loop=1&playlist=' + item.order + (autoStart ? '&autoplay=1' : '');
                 frame.src = 'https://www.youtube.com/embed/' + item.vid + params;
             }
-            var keys = ['meyve', 'yarim', 'suhedai'];
-            for (var i = 0; i < keys.length; i++) {
-                var b = document.getElementById(JUKEBOX_STREAMS[keys[i]].id);
-                if (b) b.setAttribute('aria-pressed', keys[i] === key ? 'true' : 'false');
+            for (var i = 0; i < JUKEBOX_ORDER.length; i++) {
+                var k = JUKEBOX_ORDER[i];
+                var b = document.getElementById(JUKEBOX_STREAMS[k].id);
+                if (b) b.setAttribute('aria-pressed', k === key ? 'true' : 'false');
             }
             if (autoStart) {
                 trackRoyaltyAction('jukebox_plays');
+                var stBar = document.getElementById('sticky-now-playing');
+                if (stBar) {
+                    stBar.textContent = (currentLang === 'en' ? '🔊 Playing: ' : '🔊 Çalıyor: ') + item.title;
+                }
             }
+        }
+
+        function nextJukeboxTrack() {
+            var idx = JUKEBOX_ORDER.indexOf(currentJukeboxKey);
+            var nextKey = JUKEBOX_ORDER[(idx + 1) % JUKEBOX_ORDER.length];
+            loadJukeboxTrack(nextKey, true);
+            announcePreviewStatus((currentLang === 'en' ? 'Switched to: ' : 'Sıradaki esere geçildi: ') + JUKEBOX_STREAMS[nextKey].title);
         }
 
         function startNonStopRoyaltyRadio() {
@@ -1604,9 +1746,51 @@
                 btnEn.setAttribute('aria-pressed', currentLang === 'en' ? 'true' : 'false');
             }
             updateAdrenalineStatus(currentLang);
+            updateSmartTimeDj(currentLang);
             renderDiscography();
             if (activeMoodKey) selectMood(activeMoodKey);
             updateWelcomeClock();
+        }
+
+        function updateSmartTimeDj(lang) {
+            var el = document.getElementById('smart-time-dj');
+            if (!el) return;
+            var hr = new Date().getHours();
+            if (hr >= 6 && hr < 12) {
+                el.textContent = lang === 'en'
+                    ? '☀️ Morning Pick: Start your day calmly with "Meyve Dalında Güzel"'
+                    : '☀️ Sabah Seçkisi: Güne huzurlu "Meyve Dalında Güzel" tınısıyla başlayın';
+            } else if (hr >= 12 && hr < 18) {
+                el.textContent = lang === 'en'
+                    ? '🎹 Focus Hours: Non-stop instrumental piano & mystic ney radio ready'
+                    : '🎹 Odaklanma Saati: Çalışırken dinlemelik kesintisiz piyano & ney radyosu hazır';
+            } else if (hr >= 18 && hr < 23) {
+                el.textContent = lang === 'en'
+                    ? '🌆 Evening Vibe: Relax with "Yarim Gitti Gelmeyecek" & cinematic scores'
+                    : '🌆 Akşam Atmosferi: "Yarim Gitti Gelmeyecek" ve sinematik bestelerim yayında';
+            } else {
+                el.textContent = lang === 'en'
+                    ? '🌙 Night Mode: Headphones on for deep emotional & night-drive music'
+                    : '🌙 Gece Modu: Kulaklığınızı takın, geceye özel derin bestelerim hazır';
+            }
+        }
+
+        function fetchLivePortalStats() {
+            fetch(RTDB_BASE + '.json')
+                .then(function (r) { return r.json(); })
+                .then(function (d) {
+                    if (!d) return;
+                    var pill = document.getElementById('live-stats-pill');
+                    if (!pill) return;
+                    var vis = Number(d.total_visitors || 0);
+                    var plays = Number(d.jukebox_plays || 0) + Number(d.radio_starts || 0);
+                    if (vis > 0) {
+                        pill.textContent = currentLang === 'en'
+                            ? ('• ' + vis + ' visitors' + (plays > 0 ? (' • ' + plays + ' radio plays') : ''))
+                            : ('• ' + vis + ' ziyaret' + (plays > 0 ? (' • ' + plays + ' radyo dinlemesi') : ''));
+                    }
+                })
+                .catch(function () {});
         }
 
         function updateWelcomeClock() {
@@ -1634,7 +1818,27 @@
                 setSiteLang('en');
             }
             recordPortalVisit();
+            fetchLivePortalStats();
             fetchLiveDiscography();
+
+            document.addEventListener('keydown', function (ev) {
+                if (!ev.altKey || ev.ctrlKey || ev.metaKey) return;
+                var k = (ev.key || '').toLowerCase();
+                if (k === 'r') {
+                    ev.preventDefault();
+                    startNonStopRoyaltyRadio();
+                } else if (k === 's') {
+                    ev.preventDefault();
+                    nextJukeboxTrack();
+                } else if (k === 'y') {
+                    ev.preventDefault();
+                    trackRoyaltyAction('youtube_sub');
+                    window.open('https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1', '_blank', 'noopener,noreferrer');
+                } else if (k === 'd') {
+                    ev.preventDefault();
+                    setSiteLang(currentLang === 'tr' ? 'en' : 'tr');
+                }
+            });
             if (window.location.hash === '#dinle') {
                 var musicSec = document.getElementById('dinle');
                 if (musicSec) {
