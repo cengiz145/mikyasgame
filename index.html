@@ -7,14 +7,38 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Mikyas Studio</title>
-    <meta name="description" content="Mikyas Studio tarafından geliştirilen erişilebilir ve eğlenceli oyunlar portalı. Müzik ve sesli oyun projeleri.">
-    
+    <title>Ümit Ekrem Mikyas | Mikyas Studio — Resmi Sanatçı &amp; Erişilebilir Oyun Portalı</title>
+    <meta name="description" content="Piyanist, müzik öğretmeni, besteci ve yazılımcı Ümit Ekrem Mikyas'ın resmi müzikleri (Spotify, Apple Music, YouTube, Deezer) ve erişilebilir sesli oyun projeleri portalı.">
+    <meta property="og:title" content="Ümit Ekrem Mikyas | Mikyas Studio — Official Music &amp; Accessible Games">
+    <meta property="og:description" content="Listen to official releases by pianist &amp; composer Ümit Ekrem Mikyas on Spotify, Apple Music, YouTube &amp; explore accessible audio games.">
+    <meta property="og:url" content="https://mikyasstudio.com.tr/">
+    <meta property="og:type" content="website">
+
+    <!-- Google Sanatçı Bilgi Grafiği (Schema.org MusicGroup & Person) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MusicGroup",
+      "name": "Ümit Ekrem Mikyas",
+      "alternateName": "Mikyas Studio",
+      "url": "https://mikyasstudio.com.tr/",
+      "genre": ["Instrumental", "Piano", "Melodic Techno", "Cinematic", "World Music"],
+      "sameAs": [
+        "https://www.youtube.com/@umitekremmikyas2518",
+        "https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN",
+        "https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059",
+        "https://www.deezer.com/artist/385830051",
+        "https://www.instagram.com/umitekremmikyas/",
+        "https://www.tiktok.com/@umitekremmikyas"
+      ]
+    }
+    </script>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --primary-bg: #0f172a;
@@ -22,7 +46,7 @@
             --gradient-2: #8b5cf6;
             --gradient-3: #ec4899;
             --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.12);
             --text-main: #f8fafc;
             --text-muted: #cbd5e1;
         }
@@ -45,27 +69,60 @@
             position: relative;
         }
 
-        /* Top Navbar / Logo */
+        a:focus-visible, button:focus-visible {
+            outline: 3px solid #38bdf8;
+            outline-offset: 3px;
+        }
+
+        /* Top Navbar / Logo & Language Switcher */
         .navbar {
             width: 100%;
-            padding: 1.5rem 2rem;
+            padding: 1.2rem 2rem;
             display: flex;
-            justify-content: center;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(10px);
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1100px;
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--glass-border);
             position: sticky;
             top: 0;
             z-index: 10;
+            border-radius: 0 0 18px 18px;
         }
 
         .logo {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 800;
             letter-spacing: 2px;
             background: linear-gradient(135deg, #fff, #a5b4fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-lang {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+            padding: 0.45rem 0.95rem;
+            border-radius: 20px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-lang[aria-pressed="true"] {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
         }
 
         /* Dynamic Animated Background */
@@ -99,43 +156,40 @@
 
         /* Main Container */
         .container {
-            margin-top: 4rem;
+            margin-top: 2.5rem;
             margin-bottom: 4rem;
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
-            padding: 3rem;
-            max-width: 800px;
-            width: 90%;
+            padding: 2.8rem;
+            max-width: 860px;
+            width: 92%;
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* About Section (New) */
         .about-section {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
-            padding: 2.5rem;
-            margin-bottom: 3rem;
+            padding: 2rem;
+            margin-bottom: 2.2rem;
             text-align: left;
-            animation: fadeIn 0.5s ease-in-out;
             box-shadow: inset 0 0 20px rgba(255,255,255,0.02);
         }
 
         .about-section p {
-            font-size: 1.1rem;
+            font-size: 1.08rem;
             color: var(--text-main);
             line-height: 1.7;
-            margin-bottom: 1.25rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-bottom: 1rem;
         }
 
         .about-section p:last-child {
@@ -145,9 +199,8 @@
         .suits-decoration {
             font-size: 1.8rem;
             letter-spacing: 5px;
-            color: #ef4444;
+            color: #38bdf8;
             margin-bottom: 0.5rem;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
         .portal-title {
@@ -161,9 +214,52 @@
         }
 
         .welcome-text {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             color: var(--text-muted);
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Quick Subscribe Hero CTA Bar */
+        .hero-cta-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.9rem;
+            margin-bottom: 2.2rem;
+        }
+
+        .btn-hero-yt {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            padding: 0.85rem 1.8rem;
+            border-radius: 30px;
+            font-size: 1.05rem;
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-hero-yt:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.55);
+        }
+
+        .btn-hero-sp {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            padding: 0.85rem 1.8rem;
+            border-radius: 30px;
+            font-size: 1.05rem;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-hero-sp:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
         }
 
         .category-title {
@@ -172,21 +268,95 @@
             color: #f8fafc;
             margin: 2.5rem 0 1rem 0;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
+            border-bottom: 2px solid rgba(255,255,255,0.12);
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+
+        /* Featured Adrenaline Release Banner */
+        .release-highlight {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.16), rgba(139, 92, 246, 0.18));
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 18px;
+            padding: 1.6rem;
+            margin-bottom: 1.4rem;
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.15);
+        }
+
+        .release-badge {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid rgba(56, 189, 248, 0.55);
+            color: #7dd3fc;
+            font-size: 0.85rem;
+            font-weight: 800;
+            padding: 0.25rem 0.8rem;
+            border-radius: 20px;
+            margin-bottom: 0.65rem;
+            letter-spacing: 0.5px;
+        }
+
+        .release-title {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.4rem;
+        }
+
+        .release-desc {
+            font-size: 0.98rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin-bottom: 1.1rem;
+        }
+
+        /* Platform Pills Grid */
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.9rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .platform-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 0.95rem 1.2rem;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.22s ease;
+        }
+
+        .platform-btn:hover {
+            background: rgba(255, 255, 255, 0.11);
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .platform-btn span.arrow {
+            opacity: 0.75;
+            font-size: 1.1rem;
+        }
+
+        .spotify-embed-wrap {
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 1.2rem;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.25);
         }
 
         .games-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 1.2rem;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .app-card {
@@ -205,7 +375,7 @@
         .app-card:hover {
             background: rgba(255, 255, 255, 0.06);
             transform: translateY(-4px);
-            border-color: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.22);
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
@@ -217,7 +387,7 @@
         }
 
         .app-icon {
-            font-size: 2.5rem;
+            font-size: 2.3rem;
             background: rgba(0,0,0,0.3);
             padding: 0.8rem;
             border-radius: 14px;
@@ -229,7 +399,7 @@
         }
 
         .app-title {
-            font-size: 1.3rem;
+            font-size: 1.28rem;
             font-weight: bold;
             margin-bottom: 0.4rem;
             color: #fff;
@@ -244,6 +414,8 @@
         .app-action {
             display: flex;
             justify-content: flex-end;
+            gap: 0.75rem;
+            flex-wrap: wrap;
         }
 
         .btn-play {
@@ -251,24 +423,19 @@
             color: #fff;
             text-decoration: none;
             font-weight: 600;
-            padding: 0.7rem 2.5rem;
+            padding: 0.7rem 2.2rem;
             border-radius: 25px;
-            font-size: 1.05rem;
+            font-size: 1.02rem;
             transition: all 0.2s;
             border: none;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            display: inline-block;
         }
 
         .btn-play:hover {
             background: linear-gradient(135deg, #60a5fa, #3b82f6);
-            transform: scale(1.05);
-        }
-
-        .btn-play.disabled {
-            background: #475569;
-            color: #cbd5e1;
-            box-shadow: none;
+            transform: scale(1.04);
         }
 
         .btn-news-play {
@@ -287,7 +454,14 @@
             background: linear-gradient(135deg, #a78bfa, #f472b6);
         }
 
-        /* Accessibility improvements for screen readers */
+        .btn-yt-sub {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.38);
+        }
+        .btn-yt-sub:hover {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+        }
+
         .sr-only {
             position: absolute;
             width: 1px;
@@ -299,6 +473,13 @@
             white-space: nowrap;
             border-width: 0;
         }
+
+        @media (max-width: 600px) {
+            .container { padding: 1.6rem 1.2rem; }
+            .navbar { padding: 1rem 1.2rem; }
+            .logo { font-size: 1.4rem; }
+            .portal-title { font-size: 1.75rem; }
+        }
     </style>
 </head>
 <body>
@@ -309,40 +490,180 @@
         <div class="blob blob-3"></div>
     </div>
 
-    <!-- En baştaki Mikyas Studio Logo Alanı -->
-    <nav class="navbar">
+    <!-- Üst Menü & Dil Seçici (TR / EN) -->
+    <nav class="navbar" aria-label="Üst Menü">
         <div class="logo" tabindex="0" aria-label="Mikyas Studio">Mikyas Studio</div>
+        <div class="lang-switch" role="group" aria-label="Dil Seçimi / Language Selection">
+            <button type="button" id="btn-tr" class="btn-lang" aria-pressed="true" onclick="setSiteLang('tr')">TR Türkçe</button>
+            <button type="button" id="btn-en" class="btn-lang" aria-pressed="false" onclick="setSiteLang('en')">EN English</button>
+        </div>
     </nav>
 
     <main class="container">
-        
-        <!-- Karşılama ve Title -->
-        <div class="suits-decoration" aria-hidden="true">♥♠♦♣</div>
-        <h1 class="portal-title">MİKYAS STUDIO PORTAL</h1>
-        <p class="welcome-text" id="welcome-message" aria-live="polite">Hoş Geldiniz. Saat şuan <span id="current-time-display"></span></p>
+
+        <!-- Karşılama ve Başlık -->
+        <div class="suits-decoration" aria-hidden="true">🎹 🎵 🌍</div>
+        <h1 class="portal-title" data-tr="ÜMİT EKREM MİKYAS • MİKYAS STUDIO" data-en="ÜMİT EKREM MİKYAS • MIKYAS STUDIO">ÜMİT EKREM MİKYAS • MİKYAS STUDIO</h1>
+        <p class="welcome-text" id="welcome-message" aria-live="polite">
+            <span data-tr="Hoş Geldiniz. Saat şu an " data-en="Welcome. Local time: ">Hoş Geldiniz. Saat şu an </span><span id="current-time-display"></span>
+        </p>
+
+        <!-- Hızlı Abone Ol & Dinle Çağrısı -->
+        <div class="hero-cta-row">
+            <a href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="btn-hero-yt"
+               data-tr="▶️ Resmi YouTube Kanalıma Abone Ol" data-en="▶️ Subscribe on YouTube"
+               aria-label="Resmi YouTube Sanatçı Kanalıma Tek Tıkla Abone Ol">▶️ Resmi YouTube Kanalıma Abone Ol</a>
+            <a href="https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN" target="_blank" rel="noopener noreferrer" class="btn-hero-sp"
+               data-tr="🎧 Spotify'da Dinle" data-en="🎧 Listen on Spotify"
+               aria-label="Spotify Resmi Sanatçı Profilimde Şarkılarımı Dinle">🎧 Spotify'da Dinle</a>
+        </div>
 
         <!-- Hakkımda Bölümü -->
         <section class="about-section" aria-label="Hakkımda">
-            <h2 class="sr-only">Ümit Ekrem Mikyas - Hakkımda</h2>
-            <p>Merhaba. Benim adım Ümit Ekrem Mikyas. 26 yaşındayım ve müzik öğretmeniyim.</p>
-            <p>Bu portalda geliştirmekte olduğum sesli oyun projelerimi ve müziklerimi bulacaksınız. Projelerimde yapay zekanın gücünü aktif bir şekilde kullanıyorum, ancak fikirlerimin tamamen bana ait, özgün düşünceler olduğunu da belirtmek isterim.</p>
+            <h2 class="sr-only" data-tr="Ümit Ekrem Mikyas - Hakkımda" data-en="About Ümit Ekrem Mikyas">Ümit Ekrem Mikyas - Hakkımda</h2>
+            <p data-tr="Merhaba, ben Ümit Ekrem Mikyas. Müzik öğretmeni, piyanist, besteci ve yazılımcıyım."
+               data-en="Hello, I am Ümit Ekrem Mikyas — a music educator, pianist, composer, and software developer from Türkiye.">
+               Merhaba, ben Ümit Ekrem Mikyas. Müzik öğretmeni, piyanist, besteci ve yazılımcıyım.
+            </p>
+            <p data-tr="Bu portalda tüm dünya dijital platformlarında yayınlanan özgün enstrümantal bestelerimi ve geliştirdiğim erişilebilir sesli oyun projelerimi bulabilirsiniz. Projelerimde modern yapay zeka teknolojilerinden aktif şekilde yararlanıyor, tüm eserlerimi kendi müzikal ruhum ve özgün fikirlerimle şekillendiriyorum."
+               data-en="On this portal you can listen to my original instrumental, piano, cinematic, and electronic releases across global streaming platforms and explore my accessible audio games.">
+               Bu portalda tüm dünya dijital platformlarında yayınlanan özgün enstrümantal bestelerimi ve geliştirdiğim erişilebilir sesli oyun projelerimi bulabilirsiniz. Projelerimde modern yapay zeka teknolojilerinden aktif şekilde yararlanıyor, tüm eserlerimi kendi müzikal ruhum ve özgün fikirlerimle şekillendiriyorum.
+            </p>
         </section>
 
-        <!-- KATEGORİ: Projelerim -->
-        <h2 class="category-title">PROJELERİM</h2>
+        <!-- KATEGORİ: Müziklerim & Dijital Platformlar -->
+        <h2 class="category-title" data-tr="MÜZİKLERİM &amp; DİJİTAL PLATFORMLAR" data-en="OFFICIAL MUSIC &amp; STREAMING">MÜZİKLERİM &amp; DİJİTAL PLATFORMLAR</h2>
+
+        <!-- Adrenaline Öne Çıkan Lansman Kartı (Tarihe Göre Otomatik Güncellenir!) -->
+        <div class="release-highlight" role="region" aria-label="Adrenaline Yeni Tekli Duyurusu">
+            <span class="release-badge" id="adrenaline-status-badge">🔥 4 ARALIK 2026 • YENİ TEKLİ</span>
+            <h3 class="release-title">Adrenaline — Ümit Ekrem Mikyas</h3>
+            <p class="release-desc" id="adrenaline-status-desc"
+               data-tr="Anadolu ve Balkan üflemeli sololarının yüksek enerjili kulüp bası ve melodik tekno ile buluştuğu yeni enstrümantal parçam. Çıktığı an bildirim almak için şimdiden Spotify Ön Kaydı yapabilirsiniz!"
+               data-en="134 BPM oriental club bass &amp; melodic techno instrumental fusing hypnotic Anatolian-Balkan woodwinds with high-energy night drive rhythms.">
+               Anadolu ve Balkan üflemeli sololarının yüksek enerjili kulüp bası ve melodik tekno ile buluştuğu yeni enstrümantal parçam. Çıktığı an bildirim almak için şimdiden Spotify Ön Kaydı yapabilirsiniz!
+            </p>
+            <div class="app-action" style="justify-content: flex-start;">
+                <a href="https://distrokid.com/hyperfollow/mitekremmikyas/adrenaline" target="_blank" rel="noopener noreferrer" class="btn-play" id="adrenaline-cta-btn"
+                   style="background: linear-gradient(135deg, #0ea5e9, #6366f1);"
+                   data-tr="🔥 Ön Kayıt Yap / Platformlarda Aç" data-en="🔥 Pre-Save / Listen Now">🔥 Ön Kayıt Yap / Platformlarda Aç</a>
+            </div>
+        </div>
+
+        <!-- Gömülü Resmi Spotify Sanatçı Çalar (Otomatik Çalmaz, Ekran Okuyucu Dostu) -->
+        <div class="spotify-embed-wrap">
+            <iframe style="border-radius:12px; display:block;"
+                src="https://open.spotify.com/embed/artist/3sNMBBVuhw9gsNViAge3qN?utm_source=generator&amp;theme=0"
+                width="100%" height="352" frameBorder="0" allowfullscreen=""
+                allow=" clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                title="Ümit Ekrem Mikyas Resmi Spotify Müzik Çalar"></iframe>
+        </div>
+
+        <!-- 5 Ana Müzik & Sanatçı Platformu -->
+        <div class="platform-grid" role="list" aria-label="Resmi Müzik Mağazaları ve Sanatçı Profilleri">
+            <a role="listitem" href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Resmi YouTube Sanatçı Kanalıma Abone Ol">
+                <span data-tr="▶️ YouTube Sanatçı Kanalım" data-en="▶️ Official YouTube Channel">▶️ YouTube Sanatçı Kanalım</span>
+                <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a role="listitem" href="https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Spotify Sanatçı Profilim">
+                <span>🟢 Spotify</span>
+                <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a role="listitem" href="https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Apple Music Sanatçı Profilim">
+                <span>🍎 Apple Music (Lossless)</span>
+                <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a role="listitem" href="https://www.deezer.com/artist/385830051" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Deezer Sanatçı Profilim">
+                <span>💜 Deezer</span>
+                <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a role="listitem" href="https://open.spotify.com/playlist/4RBXwXyZIrwiAlXwjesltF" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Adrenaline Night Drive ve Oriental Techno Spotify Çalma Listesi">
+                <span data-tr="⚡ Night Drive &amp; Techno Listem" data-en="⚡ Night Drive &amp; Techno Playlist">⚡ Night Drive &amp; Techno Listem</span>
+                <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a role="listitem" href="https://open.spotify.com/playlist/1zYt03Tn9l86UC7YL4kZJg" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Duygusal Piyano, Ney ve Sinematik Müzik Spotify Çalma Listesi">
+                <span data-tr="🎹 Piyano &amp; Ney Seçki Listem" data-en="🎹 Piano, Ney &amp; Cinematic Playlist">🎹 Piyano &amp; Ney Seçki Listem</span>
+                <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+        </div>
+
+        <!-- KATEGORİ: Sosyal Medya & Topluluk -->
+        <h2 class="category-title" data-tr="SOSYAL MEDYA &amp; TOPLULUK" data-en="SOCIAL MEDIA &amp; COMMUNITY">SOSYAL MEDYA &amp; TOPLULUK</h2>
         <div class="games-grid">
-            
+            <!-- YouTube Abone Ol (En Başta!) -->
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">▶️</div>
+                    <div class="app-info">
+                        <h3 class="app-title" data-tr="YouTube Resmi Sanatçı Kanalı" data-en="YouTube Official Artist Channel">YouTube Resmi Sanatçı Kanalı</h3>
+                        <p class="app-desc" data-tr="Özgün piyano bestelerim, yeni teklilerim, canlı sahne performanslarım ve Shorts videolarım. Yeni eserleri kaçırmamak için tek tıkla abone olun!"
+                           data-en="Original piano compositions, official releases, live performances, and Shorts. Subscribe with one click!">
+                           Özgün piyano bestelerim, yeni teklilerim, canlı sahne performanslarım ve Shorts videolarım. Yeni eserleri kaçırmamak için tek tıkla abone olun!
+                        </p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="btn-play btn-yt-sub"
+                       data-tr="Abone Ol" data-en="Subscribe" aria-label="Resmi YouTube kanalıma tek tıkla abone ol">Abone Ol</a>
+                </div>
+            </div>
+
+            <!-- Instagram -->
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">📸</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Instagram (@umitekremmikyas)</h3>
+                        <p class="app-desc" data-tr="Sahne arkası anlar, canlı piyano Reels videolarım ve yeni şarkı duyurularım."
+                           data-en="Live piano Reels, stage moments, and upcoming release announcements.">
+                           Sahne arkası anlar, canlı piyano Reels videolarım ve yeni şarkı duyurularım.
+                        </p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://www.instagram.com/umitekremmikyas/" target="_blank" rel="noopener noreferrer" class="btn-play btn-social-play"
+                       data-tr="Takip Et" data-en="Follow" aria-label="Instagram hesabıma git ve takip et">Takip Et</a>
+                </div>
+            </div>
+
+            <!-- TikTok -->
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">🎵</div>
+                    <div class="app-info">
+                        <h3 class="app-title">TikTok (@umitekremmikyas)</h3>
+                        <p class="app-desc" data-tr="Kısa piyano performanslarım, yeni elektronik ve enstrümantal müzik kliplerim."
+                           data-en="Short live piano clips, electronic drops, and instrumental performances.">
+                           Kısa piyano performanslarım, yeni elektronik ve enstrümantal müzik kliplerim.
+                        </p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://www.tiktok.com/@umitekremmikyas" target="_blank" rel="noopener noreferrer" class="btn-play btn-social-play"
+                       data-tr="Takip Et" data-en="Follow" aria-label="TikTok hesabıma git ve takip et">Takip Et</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- KATEGORİ: Projelerim -->
+        <h2 class="category-title" data-tr="PROJELERİM" data-en="ACCESSIBLE GAMES &amp; APPS">PROJELERİM</h2>
+        <div class="games-grid">
+
             <!-- Otobüs Simülasyonu -->
             <div class="app-card">
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">🚌</div>
                     <div class="app-info">
-                        <h3 class="app-title">Otobüs Simülasyonu</h3>
-                        <p class="app-desc">Türkiye'nin yollarında gerçekçi ve erişilebilir bir otobüs sürüş deneyimi yaşayın.</p>
+                        <h3 class="app-title" data-tr="Otobüs Simülasyonu" data-en="Bus Simulation Türkiye">Otobüs Simülasyonu</h3>
+                        <p class="app-desc" data-tr="Türkiye'nin yollarında gerçekçi ve erişilebilir bir otobüs sürüş deneyimi yaşayın."
+                           data-en="Experience a realistic and screen-reader accessible intercity bus driving simulation across Türkiye.">
+                           Türkiye'nin yollarında gerçekçi ve erişilebilir bir otobüs sürüş deneyimi yaşayın.
+                        </p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="otobus/" target="_blank" rel="noopener noreferrer" class="btn-play" aria-label="Otobüs Simülasyonu Oynamak İçin Tıklayın">Oyna</a>
+                    <a href="otobus/" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="Oyna" data-en="Play" aria-label="Otobüs Simülasyonu Oynamak İçin Tıklayın">Oyna</a>
                 </div>
             </div>
 
@@ -351,12 +672,15 @@
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">🧠</div>
                     <div class="app-info">
-                        <h3 class="app-title">Hafızana Güven</h3>
-                        <p class="app-desc">Sesleri ve ipuçlarını takip ederek hafızanızı test edin.</p>
+                        <h3 class="app-title" data-tr="Hafızana Güven" data-en="Trust Your Memory">Hafızana Güven</h3>
+                        <p class="app-desc" data-tr="Sesleri ve ipuçlarını takip ederek hafızanızı test edin."
+                           data-en="Test and sharpen your memory by following rich audio cues and sequences.">
+                           Sesleri ve ipuçlarını takip ederek hafızanızı test edin.
+                        </p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="hafizana_guven/portal.html" target="_blank" rel="noopener noreferrer" class="btn-play" aria-label="Hafızana Güven Oyunu Oynamak İçin Tıklayın">Oyna</a>
+                    <a href="hafizana_guven/portal.html" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="Oyna" data-en="Play" aria-label="Hafızana Güven Oyunu Oynamak İçin Tıklayın">Oyna</a>
                 </div>
             </div>
 
@@ -365,12 +689,15 @@
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">🎬</div>
                     <div class="app-info">
-                        <h3 class="app-title">Erişilebilir Video Asistanı</h3>
-                        <p class="app-desc">Görme engelli bireyler için özel tasarlanmış, adım adım sesli yönlendirme yapan video kesme aracı.</p>
+                        <h3 class="app-title" data-tr="Erişilebilir Video Asistanı" data-en="Accessible Video Assistant">Erişilebilir Video Asistanı</h3>
+                        <p class="app-desc" data-tr="Görme engelli bireyler için özel tasarlanmış, adım adım sesli yönlendirme yapan video kesme aracı."
+                           data-en="Step-by-step voice-guided video trimming tool designed specifically for visually impaired creators.">
+                           Görme engelli bireyler için özel tasarlanmış, adım adım sesli yönlendirme yapan video kesme aracı.
+                        </p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="video_asistan/" target="_blank" rel="noopener noreferrer" class="btn-play" aria-label="Erişilebilir Video Asistanı Açmak İçin Tıklayın">Aç</a>
+                    <a href="video_asistan/" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="Aç" data-en="Open" aria-label="Erişilebilir Video Asistanı Açmak İçin Tıklayın">Aç</a>
                 </div>
             </div>
 
@@ -380,18 +707,21 @@
                     <div class="app-icon" aria-hidden="true">📷</div>
                     <div class="app-info">
                         <h3 class="app-title">Voice Lens</h3>
-                        <p class="app-desc">Görme engelliler için 3D sesli kamera, belge ve sınav okuyucu, para sayıcı, renk ve kıble asistanı.</p>
+                        <p class="app-desc" data-tr="Görme engelliler için 3D sesli kamera, belge ve sınav okuyucu, para sayıcı, renk ve kıble asistanı."
+                           data-en="3D audio camera, document reader, currency identifier, color detector, and orientation assistant for visually impaired users.">
+                           Görme engelliler için 3D sesli kamera, belge ve sınav okuyucu, para sayıcı, renk ve kıble asistanı.
+                        </p>
                     </div>
                 </div>
-                <div class="app-action" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                    <a href="kamera_asistan/" target="_blank" rel="noopener noreferrer" class="btn-play" aria-label="Voice Lens Web Uygulamasını Açmak İçin Tıklayın">Aç</a>
-                    <a href="kamera_asistan/VoiceLens.apk" download="VoiceLens.apk" class="btn-play" style="background: linear-gradient(135deg, #10b981, #059669);" aria-label="Voice Lens Android APK Uygulamasını İndirmek İçin Tıklayın">APK İndir</a>
+                <div class="app-action">
+                    <a href="kamera_asistan/" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="Aç" data-en="Open Web" aria-label="Voice Lens Web Uygulamasını Açmak İçin Tıklayın">Aç</a>
+                    <a href="kamera_asistan/VoiceLens.apk" download="VoiceLens.apk" class="btn-play" style="background: linear-gradient(135deg, #10b981, #059669);" data-tr="APK İndir" data-en="Download APK" aria-label="Voice Lens Android APK Uygulamasını İndirmek İçin Tıklayın">APK İndir</a>
                 </div>
             </div>
         </div>
 
         <!-- KATEGORİ: Desteklediğim Projeler -->
-        <h2 class="category-title">DESTEKLEDİĞİM PROJELER</h2>
+        <h2 class="category-title" data-tr="DESTEKLEDİĞİM PROJELER" data-en="SUPPORTED PROJECTS">DESTEKLEDİĞİM PROJELER</h2>
         <div class="games-grid">
             <!-- Gaddar Bilgi -->
             <div class="app-card">
@@ -399,11 +729,11 @@
                     <div class="app-icon" aria-hidden="true">📱</div>
                     <div class="app-info">
                         <h3 class="app-title">Gaddar Bilgi</h3>
-                        <p class="app-desc">Gaddar Bilgi uygulamasını indirmek için tıklayın.</p>
+                        <p class="app-desc" data-tr="Gaddar Bilgi uygulamasını indirmek için tıklayın." data-en="Download the Gaddar Bilgi mobile trivia application.">Gaddar Bilgi uygulamasını indirmek için tıklayın.</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://play.google.com/store/apps/details?id=com.gaddarbilgimobil" target="_blank" rel="noopener noreferrer" class="btn-play" aria-label="Gaddar Bilgi uygulamasını indir">İndir</a>
+                    <a href="https://play.google.com/store/apps/details?id=com.gaddarbilgimobil" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="İndir" data-en="Download" aria-label="Gaddar Bilgi uygulamasını indir">İndir</a>
                 </div>
             </div>
 
@@ -413,17 +743,17 @@
                     <div class="app-icon" aria-hidden="true">🃏</div>
                     <div class="app-info">
                         <h3 class="app-title">Keleş Pişti</h3>
-                        <p class="app-desc">Keleş Pişti uygulamasını indirmek için tıklayın.</p>
+                        <p class="app-desc" data-tr="Keleş Pişti uygulamasını indirmek için tıklayın." data-en="Download the accessible Keleş Pişti card game on Google Play.">Keleş Pişti uygulamasını indirmek için tıklayın.</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://play.google.com/store/apps/details?id=com.scelik.kelespisti&hl=tr" target="_blank" rel="noopener noreferrer" class="btn-play" aria-label="Keleş Pişti uygulamasını indir">İndir</a>
+                    <a href="https://play.google.com/store/apps/details?id=com.scelik.kelespisti&amp;hl=tr" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="İndir" data-en="Download" aria-label="Keleş Pişti uygulamasını indir">İndir</a>
                 </div>
             </div>
         </div>
 
         <!-- KATEGORİ: Haberler (Basında Biz) -->
-        <h2 class="category-title">HABERLER (BASINDA BİZ)</h2>
+        <h2 class="category-title" data-tr="HABERLER (BASINDA BİZ)" data-en="IN THE PRESS">HABERLER (BASINDA BİZ)</h2>
         <div class="games-grid">
             <!-- Haber 1 -->
             <div class="app-card">
@@ -431,11 +761,11 @@
                     <div class="app-icon" aria-hidden="true">📰</div>
                     <div class="app-info">
                         <h3 class="app-title">Görme engelli müzik öğretmeni piyano eğitimiyle öğrencilerin hayallerine dokunuyor</h3>
-                        <p class="app-desc">Anadolu Ajansı Röportajı</p>
+                        <p class="app-desc" data-tr="Anadolu Ajansı Röportajı" data-en="Anadolu Agency Feature Interview">Anadolu Ajansı Röportajı</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://www.aa.com.tr/tr/yasam/gorme-engelli-muzik-ogretmeni-piyano-egitimiyle-ogrencilerin-hayallerine-dokunuyor/3779375" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
+                    <a href="https://www.aa.com.tr/tr/yasam/gorme-engelli-muzik-ogretmeni-piyano-egitimiyle-ogrencilerin-hayallerine-dokunuyor/3779375" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" data-tr="Haberi Oku" data-en="Read Article" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
                 </div>
             </div>
 
@@ -445,55 +775,25 @@
                     <div class="app-icon" aria-hidden="true">📰</div>
                     <div class="app-info">
                         <h3 class="app-title">Barış Manço hayranı görme engelli, müzik öğretmenliği hayaline çok yaklaştı</h3>
-                        <p class="app-desc">Anadolu Ajansı Röportajı</p>
+                        <p class="app-desc" data-tr="Anadolu Ajansı Röportajı" data-en="Anadolu Agency Feature Interview">Anadolu Ajansı Röportajı</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://www.aa.com.tr/tr/ayrimcilikhatti/ayrimcilik/baris-manco-hayrani-gorme-engelli-muzik-ogretmenligi-hayaline-cok-yaklasti-/1820538" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
+                    <a href="https://www.aa.com.tr/tr/ayrimcilikhatti/ayrimcilik/baris-manco-hayrani-gorme-engelli-muzik-ogretmenligi-hayaline-cok-yaklasti-/1820538" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" data-tr="Haberi Oku" data-en="Read Article" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
                 </div>
             </div>
-            
+
             <!-- Haber 3 -->
             <div class="app-card">
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">📰</div>
                     <div class="app-info">
                         <h3 class="app-title">Barış Manço hayranı görme engelli Ümit'in hayali müzik öğretmeni olmak</h3>
-                        <p class="app-desc">Anadolu Ajansı Röportajı</p>
+                        <p class="app-desc" data-tr="Anadolu Ajansı Röportajı" data-en="Anadolu Agency Feature Interview">Anadolu Ajansı Röportajı</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://www.aa.com.tr/tr/yasam/baris-manco-hayrani-gorme-engelli-umitin-hayali-muzik-ogretmeni-olmak-/1975038" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- KATEGORİ: Sosyal Medya -->
-        <h2 class="category-title">SOSYAL MEDYA</h2>
-        <div class="games-grid">
-            <div class="app-card">
-                <div class="app-card-top">
-                    <div class="app-icon" aria-hidden="true">📸</div>
-                    <div class="app-info">
-                        <h3 class="app-title">Instagram</h3>
-                        <p class="app-desc">Günlük hayatımdan kareler ve güncel paylaşımlarım.</p>
-                    </div>
-                </div>
-                <div class="app-action">
-                    <a href="https://www.instagram.com/umitekremmikyas/" target="_blank" rel="noopener noreferrer" class="btn-play btn-social-play" aria-label="Instagram hesabıma git">Takip Et</a>
-                </div>
-            </div>
-
-            <div class="app-card">
-                <div class="app-card-top">
-                    <div class="app-icon" aria-hidden="true">▶️</div>
-                    <div class="app-info">
-                        <h3 class="app-title">YouTube</h3>
-                        <p class="app-desc">Müzik icralarım, Barış Manço eserleri ve diğer videolarım.</p>
-                    </div>
-                </div>
-                <div class="app-action">
-                    <a href="https://www.youtube.com/@umitekremmikyas2518" target="_blank" rel="noopener noreferrer" class="btn-play btn-social-play" aria-label="YouTube kanalıma git">Abone Ol</a>
+                    <a href="https://www.aa.com.tr/tr/yasam/baris-manco-hayrani-gorme-engelli-umitin-hayali-muzik-ogretmeni-olmak-/1975038" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" data-tr="Haberi Oku" data-en="Read Article" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
                 </div>
             </div>
         </div>
@@ -501,22 +801,71 @@
         <!-- Teşekkür Bölümü -->
         <section class="about-section" aria-label="Teşekkür" style="margin-top: 3rem; background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2);">
             <h2 class="sr-only">Teşekkür</h2>
-            <p style="text-align: center; font-style: italic; color: #cbd5e1; font-size: 1.05rem;">
+            <p style="text-align: center; font-style: italic; color: #cbd5e1; font-size: 1.05rem;"
+               data-tr="Bu site, Gaddar Bilgi altyapısı sayesinde ayakta durmaktadır. Sunucu maliyetlerini üstlendikleri ve karşılaştığım her türlü soruna özveriyle çözüm buldukları için kendilerine sonsuz teşekkürlerimi sunarım. Bu sitenin hayatta kalmasında ve sizlere ulaşmasında onların emekleri çok büyük."
+               data-en="Special thanks to Gaddar Bilgi infrastructure for hosting and supporting Mikyas Studio.">
                 Bu site, <strong>Gaddar Bilgi</strong> altyapısı sayesinde ayakta durmaktadır. Sunucu maliyetlerini üstlendikleri ve karşılaştığım her türlü soruna özveriyle çözüm buldukları için kendilerine sonsuz teşekkürlerimi sunarım. Bu sitenin hayatta kalmasında ve sizlere ulaşmasında onların emekleri çok büyük.
             </p>
         </section>
     </main>
 
     <script>
+        var currentLang = 'tr';
+
+        function updateAdrenalineStatus(lang) {
+            var badge = document.getElementById('adrenaline-status-badge');
+            var btn = document.getElementById('adrenaline-cta-btn');
+            if (!badge || !btn) return;
+            var releaseDate = new Date('2026-12-04T00:00:00+03:00');
+            var now = new Date();
+            var diffMs = releaseDate.getTime() - now.getTime();
+            if (diffMs <= 0) {
+                badge.textContent = lang === 'en' ? '🔥 OUT NOW ON ALL PLATFORMS' : '🔥 ŞİMDİ TÜM PLATFORMLARDA YAYINDA';
+                btn.textContent = lang === 'en' ? '🎧 Listen on All Platforms' : '🎧 Tüm Platformlarda Dinle';
+            } else {
+                var days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                badge.textContent = lang === 'en'
+                    ? ('🔥 RELEASING DEC 4 • ' + days + ' DAYS LEFT')
+                    : ('🔥 4 ARALIK\'TA YAYINDA • SON ' + days + ' GÜN');
+                btn.textContent = lang === 'en' ? '🔥 Pre-Save on Spotify' : '🔥 Spotify Ön Kaydı Yap';
+            }
+        }
+
+        function setSiteLang(lang) {
+            currentLang = (lang === 'en') ? 'en' : 'tr';
+            document.documentElement.lang = currentLang;
+            var nodes = document.querySelectorAll('[data-' + currentLang + ']');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].textContent = nodes[i].getAttribute('data-' + currentLang);
+            }
+            var btnTr = document.getElementById('btn-tr');
+            var btnEn = document.getElementById('btn-en');
+            if (btnTr && btnEn) {
+                btnTr.setAttribute('aria-pressed', currentLang === 'tr' ? 'true' : 'false');
+                btnEn.setAttribute('aria-pressed', currentLang === 'en' ? 'true' : 'false');
+            }
+            updateAdrenalineStatus(currentLang);
+            updateWelcomeClock();
+        }
+
         function updateWelcomeClock() {
             var timeDisplay = document.getElementById('current-time-display');
             if (timeDisplay) {
                 var now = new Date();
-                timeDisplay.textContent = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                var locale = currentLang === 'en' ? 'en-US' : 'tr-TR';
+                timeDisplay.textContent = now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
             }
         }
-        updateWelcomeClock();
-        setInterval(updateWelcomeClock, 10000);
+
+        (function initPortal() {
+            var browserLang = (navigator.language || navigator.userLanguage || 'tr').toLowerCase();
+            if (browserLang.indexOf('tr') === 0) {
+                setSiteLang('tr');
+            } else {
+                setSiteLang('en');
+            }
+            setInterval(updateWelcomeClock, 10000);
+        })();
     </script>
 </body>
 </html>
