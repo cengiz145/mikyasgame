@@ -4,17 +4,17 @@
     <link rel="canonical" href="https://mikyasstudio.com.tr/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="robots" content="index, follow">
     <title>Mikyas Studio — Ümit Ekrem Mikyas</title>
     <meta name="description" content="Mikyas Studio tarafından geliştirilen erişilebilir sesli oyun projeleri ve Ümit Ekrem Mikyas'ın resmi müzikleri.">
     <meta property="og:title" content="Mikyas Studio — Ümit Ekrem Mikyas">
     <meta property="og:description" content="Erişilebilir sesli oyunlar ve resmi enstrümantal müzik eserleri.">
     <meta property="og:url" content="https://mikyasstudio.com.tr/">
     <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
 
-    <script type="application/ld+json">
+    <script type="application/ld+json" id="artist-schema-jsonld">
     {
       "@context": "https://schema.org",
       "@type": "MusicGroup",
@@ -34,6 +34,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://itunes.apple.com" crossorigin>
+    <link rel="preconnect" href="https://is1-ssl.mzstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <style>
@@ -71,6 +73,25 @@
             outline-offset: 3px;
         }
 
+        /* WCAG AAA Ana İçeriğe Atla Bağlantısı (Yalnızca Tab ile odaklanınca görünür) */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 1rem;
+            background: #2563eb;
+            color: #fff;
+            padding: 0.65rem 1.2rem;
+            border-radius: 0 0 10px 10px;
+            font-weight: 700;
+            text-decoration: none;
+            z-index: 100;
+            transition: top 0.15s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
         .navbar {
             width: 100%;
             padding: 1.4rem 2rem;
@@ -102,12 +123,14 @@
             height: 100%;
             overflow: hidden;
             z-index: -1;
+            pointer-events: none;
         }
 
         .blob {
             position: absolute;
             filter: blur(80px);
             opacity: 0.5;
+            will-change: transform;
             animation: float 20s infinite alternate;
         }
 
@@ -120,6 +143,11 @@
             33% { transform: translate(30px, -50px) scale(1.1); }
             66% { transform: translate(-20px, 20px) scale(0.9); }
             100% { transform: translate(0, 0) scale(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .blob { animation: none; }
+            * { scroll-behavior: auto !important; transition: none !important; }
         }
 
         .container {
@@ -207,6 +235,8 @@
             text-align: left;
             transition: all 0.25s ease;
             color: var(--text-main);
+            content-visibility: auto;
+            contain-intrinsic-size: 160px;
         }
 
         .app-card:hover {
@@ -316,7 +346,6 @@
             background: linear-gradient(135deg, #f87171, #ef4444);
         }
 
-        /* Sadece kullanıcı "Sitede Çal" dediğinde açılan sade resmi oynatıcı alanı */
         .clean-player-box {
             display: none;
             margin-bottom: 1.2rem;
@@ -364,30 +393,32 @@
 </head>
 <body>
 
+    <a href="#main-content" class="skip-link" id="skip-to-main">Ana İçeriğe Atla</a>
+
     <div class="bg-blobs" aria-hidden="true">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
     </div>
 
-    <nav class="navbar" aria-label="Üst Başlık">
+    <header class="navbar">
         <div class="logo" aria-hidden="true">Mikyas Studio</div>
-    </nav>
+    </header>
 
-    <main class="container">
+    <main class="container" id="main-content" tabindex="-1">
 
         <div class="suits-decoration" aria-hidden="true">♥♠♦♣</div>
         <h1 class="portal-title" id="main-title">MİKYAS STUDIO PORTAL</h1>
         <p class="welcome-text" id="welcome-message"><span id="welcome-prefix">Hoş Geldiniz. Saat şu an </span><span id="current-time-display"></span></p>
 
         <!-- Hakkımda Bölümü -->
-        <section class="about-section" aria-label="Hakkımda">
+        <section class="about-section" aria-labelledby="about-heading">
             <h2 class="sr-only" id="about-heading">Ümit Ekrem Mikyas - Hakkımda</h2>
             <p id="about-p1">Merhaba. Benim adım Ümit Ekrem Mikyas. 26 yaşındayım ve müzik öğretmeniyim.</p>
             <p id="about-p2">Bu portalda geliştirmekte olduğum erişilebilir sesli oyun projelerimi ve dijital platformlarda yayınlanan özgün müziklerimi bulacaksınız. Projelerimde yapay zekanın gücünü aktif bir şekilde kullanıyorum, ancak fikirlerimin tamamen bana ait, özgün düşünceler olduğunu da belirtmek isterim.</p>
         </section>
 
-        <!-- 1. KATEGORİ: Projelerim (Görme Engelli Ziyaretçiler İçin Alışılmış İlk Sırada ve Tertemiz!) -->
+        <!-- 1. KATEGORİ: Projelerim -->
         <h2 class="category-title" id="cat-projects">PROJELERİM</h2>
         <div class="games-grid">
 
@@ -445,11 +476,10 @@
             </div>
         </div>
 
-        <!-- 2. KATEGORİ: Müziklerim (Arka Planda Tam Otomatik Mağaza Senkronlu, Ön Yüzde Sade ve Erişilebilir!) -->
+        <!-- 2. KATEGORİ: Müziklerim -->
         <h2 class="category-title" id="dinle" tabindex="-1">MÜZİKLERİM</h2>
 
-        <!-- Sadece kullanıcı bir şarkıda "Sitede Dinle" düğmesine basınca açılan tekil temiz oynatıcı (sayfa açılışında kapalıdır, ekran okuyucuyu asla yormaz) -->
-        <div id="clean-player-container" class="clean-player-box" role="region" aria-label="Müzik Oynatıcı">
+        <div id="clean-player-container" class="clean-player-box" role="region" aria-labelledby="clean-player-title">
             <div class="clean-player-header">
                 <strong id="clean-player-title">Şimdi Çalıyor</strong>
                 <button type="button" class="btn-play" style="padding: 0.4rem 1.1rem; font-size: 0.9rem; background: #475569;" onclick="closeSitePlayer()" id="clean-player-close">Kapat</button>
@@ -459,10 +489,8 @@
 
         <div id="sr-music-announce" class="sr-only" aria-live="polite"></div>
 
-        <!-- Otomatik Güncellenen Sade Şarkı Kartları -->
         <div id="smart-discography-list" class="games-grid"></div>
 
-        <!-- Yaklaşan Yeni Tekli: Adrenaline (4 Aralık'tan sonra mağaza listesine otomatik geçeceği için sade kart) -->
         <div id="upcoming-adrenaline-card" class="app-card" style="margin-top: 1.2rem;">
             <div class="app-card-top">
                 <div class="app-icon" aria-hidden="true">🎵</div>
@@ -472,11 +500,11 @@
                 </div>
             </div>
             <div class="app-action">
-                <a href="https://distrokid.com/hyperfollow/mitekremmikyas/adrenaline" target="_blank" rel="noopener noreferrer" onclick="trackStat('adrenaline_presave')" class="btn-play btn-music-store" id="adr-btn" aria-label="Adrenaline şarkısı için Spotify ön kaydı yap">Ön Kayıt Yap</a>
+                <a href="https://distrokid.com/hyperfollow/mitekremmikyas/adrenaline" target="_blank" rel="noopener noreferrer" data-track-stat="adrenaline_presave" class="btn-play btn-music-store" id="adr-btn" aria-label="Adrenaline şarkısı için Spotify ön kaydı yap">Ön Kayıt Yap</a>
             </div>
         </div>
 
-        <!-- 3. KATEGORİ: Sosyal Medya ve Müzik Hesaplarım (5 Ana Hesap — Tek ve Net Düğmeler) -->
+        <!-- 3. KATEGORİ: Sosyal Medya ve Müzik Hesaplarım -->
         <h2 class="category-title" id="cat-social">SOSYAL MEDYA VE MÜZİK HESAPLARIM</h2>
         <div class="games-grid">
 
@@ -489,7 +517,7 @@
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer" onclick="trackStat('youtube_sub')" class="btn-play btn-yt-sub" id="soc-yt-btn" aria-label="YouTube kanalıma abone ol">Abone Ol</a>
+                    <a href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer" data-track-stat="youtube_sub" class="btn-play btn-yt-sub" id="soc-yt-btn" aria-label="YouTube kanalıma abone ol">Abone Ol</a>
                 </div>
             </div>
 
@@ -502,7 +530,7 @@
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN" target="_blank" rel="noopener noreferrer" onclick="trackStat('spotify_profile')" class="btn-play btn-music-store" id="soc-sp-btn" aria-label="Spotify sanatçı profilimde dinle">Dinle</a>
+                    <a href="https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN" target="_blank" rel="noopener noreferrer" data-track-stat="spotify_profile" class="btn-play btn-music-store" id="soc-sp-btn" aria-label="Spotify sanatçı profilimde dinle">Dinle</a>
                 </div>
             </div>
 
@@ -515,7 +543,7 @@
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059" target="_blank" rel="noopener noreferrer" onclick="trackStat('apple_profile')" class="btn-play btn-music-store" id="soc-ap-btn" aria-label="Apple Music sanatçı profilimde dinle">Dinle</a>
+                    <a href="https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059" target="_blank" rel="noopener noreferrer" data-track-stat="apple_profile" class="btn-play btn-music-store" id="soc-ap-btn" aria-label="Apple Music sanatçı profilimde dinle">Dinle</a>
                 </div>
             </div>
 
@@ -528,7 +556,7 @@
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://www.instagram.com/umitekremmikyas/" target="_blank" rel="noopener noreferrer" onclick="trackStat('instagram_profile')" class="btn-play btn-social-play" id="soc-ig-btn" aria-label="Instagram hesabımı takip et">Takip Et</a>
+                    <a href="https://www.instagram.com/umitekremmikyas/" target="_blank" rel="noopener noreferrer" data-track-stat="instagram_profile" class="btn-play btn-social-play" id="soc-ig-btn" aria-label="Instagram hesabımı takip et">Takip Et</a>
                 </div>
             </div>
 
@@ -541,7 +569,7 @@
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://www.tiktok.com/@umitekremmikyas" target="_blank" rel="noopener noreferrer" onclick="trackStat('tiktok_profile')" class="btn-play btn-social-play" id="soc-tt-btn" aria-label="TikTok hesabımı takip et">Takip Et</a>
+                    <a href="https://www.tiktok.com/@umitekremmikyas" target="_blank" rel="noopener noreferrer" data-track-stat="tiktok_profile" class="btn-play btn-social-play" id="soc-tt-btn" aria-label="TikTok hesabımı takip et">Takip Et</a>
                 </div>
             </div>
         </div>
@@ -620,8 +648,8 @@
         </div>
 
         <!-- Teşekkür Bölümü -->
-        <section class="about-section" aria-label="Teşekkür" style="margin-top: 3rem; background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2);">
-            <h2 class="sr-only">Teşekkür</h2>
+        <section class="about-section" aria-labelledby="thanks-heading" style="margin-top: 3rem; background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2);">
+            <h2 class="sr-only" id="thanks-heading">Teşekkür</h2>
             <p style="text-align: center; font-style: italic; color: #cbd5e1; font-size: 1.05rem;">
                 Bu site, <strong>Gaddar Bilgi</strong> altyapısı sayesinde ayakta durmaktadır. Sunucu maliyetlerini üstlendikleri ve karşılaştığım her türlü soruna özveriyle çözüm buldukları için kendilerine sonsuz teşekkürlerimi sunarım. Bu sitenin hayatta kalmasında ve sizlere ulaşmasında onların emekleri çok büyük.
             </p>
@@ -629,12 +657,16 @@
     </main>
 
     <script>
-        /* Arka planda sessizce çalışan akıllı sistemler (Ekranı asla kalabalıklaştırmaz!) */
+    (function () {
+        'use strict';
+
         var isEnglishVisitor = ((navigator.language || 'tr').toLowerCase().indexOf('tr') !== 0);
         var isAppleDevice = /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent || '');
         var RTDB_BASE = 'https://hgfz-5a1ca-default-rtdb.firebaseio.com/site_stats';
+        var CACHE_KEY = 'mikyas_discography_v2';
+        var CACHE_TTL_MS = 6 * 60 * 60 * 1000; /* 6 saatlik yerel önbellek (0ms anında açılış) */
+        var lastTriggerElement = null;
 
-        /* Resmi DistroKid YouTube Art Track ve Spotify eşleşmeleri */
         var KNOWN_SONGS = {
             'meyve dalında güzel': {
                 ytId: 'h6IzlHhS7I4',
@@ -674,11 +706,19 @@
             }
         ];
 
+        function sanitizeHttpsUrl(url, fallback) {
+            if (typeof url === 'string' && /^https:\/\//i.test(url)) {
+                return url;
+            }
+            return fallback;
+        }
+
         function trackStat(metric) {
             try {
-                if (window.location.protocol === 'file:') return;
+                if (window.location.protocol === 'file:' || !/^[a-z0-9_]+$/i.test(metric)) return;
                 fetch(RTDB_BASE + '/' + metric + '.json', {
                     method: 'PUT',
+                    keepalive: true,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ '.sv': { 'increment': 1 } })
                 }).catch(function () {});
@@ -693,42 +733,124 @@
             } catch (e) {}
         }
 
-        /* Sadece kullanıcı bastığında tek ve temiz bir resmi oynatıcı açar (DistroKid telifi yazar) */
-        function playFullSongOnSite(trackTitle, ytId, playlistOrder) {
+        /* İşletim sistemi kilit ekranı ve kulaklık tuşları için resmi MediaSession entegrasyonu */
+        function updateOsMediaSession(trackTitle, artworkUrl) {
+            try {
+                if ('mediaSession' in navigator && typeof MediaMetadata !== 'undefined') {
+                    var artArr = artworkUrl ? [{ src: artworkUrl, sizes: '300x300', type: 'image/jpeg' }] : [];
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title: trackTitle,
+                        artist: 'Ümit Ekrem Mikyas',
+                        album: 'Mikyas Studio',
+                        artwork: artArr
+                    });
+                }
+            } catch (e) {}
+        }
+
+        /* XSS-Korumalı saf DOM iframe oluşturma + Ekran okuyucu odak yönetimi */
+        function playFullSongOnSite(trackTitle, ytId, playlistOrder, artworkUrl, triggerEl) {
             var box = document.getElementById('clean-player-container');
             var mount = document.getElementById('clean-player-mount');
             var titleEl = document.getElementById('clean-player-title');
+            var closeBtn = document.getElementById('clean-player-close');
             var sr = document.getElementById('sr-music-announce');
             if (!box || !mount) return;
 
-            if (!ytId) {
+            if (!ytId || !/^[A-Za-z0-9_-]{6,20}$/.test(ytId)) {
                 var qUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent('Ümit Ekrem Mikyas ' + trackTitle);
                 window.open(qUrl, '_blank', 'noopener,noreferrer');
                 return;
             }
 
+            lastTriggerElement = triggerEl || document.activeElement;
             titleEl.textContent = (isEnglishVisitor ? 'Now Playing: ' : 'Şimdi Çalıyor: ') + trackTitle;
-            var src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&loop=1&playlist=' + (playlistOrder || ytId);
-            mount.innerHTML = '<iframe class="clean-player-frame" src="' + src + '" title="' + trackTitle + ' Oynatıcı" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>';
+
+            while (mount.firstChild) {
+                mount.removeChild(mount.firstChild);
+            }
+
+            var safeOrder = (playlistOrder && /^[A-Za-z0-9_,-]+$/.test(playlistOrder)) ? playlistOrder : ytId;
+            var iframe = document.createElement('iframe');
+            iframe.className = 'clean-player-frame';
+            iframe.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&loop=1&playlist=' + safeOrder;
+            iframe.title = trackTitle + (isEnglishVisitor ? ' Audio Player' : ' Müzik Oynatıcı');
+            iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
+            iframe.allowFullscreen = true;
+            mount.appendChild(iframe);
+
             box.style.display = 'block';
+            updateOsMediaSession(trackTitle, artworkUrl);
             trackStat('site_song_plays');
+
             if (sr) {
-                sr.textContent = trackTitle + (isEnglishVisitor ? ' started playing.' : ' çalmaya başladı.');
+                sr.textContent = trackTitle + (isEnglishVisitor ? ' started playing. Press Escape to close player.' : ' çalmaya başladı. Oynatıcıyı kapatmak için Kapat düğmesini veya Escape tuşunu kullanabilirsiniz.');
+            }
+            if (closeBtn) {
+                closeBtn.focus();
             }
         }
 
-        function closeSitePlayer() {
+        window.closeSitePlayer = function () {
             var box = document.getElementById('clean-player-container');
             var mount = document.getElementById('clean-player-mount');
-            if (mount) mount.innerHTML = '';
+            var sr = document.getElementById('sr-music-announce');
+            if (mount) {
+                while (mount.firstChild) {
+                    mount.removeChild(mount.firstChild);
+                }
+            }
             if (box) box.style.display = 'none';
+            if (sr) {
+                sr.textContent = isEnglishVisitor ? 'Player closed.' : 'Oynatıcı kapatıldı.';
+            }
+            if (lastTriggerElement && typeof lastTriggerElement.focus === 'function') {
+                lastTriggerElement.focus();
+                lastTriggerElement = null;
+            }
+        };
+
+        /* Yeni çıkan her şarkıyı Google Arama Motoru Schema.org grafiğine dinamik işler */
+        function syncDynamicSeoSchema(tracks) {
+            try {
+                var schemaEl = document.getElementById('artist-schema-jsonld');
+                if (!schemaEl || !tracks || !tracks.length) return;
+                var recordings = [];
+                for (var i = 0; i < tracks.length; i++) {
+                    var t = tracks[i];
+                    recordings.push({
+                        '@type': 'MusicRecording',
+                        'name': t.trackName,
+                        'byArtist': { '@type': 'MusicGroup', 'name': 'Ümit Ekrem Mikyas' },
+                        'datePublished': t.releaseDate ? t.releaseDate.slice(0, 10) : undefined,
+                        'url': sanitizeHttpsUrl(t.trackViewUrl, 'https://mikyasstudio.com.tr/#dinle')
+                    });
+                }
+                var data = {
+                    '@context': 'https://schema.org',
+                    '@type': 'MusicGroup',
+                    'name': 'Ümit Ekrem Mikyas',
+                    'alternateName': 'Mikyas Studio',
+                    'url': 'https://mikyasstudio.com.tr/',
+                    'sameAs': [
+                        'https://www.youtube.com/@umitekremmikyas2518',
+                        'https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN',
+                        'https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059',
+                        'https://www.deezer.com/artist/385830051',
+                        'https://www.instagram.com/umitekremmikyas/',
+                        'https://www.tiktok.com/@umitekremmikyas'
+                    ],
+                    'track': recordings
+                };
+                schemaEl.textContent = JSON.stringify(data);
+            } catch (e) {}
         }
 
         function renderCleanDiscography(tracks) {
             var listEl = document.getElementById('smart-discography-list');
             if (!listEl) return;
-            listEl.innerHTML = '';
 
+            var frag = document.createDocumentFragment();
             var hasAdrenalineLive = false;
 
             for (var i = 0; i < tracks.length; i++) {
@@ -737,11 +859,12 @@
                 if (key === 'adrenaline') hasAdrenalineLive = true;
 
                 var known = KNOWN_SONGS[key] || {};
-                var appleUrl = t.trackViewUrl || 'https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059';
+                var appleUrl = sanitizeHttpsUrl(t.trackViewUrl, 'https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059');
                 var spotifyUrl = known.spotify || ('https://open.spotify.com/search/' + encodeURIComponent('Ümit Ekrem Mikyas ' + t.trackName));
                 var storeUrl = isAppleDevice ? appleUrl : spotifyUrl;
                 var storeName = isAppleDevice ? 'Apple Music' : 'Spotify';
-                var art = (t.artworkUrl100 || '').replace('100x100bb.jpg', '300x300bb.jpg');
+                var rawArt = sanitizeHttpsUrl(t.artworkUrl100, '');
+                var art = rawArt ? rawArt.replace('100x100bb.jpg', '300x300bb.jpg') : '';
 
                 var card = document.createElement('div');
                 card.className = 'app-card';
@@ -753,6 +876,9 @@
                     var img = document.createElement('img');
                     img.className = 'track-cover';
                     img.src = art;
+                    img.width = 72;
+                    img.height = 72;
+                    img.decoding = 'async';
                     img.alt = '';
                     img.setAttribute('aria-hidden', 'true');
                     img.loading = 'lazy';
@@ -769,10 +895,11 @@
 
                 var desc = document.createElement('p');
                 desc.className = 'app-desc';
-                var year = t.releaseDate ? new Date(t.releaseDate).getFullYear() : '';
+                var parsedYear = t.releaseDate ? new Date(t.releaseDate).getFullYear() : NaN;
+                var yearStr = !isNaN(parsedYear) ? (' (' + parsedYear + ')') : '';
                 desc.textContent = isEnglishVisitor
-                    ? ('Ümit Ekrem Mikyas • Official Instrumental Single' + (year ? (' (' + year + ')') : ''))
-                    : ('Ümit Ekrem Mikyas • Resmi Enstrümantal Eser' + (year ? (' (' + year + ')') : ''));
+                    ? ('Ümit Ekrem Mikyas • Official Instrumental Single' + yearStr)
+                    : ('Ümit Ekrem Mikyas • Resmi Enstrümantal Eser' + yearStr);
                 info.appendChild(desc);
                 top.appendChild(info);
                 card.appendChild(top);
@@ -780,7 +907,6 @@
                 var actions = document.createElement('div');
                 actions.className = 'app-action';
 
-                /* Düğme 1: Siteden çıkmadan tam şarkıyı çal (DistroKid telifi yazar) */
                 var playBtn = document.createElement('button');
                 playBtn.type = 'button';
                 playBtn.className = 'btn-play';
@@ -788,14 +914,13 @@
                 playBtn.setAttribute('aria-label', isEnglishVisitor
                     ? ('Play full track ' + t.trackName + ' on this page')
                     : (t.trackName + ' şarkısını sitede dinle'));
-                (function (title, ytId, order) {
+                (function (title, ytId, order, cover, btnRef) {
                     playBtn.addEventListener('click', function () {
-                        playFullSongOnSite(title, ytId, order);
+                        playFullSongOnSite(title, ytId, order, cover, btnRef);
                     });
-                })(t.trackName, known.ytId || null, known.playlistOrder || null);
+                })(t.trackName, known.ytId || null, known.playlistOrder || null, art, playBtn);
                 actions.appendChild(playBtn);
 
-                /* Düğme 2: Cihaza uygun en yüksek ödemeli mağazada aç (iPhone -> Apple Music, diğer -> Spotify) */
                 var stLink = document.createElement('a');
                 stLink.href = storeUrl;
                 stLink.target = '_blank';
@@ -811,21 +936,58 @@
                 actions.appendChild(stLink);
 
                 card.appendChild(actions);
-                listEl.appendChild(card);
+                frag.appendChild(card);
             }
 
-            /* Adrenaline mağazalarda yayına girdiği gün ön kayıt kartını otomatik gizle (çift görünmesin!) */
+            while (listEl.firstChild) {
+                listEl.removeChild(listEl.firstChild);
+            }
+            listEl.appendChild(frag);
+            syncDynamicSeoSchema(tracks);
+
             var upCard = document.getElementById('upcoming-adrenaline-card');
             if (upCard && (hasAdrenalineLive || new Date() >= new Date('2026-12-05T00:00:00+03:00'))) {
                 upCard.style.display = 'none';
             }
         }
 
+        function loadCachedDiscography() {
+            try {
+                var raw = localStorage.getItem(CACHE_KEY);
+                if (!raw) return null;
+                var parsed = JSON.parse(raw);
+                if (parsed && Array.isArray(parsed.tracks) && parsed.tracks.length > 0) {
+                    return parsed;
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function saveCachedDiscography(tracks) {
+            try {
+                localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), tracks: tracks }));
+            } catch (e) {}
+        }
+
+        /* Stale-While-Revalidate + 6sn Zaman Aşımı Korumalı Otonom Diskografi Motoru */
         function fetchAutoDiscography() {
-            renderCleanDiscography(DEFAULT_TRACKS);
-            fetch('https://itunes.apple.com/lookup?id=1893993059&entity=song&country=tr&limit=50')
+            var cached = loadCachedDiscography();
+            if (cached) {
+                renderCleanDiscography(cached.tracks);
+                if ((Date.now() - cached.ts) < CACHE_TTL_MS) {
+                    return;
+                }
+            } else {
+                renderCleanDiscography(DEFAULT_TRACKS);
+            }
+
+            var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+            var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 6000) : null;
+
+            fetch('https://itunes.apple.com/lookup?id=1893993059&entity=song&country=tr&limit=50', ctrl ? { signal: ctrl.signal } : undefined)
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
+                    if (timer) clearTimeout(timer);
                     if (!data || !Array.isArray(data.results)) return;
                     var songs = [];
                     var seen = {};
@@ -835,7 +997,12 @@
                             var k = it.trackName.toLowerCase().trim();
                             if (!seen[k]) {
                                 seen[k] = true;
-                                songs.push(it);
+                                songs.push({
+                                    trackName: it.trackName,
+                                    releaseDate: it.releaseDate,
+                                    trackViewUrl: it.trackViewUrl,
+                                    artworkUrl100: it.artworkUrl100
+                                });
                             }
                         }
                     }
@@ -843,17 +1010,20 @@
                         songs.sort(function (a, b) {
                             return new Date(b.releaseDate || 0).getTime() - new Date(a.releaseDate || 0).getTime();
                         });
+                        saveCachedDiscography(songs);
                         renderCleanDiscography(songs);
                     }
                 })
-                .catch(function () {});
+                .catch(function () {
+                    if (timer) clearTimeout(timer);
+                });
         }
 
-        /* Yabancı ülkeden girenler için sade otomatik İngilizce çeviri (ekstra dil düğmesi kalabalığı olmadan!) */
         function applyVisitorLanguage() {
             if (!isEnglishVisitor) return;
             document.documentElement.lang = 'en';
             var map = {
+                'skip-to-main': 'Skip to main content',
                 'welcome-prefix': 'Welcome. Local time: ',
                 'about-heading': 'About Ümit Ekrem Mikyas',
                 'about-p1': 'Hello, my name is Ümit Ekrem Mikyas. I am a music educator, pianist, composer, and developer.',
@@ -904,6 +1074,24 @@
             }
         }
 
+        /* Olay delegasyonu ile temiz istatistik takibi ve Escape ile oynatıcı kapatma */
+        document.addEventListener('click', function (ev) {
+            var target = ev.target && ev.target.closest ? ev.target.closest('[data-track-stat]') : null;
+            if (target) {
+                trackStat(target.getAttribute('data-track-stat'));
+            }
+        });
+
+        document.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Escape') {
+                var box = document.getElementById('clean-player-container');
+                if (box && box.style.display === 'block') {
+                    ev.preventDefault();
+                    window.closeSitePlayer();
+                }
+            }
+        });
+
         applyVisitorLanguage();
         updateWelcomeClock();
         setInterval(updateWelcomeClock, 10000);
@@ -919,6 +1107,7 @@
                 }, 200);
             }
         }
+    })();
     </script>
 </body>
 </html>

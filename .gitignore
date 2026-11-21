@@ -1,4 +1,4 @@
-﻿node_modules/
+node_modules/
 service-account.json
 .env
 *.dat
@@ -22,3 +22,6 @@ client/lang/
 
 hafizana_guven/portatif_paket/
 hafizana_guven/dist/
+*.jks
+*.keystore
+*.aab
