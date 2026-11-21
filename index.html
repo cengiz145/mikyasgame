@@ -7,14 +7,13 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Ümit Ekrem Mikyas | Mikyas Studio — Resmi Sanatçı &amp; Erişilebilir Oyun Portalı</title>
-    <meta name="description" content="Piyanist, müzik öğretmeni, besteci ve yazılımcı Ümit Ekrem Mikyas'ın resmi müzikleri (Spotify, Apple Music, YouTube, Deezer) ve erişilebilir sesli oyun projeleri portalı.">
-    <meta property="og:title" content="Ümit Ekrem Mikyas | Mikyas Studio — Official Music &amp; Accessible Games">
-    <meta property="og:description" content="Listen to official releases by pianist &amp; composer Ümit Ekrem Mikyas on Spotify, Apple Music, YouTube &amp; explore accessible audio games.">
+    <title>Mikyas Studio — Ümit Ekrem Mikyas</title>
+    <meta name="description" content="Mikyas Studio tarafından geliştirilen erişilebilir sesli oyun projeleri ve Ümit Ekrem Mikyas'ın resmi müzikleri.">
+    <meta property="og:title" content="Mikyas Studio — Ümit Ekrem Mikyas">
+    <meta property="og:description" content="Erişilebilir sesli oyunlar ve resmi enstrümantal müzik eserleri.">
     <meta property="og:url" content="https://mikyasstudio.com.tr/">
     <meta property="og:type" content="website">
 
-    <!-- Google Sanatçı Bilgi Grafiği (Schema.org MusicGroup & Person) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -22,7 +21,6 @@
       "name": "Ümit Ekrem Mikyas",
       "alternateName": "Mikyas Studio",
       "url": "https://mikyasstudio.com.tr/",
-      "genre": ["Instrumental", "Piano", "Melodic Techno", "Cinematic", "World Music"],
       "sameAs": [
         "https://www.youtube.com/@umitekremmikyas2518",
         "https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN",
@@ -34,7 +32,6 @@
     }
     </script>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -74,25 +71,22 @@
             outline-offset: 3px;
         }
 
-        /* Top Navbar / Logo & Language Switcher */
         .navbar {
             width: 100%;
-            padding: 1.2rem 2rem;
+            padding: 1.4rem 2rem;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            max-width: 1100px;
-            background: rgba(15, 23, 42, 0.78);
-            backdrop-filter: blur(12px);
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--glass-border);
             position: sticky;
             top: 0;
             z-index: 10;
-            border-radius: 0 0 18px 18px;
         }
 
         .logo {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 800;
             letter-spacing: 2px;
             background: linear-gradient(135deg, #fff, #a5b4fc);
@@ -100,32 +94,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .lang-switch {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-lang {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-main);
-            border: 1px solid var(--glass-border);
-            padding: 0.45rem 0.95rem;
-            border-radius: 20px;
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-lang[aria-pressed="true"] {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-color: transparent;
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
-        }
-
-        /* Dynamic Animated Background */
         .bg-blobs {
             position: fixed;
             top: 0;
@@ -154,42 +122,35 @@
             100% { transform: translate(0, 0) scale(1); }
         }
 
-        /* Main Container */
         .container {
-            margin-top: 2.5rem;
+            margin-top: 3rem;
             margin-bottom: 4rem;
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
             padding: 2.8rem;
-            max-width: 860px;
-            width: 92%;
+            max-width: 800px;
+            width: 90%;
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .about-section {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2.2rem;
+            padding: 2.2rem;
+            margin-bottom: 2.5rem;
             text-align: left;
             box-shadow: inset 0 0 20px rgba(255,255,255,0.02);
         }
 
         .about-section p {
-            font-size: 1.08rem;
+            font-size: 1.1rem;
             color: var(--text-main);
             line-height: 1.7;
-            margin-bottom: 1rem;
+            margin-bottom: 1.1rem;
         }
 
         .about-section p:last-child {
@@ -199,7 +160,7 @@
         .suits-decoration {
             font-size: 1.8rem;
             letter-spacing: 5px;
-            color: #38bdf8;
+            color: #ef4444;
             margin-bottom: 0.5rem;
         }
 
@@ -216,168 +177,7 @@
         .welcome-text {
             font-size: 1.15rem;
             color: var(--text-muted);
-            margin-bottom: 2rem;
-        }
-
-        /* Quick Subscribe Hero CTA Bar */
-        .hero-cta-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.9rem;
             margin-bottom: 2.2rem;
-        }
-
-        .btn-hero-yt {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: #fff;
-            text-decoration: none;
-            font-weight: 800;
-            padding: 0.85rem 1.8rem;
-            border-radius: 30px;
-            font-size: 1.05rem;
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .btn-hero-yt:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.55);
-        }
-
-        .btn-hero-sp {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff;
-            text-decoration: none;
-            font-weight: 800;
-            padding: 0.85rem 1.8rem;
-            border-radius: 30px;
-            font-size: 1.05rem;
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .btn-hero-sp:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
-        }
-
-        .btn-hero-radio {
-            background: linear-gradient(135deg, #f59e0b, #ec4899, #8b5cf6);
-            color: #fff;
-            border: none;
-            font-family: inherit;
-            font-weight: 800;
-            padding: 0.85rem 1.8rem;
-            border-radius: 30px;
-            font-size: 1.05rem;
-            cursor: pointer;
-            box-shadow: 0 6px 22px rgba(236, 72, 153, 0.42);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .btn-hero-radio:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 8px 28px rgba(236, 72, 153, 0.6);
-        }
-
-        .smart-dj-banner {
-            display: inline-flex;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.6rem;
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: #e0f2fe;
-            padding: 0.55rem 1.2rem;
-            border-radius: 999px;
-            font-size: 0.94rem;
-            margin-bottom: 1.4rem;
-        }
-
-        .live-pulse-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: #10b981;
-            box-shadow: 0 0 8px #10b981;
-            display: inline-block;
-        }
-
-        /* Sticky Bottom Mini-Radio & Subscribe Bar */
-        .sticky-royalty-bar {
-            position: fixed;
-            bottom: 14px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: min(760px, 94%);
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(56, 189, 248, 0.35);
-            border-radius: 999px;
-            padding: 0.6rem 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.65rem;
-            z-index: 50;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
-        }
-
-        .sticky-bar-status {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #e2e8f0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding-left: 0.4rem;
-        }
-
-        .sticky-bar-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-shrink: 0;
-        }
-
-        .btn-mini {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            padding: 0.42rem 0.85rem;
-            border-radius: 999px;
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 0.84rem;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .btn-mini:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-mini-yt {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            border-color: transparent;
-            font-weight: 800;
-        }
-
-        body {
-            padding-bottom: 5.2rem;
-        }
-
-        @media (max-width: 600px) {
-            .sticky-bar-status {
-                font-size: 0.8rem;
-            }
-            .btn-mini {
-                padding: 0.38rem 0.7rem;
-                font-size: 0.78rem;
-            }
         }
 
         .category-title {
@@ -386,365 +186,9 @@
             color: #f8fafc;
             margin: 2.5rem 0 1rem 0;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid rgba(255,255,255,0.12);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
             text-transform: uppercase;
             letter-spacing: 1px;
-        }
-
-        /* Featured Adrenaline Release Banner */
-        .release-highlight {
-            background: linear-gradient(135deg, rgba(14, 165, 233, 0.16), rgba(139, 92, 246, 0.18));
-            border: 1px solid rgba(56, 189, 248, 0.4);
-            border-radius: 18px;
-            padding: 1.6rem;
-            margin-bottom: 1.4rem;
-            text-align: left;
-            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.15);
-        }
-
-        .release-badge {
-            display: inline-block;
-            background: rgba(56, 189, 248, 0.2);
-            border: 1px solid rgba(56, 189, 248, 0.55);
-            color: #7dd3fc;
-            font-size: 0.85rem;
-            font-weight: 800;
-            padding: 0.25rem 0.8rem;
-            border-radius: 20px;
-            margin-bottom: 0.65rem;
-            letter-spacing: 0.5px;
-        }
-
-        .release-title {
-            font-size: 1.55rem;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 0.4rem;
-        }
-
-        .release-desc {
-            font-size: 0.98rem;
-            color: var(--text-muted);
-            line-height: 1.55;
-            margin-bottom: 1.1rem;
-        }
-
-        /* Platform Pills Grid */
-        .platform-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 0.9rem;
-            margin-bottom: 1.4rem;
-        }
-
-        .platform-btn {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 0.95rem 1.2rem;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.22s ease;
-        }
-
-        .platform-btn:hover {
-            background: rgba(255, 255, 255, 0.11);
-            transform: translateY(-3px);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .platform-btn span.arrow {
-            opacity: 0.75;
-            font-size: 1.1rem;
-        }
-
-        .spotify-embed-wrap {
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 1.4rem;
-            border: 1px solid var(--glass-border);
-            background: rgba(0, 0, 0, 0.25);
-        }
-
-        /* Smart Auto-Updating Discography Styles */
-        .discography-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin: 1.6rem 0 0.9rem 0;
-            text-align: left;
-        }
-
-        .discography-subtitle {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: #e2e8f0;
-            letter-spacing: 0.5px;
-        }
-
-        .discography-live-pill {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #6ee7b7;
-            background: rgba(16, 185, 129, 0.14);
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            padding: 0.25rem 0.75rem;
-            border-radius: 999px;
-        }
-
-        .discography-list {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-bottom: 1.6rem;
-        }
-
-        .track-card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.15rem;
-            display: flex;
-            align-items: center;
-            gap: 1.15rem;
-            text-align: left;
-            transition: all 0.25s ease;
-        }
-
-        .track-card:hover {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(255, 255, 255, 0.25);
-            transform: translateY(-2px);
-        }
-
-        .track-art {
-            width: 84px;
-            height: 84px;
-            border-radius: 12px;
-            object-fit: cover;
-            flex-shrink: 0;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-
-        .track-body {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .track-title-row {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.55rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .track-name {
-            font-size: 1.18rem;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        .badge-new-track {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            color: #fff;
-            font-size: 0.72rem;
-            font-weight: 800;
-            padding: 0.16rem 0.55rem;
-            border-radius: 999px;
-            letter-spacing: 0.5px;
-        }
-
-        .track-meta {
-            font-size: 0.88rem;
-            color: var(--text-muted);
-            margin-bottom: 0.75rem;
-        }
-
-        .track-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.55rem;
-            align-items: center;
-        }
-
-        .btn-preview {
-            background: rgba(56, 189, 248, 0.16);
-            color: #bae6fd;
-            border: 1px solid rgba(56, 189, 248, 0.45);
-            padding: 0.45rem 0.95rem;
-            border-radius: 20px;
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 0.88rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-preview:hover, .btn-preview[aria-pressed="true"] {
-            background: linear-gradient(135deg, #0284c7, #2563eb);
-            color: #fff;
-            border-color: transparent;
-        }
-
-        .btn-store-sm {
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 0.45rem 0.9rem;
-            border-radius: 20px;
-            color: #fff;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            transition: all 0.2s ease;
-        }
-
-        .btn-store-sm:hover {
-            background: rgba(255, 255, 255, 0.18);
-            transform: translateY(-1px);
-        }
-
-        .btn-store-primary {
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-color: transparent;
-        }
-
-        .btn-share-sm {
-            background: rgba(139, 92, 246, 0.18);
-            color: #ddd6fe;
-            border: 1px solid rgba(139, 92, 246, 0.45);
-            padding: 0.45rem 0.9rem;
-            border-radius: 20px;
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-share-sm:hover {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            color: #fff;
-            border-color: transparent;
-        }
-
-        /* Smart Mood Matcher & Official Full-Track Royalty Jukebox */
-        .mood-box {
-            background: rgba(255, 255, 255, 0.035);
-            border: 1px solid var(--glass-border);
-            border-radius: 18px;
-            padding: 1.35rem;
-            margin-bottom: 1.4rem;
-            text-align: left;
-        }
-
-        .mood-title {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: #f8fafc;
-            margin-bottom: 0.8rem;
-        }
-
-        .mood-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.65rem;
-        }
-
-        .btn-mood {
-            background: rgba(255, 255, 255, 0.06);
-            color: #f1f5f9;
-            border: 1px solid var(--glass-border);
-            padding: 0.6rem 1.15rem;
-            border-radius: 24px;
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 0.92rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-mood:hover, .btn-mood[aria-pressed="true"] {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            color: #fff;
-            border-color: transparent;
-            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
-        }
-
-        .mood-recommendation {
-            margin-top: 0.9rem;
-            padding-top: 0.85rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            font-size: 0.95rem;
-            color: #bae6fd;
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.7rem;
-        }
-
-        .jukebox-box {
-            background: rgba(15, 23, 42, 0.55);
-            border: 1px solid var(--glass-border);
-            border-radius: 18px;
-            padding: 1.25rem;
-            margin-bottom: 1.4rem;
-            text-align: left;
-        }
-
-        .jukebox-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.55rem;
-            margin: 0.8rem 0 1rem 0;
-        }
-
-        .btn-jukebox-tab {
-            background: rgba(255, 255, 255, 0.06);
-            color: #e2e8f0;
-            border: 1px solid var(--glass-border);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 0.88rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-jukebox-tab[aria-pressed="true"], .btn-jukebox-tab:hover {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: #fff;
-            border-color: transparent;
-        }
-
-        .yt-jukebox-frame {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            border-radius: 12px;
-            border: 0;
-            display: block;
-            background: #000;
-        }
-
-        @media (max-width: 600px) {
-            .track-card {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .track-art {
-                width: 72px;
-                height: 72px;
-            }
         }
 
         .games-grid {
@@ -761,23 +205,21 @@
             display: flex;
             flex-direction: column;
             text-align: left;
-            transition: all 0.3s ease;
-            text-decoration: none;
+            transition: all 0.25s ease;
             color: var(--text-main);
         }
 
         .app-card:hover {
             background: rgba(255, 255, 255, 0.06);
-            transform: translateY(-4px);
-            border-color: rgba(255,255,255,0.22);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.2);
         }
 
         .app-card-top {
             display: flex;
             align-items: flex-start;
             gap: 1.2rem;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.1rem;
         }
 
         .app-icon {
@@ -785,7 +227,16 @@
             background: rgba(0,0,0,0.3);
             padding: 0.8rem;
             border-radius: 14px;
-            box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+
+        .track-cover {
+            width: 72px;
+            height: 72px;
+            border-radius: 14px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.3);
         }
 
         .app-info {
@@ -795,7 +246,7 @@
         .app-title {
             font-size: 1.28rem;
             font-weight: bold;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.35rem;
             color: #fff;
         }
 
@@ -808,7 +259,7 @@
         .app-action {
             display: flex;
             justify-content: flex-end;
-            gap: 0.75rem;
+            gap: 0.7rem;
             flex-wrap: wrap;
         }
 
@@ -817,19 +268,28 @@
             color: #fff;
             text-decoration: none;
             font-weight: 600;
-            padding: 0.7rem 2.2rem;
+            padding: 0.68rem 1.8rem;
             border-radius: 25px;
-            font-size: 1.02rem;
+            font-size: 1rem;
             transition: all 0.2s;
             border: none;
             cursor: pointer;
+            font-family: inherit;
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
             display: inline-block;
         }
 
         .btn-play:hover {
             background: linear-gradient(135deg, #60a5fa, #3b82f6);
-            transform: scale(1.04);
+            transform: scale(1.03);
+        }
+
+        .btn-music-store {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        .btn-music-store:hover {
+            background: linear-gradient(135deg, #34d399, #10b981);
         }
 
         .btn-news-play {
@@ -849,11 +309,39 @@
         }
 
         .btn-yt-sub {
-            background: linear-gradient(135deg, #ef4444, #b91c1c);
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.38);
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
         }
         .btn-yt-sub:hover {
             background: linear-gradient(135deg, #f87171, #ef4444);
+        }
+
+        /* Sadece kullanıcı "Sitede Çal" dediğinde açılan sade resmi oynatıcı alanı */
+        .clean-player-box {
+            display: none;
+            margin-bottom: 1.2rem;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .clean-player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            gap: 0.5rem;
+        }
+
+        .clean-player-frame {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border: 0;
+            border-radius: 12px;
+            display: block;
+            background: #000;
         }
 
         .sr-only {
@@ -869,10 +357,8 @@
         }
 
         @media (max-width: 600px) {
-            .container { padding: 1.6rem 1.2rem; }
-            .navbar { padding: 1rem 1.2rem; }
-            .logo { font-size: 1.4rem; }
-            .portal-title { font-size: 1.75rem; }
+            .container { padding: 1.8rem 1.2rem; }
+            .portal-title { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -884,373 +370,251 @@
         <div class="blob blob-3"></div>
     </div>
 
-    <!-- Üst Menü & Dil Seçici (TR / EN) -->
-    <nav class="navbar" aria-label="Üst Menü">
-        <div class="logo" tabindex="0" aria-label="Mikyas Studio">Mikyas Studio</div>
-        <div class="lang-switch" role="group" aria-label="Dil Seçimi / Language Selection">
-            <button type="button" id="btn-tr" class="btn-lang" aria-pressed="true" onclick="setSiteLang('tr')">TR Türkçe</button>
-            <button type="button" id="btn-en" class="btn-lang" aria-pressed="false" onclick="setSiteLang('en')">EN English</button>
-        </div>
+    <nav class="navbar" aria-label="Üst Başlık">
+        <div class="logo" aria-hidden="true">Mikyas Studio</div>
     </nav>
 
     <main class="container">
 
-        <!-- Karşılama ve Başlık -->
-        <div class="suits-decoration" aria-hidden="true">🎹 🎵 🌍</div>
-        <h1 class="portal-title" data-tr="ÜMİT EKREM MİKYAS • MİKYAS STUDIO" data-en="ÜMİT EKREM MİKYAS • MIKYAS STUDIO">ÜMİT EKREM MİKYAS • MİKYAS STUDIO</h1>
-        <p class="welcome-text" id="welcome-message" aria-live="polite" style="margin-bottom: 0.9rem;">
-            <span data-tr="Hoş Geldiniz. Saat şu an " data-en="Welcome. Local time: ">Hoş Geldiniz. Saat şu an </span><span id="current-time-display"></span>
-        </p>
-
-        <!-- Günün Saatine Duyarlı Akıllı DJ & Canlı Sayaç Rozeti -->
-        <div class="smart-dj-banner" role="status">
-            <span class="live-pulse-dot" aria-hidden="true"></span>
-            <span id="smart-time-dj">🎹 Güne özel enstrümantal seçkim hazır!</span>
-            <span id="live-stats-pill" style="opacity: 0.85; font-size: 0.85rem;"></span>
-        </div>
-
-        <!-- Hızlı Kesintisiz Radyo, Abone Ol & Dinle Çağrısı -->
-        <div class="hero-cta-row">
-            <button type="button" class="btn-hero-radio" id="hero-radio-btn" onclick="startNonStopRoyaltyRadio()"
-               data-tr="📻 Kesintisiz Sanatçı Radyomu Başlat" data-en="📻 Start Non-Stop Artist Radio"
-               aria-label="Tüm resmi şarkılarımı sitede kesintisiz sırayla çalmaya başlat">📻 Kesintisiz Sanatçı Radyomu Başlat</button>
-            <a href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="btn-hero-yt"
-               onclick="trackRoyaltyAction('youtube_sub')"
-               data-tr="▶️ Resmi YouTube Kanalıma Abone Ol" data-en="▶️ Subscribe on YouTube"
-               aria-label="Resmi YouTube Sanatçı Kanalıma Tek Tıkla Abone Ol">▶️ Resmi YouTube Kanalıma Abone Ol</a>
-            <a href="https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN" target="_blank" rel="noopener noreferrer" class="btn-hero-sp" id="hero-primary-store"
-               onclick="trackRoyaltyAction('hero_store')"
-               data-tr="🎧 Spotify'da Dinle" data-en="🎧 Listen on Spotify"
-               aria-label="Spotify Resmi Sanatçı Profilimde Şarkılarımı Dinle">🎧 Spotify'da Dinle</a>
-        </div>
+        <div class="suits-decoration" aria-hidden="true">♥♠♦♣</div>
+        <h1 class="portal-title" id="main-title">MİKYAS STUDIO PORTAL</h1>
+        <p class="welcome-text" id="welcome-message"><span id="welcome-prefix">Hoş Geldiniz. Saat şu an </span><span id="current-time-display"></span></p>
 
         <!-- Hakkımda Bölümü -->
         <section class="about-section" aria-label="Hakkımda">
-            <h2 class="sr-only" data-tr="Ümit Ekrem Mikyas - Hakkımda" data-en="About Ümit Ekrem Mikyas">Ümit Ekrem Mikyas - Hakkımda</h2>
-            <p data-tr="Merhaba, ben Ümit Ekrem Mikyas. Müzik öğretmeni, piyanist, besteci ve yazılımcıyım."
-               data-en="Hello, I am Ümit Ekrem Mikyas — a music educator, pianist, composer, and software developer from Türkiye.">
-               Merhaba, ben Ümit Ekrem Mikyas. Müzik öğretmeni, piyanist, besteci ve yazılımcıyım.
-            </p>
-            <p data-tr="Bu portalda tüm dünya dijital platformlarında yayınlanan özgün enstrümantal bestelerimi ve geliştirdiğim erişilebilir sesli oyun projelerimi bulabilirsiniz. Projelerimde modern yapay zeka teknolojilerinden aktif şekilde yararlanıyor, tüm eserlerimi kendi müzikal ruhum ve özgün fikirlerimle şekillendiriyorum."
-               data-en="On this portal you can listen to my original instrumental, piano, cinematic, and electronic releases across global streaming platforms and explore my accessible audio games.">
-               Bu portalda tüm dünya dijital platformlarında yayınlanan özgün enstrümantal bestelerimi ve geliştirdiğim erişilebilir sesli oyun projelerimi bulabilirsiniz. Projelerimde modern yapay zeka teknolojilerinden aktif şekilde yararlanıyor, tüm eserlerimi kendi müzikal ruhum ve özgün fikirlerimle şekillendiriyorum.
-            </p>
+            <h2 class="sr-only" id="about-heading">Ümit Ekrem Mikyas - Hakkımda</h2>
+            <p id="about-p1">Merhaba. Benim adım Ümit Ekrem Mikyas. 26 yaşındayım ve müzik öğretmeniyim.</p>
+            <p id="about-p2">Bu portalda geliştirmekte olduğum erişilebilir sesli oyun projelerimi ve dijital platformlarda yayınlanan özgün müziklerimi bulacaksınız. Projelerimde yapay zekanın gücünü aktif bir şekilde kullanıyorum, ancak fikirlerimin tamamen bana ait, özgün düşünceler olduğunu da belirtmek isterim.</p>
         </section>
 
-        <!-- KATEGORİ: Müziklerim & Dijital Platformlar -->
-        <h2 class="category-title" id="dinle" tabindex="-1" data-tr="MÜZİKLERİM &amp; DİJİTAL PLATFORMLAR" data-en="OFFICIAL MUSIC &amp; STREAMING">MÜZİKLERİM &amp; DİJİTAL PLATFORMLAR</h2>
-
-        <!-- Akıllı Ruh Hali Eşleştirici -->
-        <div class="mood-box" role="region" aria-label="Ruh Haline Göre Şarkı Önerici">
-            <div class="mood-title" data-tr="🎯 Şu An Hangi Ruh Halindesin? (Akıllı Müzik Seçici)" data-en="🎯 What's Your Mood Right Now? (Smart Track Matcher)">🎯 Şu An Hangi Ruh Halindesin? (Akıllı Müzik Seçici)</div>
-            <div class="mood-buttons" role="group" aria-label="Ruh Hali Seçenekleri">
-                <button type="button" class="btn-mood" id="mood-piano" aria-pressed="false" onclick="selectMood('piano')"
-                    data-tr="🎹 Huzur, Piyano &amp; Ney" data-en="🎹 Calm Piano &amp; Mystic Ney">🎹 Huzur, Piyano &amp; Ney</button>
-                <button type="button" class="btn-mood" id="mood-energy" aria-pressed="false" onclick="selectMood('energy')"
-                    data-tr="⚡ Gece Sürüşü &amp; Yüksek Enerji" data-en="⚡ Night Drive &amp; Club Bass">⚡ Gece Sürüşü &amp; Yüksek Enerji</button>
-                <button type="button" class="btn-mood" id="mood-epic" aria-pressed="false" onclick="selectMood('epic')"
-                    data-tr="⚔️ Epik Film &amp; Savaş Atmosferi" data-en="⚔️ Epic &amp; Cinematic">⚔️ Epik Film &amp; Savaş Atmosferi</button>
-            </div>
-            <div class="mood-recommendation" id="mood-result" aria-live="polite">
-                <span id="mood-result-text"></span>
-                <a href="#" target="_blank" rel="noopener noreferrer" class="btn-store-sm btn-store-primary" id="mood-result-link">Spotify</a>
-            </div>
-        </div>
-
-        <!-- Adrenaline Öne Çıkan Lansman Kartı (Tarihe Göre Otomatik Güncellenir!) -->
-        <div class="release-highlight" role="region" aria-label="Adrenaline Yeni Tekli Duyurusu">
-            <span class="release-badge" id="adrenaline-status-badge">🔥 4 ARALIK 2026 • YENİ TEKLİ</span>
-            <h3 class="release-title">Adrenaline — Ümit Ekrem Mikyas</h3>
-            <p class="release-desc" id="adrenaline-status-desc"
-               data-tr="Anadolu ve Balkan üflemeli sololarının yüksek enerjili kulüp bası ve melodik tekno ile buluştuğu yeni enstrümantal parçam. Çıktığı an bildirim almak için şimdiden Spotify Ön Kaydı yapabilirsiniz!"
-               data-en="134 BPM oriental club bass &amp; melodic techno instrumental fusing hypnotic Anatolian-Balkan woodwinds with high-energy night drive rhythms.">
-               Anadolu ve Balkan üflemeli sololarının yüksek enerjili kulüp bası ve melodik tekno ile buluştuğu yeni enstrümantal parçam. Çıktığı an bildirim almak için şimdiden Spotify Ön Kaydı yapabilirsiniz!
-            </p>
-            <div class="app-action" style="justify-content: flex-start;">
-                <a href="https://distrokid.com/hyperfollow/mitekremmikyas/adrenaline" target="_blank" rel="noopener noreferrer" class="btn-play" id="adrenaline-cta-btn"
-                   style="background: linear-gradient(135deg, #0ea5e9, #6366f1);"
-                   data-tr="🔥 Ön Kayıt Yap / Platformlarda Aç" data-en="🔥 Pre-Save / Listen Now">🔥 Ön Kayıt Yap / Platformlarda Aç</a>
-            </div>
-        </div>
-
-        <!-- Akıllı Canlı Diskografi (Yeni Çıkan Eserleri Otomatik Çeker!) -->
-        <div class="discography-header">
-            <h3 class="discography-subtitle" data-tr="🎵 YAYINDAKİ ESERLERİM (CANLI DİSKOGRAFİ)" data-en="🎵 RELEASED SINGLES (LIVE DISCOGRAPHY)">🎵 YAYINDAKİ ESERLERİM (CANLI DİSKOGRAFİ)</h3>
-            <span class="discography-live-pill" id="discography-status-pill" data-tr="● Mağazalardan Otomatik Güncellenir" data-en="● Auto-Synced with Global Stores">● Mağazalardan Otomatik Güncellenir</span>
-        </div>
-        <div id="smart-discography-list" class="discography-list" role="list" aria-label="Yayınlanan Şarkılar Listesi">
-            <!-- JS tarafından mağaza verisiyle otomatik doldurulur -->
-        </div>
-        <div id="preview-sr-status" class="sr-only" aria-live="polite"></div>
-
-        <!-- Resmi Tam Şarkı Müzik Kutusu (Spotify Kullanmayanlardan da Doğrudan DistroKid Telifi Yazar!) -->
-        <div class="jukebox-box" role="region" aria-label="Resmi Tam Şarkı Müzik Kutusu">
-            <h3 class="discography-subtitle" data-tr="▶️ TAM ŞARKI MÜZİK KUTUSU (KESİNTİSİZ LİSTE)" data-en="▶️ OFFICIAL FULL-TRACK JUKEBOX (CONTINUOUS PLAY)">▶️ TAM ŞARKI MÜZİK KUTUSU (KESİNTİSİZ LİSTE)</h3>
-            <p class="track-meta" style="margin-top: 0.35rem; margin-bottom: 0;"
-               data-tr="Spotify hesabınız olmasa bile buradan şarkılarımın tam halini peş peşe dinleyebilirsiniz; bir şarkı bittiğinde sıradaki eserime otomatik geçer."
-               data-en="Stream full official tracks directly on this page — automatically continues to the next release when a song finishes.">
-               Spotify hesabınız olmasa bile buradan şarkılarımın tam halini peş peşe dinleyebilirsiniz; bir şarkı bittiğinde sıradaki eserime otomatik geçer.
-            </p>
-            <div class="jukebox-tabs" role="group" aria-label="Tam Şarkı Seçimi">
-                <button type="button" class="btn-jukebox-tab" id="jb-meyve" aria-pressed="true" onclick="loadJukeboxTrack('meyve', true)"
-                    data-tr="▶ 1. Meyve Dalında Güzel" data-en="▶ 1. Meyve Dalında Güzel">▶ 1. Meyve Dalında Güzel</button>
-                <button type="button" class="btn-jukebox-tab" id="jb-yarim" aria-pressed="false" onclick="loadJukeboxTrack('yarim', true)"
-                    data-tr="▶ 2. Yarim Gitti Gelmeyecek" data-en="▶ 2. Yarim Gitti Gelmeyecek">▶ 2. Yarim Gitti Gelmeyecek</button>
-                <button type="button" class="btn-jukebox-tab" id="jb-suhedai" aria-pressed="false" onclick="loadJukeboxTrack('suhedai', true)"
-                    data-tr="▶ 3. Şühedai Gaza" data-en="▶ 3. Şühedai Gaza">▶ 3. Şühedai Gaza</button>
-            </div>
-            <iframe id="yt-jukebox-iframe" class="yt-jukebox-frame"
-                src="https://www.youtube.com/embed/h6IzlHhS7I4?rel=0&amp;playlist=XCyKBkxWnOk,Q1S96xzlQ0U"
-                title="Ümit Ekrem Mikyas Resmi YouTube Tam Şarkı Oynatıcısı"
-                loading="lazy"
-                allow="encrypted-media; picture-in-picture; fullscreen"
-                allowfullscreen></iframe>
-        </div>
-
-        <!-- Gömülü Resmi Spotify Sanatçı Çalar (Otomatik Çalmaz, Ekran Okuyucu Dostu) -->
-        <div class="spotify-embed-wrap">
-            <iframe style="border-radius:12px; display:block;"
-                src="https://open.spotify.com/embed/artist/3sNMBBVuhw9gsNViAge3qN?utm_source=generator&amp;theme=0"
-                width="100%" height="352" frameBorder="0" allowfullscreen=""
-                allow=" clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-                title="Ümit Ekrem Mikyas Resmi Spotify Müzik Çalar"></iframe>
-        </div>
-
-        <!-- 5 Ana Müzik & Sanatçı Platformu -->
-        <div class="platform-grid" role="list" aria-label="Resmi Müzik Mağazaları ve Sanatçı Profilleri">
-            <a role="listitem" href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Resmi YouTube Sanatçı Kanalıma Abone Ol">
-                <span data-tr="▶️ YouTube Sanatçı Kanalım" data-en="▶️ Official YouTube Channel">▶️ YouTube Sanatçı Kanalım</span>
-                <span class="arrow" aria-hidden="true">↗</span>
-            </a>
-            <a role="listitem" href="https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Spotify Sanatçı Profilim">
-                <span>🟢 Spotify</span>
-                <span class="arrow" aria-hidden="true">↗</span>
-            </a>
-            <a role="listitem" href="https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Apple Music Sanatçı Profilim">
-                <span>🍎 Apple Music (Lossless)</span>
-                <span class="arrow" aria-hidden="true">↗</span>
-            </a>
-            <a role="listitem" href="https://www.deezer.com/artist/385830051" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Deezer Sanatçı Profilim">
-                <span>💜 Deezer</span>
-                <span class="arrow" aria-hidden="true">↗</span>
-            </a>
-            <a role="listitem" href="https://open.spotify.com/playlist/4RBXwXyZIrwiAlXwjesltF" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Adrenaline Night Drive ve Oriental Techno Spotify Çalma Listesi">
-                <span data-tr="⚡ Night Drive &amp; Techno Listem" data-en="⚡ Night Drive &amp; Techno Playlist">⚡ Night Drive &amp; Techno Listem</span>
-                <span class="arrow" aria-hidden="true">↗</span>
-            </a>
-            <a role="listitem" href="https://open.spotify.com/playlist/1zYt03Tn9l86UC7YL4kZJg" target="_blank" rel="noopener noreferrer" class="platform-btn" aria-label="Duygusal Piyano, Ney ve Sinematik Müzik Spotify Çalma Listesi">
-                <span data-tr="🎹 Piyano &amp; Ney Seçki Listem" data-en="🎹 Piano, Ney &amp; Cinematic Playlist">🎹 Piyano &amp; Ney Seçki Listem</span>
-                <span class="arrow" aria-hidden="true">↗</span>
-            </a>
-        </div>
-
-        <!-- KATEGORİ: Sosyal Medya & Topluluk -->
-        <h2 class="category-title" data-tr="SOSYAL MEDYA &amp; TOPLULUK" data-en="SOCIAL MEDIA &amp; COMMUNITY">SOSYAL MEDYA &amp; TOPLULUK</h2>
-        <div class="games-grid">
-            <!-- YouTube Abone Ol (En Başta!) -->
-            <div class="app-card">
-                <div class="app-card-top">
-                    <div class="app-icon" aria-hidden="true">▶️</div>
-                    <div class="app-info">
-                        <h3 class="app-title" data-tr="YouTube Resmi Sanatçı Kanalı" data-en="YouTube Official Artist Channel">YouTube Resmi Sanatçı Kanalı</h3>
-                        <p class="app-desc" data-tr="Özgün piyano bestelerim, yeni teklilerim, canlı sahne performanslarım ve Shorts videolarım. Yeni eserleri kaçırmamak için tek tıkla abone olun!"
-                           data-en="Original piano compositions, official releases, live performances, and Shorts. Subscribe with one click!">
-                           Özgün piyano bestelerim, yeni teklilerim, canlı sahne performanslarım ve Shorts videolarım. Yeni eserleri kaçırmamak için tek tıkla abone olun!
-                        </p>
-                    </div>
-                </div>
-                <div class="app-action">
-                    <a href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="btn-play btn-yt-sub"
-                       data-tr="Abone Ol" data-en="Subscribe" aria-label="Resmi YouTube kanalıma tek tıkla abone ol">Abone Ol</a>
-                </div>
-            </div>
-
-            <!-- Instagram -->
-            <div class="app-card">
-                <div class="app-card-top">
-                    <div class="app-icon" aria-hidden="true">📸</div>
-                    <div class="app-info">
-                        <h3 class="app-title">Instagram (@umitekremmikyas)</h3>
-                        <p class="app-desc" data-tr="Sahne arkası anlar, canlı piyano Reels videolarım ve yeni şarkı duyurularım."
-                           data-en="Live piano Reels, stage moments, and upcoming release announcements.">
-                           Sahne arkası anlar, canlı piyano Reels videolarım ve yeni şarkı duyurularım.
-                        </p>
-                    </div>
-                </div>
-                <div class="app-action">
-                    <a href="https://www.instagram.com/umitekremmikyas/" target="_blank" rel="noopener noreferrer" class="btn-play btn-social-play"
-                       data-tr="Takip Et" data-en="Follow" aria-label="Instagram hesabıma git ve takip et">Takip Et</a>
-                </div>
-            </div>
-
-            <!-- TikTok -->
-            <div class="app-card">
-                <div class="app-card-top">
-                    <div class="app-icon" aria-hidden="true">🎵</div>
-                    <div class="app-info">
-                        <h3 class="app-title">TikTok (@umitekremmikyas)</h3>
-                        <p class="app-desc" data-tr="Kısa piyano performanslarım, yeni elektronik ve enstrümantal müzik kliplerim."
-                           data-en="Short live piano clips, electronic drops, and instrumental performances.">
-                           Kısa piyano performanslarım, yeni elektronik ve enstrümantal müzik kliplerim.
-                        </p>
-                    </div>
-                </div>
-                <div class="app-action">
-                    <a href="https://www.tiktok.com/@umitekremmikyas" target="_blank" rel="noopener noreferrer" class="btn-play btn-social-play"
-                       data-tr="Takip Et" data-en="Follow" aria-label="TikTok hesabıma git ve takip et">Takip Et</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- KATEGORİ: Projelerim -->
-        <h2 class="category-title" data-tr="PROJELERİM" data-en="ACCESSIBLE GAMES &amp; APPS">PROJELERİM</h2>
+        <!-- 1. KATEGORİ: Projelerim (Görme Engelli Ziyaretçiler İçin Alışılmış İlk Sırada ve Tertemiz!) -->
+        <h2 class="category-title" id="cat-projects">PROJELERİM</h2>
         <div class="games-grid">
 
-            <!-- Otobüs Simülasyonu -->
             <div class="app-card">
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">🚌</div>
                     <div class="app-info">
-                        <h3 class="app-title" data-tr="Otobüs Simülasyonu" data-en="Bus Simulation Türkiye">Otobüs Simülasyonu</h3>
-                        <p class="app-desc" data-tr="Türkiye'nin yollarında gerçekçi ve erişilebilir bir otobüs sürüş deneyimi yaşayın."
-                           data-en="Experience a realistic and screen-reader accessible intercity bus driving simulation across Türkiye.">
-                           Türkiye'nin yollarında gerçekçi ve erişilebilir bir otobüs sürüş deneyimi yaşayın.
-                        </p>
+                        <h3 class="app-title" id="proj-bus-title">Otobüs Simülasyonu</h3>
+                        <p class="app-desc" id="proj-bus-desc">Türkiye'nin yollarında gerçekçi ve erişilebilir bir otobüs sürüş deneyimi yaşayın.</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="otobus/" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="Oyna" data-en="Play" aria-label="Otobüs Simülasyonu Oynamak İçin Tıklayın">Oyna</a>
+                    <a href="otobus/" target="_blank" rel="noopener noreferrer" class="btn-play" id="proj-bus-btn" aria-label="Otobüs Simülasyonu Oyna">Oyna</a>
                 </div>
             </div>
 
-            <!-- Hafızana Güven -->
             <div class="app-card">
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">🧠</div>
                     <div class="app-info">
-                        <h3 class="app-title" data-tr="Hafızana Güven" data-en="Trust Your Memory">Hafızana Güven</h3>
-                        <p class="app-desc" data-tr="Sesleri ve ipuçlarını takip ederek hafızanızı test edin."
-                           data-en="Test and sharpen your memory by following rich audio cues and sequences.">
-                           Sesleri ve ipuçlarını takip ederek hafızanızı test edin.
-                        </p>
+                        <h3 class="app-title" id="proj-mem-title">Hafızana Güven</h3>
+                        <p class="app-desc" id="proj-mem-desc">Sesleri ve ipuçlarını takip ederek hafızanızı test edin.</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="hafizana_guven/portal.html" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="Oyna" data-en="Play" aria-label="Hafızana Güven Oyunu Oynamak İçin Tıklayın">Oyna</a>
+                    <a href="hafizana_guven/portal.html" target="_blank" rel="noopener noreferrer" class="btn-play" id="proj-mem-btn" aria-label="Hafızana Güven Oyna">Oyna</a>
                 </div>
             </div>
 
-            <!-- Erişilebilir Video Asistanı -->
             <div class="app-card">
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">🎬</div>
                     <div class="app-info">
-                        <h3 class="app-title" data-tr="Erişilebilir Video Asistanı" data-en="Accessible Video Assistant">Erişilebilir Video Asistanı</h3>
-                        <p class="app-desc" data-tr="Görme engelli bireyler için özel tasarlanmış, adım adım sesli yönlendirme yapan video kesme aracı."
-                           data-en="Step-by-step voice-guided video trimming tool designed specifically for visually impaired creators.">
-                           Görme engelli bireyler için özel tasarlanmış, adım adım sesli yönlendirme yapan video kesme aracı.
-                        </p>
+                        <h3 class="app-title" id="proj-vid-title">Erişilebilir Video Asistanı</h3>
+                        <p class="app-desc" id="proj-vid-desc">Görme engelli bireyler için özel tasarlanmış, adım adım sesli yönlendirme yapan video kesme aracı.</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="video_asistan/" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="Aç" data-en="Open" aria-label="Erişilebilir Video Asistanı Açmak İçin Tıklayın">Aç</a>
+                    <a href="video_asistan/" target="_blank" rel="noopener noreferrer" class="btn-play" id="proj-vid-btn" aria-label="Erişilebilir Video Asistanı Aç">Aç</a>
                 </div>
             </div>
 
-            <!-- Voice Lens -->
             <div class="app-card">
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">📷</div>
                     <div class="app-info">
                         <h3 class="app-title">Voice Lens</h3>
-                        <p class="app-desc" data-tr="Görme engelliler için 3D sesli kamera, belge ve sınav okuyucu, para sayıcı, renk ve kıble asistanı."
-                           data-en="3D audio camera, document reader, currency identifier, color detector, and orientation assistant for visually impaired users.">
-                           Görme engelliler için 3D sesli kamera, belge ve sınav okuyucu, para sayıcı, renk ve kıble asistanı.
-                        </p>
+                        <p class="app-desc" id="proj-vl-desc">Görme engelliler için 3D sesli kamera, belge ve sınav okuyucu, para sayıcı, renk ve kıble asistanı.</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="kamera_asistan/" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="Aç" data-en="Open Web" aria-label="Voice Lens Web Uygulamasını Açmak İçin Tıklayın">Aç</a>
-                    <a href="kamera_asistan/VoiceLens.apk" download="VoiceLens.apk" class="btn-play" style="background: linear-gradient(135deg, #10b981, #059669);" data-tr="APK İndir" data-en="Download APK" aria-label="Voice Lens Android APK Uygulamasını İndirmek İçin Tıklayın">APK İndir</a>
+                    <a href="kamera_asistan/" target="_blank" rel="noopener noreferrer" class="btn-play" id="proj-vl-btn" aria-label="Voice Lens Web Uygulamasını Aç">Aç</a>
+                    <a href="kamera_asistan/VoiceLens.apk" download="VoiceLens.apk" class="btn-play btn-music-store" id="proj-vl-apk" aria-label="Voice Lens Android APK İndir">APK İndir</a>
                 </div>
             </div>
         </div>
 
-        <!-- KATEGORİ: Desteklediğim Projeler -->
-        <h2 class="category-title" data-tr="DESTEKLEDİĞİM PROJELER" data-en="SUPPORTED PROJECTS">DESTEKLEDİĞİM PROJELER</h2>
+        <!-- 2. KATEGORİ: Müziklerim (Arka Planda Tam Otomatik Mağaza Senkronlu, Ön Yüzde Sade ve Erişilebilir!) -->
+        <h2 class="category-title" id="dinle" tabindex="-1">MÜZİKLERİM</h2>
+
+        <!-- Sadece kullanıcı bir şarkıda "Sitede Dinle" düğmesine basınca açılan tekil temiz oynatıcı (sayfa açılışında kapalıdır, ekran okuyucuyu asla yormaz) -->
+        <div id="clean-player-container" class="clean-player-box" role="region" aria-label="Müzik Oynatıcı">
+            <div class="clean-player-header">
+                <strong id="clean-player-title">Şimdi Çalıyor</strong>
+                <button type="button" class="btn-play" style="padding: 0.4rem 1.1rem; font-size: 0.9rem; background: #475569;" onclick="closeSitePlayer()" id="clean-player-close">Kapat</button>
+            </div>
+            <div id="clean-player-mount"></div>
+        </div>
+
+        <div id="sr-music-announce" class="sr-only" aria-live="polite"></div>
+
+        <!-- Otomatik Güncellenen Sade Şarkı Kartları -->
+        <div id="smart-discography-list" class="games-grid"></div>
+
+        <!-- Yaklaşan Yeni Tekli: Adrenaline (4 Aralık'tan sonra mağaza listesine otomatik geçeceği için sade kart) -->
+        <div id="upcoming-adrenaline-card" class="app-card" style="margin-top: 1.2rem;">
+            <div class="app-card-top">
+                <div class="app-icon" aria-hidden="true">🎵</div>
+                <div class="app-info">
+                    <h3 class="app-title" id="adr-title">Adrenaline (4 Aralık'ta Yayında)</h3>
+                    <p class="app-desc" id="adr-desc">Yeni enstrümantal elektronik parçam. Çıktığı an bildirim almak için ön kayıt yapabilirsiniz.</p>
+                </div>
+            </div>
+            <div class="app-action">
+                <a href="https://distrokid.com/hyperfollow/mitekremmikyas/adrenaline" target="_blank" rel="noopener noreferrer" onclick="trackStat('adrenaline_presave')" class="btn-play btn-music-store" id="adr-btn" aria-label="Adrenaline şarkısı için Spotify ön kaydı yap">Ön Kayıt Yap</a>
+            </div>
+        </div>
+
+        <!-- 3. KATEGORİ: Sosyal Medya ve Müzik Hesaplarım (5 Ana Hesap — Tek ve Net Düğmeler) -->
+        <h2 class="category-title" id="cat-social">SOSYAL MEDYA VE MÜZİK HESAPLARIM</h2>
         <div class="games-grid">
-            <!-- Gaddar Bilgi -->
+
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">▶️</div>
+                    <div class="app-info">
+                        <h3 class="app-title">YouTube</h3>
+                        <p class="app-desc" id="soc-yt-desc">Resmi sanatçı kanalım, tüm bestelerim ve piyano performanslarım.</p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer" onclick="trackStat('youtube_sub')" class="btn-play btn-yt-sub" id="soc-yt-btn" aria-label="YouTube kanalıma abone ol">Abone Ol</a>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">🎧</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Spotify</h3>
+                        <p class="app-desc" id="soc-sp-desc">Tüm yayınlanan şarkılarım ve çalma listelerim.</p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN" target="_blank" rel="noopener noreferrer" onclick="trackStat('spotify_profile')" class="btn-play btn-music-store" id="soc-sp-btn" aria-label="Spotify sanatçı profilimde dinle">Dinle</a>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">🎵</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Apple Music</h3>
+                        <p class="app-desc" id="soc-ap-desc">24-bit kayıpsız stüdyo kalitesinde tüm eserlerim.</p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059" target="_blank" rel="noopener noreferrer" onclick="trackStat('apple_profile')" class="btn-play btn-music-store" id="soc-ap-btn" aria-label="Apple Music sanatçı profilimde dinle">Dinle</a>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">📸</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Instagram</h3>
+                        <p class="app-desc" id="soc-ig-desc">Günlük hayatımdan kareler, sahne videolarım ve güncel paylaşımlarım.</p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://www.instagram.com/umitekremmikyas/" target="_blank" rel="noopener noreferrer" onclick="trackStat('instagram_profile')" class="btn-play btn-social-play" id="soc-ig-btn" aria-label="Instagram hesabımı takip et">Takip Et</a>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">🎬</div>
+                    <div class="app-info">
+                        <h3 class="app-title">TikTok</h3>
+                        <p class="app-desc" id="soc-tt-desc">Kısa piyano performanslarım ve yeni müzik kliplerim.</p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://www.tiktok.com/@umitekremmikyas" target="_blank" rel="noopener noreferrer" onclick="trackStat('tiktok_profile')" class="btn-play btn-social-play" id="soc-tt-btn" aria-label="TikTok hesabımı takip et">Takip Et</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. KATEGORİ: Desteklediğim Projeler -->
+        <h2 class="category-title" id="cat-supported">DESTEKLEDİĞİM PROJELER</h2>
+        <div class="games-grid">
             <div class="app-card">
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">📱</div>
                     <div class="app-info">
                         <h3 class="app-title">Gaddar Bilgi</h3>
-                        <p class="app-desc" data-tr="Gaddar Bilgi uygulamasını indirmek için tıklayın." data-en="Download the Gaddar Bilgi mobile trivia application.">Gaddar Bilgi uygulamasını indirmek için tıklayın.</p>
+                        <p class="app-desc">Gaddar Bilgi uygulamasını indirmek için tıklayın.</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://play.google.com/store/apps/details?id=com.gaddarbilgimobil" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="İndir" data-en="Download" aria-label="Gaddar Bilgi uygulamasını indir">İndir</a>
+                    <a href="https://play.google.com/store/apps/details?id=com.gaddarbilgimobil" target="_blank" rel="noopener noreferrer" class="btn-play" aria-label="Gaddar Bilgi uygulamasını indir">İndir</a>
                 </div>
             </div>
 
-            <!-- Keleş Pişti -->
             <div class="app-card">
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">🃏</div>
                     <div class="app-info">
                         <h3 class="app-title">Keleş Pişti</h3>
-                        <p class="app-desc" data-tr="Keleş Pişti uygulamasını indirmek için tıklayın." data-en="Download the accessible Keleş Pişti card game on Google Play.">Keleş Pişti uygulamasını indirmek için tıklayın.</p>
+                        <p class="app-desc">Keleş Pişti uygulamasını indirmek için tıklayın.</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://play.google.com/store/apps/details?id=com.scelik.kelespisti&amp;hl=tr" target="_blank" rel="noopener noreferrer" class="btn-play" data-tr="İndir" data-en="Download" aria-label="Keleş Pişti uygulamasını indir">İndir</a>
+                    <a href="https://play.google.com/store/apps/details?id=com.scelik.kelespisti&amp;hl=tr" target="_blank" rel="noopener noreferrer" class="btn-play" aria-label="Keleş Pişti uygulamasını indir">İndir</a>
                 </div>
             </div>
         </div>
 
-        <!-- KATEGORİ: Haberler (Basında Biz) -->
-        <h2 class="category-title" data-tr="HABERLER (BASINDA BİZ)" data-en="IN THE PRESS">HABERLER (BASINDA BİZ)</h2>
+        <!-- 5. KATEGORİ: Haberler (Basında Biz) -->
+        <h2 class="category-title" id="cat-news">HABERLER (BASINDA BİZ)</h2>
         <div class="games-grid">
-            <!-- Haber 1 -->
             <div class="app-card">
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">📰</div>
                     <div class="app-info">
                         <h3 class="app-title">Görme engelli müzik öğretmeni piyano eğitimiyle öğrencilerin hayallerine dokunuyor</h3>
-                        <p class="app-desc" data-tr="Anadolu Ajansı Röportajı" data-en="Anadolu Agency Feature Interview">Anadolu Ajansı Röportajı</p>
+                        <p class="app-desc">Anadolu Ajansı Röportajı</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://www.aa.com.tr/tr/yasam/gorme-engelli-muzik-ogretmeni-piyano-egitimiyle-ogrencilerin-hayallerine-dokunuyor/3779375" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" data-tr="Haberi Oku" data-en="Read Article" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
+                    <a href="https://www.aa.com.tr/tr/yasam/gorme-engelli-muzik-ogretmeni-piyano-egitimiyle-ogrencilerin-hayallerine-dokunuyor/3779375" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" aria-label="Görme engelli müzik öğretmeni haberini oku">Haberi Oku</a>
                 </div>
             </div>
 
-            <!-- Haber 2 -->
             <div class="app-card">
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">📰</div>
                     <div class="app-info">
                         <h3 class="app-title">Barış Manço hayranı görme engelli, müzik öğretmenliği hayaline çok yaklaştı</h3>
-                        <p class="app-desc" data-tr="Anadolu Ajansı Röportajı" data-en="Anadolu Agency Feature Interview">Anadolu Ajansı Röportajı</p>
+                        <p class="app-desc">Anadolu Ajansı Röportajı</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://www.aa.com.tr/tr/ayrimcilikhatti/ayrimcilik/baris-manco-hayrani-gorme-engelli-muzik-ogretmenligi-hayaline-cok-yaklasti-/1820538" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" data-tr="Haberi Oku" data-en="Read Article" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
+                    <a href="https://www.aa.com.tr/tr/ayrimcilikhatti/ayrimcilik/baris-manco-hayrani-gorme-engelli-muzik-ogretmenligi-hayaline-cok-yaklasti-/1820538" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" aria-label="Barış Manço hayranı müzik öğretmenliği haberini oku">Haberi Oku</a>
                 </div>
             </div>
 
-            <!-- Haber 3 -->
             <div class="app-card">
                 <div class="app-card-top">
                     <div class="app-icon" aria-hidden="true">📰</div>
                     <div class="app-info">
                         <h3 class="app-title">Barış Manço hayranı görme engelli Ümit'in hayali müzik öğretmeni olmak</h3>
-                        <p class="app-desc" data-tr="Anadolu Ajansı Röportajı" data-en="Anadolu Agency Feature Interview">Anadolu Ajansı Röportajı</p>
+                        <p class="app-desc">Anadolu Ajansı Röportajı</p>
                     </div>
                 </div>
                 <div class="app-action">
-                    <a href="https://www.aa.com.tr/tr/yasam/baris-manco-hayrani-gorme-engelli-umitin-hayali-muzik-ogretmeni-olmak-/1975038" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" data-tr="Haberi Oku" data-en="Read Article" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
+                    <a href="https://www.aa.com.tr/tr/yasam/baris-manco-hayrani-gorme-engelli-umitin-hayali-muzik-ogretmeni-olmak-/1975038" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" aria-label="Ümit'in hayali müzik öğretmeni olmak haberini oku">Haberi Oku</a>
                 </div>
             </div>
         </div>
@@ -1258,311 +622,62 @@
         <!-- Teşekkür Bölümü -->
         <section class="about-section" aria-label="Teşekkür" style="margin-top: 3rem; background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2);">
             <h2 class="sr-only">Teşekkür</h2>
-            <p style="text-align: center; font-style: italic; color: #cbd5e1; font-size: 1.05rem;"
-               data-tr="Bu site, Gaddar Bilgi altyapısı sayesinde ayakta durmaktadır. Sunucu maliyetlerini üstlendikleri ve karşılaştığım her türlü soruna özveriyle çözüm buldukları için kendilerine sonsuz teşekkürlerimi sunarım. Bu sitenin hayatta kalmasında ve sizlere ulaşmasında onların emekleri çok büyük."
-               data-en="Special thanks to Gaddar Bilgi infrastructure for hosting and supporting Mikyas Studio.">
+            <p style="text-align: center; font-style: italic; color: #cbd5e1; font-size: 1.05rem;">
                 Bu site, <strong>Gaddar Bilgi</strong> altyapısı sayesinde ayakta durmaktadır. Sunucu maliyetlerini üstlendikleri ve karşılaştığım her türlü soruna özveriyle çözüm buldukları için kendilerine sonsuz teşekkürlerimi sunarım. Bu sitenin hayatta kalmasında ve sizlere ulaşmasında onların emekleri çok büyük.
-            </p>
-            <p style="text-align: center; color: #94a3b8; font-size: 0.88rem; margin-top: 0.75rem;"
-               data-tr="Klavye Kısayolları: Alt+R (Radyoyu Başlat), Alt+S (Sıradaki Şarkı), Alt+Y (YouTube Abone Ol), Alt+D (Dil Değiştir)"
-               data-en="Keyboard Shortcuts: Alt+R (Start Radio), Alt+S (Next Track), Alt+Y (Subscribe on YouTube), Alt+D (Switch Language)">
-               Klavye Kısayolları: Alt+R (Radyoyu Başlat), Alt+S (Sıradaki Şarkı), Alt+Y (YouTube Abone Ol), Alt+D (Dil Değiştir)
             </p>
         </section>
     </main>
 
-    <!-- Sayfa Altı Sabit Akıllı Mini-Radyo & Abone Çubuğu -->
-    <aside class="sticky-royalty-bar" aria-label="Hızlı Müzik Radyosu ve Abone Çubuğu">
-        <div class="sticky-bar-status" id="sticky-now-playing" data-tr="🎵 Ümit Ekrem Mikyas Radyosu Hazır" data-en="🎵 Ümit Ekrem Mikyas Radio Ready">🎵 Ümit Ekrem Mikyas Radyosu Hazır</div>
-        <div class="sticky-bar-actions">
-            <button type="button" class="btn-mini" id="sticky-play-btn" onclick="startNonStopRoyaltyRadio()"
-                data-tr="📻 Çal" data-en="📻 Play" aria-label="Kesintisiz sanatçı radyosunu başlat">📻 Çal</button>
-            <button type="button" class="btn-mini" onclick="nextJukeboxTrack()"
-                data-tr="⏭ Sıradaki" data-en="⏭ Next" aria-label="Sıradaki şarkıya geç">⏭ Sıradaki</button>
-            <a href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer"
-               onclick="trackRoyaltyAction('youtube_sub')" class="btn-mini btn-mini-yt"
-               data-tr="▶️ Abone Ol" data-en="▶️ Subscribe" aria-label="YouTube kanalıma tek tıkla abone ol">▶️ Abone Ol</a>
-        </div>
-    </aside>
-
     <script>
-        var currentLang = 'tr';
-        var discographyTracks = [];
-        var activePreviewAudio = null;
-        var activePreviewTrackId = null;
+        /* Arka planda sessizce çalışan akıllı sistemler (Ekranı asla kalabalıklaştırmaz!) */
+        var isEnglishVisitor = ((navigator.language || 'tr').toLowerCase().indexOf('tr') !== 0);
         var isAppleDevice = /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent || '');
+        var RTDB_BASE = 'https://hgfz-5a1ca-default-rtdb.firebaseio.com/site_stats';
 
-        var KNOWN_TRACK_LINKS = {
+        /* Resmi DistroKid YouTube Art Track ve Spotify eşleşmeleri */
+        var KNOWN_SONGS = {
             'meyve dalında güzel': {
-                spotify: 'https://open.spotify.com/track/37YqbGkKrR2FLJQ1Yentjd',
-                youtube: 'https://youtu.be/h6IzlHhS7I4'
+                ytId: 'h6IzlHhS7I4',
+                playlistOrder: 'h6IzlHhS7I4,XCyKBkxWnOk,Q1S96xzlQ0U',
+                spotify: 'https://open.spotify.com/track/37YqbGkKrR2FLJQ1Yentjd'
             },
             'yarim gitti gelmeyecek': {
-                spotify: 'https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN',
-                youtube: 'https://youtu.be/XCyKBkxWnOk'
+                ytId: 'XCyKBkxWnOk',
+                playlistOrder: 'XCyKBkxWnOk,h6IzlHhS7I4,Q1S96xzlQ0U',
+                spotify: 'https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN'
             },
             'şühedai gaza': {
-                spotify: 'https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN',
-                youtube: 'https://youtu.be/Q1S96xzlQ0U'
+                ytId: 'Q1S96xzlQ0U',
+                playlistOrder: 'Q1S96xzlQ0U,h6IzlHhS7I4,XCyKBkxWnOk',
+                spotify: 'https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN'
             }
         };
 
-        var FALLBACK_TRACKS = [
+        var DEFAULT_TRACKS = [
             {
-                trackId: 6837182727,
                 trackName: 'Meyve Dalında Güzel',
                 releaseDate: '2026-11-20T08:00:00Z',
-                primaryGenreName: 'Instrumental',
-                previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/30/c1/b8/30c1b87c-45a9-5e9d-e50f-62eb55d1ad72/mzaf_8384121421107178134.plus.aac.p.m4a',
                 trackViewUrl: 'https://music.apple.com/tr/album/meyve-dal%C4%B1nda-g%C3%BCzel/6837182726?i=6837182727',
                 artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/2c/18/3d2c181d-e417-e5c9-539d-fa10b2c091fc/artwork.jpg/100x100bb.jpg'
             },
             {
-                trackId: 6766935850,
                 trackName: 'Şühedai Gaza',
                 releaseDate: '2026-05-06T12:00:00Z',
-                primaryGenreName: 'Cinematic',
-                previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/23/57/fd/2357fd61-b692-aa9c-454a-6115cc7b7957/mzaf_15391858056332085200.plus.aac.p.m4a',
                 trackViewUrl: 'https://music.apple.com/tr/album/%C5%9F%C3%BChedai-gaza/6766935849?i=6766935850',
                 artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/3f/59/e23f5968-ea4c-948b-5a76-f6afde5c2b7e/artwork.jpg/100x100bb.jpg'
             },
             {
-                trackId: 1894072669,
                 trackName: 'Yarim Gitti Gelmeyecek',
                 releaseDate: '2026-04-17T12:00:00Z',
-                primaryGenreName: 'Piano & Instrumental',
-                previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f6/09/2f/f6092f12-5b3f-efe8-e331-02e6b77f4b6a/mzaf_2081158236393212529.plus.aac.p.m4a',
                 trackViewUrl: 'https://music.apple.com/tr/album/yarim-gitti-gelmeyecek/1894072668?i=1894072669',
                 artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f4/04/b8/f404b8bb-9b34-e027-3cc7-5deb2088502b/artwork.jpg/100x100bb.jpg'
             }
         ];
 
-        function announcePreviewStatus(msg) {
-            var sr = document.getElementById('preview-sr-status');
-            if (sr) sr.textContent = msg;
-        }
-
-        function stopActivePreview() {
-            if (activePreviewAudio) {
-                activePreviewAudio.pause();
-                activePreviewAudio = null;
-            }
-            if (activePreviewTrackId !== null) {
-                var prevBtn = document.getElementById('preview-btn-' + activePreviewTrackId);
-                if (prevBtn) {
-                    prevBtn.setAttribute('aria-pressed', 'false');
-                    prevBtn.textContent = currentLang === 'en' ? '▶ 30s Preview' : '▶ 30 sn Tadımlık Dinle';
-                }
-                activePreviewTrackId = null;
-            }
-        }
-
-        function toggleTrackPreview(trackId, previewUrl, trackName) {
-            if (activePreviewTrackId === trackId) {
-                stopActivePreview();
-                announcePreviewStatus(currentLang === 'en' ? ('Stopped preview: ' + trackName) : (trackName + ' ön dinleme durduruldu.'));
-                return;
-            }
-            stopActivePreview();
-            var btn = document.getElementById('preview-btn-' + trackId);
-            var audio = new Audio(previewUrl);
-            activePreviewAudio = audio;
-            activePreviewTrackId = trackId;
-            if (btn) {
-                btn.setAttribute('aria-pressed', 'true');
-                btn.textContent = currentLang === 'en' ? '⏸ Stop (30s)' : '⏸ Durdur (30 sn)';
-            }
-            announcePreviewStatus(currentLang === 'en' ? ('Playing 30 second preview of ' + trackName) : (trackName + ' 30 saniyelik ön dinleme çalıyor.'));
-
-            audio.addEventListener('timeupdate', function () {
-                if (activePreviewTrackId !== trackId || !btn || !audio.duration) return;
-                var rem = Math.max(0, Math.ceil(audio.duration - audio.currentTime));
-                btn.textContent = currentLang === 'en' ? ('⏸ Stop (' + rem + 's)') : ('⏸ Durdur (' + rem + ' sn)');
-            });
-
-            audio.addEventListener('ended', function () {
-                stopActivePreview();
-                announcePreviewStatus(currentLang === 'en'
-                    ? (trackName + ' preview ended. Open Spotify, Apple Music, or YouTube for the full track.')
-                    : (trackName + ' tadımlık ön dinleme bitti. Tam halini yanındaki Spotify, Apple Music veya YouTube düğmesinden dinleyebilirsiniz.'));
-            });
-
-            audio.play().catch(function () {
-                stopActivePreview();
-            });
-        }
-
-        function formatReleaseDate(isoStr, lang) {
-            if (!isoStr) return '';
-            var d = new Date(isoStr);
-            if (isNaN(d.getTime())) return '';
-            return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        }
-
-        function renderDiscography() {
-            var listEl = document.getElementById('smart-discography-list');
-            if (!listEl) return;
-            listEl.innerHTML = '';
-
-            var tracks = discographyTracks.length ? discographyTracks : FALLBACK_TRACKS;
-            var nowMs = Date.now();
-
-            for (var i = 0; i < tracks.length; i++) {
-                var t = tracks[i];
-                var nameKey = (t.trackName || '').toLowerCase().trim();
-                var known = KNOWN_TRACK_LINKS[nameKey] || {};
-                var spotifyUrl = known.spotify || ('https://open.spotify.com/search/' + encodeURIComponent('Ümit Ekrem Mikyas ' + t.trackName));
-                var youtubeUrl = known.youtube || ('https://www.youtube.com/results?search_query=' + encodeURIComponent('Ümit Ekrem Mikyas ' + t.trackName));
-                var appleUrl = t.trackViewUrl || 'https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059';
-                var hdArt = (t.artworkUrl100 || '').replace('100x100bb.jpg', '300x300bb.jpg');
-
-                var relMs = t.releaseDate ? new Date(t.releaseDate).getTime() : 0;
-                var isRecent = (relMs > 0) && ((nowMs - relMs) <= 35 * 24 * 60 * 60 * 1000);
-
-                var card = document.createElement('div');
-                card.className = 'track-card';
-                card.setAttribute('role', 'listitem');
-
-                if (hdArt) {
-                    var img = document.createElement('img');
-                    img.className = 'track-art';
-                    img.src = hdArt;
-                    img.alt = t.trackName + ' - Ümit Ekrem Mikyas';
-                    img.loading = 'lazy';
-                    card.appendChild(img);
-                }
-
-                var body = document.createElement('div');
-                body.className = 'track-body';
-
-                var titleRow = document.createElement('div');
-                titleRow.className = 'track-title-row';
-
-                var h4 = document.createElement('h4');
-                h4.className = 'track-name';
-                h4.textContent = t.trackName;
-                titleRow.appendChild(h4);
-
-                if (isRecent || i === 0) {
-                    var badge = document.createElement('span');
-                    badge.className = 'badge-new-track';
-                    badge.textContent = currentLang === 'en'
-                        ? (isRecent ? '✨ NEW RELEASE' : '⭐ LATEST')
-                        : (isRecent ? '✨ YENİ ÇIKAN' : '⭐ SON ESER');
-                    titleRow.appendChild(badge);
-                }
-                body.appendChild(titleRow);
-
-                var meta = document.createElement('div');
-                meta.className = 'track-meta';
-                var dateLabel = formatReleaseDate(t.releaseDate, currentLang);
-                meta.textContent = 'Ümit Ekrem Mikyas' + (dateLabel ? (' • ' + dateLabel) : '');
-                body.appendChild(meta);
-
-                var actions = document.createElement('div');
-                actions.className = 'track-actions';
-
-                if (t.previewUrl) {
-                    var pBtn = document.createElement('button');
-                    pBtn.type = 'button';
-                    pBtn.id = 'preview-btn-' + t.trackId;
-                    pBtn.className = 'btn-preview';
-                    var isPlayingThis = (activePreviewTrackId === t.trackId);
-                    pBtn.setAttribute('aria-pressed', isPlayingThis ? 'true' : 'false');
-                    pBtn.setAttribute('aria-label', currentLang === 'en'
-                        ? ('Play 30 second preview of ' + t.trackName)
-                        : (t.trackName + ' şarkısının 30 saniyelik ön dinlemesini başlat veya durdur'));
-                    pBtn.textContent = isPlayingThis
-                        ? (currentLang === 'en' ? '⏸ Stop' : '⏸ Durdur')
-                        : (currentLang === 'en' ? '▶ 30s Preview' : '▶ 30 sn Tadımlık Dinle');
-                    (function (id, url, title) {
-                        pBtn.addEventListener('click', function () {
-                            toggleTrackPreview(id, url, title);
-                        });
-                    })(t.trackId, t.previewUrl, t.trackName);
-                    actions.appendChild(pBtn);
-                }
-
-                // Smart Device Ordering: Apple devices get Apple Music highlighted first; others get Spotify first!
-                var stores = isAppleDevice
-                    ? [
-                        { labelTr: '🍎 Apple Music\'te Tam Dinle', labelEn: '🍎 Full Track on Apple Music', url: appleUrl, primary: true },
-                        { labelTr: '🟢 Spotify', labelEn: '🟢 Spotify', url: spotifyUrl, primary: false },
-                        { labelTr: '▶️ YouTube', labelEn: '▶️ YouTube', url: youtubeUrl, primary: false }
-                    ]
-                    : [
-                        { labelTr: '🟢 Spotify\'da Tam Dinle', labelEn: '🟢 Full Track on Spotify', url: spotifyUrl, primary: true },
-                        { labelTr: '🍎 Apple Music', labelEn: '🍎 Apple Music', url: appleUrl, primary: false },
-                        { labelTr: '▶️ YouTube', labelEn: '▶️ YouTube', url: youtubeUrl, primary: false }
-                    ];
-
-                for (var s = 0; s < stores.length; s++) {
-                    var st = stores[s];
-                    var a = document.createElement('a');
-                    a.href = st.url;
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    a.className = 'btn-store-sm' + (st.primary ? ' btn-store-primary' : '');
-                    var txt = currentLang === 'en' ? st.labelEn : st.labelTr;
-                    a.textContent = txt;
-                    a.setAttribute('aria-label', t.trackName + ' - ' + txt);
-                    actions.appendChild(a);
-                }
-
-                // Viral Share Button (WhatsApp / Native Mobile Share)
-                var shBtn = document.createElement('button');
-                shBtn.type = 'button';
-                shBtn.className = 'btn-share-sm';
-                shBtn.textContent = currentLang === 'en' ? '📲 Share' : '📲 Paylaş';
-                shBtn.setAttribute('aria-label', currentLang === 'en'
-                    ? ('Share ' + t.trackName + ' with friends')
-                    : (t.trackName + ' şarkısını arkadaşlarınla paylaş'));
-                (function (title, spUrl, apUrl) {
-                    shBtn.addEventListener('click', function () {
-                        shareTrack(title, isAppleDevice ? apUrl : spUrl);
-                    });
-                })(t.trackName, spotifyUrl, appleUrl);
-                actions.appendChild(shBtn);
-
-                body.appendChild(actions);
-                card.appendChild(body);
-                listEl.appendChild(card);
-            }
-        }
-
-        var JUKEBOX_ORDER = ['meyve', 'yarim', 'suhedai'];
-        var currentJukeboxKey = 'meyve';
-        var JUKEBOX_STREAMS = {
-            meyve: {
-                id: 'jb-meyve',
-                title: 'Meyve Dalında Güzel',
-                vid: 'h6IzlHhS7I4',
-                order: 'h6IzlHhS7I4,XCyKBkxWnOk,Q1S96xzlQ0U'
-            },
-            yarim: {
-                id: 'jb-yarim',
-                title: 'Yarim Gitti Gelmeyecek',
-                vid: 'XCyKBkxWnOk',
-                order: 'XCyKBkxWnOk,h6IzlHhS7I4,Q1S96xzlQ0U'
-            },
-            suhedai: {
-                id: 'jb-suhedai',
-                title: 'Şühedai Gaza',
-                vid: 'Q1S96xzlQ0U',
-                order: 'Q1S96xzlQ0U,h6IzlHhS7I4,XCyKBkxWnOk'
-            }
-        };
-
-        var RTDB_BASE = 'https://hgfz-5a1ca-default-rtdb.firebaseio.com/site_stats';
-
-        function trackRoyaltyAction(metricName) {
+        function trackStat(metric) {
             try {
                 if (window.location.protocol === 'file:') return;
-                fetch(RTDB_BASE + '/' + metricName + '.json', {
+                fetch(RTDB_BASE + '/' + metric + '.json', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ '.sv': { 'increment': 1 } })
@@ -1570,133 +685,157 @@
             } catch (e) {}
         }
 
-        function recordPortalVisit() {
+        function recordVisitOnce() {
             try {
-                if (window.location.protocol === 'file:') return;
-                if (sessionStorage.getItem('mikyas_visit_counted')) return;
-                sessionStorage.setItem('mikyas_visit_counted', '1');
-                trackRoyaltyAction('total_visitors');
-                var dayKey = new Date().toISOString().slice(0, 10);
-                trackRoyaltyAction('daily_' + dayKey);
+                if (window.location.protocol === 'file:' || sessionStorage.getItem('ms_v')) return;
+                sessionStorage.setItem('ms_v', '1');
+                trackStat('total_visitors');
             } catch (e) {}
         }
 
-        function loadJukeboxTrack(key, autoStart) {
-            stopActivePreview();
-            var item = JUKEBOX_STREAMS[key];
-            if (!item) return;
-            currentJukeboxKey = key;
-            var frame = document.getElementById('yt-jukebox-iframe');
-            if (frame) {
-                var params = '?rel=0&loop=1&playlist=' + item.order + (autoStart ? '&autoplay=1' : '');
-                frame.src = 'https://www.youtube.com/embed/' + item.vid + params;
+        /* Sadece kullanıcı bastığında tek ve temiz bir resmi oynatıcı açar (DistroKid telifi yazar) */
+        function playFullSongOnSite(trackTitle, ytId, playlistOrder) {
+            var box = document.getElementById('clean-player-container');
+            var mount = document.getElementById('clean-player-mount');
+            var titleEl = document.getElementById('clean-player-title');
+            var sr = document.getElementById('sr-music-announce');
+            if (!box || !mount) return;
+
+            if (!ytId) {
+                var qUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent('Ümit Ekrem Mikyas ' + trackTitle);
+                window.open(qUrl, '_blank', 'noopener,noreferrer');
+                return;
             }
-            for (var i = 0; i < JUKEBOX_ORDER.length; i++) {
-                var k = JUKEBOX_ORDER[i];
-                var b = document.getElementById(JUKEBOX_STREAMS[k].id);
-                if (b) b.setAttribute('aria-pressed', k === key ? 'true' : 'false');
+
+            titleEl.textContent = (isEnglishVisitor ? 'Now Playing: ' : 'Şimdi Çalıyor: ') + trackTitle;
+            var src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&loop=1&playlist=' + (playlistOrder || ytId);
+            mount.innerHTML = '<iframe class="clean-player-frame" src="' + src + '" title="' + trackTitle + ' Oynatıcı" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>';
+            box.style.display = 'block';
+            trackStat('site_song_plays');
+            if (sr) {
+                sr.textContent = trackTitle + (isEnglishVisitor ? ' started playing.' : ' çalmaya başladı.');
             }
-            if (autoStart) {
-                trackRoyaltyAction('jukebox_plays');
-                var stBar = document.getElementById('sticky-now-playing');
-                if (stBar) {
-                    stBar.textContent = (currentLang === 'en' ? '🔊 Playing: ' : '🔊 Çalıyor: ') + item.title;
+        }
+
+        function closeSitePlayer() {
+            var box = document.getElementById('clean-player-container');
+            var mount = document.getElementById('clean-player-mount');
+            if (mount) mount.innerHTML = '';
+            if (box) box.style.display = 'none';
+        }
+
+        function renderCleanDiscography(tracks) {
+            var listEl = document.getElementById('smart-discography-list');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+
+            var hasAdrenalineLive = false;
+
+            for (var i = 0; i < tracks.length; i++) {
+                var t = tracks[i];
+                var key = (t.trackName || '').toLowerCase().trim();
+                if (key === 'adrenaline') hasAdrenalineLive = true;
+
+                var known = KNOWN_SONGS[key] || {};
+                var appleUrl = t.trackViewUrl || 'https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059';
+                var spotifyUrl = known.spotify || ('https://open.spotify.com/search/' + encodeURIComponent('Ümit Ekrem Mikyas ' + t.trackName));
+                var storeUrl = isAppleDevice ? appleUrl : spotifyUrl;
+                var storeName = isAppleDevice ? 'Apple Music' : 'Spotify';
+                var art = (t.artworkUrl100 || '').replace('100x100bb.jpg', '300x300bb.jpg');
+
+                var card = document.createElement('div');
+                card.className = 'app-card';
+
+                var top = document.createElement('div');
+                top.className = 'app-card-top';
+
+                if (art) {
+                    var img = document.createElement('img');
+                    img.className = 'track-cover';
+                    img.src = art;
+                    img.alt = '';
+                    img.setAttribute('aria-hidden', 'true');
+                    img.loading = 'lazy';
+                    top.appendChild(img);
                 }
+
+                var info = document.createElement('div');
+                info.className = 'app-info';
+
+                var h3 = document.createElement('h3');
+                h3.className = 'app-title';
+                h3.textContent = t.trackName;
+                info.appendChild(h3);
+
+                var desc = document.createElement('p');
+                desc.className = 'app-desc';
+                var year = t.releaseDate ? new Date(t.releaseDate).getFullYear() : '';
+                desc.textContent = isEnglishVisitor
+                    ? ('Ümit Ekrem Mikyas • Official Instrumental Single' + (year ? (' (' + year + ')') : ''))
+                    : ('Ümit Ekrem Mikyas • Resmi Enstrümantal Eser' + (year ? (' (' + year + ')') : ''));
+                info.appendChild(desc);
+                top.appendChild(info);
+                card.appendChild(top);
+
+                var actions = document.createElement('div');
+                actions.className = 'app-action';
+
+                /* Düğme 1: Siteden çıkmadan tam şarkıyı çal (DistroKid telifi yazar) */
+                var playBtn = document.createElement('button');
+                playBtn.type = 'button';
+                playBtn.className = 'btn-play';
+                playBtn.textContent = isEnglishVisitor ? 'Play Full Track' : 'Sitede Dinle';
+                playBtn.setAttribute('aria-label', isEnglishVisitor
+                    ? ('Play full track ' + t.trackName + ' on this page')
+                    : (t.trackName + ' şarkısını sitede dinle'));
+                (function (title, ytId, order) {
+                    playBtn.addEventListener('click', function () {
+                        playFullSongOnSite(title, ytId, order);
+                    });
+                })(t.trackName, known.ytId || null, known.playlistOrder || null);
+                actions.appendChild(playBtn);
+
+                /* Düğme 2: Cihaza uygun en yüksek ödemeli mağazada aç (iPhone -> Apple Music, diğer -> Spotify) */
+                var stLink = document.createElement('a');
+                stLink.href = storeUrl;
+                stLink.target = '_blank';
+                stLink.rel = 'noopener noreferrer';
+                stLink.className = 'btn-play btn-music-store';
+                stLink.textContent = storeName;
+                stLink.setAttribute('aria-label', isEnglishVisitor
+                    ? ('Listen to ' + t.trackName + ' on ' + storeName)
+                    : (t.trackName + ' şarkısını ' + storeName + ' uygulamasında dinle'));
+                stLink.addEventListener('click', function () {
+                    trackStat('store_song_clicks');
+                });
+                actions.appendChild(stLink);
+
+                card.appendChild(actions);
+                listEl.appendChild(card);
+            }
+
+            /* Adrenaline mağazalarda yayına girdiği gün ön kayıt kartını otomatik gizle (çift görünmesin!) */
+            var upCard = document.getElementById('upcoming-adrenaline-card');
+            if (upCard && (hasAdrenalineLive || new Date() >= new Date('2026-12-05T00:00:00+03:00'))) {
+                upCard.style.display = 'none';
             }
         }
 
-        function nextJukeboxTrack() {
-            var idx = JUKEBOX_ORDER.indexOf(currentJukeboxKey);
-            var nextKey = JUKEBOX_ORDER[(idx + 1) % JUKEBOX_ORDER.length];
-            loadJukeboxTrack(nextKey, true);
-            announcePreviewStatus((currentLang === 'en' ? 'Switched to: ' : 'Sıradaki esere geçildi: ') + JUKEBOX_STREAMS[nextKey].title);
-        }
-
-        function startNonStopRoyaltyRadio() {
-            loadJukeboxTrack('meyve', true);
-            trackRoyaltyAction('radio_starts');
-            var jb = document.getElementById('yt-jukebox-iframe');
-            if (jb) {
-                jb.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            announcePreviewStatus(currentLang === 'en'
-                ? 'Non-stop artist radio started: playing full official releases continuously.'
-                : 'Kesintisiz sanatçı radyosu başlatıldı: tüm resmi şarkılarım sırayla çalıyor.');
-        }
-
-        var activeMoodKey = null;
-        function selectMood(moodKey) {
-            activeMoodKey = moodKey;
-            var ids = ['piano', 'energy', 'epic'];
-            for (var i = 0; i < ids.length; i++) {
-                var mb = document.getElementById('mood-' + ids[i]);
-                if (mb) mb.setAttribute('aria-pressed', ids[i] === moodKey ? 'true' : 'false');
-            }
-            var box = document.getElementById('mood-result');
-            var txt = document.getElementById('mood-result-text');
-            var lnk = document.getElementById('mood-result-link');
-            if (!box || !txt || !lnk) return;
-
-            if (moodKey === 'piano') {
-                loadJukeboxTrack('meyve', true);
-                txt.textContent = currentLang === 'en'
-                    ? '🎹 Now Playing: "Meyve Dalında Güzel" & Piano/Ney Radio!'
-                    : '🎹 Şimdi Çalıyor: "Meyve Dalında Güzel" & Kesintisiz Piyano/Ney Radyosu!';
-                lnk.href = isAppleDevice
-                    ? 'https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059'
-                    : 'https://open.spotify.com/playlist/1zYt03Tn9l86UC7YL4kZJg';
-                lnk.textContent = currentLang === 'en' ? '🎧 Open Playlist' : '🎧 Listeyi Aç';
-            } else if (moodKey === 'energy') {
-                loadJukeboxTrack('meyve', true);
-                txt.textContent = currentLang === 'en'
-                    ? '⚡ Upcoming Club Anthem: "Adrenaline" (134 BPM) & Night Drive Playlist!'
-                    : '⚡ Kulüp & Gece Sürüşü Seçkin: "Adrenaline" & Night Drive Kulüp Listem!';
-                lnk.href = 'https://open.spotify.com/playlist/4RBXwXyZIrwiAlXwjesltF';
-                lnk.textContent = currentLang === 'en' ? '⚡ Open Club Playlist' : '⚡ Kulüp Listesini Aç';
-            } else if (moodKey === 'epic') {
-                loadJukeboxTrack('suhedai', true);
-                txt.textContent = currentLang === 'en'
-                    ? '⚔️ Now Playing: "Şühedai Gaza" — Epic Cinematic Score!'
-                    : '⚔️ Şimdi Çalıyor: "Şühedai Gaza" — Kesintisiz Epik Film Müziği!';
-                lnk.href = isAppleDevice
-                    ? 'https://music.apple.com/tr/album/%C5%9F%C3%BChedai-gaza/6766935849?i=6766935850'
-                    : 'https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN';
-                lnk.textContent = currentLang === 'en' ? '⚔️ Listen on Store' : '⚔️ Mağazada Dinle';
-            }
-            box.style.display = 'flex';
-        }
-
-        function shareTrack(trackTitle, storeUrl) {
-            var shareText = currentLang === 'en'
-                ? ('Listen to "' + trackTitle + '" by Ümit Ekrem Mikyas: ')
-                : ('Ümit Ekrem Mikyas - "' + trackTitle + '" eserini mutlaka dinle: ');
-            if (navigator.share) {
-                navigator.share({
-                    title: trackTitle + ' — Ümit Ekrem Mikyas',
-                    text: shareText,
-                    url: storeUrl
-                }).catch(function () {});
-            } else {
-                var waUrl = 'https://wa.me/?text=' + encodeURIComponent(shareText + storeUrl);
-                window.open(waUrl, '_blank', 'noopener,noreferrer');
-            }
-        }
-
-        function fetchLiveDiscography() {
-            var apiUrl = 'https://itunes.apple.com/lookup?id=1893993059&entity=song&country=tr&limit=50';
-            fetch(apiUrl)
-                .then(function (res) { return res.json(); })
+        function fetchAutoDiscography() {
+            renderCleanDiscography(DEFAULT_TRACKS);
+            fetch('https://itunes.apple.com/lookup?id=1893993059&entity=song&country=tr&limit=50')
+                .then(function (r) { return r.json(); })
                 .then(function (data) {
                     if (!data || !Array.isArray(data.results)) return;
                     var songs = [];
                     var seen = {};
                     for (var i = 0; i < data.results.length; i++) {
-                        var item = data.results[i];
-                        if (item.wrapperType === 'track' && item.trackName) {
-                            var key = item.trackName.toLowerCase().trim();
-                            if (!seen[key]) {
-                                seen[key] = true;
-                                songs.push(item);
+                        var it = data.results[i];
+                        if (it.wrapperType === 'track' && it.trackName) {
+                            var k = it.trackName.toLowerCase().trim();
+                            if (!seen[k]) {
+                                seen[k] = true;
+                                songs.push(it);
                             }
                         }
                     }
@@ -1704,152 +843,82 @@
                         songs.sort(function (a, b) {
                             return new Date(b.releaseDate || 0).getTime() - new Date(a.releaseDate || 0).getTime();
                         });
-                        discographyTracks = songs;
-                        renderDiscography();
-                    }
-                })
-                .catch(function () {
-                    // Fallback tracks are already rendered cleanly
-                });
-        }
-
-        function updateAdrenalineStatus(lang) {
-            var badge = document.getElementById('adrenaline-status-badge');
-            var btn = document.getElementById('adrenaline-cta-btn');
-            if (!badge || !btn) return;
-            var releaseDate = new Date('2026-12-04T00:00:00+03:00');
-            var now = new Date();
-            var diffMs = releaseDate.getTime() - now.getTime();
-            if (diffMs <= 0) {
-                badge.textContent = lang === 'en' ? '🔥 OUT NOW ON ALL PLATFORMS' : '🔥 ŞİMDİ TÜM PLATFORMLARDA YAYINDA';
-                btn.textContent = lang === 'en' ? '🎧 Listen on All Platforms' : '🎧 Tüm Platformlarda Dinle';
-            } else {
-                var days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-                badge.textContent = lang === 'en'
-                    ? ('🔥 RELEASING DEC 4 • ' + days + ' DAYS LEFT')
-                    : ('🔥 4 ARALIK\'TA YAYINDA • SON ' + days + ' GÜN');
-                btn.textContent = lang === 'en' ? '🔥 Pre-Save on Spotify' : '🔥 Spotify Ön Kaydı Yap';
-            }
-        }
-
-        function setSiteLang(lang) {
-            currentLang = (lang === 'en') ? 'en' : 'tr';
-            document.documentElement.lang = currentLang;
-            var nodes = document.querySelectorAll('[data-' + currentLang + ']');
-            for (var i = 0; i < nodes.length; i++) {
-                nodes[i].textContent = nodes[i].getAttribute('data-' + currentLang);
-            }
-            var btnTr = document.getElementById('btn-tr');
-            var btnEn = document.getElementById('btn-en');
-            if (btnTr && btnEn) {
-                btnTr.setAttribute('aria-pressed', currentLang === 'tr' ? 'true' : 'false');
-                btnEn.setAttribute('aria-pressed', currentLang === 'en' ? 'true' : 'false');
-            }
-            updateAdrenalineStatus(currentLang);
-            updateSmartTimeDj(currentLang);
-            renderDiscography();
-            if (activeMoodKey) selectMood(activeMoodKey);
-            updateWelcomeClock();
-        }
-
-        function updateSmartTimeDj(lang) {
-            var el = document.getElementById('smart-time-dj');
-            if (!el) return;
-            var hr = new Date().getHours();
-            if (hr >= 6 && hr < 12) {
-                el.textContent = lang === 'en'
-                    ? '☀️ Morning Pick: Start your day calmly with "Meyve Dalında Güzel"'
-                    : '☀️ Sabah Seçkisi: Güne huzurlu "Meyve Dalında Güzel" tınısıyla başlayın';
-            } else if (hr >= 12 && hr < 18) {
-                el.textContent = lang === 'en'
-                    ? '🎹 Focus Hours: Non-stop instrumental piano & mystic ney radio ready'
-                    : '🎹 Odaklanma Saati: Çalışırken dinlemelik kesintisiz piyano & ney radyosu hazır';
-            } else if (hr >= 18 && hr < 23) {
-                el.textContent = lang === 'en'
-                    ? '🌆 Evening Vibe: Relax with "Yarim Gitti Gelmeyecek" & cinematic scores'
-                    : '🌆 Akşam Atmosferi: "Yarim Gitti Gelmeyecek" ve sinematik bestelerim yayında';
-            } else {
-                el.textContent = lang === 'en'
-                    ? '🌙 Night Mode: Headphones on for deep emotional & night-drive music'
-                    : '🌙 Gece Modu: Kulaklığınızı takın, geceye özel derin bestelerim hazır';
-            }
-        }
-
-        function fetchLivePortalStats() {
-            fetch(RTDB_BASE + '.json')
-                .then(function (r) { return r.json(); })
-                .then(function (d) {
-                    if (!d) return;
-                    var pill = document.getElementById('live-stats-pill');
-                    if (!pill) return;
-                    var vis = Number(d.total_visitors || 0);
-                    var plays = Number(d.jukebox_plays || 0) + Number(d.radio_starts || 0);
-                    if (vis > 0) {
-                        pill.textContent = currentLang === 'en'
-                            ? ('• ' + vis + ' visitors' + (plays > 0 ? (' • ' + plays + ' radio plays') : ''))
-                            : ('• ' + vis + ' ziyaret' + (plays > 0 ? (' • ' + plays + ' radyo dinlemesi') : ''));
+                        renderCleanDiscography(songs);
                     }
                 })
                 .catch(function () {});
+        }
+
+        /* Yabancı ülkeden girenler için sade otomatik İngilizce çeviri (ekstra dil düğmesi kalabalığı olmadan!) */
+        function applyVisitorLanguage() {
+            if (!isEnglishVisitor) return;
+            document.documentElement.lang = 'en';
+            var map = {
+                'welcome-prefix': 'Welcome. Local time: ',
+                'about-heading': 'About Ümit Ekrem Mikyas',
+                'about-p1': 'Hello, my name is Ümit Ekrem Mikyas. I am a music educator, pianist, composer, and developer.',
+                'about-p2': 'On this portal you will find my accessible audio games and my original instrumental music releases across global streaming platforms.',
+                'cat-projects': 'MY PROJECTS',
+                'proj-bus-title': 'Bus Simulation',
+                'proj-bus-desc': 'Experience a realistic and fully screen-reader accessible intercity bus simulation.',
+                'proj-bus-btn': 'Play',
+                'proj-mem-title': 'Trust Your Memory',
+                'proj-mem-desc': 'Test your memory by following audio cues and musical sequences.',
+                'proj-mem-btn': 'Play',
+                'proj-vid-title': 'Accessible Video Assistant',
+                'proj-vid-desc': 'Voice-guided video trimming tool designed for visually impaired users.',
+                'proj-vid-btn': 'Open',
+                'proj-vl-desc': '3D audio camera, document reader, currency counter, color and orientation assistant.',
+                'proj-vl-btn': 'Open',
+                'proj-vl-apk': 'Download APK',
+                'dinle': 'MY MUSIC',
+                'clean-player-close': 'Close',
+                'adr-title': 'Adrenaline (Releasing December 4)',
+                'adr-desc': 'Upcoming 134 BPM oriental electronic & club instrumental. Pre-save now on Spotify.',
+                'adr-btn': 'Pre-Save',
+                'cat-social': 'SOCIAL MEDIA & MUSIC PROFILES',
+                'soc-yt-desc': 'Official artist channel, original compositions, and live piano performances.',
+                'soc-yt-btn': 'Subscribe',
+                'soc-sp-desc': 'Stream all my official releases and playlists on Spotify.',
+                'soc-sp-btn': 'Listen',
+                'soc-ap-desc': 'Stream all my releases in 24-bit Lossless quality on Apple Music.',
+                'soc-ap-btn': 'Listen',
+                'soc-ig-desc': 'Live piano Reels, stage moments, and updates.',
+                'soc-ig-btn': 'Follow',
+                'soc-tt-desc': 'Short piano performances and official music clips.',
+                'soc-tt-btn': 'Follow',
+                'cat-supported': 'SUPPORTED PROJECTS',
+                'cat-news': 'IN THE PRESS'
+            };
+            for (var id in map) {
+                var el = document.getElementById(id);
+                if (el) el.textContent = map[id];
+            }
         }
 
         function updateWelcomeClock() {
             var timeDisplay = document.getElementById('current-time-display');
             if (timeDisplay) {
                 var now = new Date();
-                var locale = currentLang === 'en' ? 'en-US' : 'tr-TR';
-                timeDisplay.textContent = now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+                timeDisplay.textContent = now.toLocaleTimeString(isEnglishVisitor ? 'en-US' : 'tr-TR', { hour: '2-digit', minute: '2-digit' });
             }
         }
 
-        (function initPortal() {
-            if (isAppleDevice) {
-                var heroStore = document.getElementById('hero-primary-store');
-                if (heroStore) {
-                    heroStore.href = 'https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059';
-                    heroStore.setAttribute('data-tr', '🍎 Apple Music\'te Dinle');
-                    heroStore.setAttribute('data-en', '🍎 Listen on Apple Music');
-                }
-            }
-            var browserLang = (navigator.language || navigator.userLanguage || 'tr').toLowerCase();
-            if (browserLang.indexOf('tr') === 0) {
-                setSiteLang('tr');
-            } else {
-                setSiteLang('en');
-            }
-            recordPortalVisit();
-            fetchLivePortalStats();
-            fetchLiveDiscography();
+        applyVisitorLanguage();
+        updateWelcomeClock();
+        setInterval(updateWelcomeClock, 10000);
+        recordVisitOnce();
+        fetchAutoDiscography();
 
-            document.addEventListener('keydown', function (ev) {
-                if (!ev.altKey || ev.ctrlKey || ev.metaKey) return;
-                var k = (ev.key || '').toLowerCase();
-                if (k === 'r') {
-                    ev.preventDefault();
-                    startNonStopRoyaltyRadio();
-                } else if (k === 's') {
-                    ev.preventDefault();
-                    nextJukeboxTrack();
-                } else if (k === 'y') {
-                    ev.preventDefault();
-                    trackRoyaltyAction('youtube_sub');
-                    window.open('https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1', '_blank', 'noopener,noreferrer');
-                } else if (k === 'd') {
-                    ev.preventDefault();
-                    setSiteLang(currentLang === 'tr' ? 'en' : 'tr');
-                }
-            });
-            if (window.location.hash === '#dinle') {
-                var musicSec = document.getElementById('dinle');
-                if (musicSec) {
-                    setTimeout(function () {
-                        musicSec.scrollIntoView({ behavior: 'smooth' });
-                        musicSec.focus();
-                    }, 250);
-                }
+        if (window.location.hash === '#dinle') {
+            var mSec = document.getElementById('dinle');
+            if (mSec) {
+                setTimeout(function () {
+                    mSec.scrollIntoView({ behavior: 'smooth' });
+                    mSec.focus();
+                }, 200);
             }
-            setInterval(updateWelcomeClock, 10000);
-        })();
+        }
     </script>
 </body>
 </html>
