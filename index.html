@@ -262,6 +262,25 @@
             box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
         }
 
+        .btn-hero-radio {
+            background: linear-gradient(135deg, #f59e0b, #ec4899, #8b5cf6);
+            color: #fff;
+            border: none;
+            font-family: inherit;
+            font-weight: 800;
+            padding: 0.85rem 1.8rem;
+            border-radius: 30px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            box-shadow: 0 6px 22px rgba(236, 72, 153, 0.42);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-hero-radio:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 28px rgba(236, 72, 153, 0.6);
+        }
+
         .category-title {
             text-align: left;
             font-size: 1.3rem;
@@ -784,12 +803,17 @@
             <span data-tr="Hoş Geldiniz. Saat şu an " data-en="Welcome. Local time: ">Hoş Geldiniz. Saat şu an </span><span id="current-time-display"></span>
         </p>
 
-        <!-- Hızlı Abone Ol & Dinle Çağrısı -->
+        <!-- Hızlı Kesintisiz Radyo, Abone Ol & Dinle Çağrısı -->
         <div class="hero-cta-row">
+            <button type="button" class="btn-hero-radio" id="hero-radio-btn" onclick="startNonStopRoyaltyRadio()"
+               data-tr="📻 Kesintisiz Sanatçı Radyomu Başlat" data-en="📻 Start Non-Stop Artist Radio"
+               aria-label="Tüm resmi şarkılarımı sitede kesintisiz sırayla çalmaya başlat">📻 Kesintisiz Sanatçı Radyomu Başlat</button>
             <a href="https://www.youtube.com/@umitekremmikyas2518?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="btn-hero-yt"
+               onclick="trackRoyaltyAction('youtube_sub')"
                data-tr="▶️ Resmi YouTube Kanalıma Abone Ol" data-en="▶️ Subscribe on YouTube"
                aria-label="Resmi YouTube Sanatçı Kanalıma Tek Tıkla Abone Ol">▶️ Resmi YouTube Kanalıma Abone Ol</a>
-            <a href="https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN" target="_blank" rel="noopener noreferrer" class="btn-hero-sp"
+            <a href="https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN" target="_blank" rel="noopener noreferrer" class="btn-hero-sp" id="hero-primary-store"
+               onclick="trackRoyaltyAction('hero_store')"
                data-tr="🎧 Spotify'da Dinle" data-en="🎧 Listen on Spotify"
                aria-label="Spotify Resmi Sanatçı Profilimde Şarkılarımı Dinle">🎧 Spotify'da Dinle</a>
         </div>
@@ -862,12 +886,12 @@
                Spotify hesabınız olmasa bile buradan şarkılarımın tam halini peş peşe dinleyebilirsiniz; bir şarkı bittiğinde sıradaki eserime otomatik geçer.
             </p>
             <div class="jukebox-tabs" role="group" aria-label="Tam Şarkı Seçimi">
-                <button type="button" class="btn-jukebox-tab" id="jb-meyve" aria-pressed="true" onclick="loadJukeboxTrack('meyve')"
-                    data-tr="1. Meyve Dalında Güzel" data-en="1. Meyve Dalında Güzel">1. Meyve Dalında Güzel</button>
-                <button type="button" class="btn-jukebox-tab" id="jb-yarim" aria-pressed="false" onclick="loadJukeboxTrack('yarim')"
-                    data-tr="2. Yarim Gitti Gelmeyecek" data-en="2. Yarim Gitti Gelmeyecek">2. Yarim Gitti Gelmeyecek</button>
-                <button type="button" class="btn-jukebox-tab" id="jb-suhedai" aria-pressed="false" onclick="loadJukeboxTrack('suhedai')"
-                    data-tr="3. Şühedai Gaza" data-en="3. Şühedai Gaza">3. Şühedai Gaza</button>
+                <button type="button" class="btn-jukebox-tab" id="jb-meyve" aria-pressed="true" onclick="loadJukeboxTrack('meyve', true)"
+                    data-tr="▶ 1. Meyve Dalında Güzel" data-en="▶ 1. Meyve Dalında Güzel">▶ 1. Meyve Dalında Güzel</button>
+                <button type="button" class="btn-jukebox-tab" id="jb-yarim" aria-pressed="false" onclick="loadJukeboxTrack('yarim', true)"
+                    data-tr="▶ 2. Yarim Gitti Gelmeyecek" data-en="▶ 2. Yarim Gitti Gelmeyecek">▶ 2. Yarim Gitti Gelmeyecek</button>
+                <button type="button" class="btn-jukebox-tab" id="jb-suhedai" aria-pressed="false" onclick="loadJukeboxTrack('suhedai', true)"
+                    data-tr="▶ 3. Şühedai Gaza" data-en="▶ 3. Şühedai Gaza">▶ 3. Şühedai Gaza</button>
             </div>
             <iframe id="yt-jukebox-iframe" class="yt-jukebox-frame"
                 src="https://www.youtube.com/embed/h6IzlHhS7I4?rel=0&amp;playlist=XCyKBkxWnOk,Q1S96xzlQ0U"
@@ -1388,29 +1412,74 @@
         var JUKEBOX_STREAMS = {
             meyve: {
                 id: 'jb-meyve',
-                embed: 'https://www.youtube.com/embed/h6IzlHhS7I4?rel=0&playlist=XCyKBkxWnOk,Q1S96xzlQ0U'
+                vid: 'h6IzlHhS7I4',
+                order: 'h6IzlHhS7I4,XCyKBkxWnOk,Q1S96xzlQ0U'
             },
             yarim: {
                 id: 'jb-yarim',
-                embed: 'https://www.youtube.com/embed/XCyKBkxWnOk?rel=0&playlist=h6IzlHhS7I4,Q1S96xzlQ0U'
+                vid: 'XCyKBkxWnOk',
+                order: 'XCyKBkxWnOk,h6IzlHhS7I4,Q1S96xzlQ0U'
             },
             suhedai: {
                 id: 'jb-suhedai',
-                embed: 'https://www.youtube.com/embed/Q1S96xzlQ0U?rel=0&playlist=h6IzlHhS7I4,XCyKBkxWnOk'
+                vid: 'Q1S96xzlQ0U',
+                order: 'Q1S96xzlQ0U,h6IzlHhS7I4,XCyKBkxWnOk'
             }
         };
 
-        function loadJukeboxTrack(key) {
+        var RTDB_BASE = 'https://hgfz-5a1ca-default-rtdb.firebaseio.com/site_stats';
+
+        function trackRoyaltyAction(metricName) {
+            try {
+                if (window.location.protocol === 'file:') return;
+                fetch(RTDB_BASE + '/' + metricName + '.json', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ '.sv': { 'increment': 1 } })
+                }).catch(function () {});
+            } catch (e) {}
+        }
+
+        function recordPortalVisit() {
+            try {
+                if (window.location.protocol === 'file:') return;
+                if (sessionStorage.getItem('mikyas_visit_counted')) return;
+                sessionStorage.setItem('mikyas_visit_counted', '1');
+                trackRoyaltyAction('total_visitors');
+                var dayKey = new Date().toISOString().slice(0, 10);
+                trackRoyaltyAction('daily_' + dayKey);
+            } catch (e) {}
+        }
+
+        function loadJukeboxTrack(key, autoStart) {
             stopActivePreview();
             var item = JUKEBOX_STREAMS[key];
             if (!item) return;
             var frame = document.getElementById('yt-jukebox-iframe');
-            if (frame) frame.src = item.embed;
+            if (frame) {
+                var params = '?rel=0&loop=1&playlist=' + item.order + (autoStart ? '&autoplay=1' : '');
+                frame.src = 'https://www.youtube.com/embed/' + item.vid + params;
+            }
             var keys = ['meyve', 'yarim', 'suhedai'];
             for (var i = 0; i < keys.length; i++) {
                 var b = document.getElementById(JUKEBOX_STREAMS[keys[i]].id);
                 if (b) b.setAttribute('aria-pressed', keys[i] === key ? 'true' : 'false');
             }
+            if (autoStart) {
+                trackRoyaltyAction('jukebox_plays');
+            }
+        }
+
+        function startNonStopRoyaltyRadio() {
+            loadJukeboxTrack('meyve', true);
+            trackRoyaltyAction('radio_starts');
+            var jb = document.getElementById('yt-jukebox-iframe');
+            if (jb) {
+                jb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            announcePreviewStatus(currentLang === 'en'
+                ? 'Non-stop artist radio started: playing full official releases continuously.'
+                : 'Kesintisiz sanatçı radyosu başlatıldı: tüm resmi şarkılarım sırayla çalıyor.');
         }
 
         var activeMoodKey = null;
@@ -1427,29 +1496,30 @@
             if (!box || !txt || !lnk) return;
 
             if (moodKey === 'piano') {
-                loadJukeboxTrack('meyve');
+                loadJukeboxTrack('meyve', true);
                 txt.textContent = currentLang === 'en'
-                    ? '🎹 Recommended: "Meyve Dalında Güzel" & Piano/Ney Playlist (loaded in Jukebox below!)'
-                    : '🎹 Senin İçin Seçildi: "Meyve Dalında Güzel" & Piyano/Ney Listesi (aşağıdaki Müzik Kutusuna yüklendi!)';
+                    ? '🎹 Now Playing: "Meyve Dalında Güzel" & Piano/Ney Radio!'
+                    : '🎹 Şimdi Çalıyor: "Meyve Dalında Güzel" & Kesintisiz Piyano/Ney Radyosu!';
                 lnk.href = isAppleDevice
                     ? 'https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059'
                     : 'https://open.spotify.com/playlist/1zYt03Tn9l86UC7YL4kZJg';
                 lnk.textContent = currentLang === 'en' ? '🎧 Open Playlist' : '🎧 Listeyi Aç';
             } else if (moodKey === 'energy') {
+                loadJukeboxTrack('meyve', true);
                 txt.textContent = currentLang === 'en'
-                    ? '⚡ Recommended: "Adrenaline" (134 BPM) & Night Drive Oriental Techno Playlist!'
-                    : '⚡ Senin İçin Seçildi: "Adrenaline" (134 BPM) & Night Drive Kulüp Listem!';
+                    ? '⚡ Upcoming Club Anthem: "Adrenaline" (134 BPM) & Night Drive Playlist!'
+                    : '⚡ Kulüp & Gece Sürüşü Seçkin: "Adrenaline" & Night Drive Kulüp Listem!';
                 lnk.href = 'https://open.spotify.com/playlist/4RBXwXyZIrwiAlXwjesltF';
                 lnk.textContent = currentLang === 'en' ? '⚡ Open Club Playlist' : '⚡ Kulüp Listesini Aç';
             } else if (moodKey === 'epic') {
-                loadJukeboxTrack('suhedai');
+                loadJukeboxTrack('suhedai', true);
                 txt.textContent = currentLang === 'en'
-                    ? '⚔️ Recommended: "Şühedai Gaza" — Epic Cinematic Score (loaded in Jukebox below!)'
-                    : '⚔️ Senin İçin Seçildi: "Şühedai Gaza" — Epik Film & Savaş Müziği (aşağıdaki Müzik Kutusuna yüklendi!)';
+                    ? '⚔️ Now Playing: "Şühedai Gaza" — Epic Cinematic Score!'
+                    : '⚔️ Şimdi Çalıyor: "Şühedai Gaza" — Kesintisiz Epik Film Müziği!';
                 lnk.href = isAppleDevice
                     ? 'https://music.apple.com/tr/album/%C5%9F%C3%BChedai-gaza/6766935849?i=6766935850'
                     : 'https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN';
-                lnk.textContent = currentLang === 'en' ? '⚔️ Listen Full Score' : '⚔️ Mağazada Dinle';
+                lnk.textContent = currentLang === 'en' ? '⚔️ Listen on Store' : '⚔️ Mağazada Dinle';
             }
             box.style.display = 'flex';
         }
@@ -1549,12 +1619,21 @@
         }
 
         (function initPortal() {
+            if (isAppleDevice) {
+                var heroStore = document.getElementById('hero-primary-store');
+                if (heroStore) {
+                    heroStore.href = 'https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059';
+                    heroStore.setAttribute('data-tr', '🍎 Apple Music\'te Dinle');
+                    heroStore.setAttribute('data-en', '🍎 Listen on Apple Music');
+                }
+            }
             var browserLang = (navigator.language || navigator.userLanguage || 'tr').toLowerCase();
             if (browserLang.indexOf('tr') === 0) {
                 setSiteLang('tr');
             } else {
                 setSiteLang('en');
             }
+            recordPortalVisit();
             fetchLiveDiscography();
             if (window.location.hash === '#dinle') {
                 var musicSec = document.getElementById('dinle');
