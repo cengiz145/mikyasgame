@@ -348,9 +348,166 @@
         .spotify-embed-wrap {
             border-radius: 16px;
             overflow: hidden;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.4rem;
             border: 1px solid var(--glass-border);
             background: rgba(0, 0, 0, 0.25);
+        }
+
+        /* Smart Auto-Updating Discography Styles */
+        .discography-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1.6rem 0 0.9rem 0;
+            text-align: left;
+        }
+
+        .discography-subtitle {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #e2e8f0;
+            letter-spacing: 0.5px;
+        }
+
+        .discography-live-pill {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #6ee7b7;
+            background: rgba(16, 185, 129, 0.14);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+        }
+
+        .discography-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1.6rem;
+        }
+
+        .track-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.15rem;
+            display: flex;
+            align-items: center;
+            gap: 1.15rem;
+            text-align: left;
+            transition: all 0.25s ease;
+        }
+
+        .track-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .track-art {
+            width: 84px;
+            height: 84px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .track-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .track-title-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .track-name {
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .badge-new-track {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 0.16rem 0.55rem;
+            border-radius: 999px;
+            letter-spacing: 0.5px;
+        }
+
+        .track-meta {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .track-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            align-items: center;
+        }
+
+        .btn-preview {
+            background: rgba(56, 189, 248, 0.16);
+            color: #bae6fd;
+            border: 1px solid rgba(56, 189, 248, 0.45);
+            padding: 0.45rem 0.95rem;
+            border-radius: 20px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-preview:hover, .btn-preview[aria-pressed="true"] {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .btn-store-sm {
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.45rem 0.9rem;
+            border-radius: 20px;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            transition: all 0.2s ease;
+        }
+
+        .btn-store-sm:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .btn-store-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: transparent;
+        }
+
+        @media (max-width: 600px) {
+            .track-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .track-art {
+                width: 72px;
+                height: 72px;
+            }
         }
 
         .games-grid {
@@ -549,6 +706,16 @@
                    data-tr="🔥 Ön Kayıt Yap / Platformlarda Aç" data-en="🔥 Pre-Save / Listen Now">🔥 Ön Kayıt Yap / Platformlarda Aç</a>
             </div>
         </div>
+
+        <!-- Akıllı Canlı Diskografi (Yeni Çıkan Eserleri Otomatik Çeker!) -->
+        <div class="discography-header">
+            <h3 class="discography-subtitle" data-tr="🎵 YAYINDAKİ ESERLERİM (CANLI DİSKOGRAFİ)" data-en="🎵 RELEASED SINGLES (LIVE DISCOGRAPHY)">🎵 YAYINDAKİ ESERLERİM (CANLI DİSKOGRAFİ)</h3>
+            <span class="discography-live-pill" id="discography-status-pill" data-tr="● Mağazalardan Otomatik Güncellenir" data-en="● Auto-Synced with Global Stores">● Mağazalardan Otomatik Güncellenir</span>
+        </div>
+        <div id="smart-discography-list" class="discography-list" role="list" aria-label="Yayınlanan Şarkılar Listesi">
+            <!-- JS tarafından mağaza verisiyle otomatik doldurulur -->
+        </div>
+        <div id="preview-sr-status" class="sr-only" aria-live="polite"></div>
 
         <!-- Gömülü Resmi Spotify Sanatçı Çalar (Otomatik Çalmaz, Ekran Okuyucu Dostu) -->
         <div class="spotify-embed-wrap">
@@ -811,6 +978,268 @@
 
     <script>
         var currentLang = 'tr';
+        var discographyTracks = [];
+        var activePreviewAudio = null;
+        var activePreviewTrackId = null;
+        var isAppleDevice = /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent || '');
+
+        var KNOWN_TRACK_LINKS = {
+            'meyve dalında güzel': {
+                spotify: 'https://open.spotify.com/track/37YqbGkKrR2FLJQ1Yentjd',
+                youtube: 'https://youtu.be/h6IzlHhS7I4'
+            },
+            'yarim gitti gelmeyecek': {
+                spotify: 'https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN',
+                youtube: 'https://youtu.be/XCyKBkxWnOk'
+            },
+            'şühedai gaza': {
+                spotify: 'https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN',
+                youtube: 'https://youtu.be/Q1S96xzlQ0U'
+            }
+        };
+
+        var FALLBACK_TRACKS = [
+            {
+                trackId: 6837182727,
+                trackName: 'Meyve Dalında Güzel',
+                releaseDate: '2026-11-20T08:00:00Z',
+                primaryGenreName: 'Instrumental',
+                previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/30/c1/b8/30c1b87c-45a9-5e9d-e50f-62eb55d1ad72/mzaf_8384121421107178134.plus.aac.p.m4a',
+                trackViewUrl: 'https://music.apple.com/tr/album/meyve-dal%C4%B1nda-g%C3%BCzel/6837182726?i=6837182727',
+                artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/2c/18/3d2c181d-e417-e5c9-539d-fa10b2c091fc/artwork.jpg/100x100bb.jpg'
+            },
+            {
+                trackId: 6766935850,
+                trackName: 'Şühedai Gaza',
+                releaseDate: '2026-05-06T12:00:00Z',
+                primaryGenreName: 'Cinematic',
+                previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/23/57/fd/2357fd61-b692-aa9c-454a-6115cc7b7957/mzaf_15391858056332085200.plus.aac.p.m4a',
+                trackViewUrl: 'https://music.apple.com/tr/album/%C5%9F%C3%BChedai-gaza/6766935849?i=6766935850',
+                artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/3f/59/e23f5968-ea4c-948b-5a76-f6afde5c2b7e/artwork.jpg/100x100bb.jpg'
+            },
+            {
+                trackId: 1894072669,
+                trackName: 'Yarim Gitti Gelmeyecek',
+                releaseDate: '2026-04-17T12:00:00Z',
+                primaryGenreName: 'Piano & Instrumental',
+                previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f6/09/2f/f6092f12-5b3f-efe8-e331-02e6b77f4b6a/mzaf_2081158236393212529.plus.aac.p.m4a',
+                trackViewUrl: 'https://music.apple.com/tr/album/yarim-gitti-gelmeyecek/1894072668?i=1894072669',
+                artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f4/04/b8/f404b8bb-9b34-e027-3cc7-5deb2088502b/artwork.jpg/100x100bb.jpg'
+            }
+        ];
+
+        function announcePreviewStatus(msg) {
+            var sr = document.getElementById('preview-sr-status');
+            if (sr) sr.textContent = msg;
+        }
+
+        function stopActivePreview() {
+            if (activePreviewAudio) {
+                activePreviewAudio.pause();
+                activePreviewAudio = null;
+            }
+            if (activePreviewTrackId !== null) {
+                var prevBtn = document.getElementById('preview-btn-' + activePreviewTrackId);
+                if (prevBtn) {
+                    prevBtn.setAttribute('aria-pressed', 'false');
+                    prevBtn.textContent = currentLang === 'en' ? '▶ 30s Preview' : '▶ 30 sn Tadımlık Dinle';
+                }
+                activePreviewTrackId = null;
+            }
+        }
+
+        function toggleTrackPreview(trackId, previewUrl, trackName) {
+            if (activePreviewTrackId === trackId) {
+                stopActivePreview();
+                announcePreviewStatus(currentLang === 'en' ? ('Stopped preview: ' + trackName) : (trackName + ' ön dinleme durduruldu.'));
+                return;
+            }
+            stopActivePreview();
+            var btn = document.getElementById('preview-btn-' + trackId);
+            var audio = new Audio(previewUrl);
+            activePreviewAudio = audio;
+            activePreviewTrackId = trackId;
+            if (btn) {
+                btn.setAttribute('aria-pressed', 'true');
+                btn.textContent = currentLang === 'en' ? '⏸ Stop (30s)' : '⏸ Durdur (30 sn)';
+            }
+            announcePreviewStatus(currentLang === 'en' ? ('Playing 30 second preview of ' + trackName) : (trackName + ' 30 saniyelik ön dinleme çalıyor.'));
+
+            audio.addEventListener('timeupdate', function () {
+                if (activePreviewTrackId !== trackId || !btn || !audio.duration) return;
+                var rem = Math.max(0, Math.ceil(audio.duration - audio.currentTime));
+                btn.textContent = currentLang === 'en' ? ('⏸ Stop (' + rem + 's)') : ('⏸ Durdur (' + rem + ' sn)');
+            });
+
+            audio.addEventListener('ended', function () {
+                stopActivePreview();
+                announcePreviewStatus(currentLang === 'en'
+                    ? (trackName + ' preview ended. Open Spotify, Apple Music, or YouTube for the full track.')
+                    : (trackName + ' tadımlık ön dinleme bitti. Tam halini yanındaki Spotify, Apple Music veya YouTube düğmesinden dinleyebilirsiniz.'));
+            });
+
+            audio.play().catch(function () {
+                stopActivePreview();
+            });
+        }
+
+        function formatReleaseDate(isoStr, lang) {
+            if (!isoStr) return '';
+            var d = new Date(isoStr);
+            if (isNaN(d.getTime())) return '';
+            return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function renderDiscography() {
+            var listEl = document.getElementById('smart-discography-list');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+
+            var tracks = discographyTracks.length ? discographyTracks : FALLBACK_TRACKS;
+            var nowMs = Date.now();
+
+            for (var i = 0; i < tracks.length; i++) {
+                var t = tracks[i];
+                var nameKey = (t.trackName || '').toLowerCase().trim();
+                var known = KNOWN_TRACK_LINKS[nameKey] || {};
+                var spotifyUrl = known.spotify || ('https://open.spotify.com/search/' + encodeURIComponent('Ümit Ekrem Mikyas ' + t.trackName));
+                var youtubeUrl = known.youtube || ('https://www.youtube.com/results?search_query=' + encodeURIComponent('Ümit Ekrem Mikyas ' + t.trackName));
+                var appleUrl = t.trackViewUrl || 'https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059';
+                var hdArt = (t.artworkUrl100 || '').replace('100x100bb.jpg', '300x300bb.jpg');
+
+                var relMs = t.releaseDate ? new Date(t.releaseDate).getTime() : 0;
+                var isRecent = (relMs > 0) && ((nowMs - relMs) <= 35 * 24 * 60 * 60 * 1000);
+
+                var card = document.createElement('div');
+                card.className = 'track-card';
+                card.setAttribute('role', 'listitem');
+
+                if (hdArt) {
+                    var img = document.createElement('img');
+                    img.className = 'track-art';
+                    img.src = hdArt;
+                    img.alt = t.trackName + ' - Ümit Ekrem Mikyas';
+                    img.loading = 'lazy';
+                    card.appendChild(img);
+                }
+
+                var body = document.createElement('div');
+                body.className = 'track-body';
+
+                var titleRow = document.createElement('div');
+                titleRow.className = 'track-title-row';
+
+                var h4 = document.createElement('h4');
+                h4.className = 'track-name';
+                h4.textContent = t.trackName;
+                titleRow.appendChild(h4);
+
+                if (isRecent || i === 0) {
+                    var badge = document.createElement('span');
+                    badge.className = 'badge-new-track';
+                    badge.textContent = currentLang === 'en'
+                        ? (isRecent ? '✨ NEW RELEASE' : '⭐ LATEST')
+                        : (isRecent ? '✨ YENİ ÇIKAN' : '⭐ SON ESER');
+                    titleRow.appendChild(badge);
+                }
+                body.appendChild(titleRow);
+
+                var meta = document.createElement('div');
+                meta.className = 'track-meta';
+                var dateLabel = formatReleaseDate(t.releaseDate, currentLang);
+                meta.textContent = 'Ümit Ekrem Mikyas' + (dateLabel ? (' • ' + dateLabel) : '');
+                body.appendChild(meta);
+
+                var actions = document.createElement('div');
+                actions.className = 'track-actions';
+
+                if (t.previewUrl) {
+                    var pBtn = document.createElement('button');
+                    pBtn.type = 'button';
+                    pBtn.id = 'preview-btn-' + t.trackId;
+                    pBtn.className = 'btn-preview';
+                    var isPlayingThis = (activePreviewTrackId === t.trackId);
+                    pBtn.setAttribute('aria-pressed', isPlayingThis ? 'true' : 'false');
+                    pBtn.setAttribute('aria-label', currentLang === 'en'
+                        ? ('Play 30 second preview of ' + t.trackName)
+                        : (t.trackName + ' şarkısının 30 saniyelik ön dinlemesini başlat veya durdur'));
+                    pBtn.textContent = isPlayingThis
+                        ? (currentLang === 'en' ? '⏸ Stop' : '⏸ Durdur')
+                        : (currentLang === 'en' ? '▶ 30s Preview' : '▶ 30 sn Tadımlık Dinle');
+                    (function (id, url, title) {
+                        pBtn.addEventListener('click', function () {
+                            toggleTrackPreview(id, url, title);
+                        });
+                    })(t.trackId, t.previewUrl, t.trackName);
+                    actions.appendChild(pBtn);
+                }
+
+                // Smart Device Ordering: Apple devices get Apple Music highlighted first; others get Spotify first!
+                var stores = isAppleDevice
+                    ? [
+                        { labelTr: '🍎 Apple Music\'te Tam Dinle', labelEn: '🍎 Full Track on Apple Music', url: appleUrl, primary: true },
+                        { labelTr: '🟢 Spotify', labelEn: '🟢 Spotify', url: spotifyUrl, primary: false },
+                        { labelTr: '▶️ YouTube', labelEn: '▶️ YouTube', url: youtubeUrl, primary: false }
+                    ]
+                    : [
+                        { labelTr: '🟢 Spotify\'da Tam Dinle', labelEn: '🟢 Full Track on Spotify', url: spotifyUrl, primary: true },
+                        { labelTr: '🍎 Apple Music', labelEn: '🍎 Apple Music', url: appleUrl, primary: false },
+                        { labelTr: '▶️ YouTube', labelEn: '▶️ YouTube', url: youtubeUrl, primary: false }
+                    ];
+
+                for (var s = 0; s < stores.length; s++) {
+                    var st = stores[s];
+                    var a = document.createElement('a');
+                    a.href = st.url;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.className = 'btn-store-sm' + (st.primary ? ' btn-store-primary' : '');
+                    var txt = currentLang === 'en' ? st.labelEn : st.labelTr;
+                    a.textContent = txt;
+                    a.setAttribute('aria-label', t.trackName + ' - ' + txt);
+                    actions.appendChild(a);
+                }
+
+                body.appendChild(actions);
+                card.appendChild(body);
+                listEl.appendChild(card);
+            }
+        }
+
+        function fetchLiveDiscography() {
+            var apiUrl = 'https://itunes.apple.com/lookup?id=1893993059&entity=song&country=tr&limit=50';
+            fetch(apiUrl)
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (!data || !Array.isArray(data.results)) return;
+                    var songs = [];
+                    var seen = {};
+                    for (var i = 0; i < data.results.length; i++) {
+                        var item = data.results[i];
+                        if (item.wrapperType === 'track' && item.trackName) {
+                            var key = item.trackName.toLowerCase().trim();
+                            if (!seen[key]) {
+                                seen[key] = true;
+                                songs.push(item);
+                            }
+                        }
+                    }
+                    if (songs.length > 0) {
+                        songs.sort(function (a, b) {
+                            return new Date(b.releaseDate || 0).getTime() - new Date(a.releaseDate || 0).getTime();
+                        });
+                        discographyTracks = songs;
+                        renderDiscography();
+                    }
+                })
+                .catch(function () {
+                    // Fallback tracks are already rendered cleanly
+                });
+        }
 
         function updateAdrenalineStatus(lang) {
             var badge = document.getElementById('adrenaline-status-badge');
@@ -845,6 +1274,7 @@
                 btnEn.setAttribute('aria-pressed', currentLang === 'en' ? 'true' : 'false');
             }
             updateAdrenalineStatus(currentLang);
+            renderDiscography();
             updateWelcomeClock();
         }
 
@@ -864,6 +1294,7 @@
             } else {
                 setSiteLang('en');
             }
+            fetchLiveDiscography();
             setInterval(updateWelcomeClock, 10000);
         })();
     </script>
