@@ -499,6 +499,125 @@
             border-color: transparent;
         }
 
+        .btn-share-sm {
+            background: rgba(139, 92, 246, 0.18);
+            color: #ddd6fe;
+            border: 1px solid rgba(139, 92, 246, 0.45);
+            padding: 0.45rem 0.9rem;
+            border-radius: 20px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-share-sm:hover {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        /* Smart Mood Matcher & Official Full-Track Royalty Jukebox */
+        .mood-box {
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 1.35rem;
+            margin-bottom: 1.4rem;
+            text-align: left;
+        }
+
+        .mood-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #f8fafc;
+            margin-bottom: 0.8rem;
+        }
+
+        .mood-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+        }
+
+        .btn-mood {
+            background: rgba(255, 255, 255, 0.06);
+            color: #f1f5f9;
+            border: 1px solid var(--glass-border);
+            padding: 0.6rem 1.15rem;
+            border-radius: 24px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-mood:hover, .btn-mood[aria-pressed="true"] {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+        }
+
+        .mood-recommendation {
+            margin-top: 0.9rem;
+            padding-top: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.95rem;
+            color: #bae6fd;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+        }
+
+        .jukebox-box {
+            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 1.25rem;
+            margin-bottom: 1.4rem;
+            text-align: left;
+        }
+
+        .jukebox-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            margin: 0.8rem 0 1rem 0;
+        }
+
+        .btn-jukebox-tab {
+            background: rgba(255, 255, 255, 0.06);
+            color: #e2e8f0;
+            border: 1px solid var(--glass-border);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-jukebox-tab[aria-pressed="true"], .btn-jukebox-tab:hover {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .yt-jukebox-frame {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 12px;
+            border: 0;
+            display: block;
+            background: #000;
+        }
+
         @media (max-width: 600px) {
             .track-card {
                 flex-direction: column;
@@ -689,7 +808,24 @@
         </section>
 
         <!-- KATEGORİ: Müziklerim & Dijital Platformlar -->
-        <h2 class="category-title" data-tr="MÜZİKLERİM &amp; DİJİTAL PLATFORMLAR" data-en="OFFICIAL MUSIC &amp; STREAMING">MÜZİKLERİM &amp; DİJİTAL PLATFORMLAR</h2>
+        <h2 class="category-title" id="dinle" tabindex="-1" data-tr="MÜZİKLERİM &amp; DİJİTAL PLATFORMLAR" data-en="OFFICIAL MUSIC &amp; STREAMING">MÜZİKLERİM &amp; DİJİTAL PLATFORMLAR</h2>
+
+        <!-- Akıllı Ruh Hali Eşleştirici -->
+        <div class="mood-box" role="region" aria-label="Ruh Haline Göre Şarkı Önerici">
+            <div class="mood-title" data-tr="🎯 Şu An Hangi Ruh Halindesin? (Akıllı Müzik Seçici)" data-en="🎯 What's Your Mood Right Now? (Smart Track Matcher)">🎯 Şu An Hangi Ruh Halindesin? (Akıllı Müzik Seçici)</div>
+            <div class="mood-buttons" role="group" aria-label="Ruh Hali Seçenekleri">
+                <button type="button" class="btn-mood" id="mood-piano" aria-pressed="false" onclick="selectMood('piano')"
+                    data-tr="🎹 Huzur, Piyano &amp; Ney" data-en="🎹 Calm Piano &amp; Mystic Ney">🎹 Huzur, Piyano &amp; Ney</button>
+                <button type="button" class="btn-mood" id="mood-energy" aria-pressed="false" onclick="selectMood('energy')"
+                    data-tr="⚡ Gece Sürüşü &amp; Yüksek Enerji" data-en="⚡ Night Drive &amp; Club Bass">⚡ Gece Sürüşü &amp; Yüksek Enerji</button>
+                <button type="button" class="btn-mood" id="mood-epic" aria-pressed="false" onclick="selectMood('epic')"
+                    data-tr="⚔️ Epik Film &amp; Savaş Atmosferi" data-en="⚔️ Epic &amp; Cinematic">⚔️ Epik Film &amp; Savaş Atmosferi</button>
+            </div>
+            <div class="mood-recommendation" id="mood-result" aria-live="polite">
+                <span id="mood-result-text"></span>
+                <a href="#" target="_blank" rel="noopener noreferrer" class="btn-store-sm btn-store-primary" id="mood-result-link">Spotify</a>
+            </div>
+        </div>
 
         <!-- Adrenaline Öne Çıkan Lansman Kartı (Tarihe Göre Otomatik Güncellenir!) -->
         <div class="release-highlight" role="region" aria-label="Adrenaline Yeni Tekli Duyurusu">
@@ -716,6 +852,30 @@
             <!-- JS tarafından mağaza verisiyle otomatik doldurulur -->
         </div>
         <div id="preview-sr-status" class="sr-only" aria-live="polite"></div>
+
+        <!-- Resmi Tam Şarkı Müzik Kutusu (Spotify Kullanmayanlardan da Doğrudan DistroKid Telifi Yazar!) -->
+        <div class="jukebox-box" role="region" aria-label="Resmi Tam Şarkı Müzik Kutusu">
+            <h3 class="discography-subtitle" data-tr="▶️ TAM ŞARKI MÜZİK KUTUSU (KESİNTİSİZ LİSTE)" data-en="▶️ OFFICIAL FULL-TRACK JUKEBOX (CONTINUOUS PLAY)">▶️ TAM ŞARKI MÜZİK KUTUSU (KESİNTİSİZ LİSTE)</h3>
+            <p class="track-meta" style="margin-top: 0.35rem; margin-bottom: 0;"
+               data-tr="Spotify hesabınız olmasa bile buradan şarkılarımın tam halini peş peşe dinleyebilirsiniz; bir şarkı bittiğinde sıradaki eserime otomatik geçer."
+               data-en="Stream full official tracks directly on this page — automatically continues to the next release when a song finishes.">
+               Spotify hesabınız olmasa bile buradan şarkılarımın tam halini peş peşe dinleyebilirsiniz; bir şarkı bittiğinde sıradaki eserime otomatik geçer.
+            </p>
+            <div class="jukebox-tabs" role="group" aria-label="Tam Şarkı Seçimi">
+                <button type="button" class="btn-jukebox-tab" id="jb-meyve" aria-pressed="true" onclick="loadJukeboxTrack('meyve')"
+                    data-tr="1. Meyve Dalında Güzel" data-en="1. Meyve Dalında Güzel">1. Meyve Dalında Güzel</button>
+                <button type="button" class="btn-jukebox-tab" id="jb-yarim" aria-pressed="false" onclick="loadJukeboxTrack('yarim')"
+                    data-tr="2. Yarim Gitti Gelmeyecek" data-en="2. Yarim Gitti Gelmeyecek">2. Yarim Gitti Gelmeyecek</button>
+                <button type="button" class="btn-jukebox-tab" id="jb-suhedai" aria-pressed="false" onclick="loadJukeboxTrack('suhedai')"
+                    data-tr="3. Şühedai Gaza" data-en="3. Şühedai Gaza">3. Şühedai Gaza</button>
+            </div>
+            <iframe id="yt-jukebox-iframe" class="yt-jukebox-frame"
+                src="https://www.youtube.com/embed/h6IzlHhS7I4?rel=0&amp;playlist=XCyKBkxWnOk,Q1S96xzlQ0U"
+                title="Ümit Ekrem Mikyas Resmi YouTube Tam Şarkı Oynatıcısı"
+                loading="lazy"
+                allow="encrypted-media; picture-in-picture; fullscreen"
+                allowfullscreen></iframe>
+        </div>
 
         <!-- Gömülü Resmi Spotify Sanatçı Çalar (Otomatik Çalmaz, Ekran Okuyucu Dostu) -->
         <div class="spotify-embed-wrap">
@@ -1204,9 +1364,109 @@
                     actions.appendChild(a);
                 }
 
+                // Viral Share Button (WhatsApp / Native Mobile Share)
+                var shBtn = document.createElement('button');
+                shBtn.type = 'button';
+                shBtn.className = 'btn-share-sm';
+                shBtn.textContent = currentLang === 'en' ? '📲 Share' : '📲 Paylaş';
+                shBtn.setAttribute('aria-label', currentLang === 'en'
+                    ? ('Share ' + t.trackName + ' with friends')
+                    : (t.trackName + ' şarkısını arkadaşlarınla paylaş'));
+                (function (title, spUrl, apUrl) {
+                    shBtn.addEventListener('click', function () {
+                        shareTrack(title, isAppleDevice ? apUrl : spUrl);
+                    });
+                })(t.trackName, spotifyUrl, appleUrl);
+                actions.appendChild(shBtn);
+
                 body.appendChild(actions);
                 card.appendChild(body);
                 listEl.appendChild(card);
+            }
+        }
+
+        var JUKEBOX_STREAMS = {
+            meyve: {
+                id: 'jb-meyve',
+                embed: 'https://www.youtube.com/embed/h6IzlHhS7I4?rel=0&playlist=XCyKBkxWnOk,Q1S96xzlQ0U'
+            },
+            yarim: {
+                id: 'jb-yarim',
+                embed: 'https://www.youtube.com/embed/XCyKBkxWnOk?rel=0&playlist=h6IzlHhS7I4,Q1S96xzlQ0U'
+            },
+            suhedai: {
+                id: 'jb-suhedai',
+                embed: 'https://www.youtube.com/embed/Q1S96xzlQ0U?rel=0&playlist=h6IzlHhS7I4,XCyKBkxWnOk'
+            }
+        };
+
+        function loadJukeboxTrack(key) {
+            stopActivePreview();
+            var item = JUKEBOX_STREAMS[key];
+            if (!item) return;
+            var frame = document.getElementById('yt-jukebox-iframe');
+            if (frame) frame.src = item.embed;
+            var keys = ['meyve', 'yarim', 'suhedai'];
+            for (var i = 0; i < keys.length; i++) {
+                var b = document.getElementById(JUKEBOX_STREAMS[keys[i]].id);
+                if (b) b.setAttribute('aria-pressed', keys[i] === key ? 'true' : 'false');
+            }
+        }
+
+        var activeMoodKey = null;
+        function selectMood(moodKey) {
+            activeMoodKey = moodKey;
+            var ids = ['piano', 'energy', 'epic'];
+            for (var i = 0; i < ids.length; i++) {
+                var mb = document.getElementById('mood-' + ids[i]);
+                if (mb) mb.setAttribute('aria-pressed', ids[i] === moodKey ? 'true' : 'false');
+            }
+            var box = document.getElementById('mood-result');
+            var txt = document.getElementById('mood-result-text');
+            var lnk = document.getElementById('mood-result-link');
+            if (!box || !txt || !lnk) return;
+
+            if (moodKey === 'piano') {
+                loadJukeboxTrack('meyve');
+                txt.textContent = currentLang === 'en'
+                    ? '🎹 Recommended: "Meyve Dalında Güzel" & Piano/Ney Playlist (loaded in Jukebox below!)'
+                    : '🎹 Senin İçin Seçildi: "Meyve Dalında Güzel" & Piyano/Ney Listesi (aşağıdaki Müzik Kutusuna yüklendi!)';
+                lnk.href = isAppleDevice
+                    ? 'https://music.apple.com/tr/artist/%C3%BCmit-ekrem-mikyas/1893993059'
+                    : 'https://open.spotify.com/playlist/1zYt03Tn9l86UC7YL4kZJg';
+                lnk.textContent = currentLang === 'en' ? '🎧 Open Playlist' : '🎧 Listeyi Aç';
+            } else if (moodKey === 'energy') {
+                txt.textContent = currentLang === 'en'
+                    ? '⚡ Recommended: "Adrenaline" (134 BPM) & Night Drive Oriental Techno Playlist!'
+                    : '⚡ Senin İçin Seçildi: "Adrenaline" (134 BPM) & Night Drive Kulüp Listem!';
+                lnk.href = 'https://open.spotify.com/playlist/4RBXwXyZIrwiAlXwjesltF';
+                lnk.textContent = currentLang === 'en' ? '⚡ Open Club Playlist' : '⚡ Kulüp Listesini Aç';
+            } else if (moodKey === 'epic') {
+                loadJukeboxTrack('suhedai');
+                txt.textContent = currentLang === 'en'
+                    ? '⚔️ Recommended: "Şühedai Gaza" — Epic Cinematic Score (loaded in Jukebox below!)'
+                    : '⚔️ Senin İçin Seçildi: "Şühedai Gaza" — Epik Film & Savaş Müziği (aşağıdaki Müzik Kutusuna yüklendi!)';
+                lnk.href = isAppleDevice
+                    ? 'https://music.apple.com/tr/album/%C5%9F%C3%BChedai-gaza/6766935849?i=6766935850'
+                    : 'https://open.spotify.com/artist/3sNMBBVuhw9gsNViAge3qN';
+                lnk.textContent = currentLang === 'en' ? '⚔️ Listen Full Score' : '⚔️ Mağazada Dinle';
+            }
+            box.style.display = 'flex';
+        }
+
+        function shareTrack(trackTitle, storeUrl) {
+            var shareText = currentLang === 'en'
+                ? ('Listen to "' + trackTitle + '" by Ümit Ekrem Mikyas: ')
+                : ('Ümit Ekrem Mikyas - "' + trackTitle + '" eserini mutlaka dinle: ');
+            if (navigator.share) {
+                navigator.share({
+                    title: trackTitle + ' — Ümit Ekrem Mikyas',
+                    text: shareText,
+                    url: storeUrl
+                }).catch(function () {});
+            } else {
+                var waUrl = 'https://wa.me/?text=' + encodeURIComponent(shareText + storeUrl);
+                window.open(waUrl, '_blank', 'noopener,noreferrer');
             }
         }
 
@@ -1275,6 +1535,7 @@
             }
             updateAdrenalineStatus(currentLang);
             renderDiscography();
+            if (activeMoodKey) selectMood(activeMoodKey);
             updateWelcomeClock();
         }
 
@@ -1295,6 +1556,15 @@
                 setSiteLang('en');
             }
             fetchLiveDiscography();
+            if (window.location.hash === '#dinle') {
+                var musicSec = document.getElementById('dinle');
+                if (musicSec) {
+                    setTimeout(function () {
+                        musicSec.scrollIntoView({ behavior: 'smooth' });
+                        musicSec.focus();
+                    }, 250);
+                }
+            }
             setInterval(updateWelcomeClock, 10000);
         })();
     </script>
