@@ -44,6 +44,7 @@
         "Giresun": { altitude: 10, region: "Karadeniz", terrain: "sahil" },
         "Gümüşhane": { altitude: 1210, region: "Karadeniz", terrain: "dag" },
         "Hakkâri": { altitude: 1720, region: "Doğu Anadolu", terrain: "dag" },
+        "Hakkari": { altitude: 1720, region: "Doğu Anadolu", terrain: "dag" },
         "Hatay": { altitude: 85, region: "Akdeniz", terrain: "asfalt" },
         "Isparta": { altitude: 1035, region: "Akdeniz", terrain: "asfalt" },
         "Mersin": { altitude: 10, region: "Akdeniz", terrain: "sahil" },
@@ -109,7 +110,8 @@
         "Saray": { baseAlt: 140, minAlt: 125, maxAlt: 180, desc: "Istranca Orman Etekleri ve Vadi" },
         "Hayrabolu": { baseAlt: 65, minAlt: 50, maxAlt: 90, desc: "Hayrabolu Deresi Vadisi ve Tarım Havzası" },
         "Muratlı": { baseAlt: 75, minAlt: 60, maxAlt: 105, desc: "Demiryolu ve Ergene Kolu Düzlüğü" },
-        "Marmaraereğlisi": { baseAlt: 15, minAlt: 2, maxAlt: 45, desc: "Perinthos Tarihi Yarımadası ve Kıyı Hattı" }
+        "Marmaraereğlisi": { baseAlt: 15, minAlt: 2, maxAlt: 45, desc: "Perinthos Tarihi Yarımadası ve Kıyı Hattı" },
+        "Velimeşe": { baseAlt: 135, minAlt: 120, maxAlt: 155, desc: "Velimeşe OSB ve Ergene Düzlüğü" }
     };
 
     // 3. TÜRKİYE TESCİLLİ KARAYOLU DAĞ GEÇİTLERİ VE EĞİM ORANLARI
@@ -168,6 +170,16 @@
         { id: "ergene_viyaduk", name: "Ergene Otoyol Viyadüğü", length: 1320, highway: "O-3", provinces: ["Tekirdağ"], crosswindIntensity: 2.0 }
     ];
 
+    // Türkçe İ/I duyarlı küçük harfe çevirme yardımcısı
+    function normTr(str) {
+        return String(str || '')
+            .replace(/İ/g, 'i')
+            .replace(/I/g, 'ı')
+            .replace(/Â/g, 'a')
+            .replace(/â/g, 'a')
+            .toLowerCase();
+    }
+
     // Haversine ile Metre Cinsinden GPS Mesafe Hesabı
     function calculateGpsDistanceMeters(lat1, lon1, lat2, lon2) {
         const R = 6371000;
@@ -199,12 +211,14 @@
          */
         getAltitudeForLocation: function(cityName, districtName = "", stopName = "", lat = null, lon = null) {
             const city = cityName || "Tekirdağ";
+            const cityNorm = normTr(city);
             const dist = districtName || "";
-            const sName = (stopName || "").toLowerCase();
+            const distNorm = normTr(dist);
+            const sName = normTr(stopName);
 
-            // 1. Eğer GPS varsa mikro-hesaplama
-            if (typeof lat === 'number' && typeof lon === 'number' && !isNaN(lat) && !isNaN(lon)) {
-                // Tekirdağ sahil vs tepe kalibrasyonu
+            // 1. Eğer GPS varsa Tekirdağ Süleymanpaşa sahil vs tepe mikro-kalibrasyonu
+            if (cityNorm === "tekirdağ" && (!distNorm || distNorm === "süleymanpaşa" || distNorm === "merkez") &&
+                typeof lat === 'number' && typeof lon === 'number' && !isNaN(lat) && !isNaN(lon)) {
                 if (lat < 40.975 && lon > 27.50 && lon < 27.53) {
                     return 8; // Süleymanpaşa Liman / Sahil bandı
                 } else if (lat > 40.985 && lon > 27.50 && lon < 27.53) {
@@ -212,9 +226,17 @@
                 }
             }
 
-            // 2. İlçe Veritabanı
-            if (TEKIRDAG_DISTRICT_ALTITUDES[dist]) {
-                const dData = TEKIRDAG_DISTRICT_ALTITUDES[dist];
+            // 2. İlçe Veritabanı (Büyük/küçük Türkçe harf duyarlı eşleşme ile)
+            let dData = TEKIRDAG_DISTRICT_ALTITUDES[dist];
+            if (!dData && distNorm) {
+                for (const dKey in TEKIRDAG_DISTRICT_ALTITUDES) {
+                    if (normTr(dKey) === distNorm) {
+                        dData = TEKIRDAG_DISTRICT_ALTITUDES[dKey];
+                        break;
+                    }
+                }
+            }
+            if (dData) {
                 if (sName.includes("sahil") || sName.includes("liman") || sName.includes("iskele")) {
                     return dData.minAlt;
                 } else if (sName.includes("tepe") || sName.includes("toki") || sName.includes("üniversite") || sName.includes("yayla")) {
@@ -224,20 +246,29 @@
             }
 
             // 3. 81 İl Veritabanı
-            const prov = TURKEY_PROVINCES_ALTITUDE[city];
+            let prov = TURKEY_PROVINCES_ALTITUDE[city];
+            if (!prov && cityNorm) {
+                for (const pKey in TURKEY_PROVINCES_ALTITUDE) {
+                    if (normTr(pKey) === cityNorm) {
+                        prov = TURKEY_PROVINCES_ALTITUDE[pKey];
+                        break;
+                    }
+                }
+            }
             let baseAlt = prov ? prov.altitude : 35;
 
             // İlçe veya durak özel anahtar kelime kalibrasyonu
-            const distLower = dist.toLowerCase();
-            if (distLower.includes("şarköy") || distLower.includes("mürefte")) baseAlt = 15;
-            else if (distLower.includes("kumbağ") || distLower.includes("sahil")) baseAlt = 5;
-            else if (distLower.includes("başkale")) baseAlt = 2400;
-            else if (distLower.includes("maçka")) baseAlt = 360;
-            else if (distLower.includes("çorlu")) baseAlt = 155;
-            else if (distLower.includes("saray")) baseAlt = 140;
-            else if (distLower.includes("malkara")) baseAlt = 230;
+            if (distNorm.includes("şarköy") || distNorm.includes("mürefte")) baseAlt = 15;
+            else if (distNorm.includes("kumbağ") || distNorm.includes("sahil")) baseAlt = 5;
+            else if (distNorm.includes("başkale")) baseAlt = 2400;
+            else if (distNorm.includes("maçka")) baseAlt = 360;
+            else if (distNorm.includes("çorlu")) baseAlt = 155;
+            else if (distNorm.includes("velimeşe")) baseAlt = 135;
+            else if (distNorm.includes("saray")) baseAlt = 140;
+            else if (distNorm.includes("malkara")) baseAlt = 230;
+            else if (distNorm.includes("hayrabolu")) baseAlt = 65;
 
-            if (sName.includes("zirve") || sName.includes("geçit")) baseAlt += 150;
+            if (sName.includes("zirve") || sName.includes("geçit") || sName.includes("geçidi")) baseAlt += 150;
             else if (sName.includes("sahil") || sName.includes("plaj")) baseAlt = 5;
 
             return baseAlt;
@@ -249,25 +280,41 @@
          */
         getInclineForSegment: function(cityName, fromStop, toStop, traveledRatio = 0, routeName = "") {
             const city = cityName || "Tekirdağ";
+            const cityNorm = normTr(city);
             const dist = (fromStop && fromStop.district) || (toStop && toStop.district) || "";
+            const ratio = Math.max(0.0, Math.min(1.0, (typeof traveledRatio === 'number' && !isNaN(traveledRatio)) ? traveledRatio : 0.0));
 
-            const lat1 = fromStop ? (fromStop.lat || fromStop.stop_lat) : null;
-            const lon1 = fromStop ? (fromStop.lon || fromStop.stop_lon) : null;
-            const lat2 = toStop ? (toStop.lat || toStop.stop_lat) : null;
-            const lon2 = toStop ? (toStop.lon || toStop.stop_lon) : null;
+            const lat1 = (fromStop && typeof (fromStop.lat ?? fromStop.stop_lat) === 'number') ? (fromStop.lat ?? fromStop.stop_lat) : null;
+            const lon1 = (fromStop && typeof (fromStop.lon ?? fromStop.stop_lon) === 'number') ? (fromStop.lon ?? fromStop.stop_lon) : null;
+            const lat2 = (toStop && typeof (toStop.lat ?? toStop.stop_lat) === 'number') ? (toStop.lat ?? toStop.stop_lat) : null;
+            const lon2 = (toStop && typeof (toStop.lon ?? toStop.stop_lon) === 'number') ? (toStop.lon ?? toStop.stop_lon) : null;
 
             let alt1 = this.getAltitudeForLocation(city, dist, fromStop ? fromStop.name : "", lat1, lon1);
             let alt2 = this.getAltitudeForLocation(city, dist, toStop ? toStop.name : "", lat2, lon2);
 
-            // Rota üzerindeki tescilli dağ geçitlerini tara
-            const rNameLower = ((routeName || "") + " " + (fromStop ? fromStop.name : "") + " " + (toStop ? toStop.name : "")).toLowerCase();
+            // Rota üzerindeki tescilli dağ geçitlerini kelime sınırı ile tara ("Hayrabolu/Gelibolu" -> "Bolu" ve "Sakarya" -> "Sakar" hataları engellendi!)
+            const rNameNorm = normTr((routeName || "") + " " + (fromStop ? fromStop.name : "") + " " + (toStop ? toStop.name : ""));
+            const isLocalStreetRef = /(?:^|[^a-zçğıöşü0-9])(sokak|sokağı|cadde|caddesi|mahalle|mahallesi)(?:$|[^a-zçğıöşü0-9])/.test(rNameNorm);
             let matchedPass = null;
 
-            for (let key in TURKEY_HIGHWAY_PASSES_GRADIENTS) {
-                if (rNameLower.includes(key.toLowerCase())) {
-                    matchedPass = TURKEY_HIGHWAY_PASSES_GRADIENTS[key];
-                    break;
+            for (const key in TURKEY_HIGHWAY_PASSES_GRADIENTS) {
+                const keyNorm = normTr(key);
+                const boundaryRe = new RegExp('(?:^|[^a-zçğıöşü0-9])' + keyNorm + '(?:$|[^a-zçğıöşü0-9])');
+                if (!boundaryRe.test(rNameNorm)) continue;
+
+                const pass = TURKEY_HIGHWAY_PASSES_GRADIENTS[key];
+                const passProvNorm = normTr(pass.province);
+
+                // Şehir içi sokak/cadde isimleri ("Güzeldere Sokak", "Çamlıbel Caddesi" vb.) başka ildeyse dağ geçidi sanılmasın
+                if (isLocalStreetRef && cityNorm !== passProvNorm && !/(geçit|geçidi|dağı|rampası)/.test(rNameNorm)) {
+                    continue;
                 }
+                // "Bolu" tek başına il adı olduğu için Bolu ili dışındaysa açıkça "Bolu Dağı / Karanlıkdere / Geçit" bağlamı ara
+                if (keyNorm === "bolu" && cityNorm !== "bolu" && !/(bolu dağı|karanlıkdere|bolu geçidi|bolu rampası)/.test(rNameNorm)) {
+                    continue;
+                }
+                matchedPass = pass;
+                break;
             }
 
             let slopePct = 0;
@@ -275,13 +322,13 @@
 
             if (matchedPass) {
                 // Tescilli geçidin gerçek eğimini ve rakımını uygula
-                currentAlt = Math.round(alt1 + (matchedPass.altitude - alt1) * Math.sin(traveledRatio * Math.PI));
-                slopePct = (traveledRatio < 0.5) ? matchedPass.slopePct : -matchedPass.slopePct;
-            } else if (lat1 && lon1 && lat2 && lon2) {
+                currentAlt = Math.round(alt1 + (matchedPass.altitude - alt1) * Math.sin(ratio * Math.PI));
+                slopePct = (ratio < 0.5) ? matchedPass.slopePct : -matchedPass.slopePct;
+            } else if (lat1 !== null && lon1 !== null && lat2 !== null && lon2 !== null) {
                 // GERÇEK GPS KOORDİNATLARINDAN EĞİM HESABI
                 const distMeters = calculateGpsDistanceMeters(lat1, lon1, lat2, lon2);
                 const altDiff = alt2 - alt1;
-                currentAlt = Math.round(alt1 + (altDiff * traveledRatio));
+                currentAlt = Math.round(alt1 + (altDiff * ratio));
                 
                 if (distMeters >= 50) {
                     slopePct = (altDiff / distMeters) * 100;
@@ -292,7 +339,7 @@
             } else {
                 // Şehir içi ve düz yol topoğrafik eğimi
                 const altDiff = alt2 - alt1;
-                currentAlt = Math.round(alt1 + altDiff * traveledRatio);
+                currentAlt = Math.round(alt1 + altDiff * ratio);
                 slopePct = Math.max(-6.5, Math.min(6.5, (altDiff / 1000) * 4));
             }
 
@@ -312,11 +359,11 @@
          * Rota üzerinde tescilli karayolu tüneli var mı kontrol eder
          */
         getTunnelForRoute: function(cityName, routeName = "", fromStop = "", toStop = "") {
-            const combined = ((cityName || "") + " " + (routeName || "") + " " + (fromStop || "") + " " + (toStop || "")).toLowerCase();
+            const combined = normTr((cityName || "") + " " + (routeName || "") + " " + (fromStop || "") + " " + (toStop || ""));
             
-            for (let tunnel of TURKEY_HIGHWAY_TUNNELS) {
-                const matchProv = tunnel.provinces.some(p => combined.includes(p.toLowerCase()));
-                const matchName = combined.includes(tunnel.id) || combined.includes(tunnel.name.toLowerCase());
+            for (const tunnel of TURKEY_HIGHWAY_TUNNELS) {
+                const matchProv = tunnel.provinces.some(p => combined.includes(normTr(p)));
+                const matchName = combined.includes(normTr(tunnel.id)) || combined.includes(normTr(tunnel.name));
                 if (matchProv && matchName) {
                     return tunnel;
                 }
@@ -328,11 +375,11 @@
          * Rota üzerinde tescilli asma köprü veya viyadük var mı kontrol eder
          */
         getBridgeForRoute: function(cityName, routeName = "", fromStop = "", toStop = "") {
-            const combined = ((cityName || "") + " " + (routeName || "") + " " + (fromStop || "") + " " + (toStop || "")).toLowerCase();
+            const combined = normTr((cityName || "") + " " + (routeName || "") + " " + (fromStop || "") + " " + (toStop || ""));
 
-            for (let bridge of TURKEY_HIGHWAY_BRIDGES) {
-                const matchProv = bridge.provinces.some(p => combined.includes(p.toLowerCase()));
-                const matchName = combined.includes(bridge.id) || combined.includes(bridge.name.toLowerCase());
+            for (const bridge of TURKEY_HIGHWAY_BRIDGES) {
+                const matchProv = bridge.provinces.some(p => combined.includes(normTr(p)));
+                const matchName = combined.includes(normTr(bridge.id)) || combined.includes(normTr(bridge.name));
                 if (matchProv && matchName) {
                     return bridge;
                 }

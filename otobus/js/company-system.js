@@ -4921,7 +4921,7 @@
                     </div>
                     <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                         <!-- Araç Seç -->
-                        <select id="bus-select-${driver.id}" class="modern-btn" style="padding: 4px 6px; font-size: 0.82rem; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 6px;">
+                        <select id="bus-select-${driver.id}" aria-label="${driver.name} için otobüs seçin" class="modern-btn" style="padding: 4px 6px; font-size: 0.82rem; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 6px;">
                             ${ownedBusIds.map(bId => {
                                 const b = this.getBusInfo(bId);
                                 return `<option value="${b.id}" ${b.id === driver.assignedBusId ? 'selected' : ''}>${b.icon} ${b.fullName}</option>`;
@@ -4929,7 +4929,7 @@
                         </select>
 
                         <!-- Rota Seç -->
-                        <select id="route-select-${driver.id}" class="modern-btn" style="padding: 4px 6px; font-size: 0.82rem; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 6px;">
+                        <select id="route-select-${driver.id}" aria-label="${driver.name} için sefer rotası seçin" class="modern-btn" style="padding: 4px 6px; font-size: 0.82rem; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 6px;">
                             ${this.availableRoutes.map(r => `<option value="${r.id}" ${r.id === driver.assignedRouteId ? 'selected' : ''}>${r.name}</option>`).join('')}
                         </select>
 
@@ -5047,7 +5047,7 @@
                                 </div>
                             </div>
                             <div style="display: flex; gap: 6px; align-items: center;">
-                                <select id="contract-driver-select-${contract.id}" class="modern-btn" style="padding: 6px; font-size: 0.85rem; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 6px;">
+                                <select id="contract-driver-select-${contract.id}" aria-label="${contract.title} ihalesi için kaptan seçin" class="modern-btn" style="padding: 6px; font-size: 0.85rem; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 6px;">
                                     ${this.data.hiredDrivers.map(d => `<option value="${d.id}">${d.avatar || '👨‍✈️'} ${d.name} (${d.rankTitle || 'Kaptan'})` + `</option>`).join('')}
                                 </select>
                                 <button id="btn-accept-contract-${contract.id}" class="modern-btn nav-item" style="padding: 8px 14px; background: linear-gradient(135deg, #ca8a04, #eab308); color: #000; font-weight: bold; border-radius: 6px; cursor: pointer; border: none;">

@@ -103,6 +103,7 @@
         "Çerkezköy": { lat: 41.29, lon: 28.00 },
         "Kapaklı": { lat: 41.31, lon: 27.97 },
         "Ergene": { lat: 41.25, lon: 27.68 },
+        "Velimeşe": { lat: 41.25, lon: 27.90 },
         "Muratlı": { lat: 41.17, lon: 27.50 },
         "Malkara": { lat: 40.89, lon: 26.90 },
         "Saray": { lat: 41.44, lon: 27.92 },
@@ -117,10 +118,10 @@
         1: { desc: "Az Bulutlu", weather: "sunny", rainMm: 0, advisory: "Görüş mükemmel, yol şartları ideal." },
         2: { desc: "Parçalı Bulutlu", weather: "sunny", rainMm: 0, advisory: "Hava ılımlı, kuru asfalt sürüşü." },
         3: { desc: "Çok Bulutlu ve Kapalı", weather: "sunny", rainMm: 0, advisory: "Bulutlu hava, zemin kuru." },
-        45: { desc: "Puslu ve Sisli", weather: "foggy", rainMm: 0, advisory: "Sis nedeniyle görüş azaldı. Sis farlarınızı (L tuşu) açık tutunuz." },
+        45: { desc: "Puslu ve Sisli", weather: "foggy", rainMm: 0, advisory: "Sis nedeniyle görüş azaldı. Farlarınızı (F tuşu) açık tutunuz." },
         48: { desc: "Yoğun Kırağılı Sis", weather: "foggy", rainMm: 0, advisory: "Görüş 100 metrenin altında. Takip mesafesini iki katına çıkarınız." },
         51: { desc: "Hafif Çisenti Yağmur", weather: "rainy", rainMm: 1.5, advisory: "Hafif çisenti başladı. Asfalt kayganlaşabilir." },
-        53: { desc: "Orta Kuvvette Çisenti", weather: "rainy", rainMm: 2.8, advisory: "Yollar ıslak. Sileceklerinizi (X tuşu) çalıştırınız." },
+        53: { desc: "Orta Kuvvette Çisenti", weather: "rainy", rainMm: 2.8, advisory: "Yollar ıslak. Sileceklerinizi (Shift + W tuşu) çalıştırınız." },
         55: { desc: "Yoğun Çisenti Yağmur", weather: "rainy", rainMm: 4.0, advisory: "Zemin kaygan, virajlarda frenlemeye dikkat." },
         61: { desc: "Hafif Yağmurlu", weather: "rainy", rainMm: 3.5, advisory: "Yağmur yağıyor. Yolcular şemsiyeli, zemin ıslak." },
         63: { desc: "Orta Şiddette Yağmur", weather: "rainy", rainMm: 6.5, advisory: "Yağmur etkisini artırdı. Takip mesafesini koruyunuz." },
@@ -249,26 +250,31 @@
             return weatherData;
         },
 
-        // Open-Meteo Yanıtını Çözümle
+        // Open-Meteo Yanıtını Çözümle (0°C donma sıcaklığının || 18 ile ezilmesi engellendi!)
         parseOpenMeteo: function(json, cityName, districtName) {
             const cur = json && json.current ? json.current : {};
-            const code = cur.weather_code !== undefined ? cur.weather_code : 0;
+            const code = typeof cur.weather_code === 'number' ? cur.weather_code : 0;
             const wInfo = WMO_TABLE[code] || WMO_TABLE[0];
+            const tempVal = (typeof cur.temperature_2m === 'number' && !isNaN(cur.temperature_2m)) ? Math.round(cur.temperature_2m) : 18;
+            const appVal = (typeof cur.apparent_temperature === 'number' && !isNaN(cur.apparent_temperature)) ? Math.round(cur.apparent_temperature) : tempVal;
+            const humVal = (typeof cur.relative_humidity_2m === 'number' && !isNaN(cur.relative_humidity_2m)) ? cur.relative_humidity_2m : 65;
+            const windVal = (typeof cur.wind_speed_10m === 'number' && !isNaN(cur.wind_speed_10m)) ? Math.round(cur.wind_speed_10m) : 10;
+            const rawRain = Math.max(typeof cur.rain === 'number' ? cur.rain : 0, typeof cur.precipitation === 'number' ? cur.precipitation : 0);
 
             return {
                 source: "Open-Meteo (Açık Uydu Verisi)",
                 city: cityName,
                 district: districtName,
-                temperature: Math.round(cur.temperature_2m !== undefined ? cur.temperature_2m : 18),
-                apparentTemp: Math.round(cur.apparent_temperature !== undefined ? cur.apparent_temperature : 17),
-                humidity: cur.relative_humidity_2m || 65,
-                windSpeed: Math.round(cur.wind_speed_10m || 10),
-                rainMm: (cur.rain !== undefined && cur.rain > 0) ? cur.rain : (wInfo.rainMm || 0),
+                temperature: tempVal,
+                apparentTemp: appVal,
+                humidity: humVal,
+                windSpeed: windVal,
+                rainMm: wInfo.weather === 'rainy' ? (rawRain > 0 ? rawRain : (wInfo.rainMm || 2.0)) : 0,
                 weatherCode: code,
                 weather: wInfo.weather,
                 desc: wInfo.desc,
                 advisory: wInfo.advisory,
-                isDay: cur.is_day === 1,
+                isDay: cur.is_day !== undefined ? (cur.is_day === 1) : true,
                 timestamp: Date.now()
             };
         },
@@ -279,28 +285,35 @@
             const wind = json.wind || {};
             const weatherArr = json.weather && json.weather[0] ? json.weather[0] : {};
             const rainObj = json.rain || {};
-            const rainMm = rainObj['1h'] || 0;
+            const rainMm = typeof rainObj['1h'] === 'number' ? rainObj['1h'] : 0;
 
             let weatherType = "sunny";
             const mainCode = weatherArr.main ? weatherArr.main.toLowerCase() : "";
-            if (mainCode.includes("rain") || mainCode.includes("drizzle")) weatherType = "rainy";
+            if (mainCode.includes("rain") || mainCode.includes("drizzle") || mainCode.includes("thunder")) weatherType = "rainy";
             else if (mainCode.includes("snow")) weatherType = "snowy";
-            else if (mainCode.includes("fog") || mainCode.includes("mist")) weatherType = "foggy";
+            else if (mainCode.includes("fog") || mainCode.includes("mist") || mainCode.includes("haze")) weatherType = "foggy";
+
+            const tempVal = (typeof main.temp === 'number' && !isNaN(main.temp)) ? Math.round(main.temp) : 18;
+            const feelsVal = (typeof main.feels_like === 'number' && !isNaN(main.feels_like)) ? Math.round(main.feels_like) : tempVal;
+            const humVal = (typeof main.humidity === 'number' && !isNaN(main.humidity)) ? main.humidity : 65;
+            const windKmh = (typeof wind.speed === 'number' && !isNaN(wind.speed)) ? Math.round(wind.speed * 3.6) : 10;
+            const iconStr = String(weatherArr.icon || '');
+            const isDayNow = iconStr ? !iconStr.endsWith('n') : true;
 
             return {
                 source: "OpenWeatherMap API",
                 city: cityName,
                 district: districtName,
-                temperature: Math.round(main.temp || 18),
-                apparentTemp: Math.round(main.feels_like || 18),
-                humidity: main.humidity || 65,
-                windSpeed: Math.round((wind.speed || 3) * 3.6),
-                rainMm: rainMm,
+                temperature: tempVal,
+                apparentTemp: feelsVal,
+                humidity: humVal,
+                windSpeed: windKmh,
+                rainMm: weatherType === 'rainy' ? Math.max(rainMm, 2.5) : rainMm,
                 weatherCode: weatherArr.id || 800,
                 weather: weatherType,
                 desc: weatherArr.description ? (weatherArr.description.charAt(0).toUpperCase() + weatherArr.description.slice(1)) : "Açık",
-                advisory: weatherType === "rainy" ? "Yağmurlu zemin, takip mesafesini koruyunuz." : "Yol koşulları emniyetli.",
-                isDay: true,
+                advisory: weatherType === "rainy" ? "Yağmurlu zemin, sileceklerinizi (Shift + W) açık tutunuz ve takip mesafesini koruyunuz." : "Yol koşulları emniyetli.",
+                isDay: isDayNow,
                 timestamp: Date.now()
             };
         },
@@ -332,6 +345,9 @@
                 advisory = "Sonbahar yağışları nedeniyle yollar kaygan.";
             }
 
+            const localHour = now.getHours();
+            const isDayLocal = (localHour >= 6 && localHour < 20);
+
             return {
                 source: "Dahili İklim Motoru (Çevrimdışı)",
                 city: cityName,
@@ -345,7 +361,7 @@
                 weather: wType,
                 desc: desc,
                 advisory: advisory,
-                isDay: true,
+                isDay: isDayLocal,
                 timestamp: Date.now()
             };
         },
@@ -362,9 +378,10 @@
                 Game.apparentTemperature = d.apparentTemp;
                 Game.liveWeather = d;
 
-                // Gece/Gündüz kontrolü
-                if (d.isDay === false) {
-                    Game.isNight = true;
+                // Gece/Gündüz kontrolü (Özel gece görevi aktif değilse gündüz havada Game.isNight takılı kalmaz)
+                const forcedNight = !!(Game.activeRouteData && Game.activeRouteData.isNightRoute) || !!(Game.activeMission && Game.activeMission.forceNight);
+                if (typeof d.isDay === 'boolean' && !forcedNight) {
+                    Game.isNight = !d.isDay;
                 }
             }
 
@@ -430,21 +447,27 @@
 
         // Olayları ve Kısayolları Bağla
         init: function() {
+            if (this._initialized) return;
+            this._initialized = true;
             console.log("[LiveWeather] Canlı Meteoroloji ve Gerçek Zamanlı Çevre Motoru hazır.");
 
-            // Shift + H Kısayolu: Sadece sürüş ekranı dışındayken buradan tetikle (Sürüş ekranında Game.handleKeyDown zaten yönetir)
+            // Shift + H Kısayolu: Sadece sürüş ekranı dışındayken ve metin kutularında büyük 'H' yazılmıyorken tetikle!
             if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
                 window.addEventListener("keydown", (e) => {
-                if (e.shiftKey && !e.altKey && !e.ctrlKey && (e.key === 'h' || e.key === 'H' || e.code === 'KeyH')) {
-                    const inBus = (typeof Game !== 'undefined' && Game.isDriving)
-                        || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'))
-                        || (document.getElementById('stop-screen') && !document.getElementById('stop-screen').classList.contains('hidden'));
-                    if (inBus) return;
-                    e.preventDefault();
-                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
-                    LiveWeather.announceWeatherReport("assertive");
-                }
-            });
+                    const targetTag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
+                    if (targetTag === 'INPUT' || targetTag === 'TEXTAREA' || targetTag === 'SELECT' || (e.target && e.target.isContentEditable)) {
+                        return;
+                    }
+                    if (e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'h' || e.key === 'H' || e.code === 'KeyH')) {
+                        const inBus = (typeof Game !== 'undefined' && Game.isDriving)
+                            || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'))
+                            || (document.getElementById('stop-screen') && !document.getElementById('stop-screen').classList.contains('hidden'));
+                        if (inBus) return;
+                        e.preventDefault();
+                        if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                        LiveWeather.announceWeatherReport("assertive");
+                    }
+                });
             }
         }
     };
@@ -459,4 +482,4 @@
         }
     }
 
-})(typeof window !== 'undefined' ? window : global);
+})(typeof window !== 'undefined' ? window : globalThis);

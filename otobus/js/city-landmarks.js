@@ -32,10 +32,14 @@
         { id: "kapakli_meydan", name: "Kapaklı Kent Meydanı", city: "Tekirdağ", district: "Kapaklı", keywords: ["kapaklı meydan", "pınarça"] },
 
         // Ergene & Velimeşe
-        { id: "velimese_sanayi", name: "Velimeşe Sanayi Meydanı", city: "Tekirdağ", district: "Ergene", keywords: ["velimeşe", "bozacı", "sağlık mah"] },
+        { id: "ergene_belediye", name: "Ergene Marmaracık Cumhuriyet Meydanı", city: "Tekirdağ", district: "Ergene", keywords: ["marmaracık", "ergene belediye", "ulaş belde"] },
+        { id: "velimese_sanayi", name: "Velimeşe Organize Sanayi Meydanı", city: "Tekirdağ", district: "Velimeşe", altDistricts: ["Ergene"], keywords: ["velimeşe sanayi", "velimeşe osb", "bozacı", "velimeşe merkez"] },
+        { id: "velimese_gar", name: "Velimeşe Tarihi Tren İstasyonu", city: "Tekirdağ", district: "Velimeşe", altDistricts: ["Ergene"], keywords: ["velimeşe tren", "velimeşe istasyon"] },
 
-        // Şarköy, Malkara, Saray, Muratlı, Hayrabolu, Marmaraereğlisi
-        { id: "sarkoy_iskele", name: "Şarköy Tarihi Sahil İskelesi", city: "Tekirdağ", district: "Şarköy", keywords: ["şarköy iskele", "sahil", "kordon"] },
+        // Şarköy, Malkara, Saray, Muratlı, Hayrabolu, Marmaraereğlisi, Uçmakdere
+        { id: "ucmakdere_cinar", name: "Uçmakdere Tarihi Çınaraltı ve Yamaç Paraşütü Tepesi", city: "Tekirdağ", district: "Süleymanpaşa", altDistricts: ["Şarköy"], keywords: ["uçmakdere", "nişantepe"] },
+        { id: "sarkoy_iskele", name: "Şarköy Tarihi Sahil İskelesi", city: "Tekirdağ", district: "Şarköy", keywords: ["şarköy iskele", "şarköy cumhuriyet", "şarköy sahil"] },
+        { id: "murefte_iskele", name: "Mürefte Tarihi Sahil İskelesi", city: "Tekirdağ", district: "Şarköy", keywords: ["mürefte", "hoşköy fener"] },
         { id: "malkara_meydan", name: "Malkara Hükümet Meydanı", city: "Tekirdağ", district: "Malkara", keywords: ["malkara meydan", "hükümet"] },
         { id: "saray_carsi", name: "Saray Tarihi Çarşısı", city: "Tekirdağ", district: "Saray", keywords: ["saray çarşı", "çamlık", "büyükyoncalı"] },
         { id: "muratli_gar", name: "Muratlı Tren İstasyonu", city: "Tekirdağ", district: "Muratlı", keywords: ["muratlı gar", "muratlı istasyon"] },
@@ -193,10 +197,16 @@
             if (!sName) return null;
 
             let matched = null;
-            // 1. Şehir + İlçe eşleşmesi
+            // 1. Şehir + İlçe eşleşmesi (altDistricts desteği dahil)
+            const distMatches = (l) => {
+                if (!l.district || !dist) return true;
+                if (this.normTr(l.district) === dist) return true;
+                if (Array.isArray(l.altDistricts) && l.altDistricts.some(ad => this.normTr(ad) === dist)) return true;
+                return false;
+            };
             for (let l of CITY_LANDMARKS) {
                 if (l.city && l.city !== city) continue;
-                if (l.district && dist && this.normTr(l.district) !== dist) continue;
+                if (!distMatches(l)) continue;
 
                 if (l.keywords && l.keywords.some(k => this.keywordMatchesStop(sName, k))) {
                     matched = l;
@@ -204,11 +214,10 @@
                 }
             }
 
-            // 2. Şehir bazlı genel eşleşme (farklı bir ilçeye özel simgeyi yanlış ilçede eşleştirme!)
-            if (!matched) {
+            // 2. İlçeler arası bir hatta (dist === 'ilçeler arası') sürerken şehir içi tüm ilçe simgelerini kontrol et
+            if (!matched && (dist === "ilçeler arası" || dist === "ilceler arasi" || dist === "all")) {
                 for (let l of CITY_LANDMARKS) {
                     if (l.city && l.city !== city) continue;
-                    if (l.district && dist && this.normTr(l.district) !== dist) continue;
                     if (l.keywords && l.keywords.some(k => this.keywordMatchesStop(sName, k))) {
                         matched = l;
                         break;

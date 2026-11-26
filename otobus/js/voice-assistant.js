@@ -230,7 +230,7 @@ class VoiceAssistant {
                 if (currentStep && !currentStep.isGraduation) {
                     const k = e.key.toLowerCase();
                     const isTarget = (k === currentStep.targetKey) || (currentStep.altTargetKey && k === currentStep.altTargetKey);
-                    
+
                     // Tab, Shift, Alt, Ctrl gibi gezinme tuşlarına dokunma
                     if (['tab', 'shift', 'control', 'alt', 'escape', 'f1', 'enter'].includes(k)) {
                         return;
@@ -1565,7 +1565,7 @@ class VoiceAssistant {
 
         if (typeof audio !== 'undefined') {
             if (audio.playWarning) {
-                try { audio.playWarning(); } catch(e) {}
+                try { audio.playWarning(); } catch (e) { }
             }
             if (audio.speak) audio.speak(currentStep.failFeedback);
             if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(currentStep.failFeedback);
@@ -1681,7 +1681,7 @@ class VoiceAssistant {
     // --- EĞİTİMDE TARİF EDİLEN SESLERİ BİREBİR ÇALMA SİSTEMİ ---
     playLessonSoundEffect(lessonId) {
         if (typeof audio === 'undefined') return;
-        switch(lessonId) {
+        switch (lessonId) {
             case 'driving':
                 // 1. Motor marş + rölanti, ardından gaz ve fren
                 if (audio.playEngineStartPreview) audio.playEngineStartPreview(2.4);
@@ -1833,13 +1833,13 @@ class VoiceAssistant {
         this.isCopilotEnabled = !this.isCopilotEnabled;
         try {
             localStorage.setItem('copilot_enabled', this.isCopilotEnabled ? 'true' : 'false');
-        } catch(e) {}
+        } catch (e) { }
         this.updateCopilotButtonText();
 
-        const statusMsg = this.isCopilotEnabled 
+        const statusMsg = this.isCopilotEnabled
             ? "Canlı Seyir Koçu ipuçları açıldı. Seyir esnasında asistan durak, kasis ve yolcu durumlarını sesli hatırlatacaktır."
             : "Canlı Seyir Koçu ipuçları kapatıldı. Seyir sırasında sadece kendi tecrübenizle ilerleyeceksiniz.";
-        
+
         if (typeof audio !== 'undefined' && audio.speak) {
             audio.speak(statusMsg);
         }
@@ -1956,7 +1956,7 @@ class VoiceAssistant {
             const level = Game.licenseLevel || 1;
             const xp = Game.playerXP || 0;
             const title = (typeof Game.getLicenseTitle === 'function' && Game.getLicenseTitle()) ? Game.getLicenseTitle() : '1. Sınıf Kaptan';
-            const nextXP = (typeof Game.getNextLevelXP === 'function' ) ? Game.getNextLevelXP(level) : 250;
+            const nextXP = (typeof Game.getNextLevelXP === 'function') ? Game.getNextLevelXP(level) : 250;
             const remaining = Math.max(0, nextXP - xp);
             audio.speak(`Kaptanlık durumunuz açıldı. Şu an Seviye ${level}, ${title} durumundasınız. Toplam tecrübeniz ${xp} puandır. Seviye ${level + 1}'e kalan: ${remaining} puan.`);
             return;
@@ -2167,7 +2167,7 @@ class VoiceAssistant {
                 const res = Game.isRouteAccessible(routeId);
                 if (!res.allowed) {
                     if (typeof audio !== 'undefined' && audio.playWarning) {
-                        try { audio.playWarning(); } catch(e) {}
+                        try { audio.playWarning(); } catch (e) { }
                     }
                     if (typeof audio !== 'undefined' && audio.speak) {
                         audio.speak(res.reason);
@@ -2213,8 +2213,8 @@ class VoiceAssistant {
         if (command.includes("saray") && (command.includes("sefer") || command.includes("şehir içi") || command.includes("sehir ici") || command.includes("hastane") || command.includes("çarşı") || command.includes("otogar") || command.includes("kampüs"))) {
             if (typeof SarayNavigasyon !== 'undefined') {
                 const toTarget = command.includes("hastane") ? "Saray Devlet Hastanesi" :
-                                 (command.includes("kampüs") ? "Saray Fakülte Kampüsü" :
-                                 (command.includes("çarşı") ? "Ayaspaşa Çarşı" : "Saray Devlet Hastanesi"));
+                    (command.includes("kampüs") ? "Saray Fakülte Kampüsü" :
+                        (command.includes("çarşı") ? "Ayaspaşa Çarşı" : "Saray Devlet Hastanesi"));
                 audio.speak("Saray içi Otogardan " + toTarget + " durağına şehir içi ring seferi başlatılıyor.");
                 SarayNavigasyon.baslat("Saray Otogarı", toTarget);
                 return;
@@ -2224,9 +2224,9 @@ class VoiceAssistant {
         if (command.includes("çetin sokak") || command.includes("cetin sokak")) {
             if (typeof VelimeseNavigasyon !== 'undefined') {
                 if (command.includes("toki") || command.includes("meydan") || command.includes("istasyon") || command.includes("çarşı")) {
-                    const toTarget = command.includes("toki") ? "Velimeşe TOKİ 233. Sokak" : 
-                                     (command.includes("istasyon") ? "Velimeşe Tren Garı & İstasyon" : 
-                                     (command.includes("çarşı") ? "Çarşı Caddesi" : "Velimeşe Merkez Meydanı"));
+                    const toTarget = command.includes("toki") ? "Velimeşe TOKİ 233. Sokak" :
+                        (command.includes("istasyon") ? "Velimeşe Tren Garı & İstasyon" :
+                            (command.includes("çarşı") ? "Çarşı Caddesi" : "Velimeşe Merkez Meydanı"));
                     audio.speak("Velimeşe içi Çetin Sokak'tan " + toTarget + " noktasına 100 sokak seferi başlatılıyor.");
                     VelimeseNavigasyon.baslat("Çetin Sokak", toTarget);
                     return;
@@ -2295,7 +2295,7 @@ class VoiceAssistant {
                 }
             }
         }
-        
+
         // --- ARAÇ KONTROLÜ ---
         if (command.includes("motor") || command.includes("çalıştır") || command.includes("kontak")) {
             if (!audio.isEngineRunning) {
@@ -2379,7 +2379,7 @@ class VoiceAssistant {
             return;
         }
 
-                                                                                                // --- TÜRKİYE DENİZLERİ SESLİ BİLGİLENDİRME VE REHBERLİK ---
+        // --- TÜRKİYE DENİZLERİ SESLİ BİLGİLENDİRME VE REHBERLİK ---
         if (command.includes("denizler") || command.includes("türkiyenin denizleri") || command.includes("kaç deniz") || command.includes("denizlerimiz")) {
             audio.speak("Türkiye üç tarafı denizlerle çevrili bir yarımadadır: Kuzeyde 1695 kilometre kıyısıyla Karadeniz, batıda girintili çıkıntılı koylarıyla Ege Denizi, güneyde en sıcak ve en tuzlu denizimiz Akdeniz ve tamamı sınırlarımızda olan iç denizimiz Marmara Denizi yer alır. Ayrıca Doğu Anadolu'da yöre halkının deniz olarak andığı Van Gölü bulunur.");
             return;
@@ -2419,7 +2419,7 @@ class VoiceAssistant {
             return;
         }
 
-                                                                                if (command.includes("yalova")) {
+        if (command.includes("yalova")) {
             if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
                 audio.speak("Tekirdağ ile Yalova arası resmi karayolu mesafesi Osmangazi Köprüsü üzerinden 220 kilometredir.");
                 return;
@@ -2428,14 +2428,14 @@ class VoiceAssistant {
             return;
         }
 
-                                                                if (command.includes("gümüşhane") || command.includes("gumushane")) {
-                if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
-                    audio.speak("Tekirdağ ile Gümüşhane arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, Bolu, Amasya, Erzincan ve Kelkit aksı üzerinden 1140 kilometredir.");
-                    return;
-                }
-                audio.speak("Gümüşhane, Doğu Karadeniz'in iç kesiminde Harşit Vadisi boyunca uzanan dağlar arasındaki tarihi maden ve kültür kentimizdir. 14.5 kilometrelik Yeni Zigana Tüneli, Karaca Mağarası, Tomara Şelalesi, Torul Kalesi Cam Terası, meşhur pestili ve kömesiyle tanınır. Koordinatları 40 derece 27 dakika Kuzey, 39 derece 28 dakika Doğudur. Komşuları Trabzon, Bayburt, Erzincan ve Giresun'dur.");
+        if (command.includes("gümüşhane") || command.includes("gumushane")) {
+            if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
+                audio.speak("Tekirdağ ile Gümüşhane arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, Bolu, Amasya, Erzincan ve Kelkit aksı üzerinden 1140 kilometredir.");
                 return;
             }
+            audio.speak("Gümüşhane, Doğu Karadeniz'in iç kesiminde Harşit Vadisi boyunca uzanan dağlar arasındaki tarihi maden ve kültür kentimizdir. 14.5 kilometrelik Yeni Zigana Tüneli, Karaca Mağarası, Tomara Şelalesi, Torul Kalesi Cam Terası, meşhur pestili ve kömesiyle tanınır. Koordinatları 40 derece 27 dakika Kuzey, 39 derece 28 dakika Doğudur. Komşuları Trabzon, Bayburt, Erzincan ve Giresun'dur.");
+            return;
+        }
         if (command.includes("rol yapma") || command.includes("kolonya") || command.includes("ikram") || command.includes("polis") || command.includes("takograf")) {
             if (command.includes("kolonya") && (command.includes("dağıt") || command.includes("tut") || command.includes("servis")) && typeof RoleplaySystem !== 'undefined' && typeof RoleplaySystem.triggerCologneService === 'function') {
                 RoleplaySystem.triggerCologneService();
@@ -2457,37 +2457,37 @@ class VoiceAssistant {
             }
             return;
         }
-            if (command.includes("hgs") || command.includes("gişe") || command.includes("otoyol ücreti") || command.includes("bakiye")) {
-                if (typeof HighwayFacilities !== 'undefined') {
-                    HighwayFacilities.openHgsModal();
-                }
+        if (command.includes("hgs") || command.includes("gişe") || command.includes("otoyol ücreti") || command.includes("bakiye")) {
+            if (typeof HighwayFacilities !== 'undefined') {
+                HighwayFacilities.openHgsModal();
+            }
+            return;
+        }
+        if (command.includes("giresun")) {
+            if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
+                audio.speak("Tekirdağ ile Giresun arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, Bolu Dağı, Samsun ve Karadeniz Sahil Yolu üzerinden 1050 kilometredir.");
                 return;
             }
-            if (command.includes("giresun")) {
-                if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
-                    audio.speak("Tekirdağ ile Giresun arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, Bolu Dağı, Samsun ve Karadeniz Sahil Yolu üzerinden 1050 kilometredir.");
-                    return;
-                }
-                audio.speak("Giresun, Doğu Karadeniz Bölgesi'nde yemyeşil fındık bahçeleri ve masmavi Karadeniz kıyısında kurulu tarihi sahil kentimizdir. Tarihi Giresun Kalesi, Karadeniz'in tek yaşanabilir adası olan Giresun Adası, Kümbet Yaylası, dünyaca meşhur tombul fındığı, Görele pidesi ve kemençesiyle ünlüdür. Koordinatları 40 derece 55 dakika Kuzey, 38 derece 23 dakika Doğudur. Komşuları Trabzon, Gümüşhane, Erzincan, Sivas ve Ordu'dur.");
+            audio.speak("Giresun, Doğu Karadeniz Bölgesi'nde yemyeşil fındık bahçeleri ve masmavi Karadeniz kıyısında kurulu tarihi sahil kentimizdir. Tarihi Giresun Kalesi, Karadeniz'in tek yaşanabilir adası olan Giresun Adası, Kümbet Yaylası, dünyaca meşhur tombul fındığı, Görele pidesi ve kemençesiyle ünlüdür. Koordinatları 40 derece 55 dakika Kuzey, 38 derece 23 dakika Doğudur. Komşuları Trabzon, Gümüşhane, Erzincan, Sivas ve Ordu'dur.");
+            return;
+        }
+        if (command.includes("gaziantep") || command.includes("antep")) {
+            if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
+                audio.speak("Tekirdağ ile Gaziantep arası resmi karayolu mesafesi Kuzey Marmara, O-4, Ankara Niğde Otoyolu ve TAG Otoyolu üzerinden 1260 kilometredir.");
                 return;
             }
-            if (command.includes("gaziantep") || command.includes("antep")) {
-                if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
-                    audio.speak("Tekirdağ ile Gaziantep arası resmi karayolu mesafesi Kuzey Marmara, O-4, Ankara Niğde Otoyolu ve TAG Otoyolu üzerinden 1260 kilometredir.");
-                    return;
-                }
-                audio.speak("Gaziantep, Güneydoğu Anadolu Bölgesi'nde yer alan kadim gastronomi ve sanayi metropolümüzdür. UNESCO tescilli mutfağı, Zeugma Mozaik Müzesi, Çingene Kızı mozaiği, Antep Kalesi, Bakırcılar Çarşısı, Rumkale, fıstık ve baklavasıyla dünyaca ünlüdür. Koordinatları 37 derece 4 dakika Kuzey, 37 derece 23 dakika Doğudur. Komşuları Adıyaman, Şanlıurfa, Kilis, Hatay, Osmaniye ve Kahramanmaraş'tır.");
+            audio.speak("Gaziantep, Güneydoğu Anadolu Bölgesi'nde yer alan kadim gastronomi ve sanayi metropolümüzdür. UNESCO tescilli mutfağı, Zeugma Mozaik Müzesi, Çingene Kızı mozaiği, Antep Kalesi, Bakırcılar Çarşısı, Rumkale, fıstık ve baklavasıyla dünyaca ünlüdür. Koordinatları 37 derece 4 dakika Kuzey, 37 derece 23 dakika Doğudur. Komşuları Adıyaman, Şanlıurfa, Kilis, Hatay, Osmaniye ve Kahramanmaraş'tır.");
+            return;
+        }
+        if (command.includes("eskişehir") || command.includes("eskisehir")) {
+            if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
+                audio.speak("Tekirdağ ile Eskişehir arası resmi karayolu mesafesi Osmangazi Köprüsü, Bursa ve Bozüyük aksı üzerinden 430 kilometredir.");
                 return;
             }
-            if (command.includes("eskişehir") || command.includes("eskisehir")) {
-                if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
-                    audio.speak("Tekirdağ ile Eskişehir arası resmi karayolu mesafesi Osmangazi Köprüsü, Bursa ve Bozüyük aksı üzerinden 430 kilometredir.");
-                    return;
-                }
-                audio.speak("Eskişehir, İç Anadolu Bölgesi'nde Porsuk Çayı kıyısında yer alan modern bir üniversite ve kültür şehridir. Tarihi Odunpazarı Evleri, Sazova Parkı, Masal Şatosu, lületaşı, çibörek, met helvası ve Frig Vadisiyle ünlüdür. Koordinatları 39 derece 46 dakika Kuzey, 30 derece 31 dakika Doğudur. Komşuları Bilecik, Bolu, Ankara, Konya, Afyonkarahisar ve Kütahya'dır.");
-                return;
-            }
-            if (command.includes("erzurum")) {
+            audio.speak("Eskişehir, İç Anadolu Bölgesi'nde Porsuk Çayı kıyısında yer alan modern bir üniversite ve kültür şehridir. Tarihi Odunpazarı Evleri, Sazova Parkı, Masal Şatosu, lületaşı, çibörek, met helvası ve Frig Vadisiyle ünlüdür. Koordinatları 39 derece 46 dakika Kuzey, 30 derece 31 dakika Doğudur. Komşuları Bilecik, Bolu, Ankara, Konya, Afyonkarahisar ve Kütahya'dır.");
+            return;
+        }
+        if (command.includes("erzurum")) {
             if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
                 audio.speak("Tekirdağ ile Erzurum arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, D-100 ve Erzincan Aşkale aksı üzerinden 1360 kilometredir.");
                 return;
@@ -2674,7 +2674,7 @@ class VoiceAssistant {
             }
             return;
         }
-        
+
         if (command.includes("zaman") || command.includes("saat")) {
             const h = Math.floor(Game.clockMinutes / 60).toString().padStart(2, '0');
             const m = Math.floor(Game.clockMinutes % 60).toString().padStart(2, '0');
@@ -2690,8 +2690,8 @@ class VoiceAssistant {
             const unitLabel = isColdMode ? "Kalorifer" : "Klima";
 
             if (command.includes("kaç derece") || command.includes("sıcaklık") || command.includes("hava") || command.includes("yağmur") || command.includes("yağış")) {
-                let durum = (Game.weather === 'sunny') 
-                    ? (Game.isNight ? 'açık gece' : 'güneşli') 
+                let durum = (Game.weather === 'sunny')
+                    ? (Game.isNight ? 'açık gece' : 'güneşli')
                     : (Game.weather === 'rainy' ? `yağmurlu, saatte ${Game.rainMmPerHour || 5} milimetre yağış var` : 'karlı');
                 audio.speak(`Dış sıcaklık ${extTemp} derece, araç içi ${inTemp} derece. Hava ${durum}. ${Game.isACOn ? unitLabel + " açık." : unitLabel + " kapalı."}`);
                 return;

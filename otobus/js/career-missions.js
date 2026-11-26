@@ -13,7 +13,7 @@
 
     const CareerMissions = {
         LEVEL_TITLES: [
-            "1. Sınıf Stajyer Şehir İçi Sürücüsü",
+            "1. Sınıf Stajyer Şehir İçi Kaptanı",
             "2. Sınıf Süleymanpaşa Kıyı & Sahil Kaptanı",
             "3. Sınıf Çorlu Sanayi & Metropol Hat Kaptanı",
             "4. Sınıf Trakya Kıyı & İlçe Hatları Kıdemli Kaptanı",
@@ -30,7 +30,7 @@
                 index: 0,
                 taskNum: 1,
                 level: 1,
-                levelTitle: "1. Sınıf Stajyer Şehir İçi Sürücüsü",
+                levelTitle: "1. Sınıf Stajyer Şehir İçi Kaptanı",
                 title: "Garaj Çıkışı ve Motor Dinamikleri Testi",
                 district: "Süleymanpaşa",
                 routeSnippet: "Merkez Garaj ➔ Sahil Kordonu",
@@ -45,7 +45,7 @@
                 index: 1,
                 taskNum: 2,
                 level: 1,
-                levelTitle: "1. Sınıf Stajyer Şehir İçi Sürücüsü",
+                levelTitle: "1. Sınıf Stajyer Şehir İçi Kaptanı",
                 title: "Hatta İntikal ve Boş Durak Hizalama Provası",
                 district: "Süleymanpaşa",
                 routeSnippet: "Sahil Kordonu ➔ Değirmenaltı",
@@ -60,7 +60,7 @@
                 index: 2,
                 taskNum: 3,
                 level: 1,
-                levelTitle: "1. Sınıf Stajyer Şehir İçi Sürücüsü",
+                levelTitle: "1. Sınıf Stajyer Şehir İçi Kaptanı",
                 title: "İlk Yolcularla Buluşma: Değirmenaltı Sabah Ringi",
                 district: "Süleymanpaşa",
                 routeSnippet: "Değirmenaltı ➔ Çarşı Merkez",
@@ -75,7 +75,7 @@
                 index: 3,
                 taskNum: 4,
                 level: 1,
-                levelTitle: "1. Sınıf Stajyer Şehir İçi Sürücüsü",
+                levelTitle: "1. Sınıf Stajyer Şehir İçi Kaptanı",
                 title: "Sahil Kordonu ve Şehir Hastanesi Ziyaretçi Seferi",
                 district: "Süleymanpaşa",
                 routeSnippet: "Çarşı ➔ Şehir Hastanesi",
@@ -90,7 +90,7 @@
                 index: 4,
                 taskNum: 5,
                 level: 1,
-                levelTitle: "1. Sınıf Stajyer Şehir İçi Sürücüsü",
+                levelTitle: "1. Sınıf Stajyer Şehir İçi Kaptanı",
                 title: "Tekirdağ Kart (Akbil) Entegrasyonu & Altınova Seferi",
                 district: "Süleymanpaşa",
                 routeSnippet: "Altınova ➔ Hürriyet Mahallesi",
@@ -105,7 +105,7 @@
                 index: 5,
                 taskNum: 6,
                 level: 1,
-                levelTitle: "1. Sınıf Stajyer Şehir İçi Sürücüsü",
+                levelTitle: "1. Sınıf Stajyer Şehir İçi Kaptanı",
                 title: "Çarşı ve Okul Çıkışı Ring İntikali",
                 district: "Süleymanpaşa",
                 routeSnippet: "100. Yıl ➔ Okullar Bölgesi",
@@ -120,7 +120,7 @@
                 index: 6,
                 taskNum: 7,
                 level: 1,
-                levelTitle: "1. Sınıf Stajyer Şehir İçi Sürücüsü",
+                levelTitle: "1. Sınıf Stajyer Şehir İçi Kaptanı",
                 title: "Akustik Duracak Butonu & Arka Kapı Entegrasyonu",
                 district: "Süleymanpaşa",
                 routeSnippet: "Köprübaşı ➔ Yenişehir",
@@ -135,7 +135,7 @@
                 index: 7,
                 taskNum: 8,
                 level: 1,
-                levelTitle: "1. Sınıf Stajyer Şehir İçi Sürücüsü",
+                levelTitle: "1. Sınıf Stajyer Şehir İçi Kaptanı",
                 title: "Namık Kemal Üniversitesi Kampüs İçi Ring Seferi",
                 district: "Süleymanpaşa",
                 routeSnippet: "NKÜ Rektörlük ➔ Tıp Fakültesi",
@@ -150,7 +150,7 @@
                 index: 8,
                 taskNum: 9,
                 level: 1,
-                levelTitle: "1. Sınıf Stajyer Şehir İçi Sürücüsü",
+                levelTitle: "1. Sınıf Stajyer Şehir İçi Kaptanı",
                 title: "Engelli Rampası ve Kneeling Sistemi Açılışı",
                 district: "Süleymanpaşa",
                 routeSnippet: "Hükümet Caddesi ➔ Çiftlikönü",
@@ -165,7 +165,7 @@
                 index: 9,
                 taskNum: 10,
                 level: 1,
-                levelTitle: "1. Sınıf Stajyer Şehir İçi Sürücüsü",
+                levelTitle: "1. Sınıf Stajyer Şehir İçi Kaptanı",
                 title: "1. Sınıf Stajyer Mezuniyet ve Yeterlilik Seferi",
                 district: "Süleymanpaşa",
                 routeSnippet: "Yeni Otogar ➔ Kumbağ Sahil Meydanı",
@@ -1547,7 +1547,7 @@
                 }
             }
             lvl = Math.max(1, Math.min(10, Math.floor(lvl) || 1));
-            return (this.LEVEL_TITLES && this.LEVEL_TITLES[lvl - 1]) || "1. Sınıf Stajyer Şehir İçi Sürücüsü";
+            return (this.LEVEL_TITLES && this.LEVEL_TITLES[lvl - 1]) || "1. Sınıf Stajyer Şehir İçi Kaptanı";
         },
 
         enrichRoute: function (route, taskIndex) {

@@ -14,6 +14,15 @@
         fanActive: false,
         lastFanSoundTime: 0,
         lastHighTempWarningTime: 0,
+        resetState: function() {
+            if (this.fanActive) {
+                this.fanActive = false;
+                if (typeof audio !== 'undefined' && typeof audio.stopRadiatorFan === 'function') {
+                    audio.stopRadiatorFan();
+                }
+            }
+            this._lastPassCount = undefined;
+        },
 
         /**
          * Saat dilimine göre yolcu ve trafik talep çarpanı
@@ -153,7 +162,7 @@
             if (!isRunning) {
                 // Motor kapalıyken yavaşça ortam sıcaklığına soğur, turbo ve yağ basıncı sıfırlanır
                 if (game.engineCoolantTemp > ambient) {
-                    game.engineCoolantTemp -= (0.25 * deltaTime);
+                    game.engineCoolantTemp = Math.max(ambient, game.engineCoolantTemp - (0.25 * deltaTime));
                 }
                 game.engineOilPressure = 0.0;
                 game.turboBoostBar = Math.max(0, game.turboBoostBar - (2.5 * deltaTime));
@@ -240,13 +249,13 @@
             const chipWearMult = (activeChip && activeChip.activeMode) ? activeChip.activeMode.wearMultiplier : 1.0;
             const chipHeatOffset = (activeChip && activeChip.activeMode) ? activeChip.activeMode.heatOffset : 0.0;
 
-            // 5. Dik yokuş aşağı retardersiz sürekli ayak freni kullanımı -> Fren balataları aşınması
-            if (game.busDamage && slope <= -2.5 && game.isBrakeKeyDown && (!game.retarderLevel || game.retarderLevel === 0) && game.speed > 35) {
+            // 5. Dik yokuş aşağı retardersiz sürekli ayak freni kullanımı -> Fren balataları aşınması (Boş eğitim seferlerinde aşınma olmaz)
+            if (!isTrainingTrip && game.busDamage && slope <= -2.5 && game.isBrakeKeyDown && (!game.retarderLevel || game.retarderLevel === 0) && game.speed > 35) {
                 game.busDamage.brakes = Math.min(100, (game.busDamage.brakes || 0) + (0.45 * chipWearMult * deltaTime));
             }
 
             // 6. Aşırı devirde (>2450 RPM) uzun süre zorlama -> Şanzıman hafif aşınma
-            if (game.busDamage && rpm > 2450 && isThrottle) {
+            if (!isTrainingTrip && game.busDamage && rpm > 2450 && isThrottle) {
                 game.busDamage.transmission = Math.min(100, (game.busDamage.transmission || 0) + (0.15 * chipWearMult * deltaTime));
             }
 
@@ -285,16 +294,21 @@
                 }
             }
 
-            // Aşırı Hararet (110°C üzeri) -> Sessiz termal koruma ve motor bloğu yıpranması
+            // Aşırı Hararet (110°C üzeri) -> Sessiz termal koruma ve motor bloğu yıpranması (boş eğitim seferlerinde hasar yazılmaz, sağlık 25 altına düşürülmez)
             if (game.engineCoolantTemp >= 110.0 && game.busDamage) {
                 game.engineCoolantTemp -= (0.45 * deltaTime);
-                game.busDamage.engine = Math.min(100, (game.busDamage.engine || 0) + (0.15 * chipWearMult * deltaTime));
-                game.busDamage.health = Math.max(0, (game.busDamage.health || 100) - (0.08 * chipWearMult * deltaTime));
+                if (!isTrainingTrip) {
+                    game.busDamage.engine = Math.min(100, (game.busDamage.engine || 0) + (0.15 * chipWearMult * deltaTime));
+                    const curHealth = (typeof game.busDamage.health === 'number') ? game.busDamage.health : 100;
+                    if (curHealth > 25) {
+                        game.busDamage.health = Math.max(25, curHealth - (0.08 * chipWearMult * deltaTime));
+                    }
+                }
             }
 
             // Aşırı Hararet İkazı (105°C ve üzeri -> En arka koltuktaki yolcular yanık/sıcaklık hisseder!)
             const now = Date.now();
-            if (game.engineCoolantTemp >= 105.0 && (now - this.lastHighTempWarningTime > 15000)) {
+            if (game.engineCoolantTemp >= 105.0 && (now - (this.lastHighTempWarningTime || 0) > 15000)) {
                 this.lastHighTempWarningTime = now;
                 const warnMsg = `Dikkat! Motor harareti ${Math.round(game.engineCoolantTemp)} dereceye ulaştı! Vitesi düşürün veya aracı rölantide soğutun.`;
                 const humanOverheat = (typeof window !== 'undefined' && window.HumanNpcVoices && typeof window.HumanNpcVoices.onEngineOverheatCabin === 'function')
@@ -305,8 +319,9 @@
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🚨 Yüksek Hararet İkazı (" + Math.round(game.engineCoolantTemp) + "°C)", "error");
             }
 
-            // Hararet alt ve üst limit sınırlaması
-            game.engineCoolantTemp = Math.max(20.0, Math.min(125.0, game.engineCoolantTemp));
+            // Hararet alt ve üst limit sınırlaması (Kışın soğuk havada ortam sıcaklığının üzerine yapay sıçrama yapmaz)
+            const minCoolantTemp = Math.min(ambient, 20.0);
+            game.engineCoolantTemp = Math.max(minCoolantTemp, Math.min(125.0, game.engineCoolantTemp));
         },
 
         /**
@@ -315,7 +330,8 @@
         speakTelemetryReport: function(game) {
             if (!game) return;
 
-            const clockMin = (typeof game.clockMinutes === 'number') ? game.clockMinutes : 480;
+            const rawClockMin = (typeof game.clockMinutes === 'number' && !isNaN(game.clockMinutes)) ? game.clockMinutes : 480;
+            const clockMin = ((Math.floor(rawClockMin) % 1440) + 1440) % 1440;
             const curHH = String(Math.floor(clockMin / 60)).padStart(2, '0');
             const curMM = String(Math.floor(clockMin % 60)).padStart(2, '0');
             

@@ -132,6 +132,11 @@ const SarayNavigasyon = {
             return Boolean(stem && stem.length >= 4 && targetNorm.includes(stem));
         };
 
+        if (qNorm.includes("100 yil") && (hasExplicitSarayContext || qNorm.includes("parklar"))) {
+            const m100 = this.sokaklar.find(s => s.id === "saray_sk_36" || s.name.includes("100. Yıl"));
+            if (m100) return m100;
+        }
+
         // 2. Tüm sorgu kelimelerinin (nitelik kelimeleri dahil: "Büyükyoncalı Merkez", "Otogar 2 Çıkış" vb.) tam eşleşmesi, ardından anlamlı kelime eşleşmesi
         matched = this.sokaklar.find(s => {
             const fullTarget = this.normalizeText(s.name + ' ' + (s.mahalle || ''));

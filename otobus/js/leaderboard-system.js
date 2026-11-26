@@ -7,6 +7,34 @@
 (function () {
     'use strict';
 
+    function escapeHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function normTr(str) {
+        return String(str ?? '')
+            .replace(/İ/g, 'i')
+            .replace(/I/g, 'ı')
+            .replace(/Â/g, 'a')
+            .replace(/â/g, 'a')
+            .toLowerCase()
+            .trim();
+    }
+
+    function safeGetStorage(key) {
+        try {
+            if (typeof localStorage !== 'undefined' && localStorage) {
+                return localStorage.getItem(key);
+            }
+        } catch (e) {}
+        return null;
+    }
+
     const LeaderboardSystem = {
         currentCategory: 'km', // 'km' | 'passengers' | 'xp' | 'company'
         searchQuery: '',
@@ -14,9 +42,12 @@
         _cacheTimestamp: 0,
         _cacheTTL: 45000, // 45 saniye önbellek (Firebase kotasını %100 korur)
         _isLoading: false,
+        _eventsBound: false,
+        _modalEventsBound: false,
 
         // Başlatıcı
         init: function () {
+            if (typeof document === 'undefined' || !document.body) return;
             this.injectModals();
             this.bindEvents();
         },
@@ -37,7 +68,7 @@
                                 <span>🏆</span> Canlı Kaptanlar Sıralaması & Lider Tablosu
                             </h2>
                             <p style="color: #cbd5e1; font-size: 0.92rem; margin: 4px 0 0 0;">
-                                Türkiye yollarında en çok mesafe kat eden, en çok yolcu taşıyan ve holding kuran şoförler.
+                                Türkiye yollarında en çok mesafe kat eden, en çok yolcu taşıyan ve holding kuran kaptanlar.
                             </p>
                         </div>
                         <button id="btn-close-leaderboard" class="modern-btn nav-item" style="padding: 7px 16px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-weight: bold; cursor: pointer;" aria-label="Lider Tablosunu Kapat (Esc)">✕ Kapat</button>
@@ -86,7 +117,7 @@
                     <!-- Üst Başlık & Kapat Butonu -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
                         <div>
-                            <span style="font-size: 0.85rem; color: #facc15; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">🎖️ Resmi Şoförlük Teftiş Karnesi</span>
+                            <span style="font-size: 0.85rem; color: #facc15; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">🎖️ Resmi Kaptanlık Teftiş Karnesi</span>
                             <h2 id="inspector-captain-name" style="font-size: 1.7rem; margin: 4px 0 0 0; color: #fff;">
                                 Kaptan Ali
                             </h2>
@@ -112,10 +143,15 @@
             `;
 
             document.body.insertAdjacentHTML('beforeend', modalHtml);
+            this._bindModalControls();
         },
 
-        // Olay Dinleyicileri
-        bindEvents: function () {
+        _bindModalControls: function () {
+            if (this._modalEventsBound) return;
+            const lbModal = document.getElementById('leaderboard-modal');
+            if (!lbModal) return;
+            this._modalEventsBound = true;
+
             // Modalı Kapatma
             const btnClose = document.getElementById('btn-close-leaderboard');
             if (btnClose) btnClose.addEventListener('click', () => this.close());
@@ -135,7 +171,7 @@
             const searchInput = document.getElementById('leaderboard-search-input');
             if (searchInput) {
                 searchInput.addEventListener('input', (e) => {
-                    this.searchQuery = e.target.value.toLowerCase().trim();
+                    this.searchQuery = normTr(e.target.value);
                     this.renderList();
                 });
             }
@@ -147,15 +183,22 @@
                     this.fetchData(true);
                 });
             }
+        },
+
+        // Olay Dinleyicileri
+        bindEvents: function () {
+            this._bindModalControls();
+            if (this._eventsBound) return;
+            this._eventsBound = true;
 
             // Başlık Ekranı veya Radar Modalındaki Liderlik Butonu
             document.addEventListener('click', (e) => {
-                if (e.target && e.target.closest('#btn-open-leaderboard-from-radar')) {
+                if (e.target && e.target.closest && e.target.closest('#btn-open-leaderboard-from-radar')) {
                     if (typeof Multiplayer !== 'undefined' && Multiplayer.closeRadarModal) {
                         Multiplayer.closeRadarModal();
                     }
                     this.open();
-                } else if (e.target && e.target.closest('#btn-open-leaderboard')) {
+                } else if (e.target && e.target.closest && e.target.closest('#btn-open-leaderboard')) {
                     this.open();
                 }
             });
@@ -165,12 +208,14 @@
                 if (e.key === 'Escape') {
                     const inspModal = document.getElementById('captain-profile-inspector-modal');
                     if (inspModal && !inspModal.classList.contains('hidden')) {
+                        e.preventDefault();
                         this.closeInspector();
                         e.stopPropagation();
                         return;
                     }
                     const lbModal = document.getElementById('leaderboard-modal');
                     if (lbModal && !lbModal.classList.contains('hidden')) {
+                        e.preventDefault();
                         this.close();
                         e.stopPropagation();
                         return;
@@ -267,13 +312,13 @@
 
         // Şu anki oyuncuyu listeyle harmanla
         mergeCurrentPlayer: function (list) {
-            const myName = (typeof Game !== 'undefined' && Game.username) ? Game.username : (localStorage.getItem('otobusUsername') || "Kaptan");
+            const myName = (typeof Game !== 'undefined' && Game.username) ? Game.username : (safeGetStorage('otobusUsername') || "Kaptan");
             let myStats = {};
             if (typeof DriverBadges !== 'undefined' && DriverBadges.getLifetimeStats) {
                 myStats = DriverBadges.getLifetimeStats();
             }
 
-            const myIdx = list.findIndex(u => u.username.toLowerCase() === myName.toLowerCase());
+            const myIdx = list.findIndex(u => normTr(u.username) === normTr(myName));
             const myObj = {
                 username: myName,
                 licenseLevel: (typeof Game !== 'undefined') ? (Game.licenseLevel || 1) : 1,
@@ -349,44 +394,39 @@
             const listEl = document.getElementById('leaderboard-list');
             if (!listEl) return;
 
-            let items = [...this._cachedData];
+            let sortedItems = [...this._cachedData];
 
             // 1. Sıralama Algoritması
             if (this.currentCategory === 'km') {
-                items.sort((a, b) => (b.totalKm || 0) - (a.totalKm || 0));
+                sortedItems.sort((a, b) => (b.totalKm || 0) - (a.totalKm || 0));
             } else if (this.currentCategory === 'passengers') {
-                items.sort((a, b) => (b.totalPassengers || 0) - (a.totalPassengers || 0));
+                sortedItems.sort((a, b) => (b.totalPassengers || 0) - (a.totalPassengers || 0));
             } else if (this.currentCategory === 'xp') {
-                items.sort((a, b) => {
+                sortedItems.sort((a, b) => {
                     const diff = (b.playerXP || 0) - (a.playerXP || 0);
                     if (diff !== 0) return diff;
                     return (b.licenseLevel || 1) - (a.licenseLevel || 1);
                 });
             } else if (this.currentCategory === 'company') {
-                items.sort((a, b) => (b.companyTreasury || 0) - (a.companyTreasury || 0));
+                sortedItems.sort((a, b) => (b.companyTreasury || 0) - (a.companyTreasury || 0));
             }
 
-            // 2. Arama Filtresi
-            if (this.searchQuery) {
-                items = items.filter(u => 
-                    (u.username && u.username.toLowerCase().includes(this.searchQuery)) ||
-                    (u.currentCity && u.currentCity.toLowerCase().includes(this.searchQuery)) ||
-                    (u.companyName && u.companyName.toLowerCase().includes(this.searchQuery))
-                );
-            }
+            sortedItems.forEach((item, idx) => {
+                item._globalRank = idx + 1;
+            });
 
-            // 3. Kendi Sıralamamızı Güncelle
-            const myName = (typeof Game !== 'undefined' && Game.username) ? Game.username : (localStorage.getItem('otobusUsername') || "Kaptan");
-            const myRankIdx = items.findIndex(u => u.username.toLowerCase() === myName.toLowerCase());
+            // 2. Kendi Genel Sıralamamızı Güncelle (Arama filtresinden bağımsız gerçek sıra!)
+            const myName = (typeof Game !== 'undefined' && Game.username) ? Game.username : (safeGetStorage('otobusUsername') || "Kaptan");
+            const myRankIdx = sortedItems.findIndex(u => normTr(u.username) === normTr(myName));
             const myBanner = document.getElementById('lb-my-rank-banner');
             if (myBanner) {
                 if (myRankIdx >= 0) {
-                    const me = items[myRankIdx];
+                    const me = sortedItems[myRankIdx];
                     let myScoreText = "";
-                    if (this.currentCategory === 'km') myScoreText = `${me.totalKm.toLocaleString('tr-TR')} KM`;
-                    else if (this.currentCategory === 'passengers') myScoreText = `${me.totalPassengers.toLocaleString('tr-TR')} Yolcu`;
+                    if (this.currentCategory === 'km') myScoreText = `${(me.totalKm || 0).toLocaleString('tr-TR')} KM`;
+                    else if (this.currentCategory === 'passengers') myScoreText = `${(me.totalPassengers || 0).toLocaleString('tr-TR')} Yolcu`;
                     else if (this.currentCategory === 'xp') myScoreText = `Seviye ${me.licenseLevel || 1} (${(me.playerXP || 0).toLocaleString('tr-TR')} XP)`;
-                    else if (this.currentCategory === 'company') myScoreText = `${Math.round(me.companyTreasury).toLocaleString('tr-TR')} ₺ Kasa`;
+                    else if (this.currentCategory === 'company') myScoreText = `${Math.round(me.companyTreasury || 0).toLocaleString('tr-TR')} ₺ Kasa`;
 
                     myBanner.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 12px;">
@@ -394,12 +434,12 @@
                         <div>
                             <div style="color: #6ee7b7; font-weight: bold; font-size: 0.95rem;">SİZİN DERECENİZ:</div>
                             <div style="color: #fff; font-size: 1.1rem; font-weight: bold;">
-                                #${myRankIdx + 1}. Sıra: <strong>${me.username}</strong>
+                                #${myRankIdx + 1}. Sıra: <strong>${escapeHtml(me.username)}</strong>
                             </div>
                         </div>
                     </div>
                     <div style="text-align: right;">
-                        <span style="color: #fde047; font-weight: bold; font-size: 1.15rem;">${myScoreText}</span>
+                        <span style="color: #fde047; font-weight: bold; font-size: 1.15rem;">${escapeHtml(myScoreText)}</span>
                     </div>
                     `;
                 } else {
@@ -410,19 +450,30 @@
                 }
             }
 
+            // 3. Arama Filtresi (Türkçe İ/I uyumlu)
+            let items = sortedItems;
+            if (this.searchQuery) {
+                const q = normTr(this.searchQuery);
+                items = sortedItems.filter(u =>
+                    (u.username && normTr(u.username).includes(q)) ||
+                    (u.currentCity && normTr(u.currentCity).includes(q)) ||
+                    (u.companyName && normTr(u.companyName).includes(q))
+                );
+            }
+
             // 4. Listeyi Oluştur
             listEl.innerHTML = '';
 
             if (items.length === 0) {
                 listEl.innerHTML = `
                 <li style="padding: 24px; text-align: center; color: #94a3b8; background: rgba(255,255,255,0.03); border-radius: 8px;">
-                    Aramanızla eşleşen şoför kaydı bulunamadı.
+                    Aramanızla eşleşen kaptan kaydı bulunamadı.
                 </li>`;
                 return;
             }
 
             items.forEach((u, index) => {
-                const rankNum = index + 1;
+                const rankNum = u._globalRank || (index + 1);
                 let medalBadge = `#${rankNum}`;
                 let rankColor = "#94a3b8";
 
@@ -443,11 +494,14 @@
                     metricSubText = `${(u.playerXP || 0).toLocaleString('tr-TR')} XP | ${u.completedTasks || 0} Görev`;
                 } else if (this.currentCategory === 'company') {
                     metricText = `${Math.round(u.companyTreasury || 0).toLocaleString('tr-TR')} ₺`;
-                    metricSubText = `${u.companyName || 'Şirket'} (Seviye ${u.companyLevel || 1})`;
+                    metricSubText = `${escapeHtml(u.companyName || 'Şirket')} (Seviye ${u.companyLevel || 1})`;
                 }
 
                 const titleObj = this.getTitleInfo(u.equippedTitle);
-                const isMe = (u.username.toLowerCase() === myName.toLowerCase());
+                const isMe = (normTr(u.username) === normTr(myName));
+                const safeUser = escapeHtml(u.username);
+                const safeCity = escapeHtml(u.currentCity || 'Tekirdağ');
+                const safeCompany = escapeHtml(u.companyName || 'Serbest Kaptan');
 
                 const li = document.createElement('li');
                 li.style.cssText = `padding: 12px 16px; margin-bottom: 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; background: ${isMe ? 'rgba(16, 185, 129, 0.16)' : 'rgba(255,255,255,0.04)'}; border: 1.5px solid ${isMe ? '#10b981' : 'rgba(255,255,255,0.1)'};`;
@@ -459,24 +513,24 @@
                     </div>
                     <div>
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                            <strong style="font-size: 1.1rem; color: #fff;">${u.username}</strong>
+                            <strong style="font-size: 1.1rem; color: #fff;">${safeUser}</strong>
                             ${isMe ? '<span style="background: #10b981; color: #000; font-size: 0.75rem; font-weight: bold; padding: 2px 6px; border-radius: 4px;">SİZ</span>' : ''}
                             <span style="font-size: 0.85rem; color: #fde047; background: rgba(234,179,8,0.18); border: 1px solid rgba(234,179,8,0.3); padding: 1px 7px; border-radius: 4px;">
-                                ${titleObj.icon} ${titleObj.name}
+                                ${escapeHtml(titleObj.icon)} ${escapeHtml(titleObj.name)}
                             </span>
                         </div>
                         <div style="color: #94a3b8; font-size: 0.85rem; margin-top: 3px;">
-                            📍 ${u.currentCity} | 🏢 ${u.companyName}
+                            📍 ${safeCity} | 🏢 ${safeCompany}
                         </div>
                     </div>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 14px;">
                     <div style="text-align: right;">
-                        <div style="color: #38bdf8; font-weight: bold; font-size: 1.15rem;">${metricText}</div>
+                        <div style="color: #38bdf8; font-weight: bold; font-size: 1.15rem;">${escapeHtml(metricText)}</div>
                         <div style="color: #64748b; font-size: 0.78rem;">${metricSubText}</div>
                     </div>
-                    <button class="btn-inspect-captain modern-btn nav-item" data-user="${u.username}" style="padding: 7px 12px; font-size: 0.85rem; background: rgba(250, 204, 21, 0.2); border: 1.5px solid #facc15; color: #fef08a; border-radius: 6px; cursor: pointer;" aria-label="${u.username} kaptanın profil karnesini ve başarılarını incele">
+                    <button class="btn-inspect-captain modern-btn nav-item" data-user="${safeUser}" style="padding: 7px 12px; font-size: 0.85rem; background: rgba(250, 204, 21, 0.2); border: 1.5px solid #facc15; color: #fef08a; border-radius: 6px; cursor: pointer;" aria-label="${safeUser} kaptanın profil karnesini ve başarılarını incele">
                         🔍 İncele
                     </button>
                 </div>
@@ -518,7 +572,7 @@
 
         // Seçilen Kaptanın Detaylı Profil Kartını Aç
         openProfileInspector: function (username) {
-            const user = this._cachedData.find(u => u.username.toLowerCase() === username.toLowerCase());
+            const user = this._cachedData.find(u => normTr(u.username) === normTr(username));
             if (!user) return;
 
             const modal = document.getElementById('captain-profile-inspector-modal');
@@ -530,20 +584,21 @@
             nameEl.innerText = user.username;
             const titleObj = this.getTitleInfo(user.equippedTitle);
             const busObj = this.getBusInfo(user.selectedBusId);
+            const badgeCnt = (typeof user.badgesCount === 'number') ? user.badgesCount : 0;
 
             bodyEl.innerHTML = `
             <!-- Ana Unvan & Statü Kartı -->
             <div style="background: rgba(250, 204, 21, 0.12); border: 1.5px solid #facc15; border-radius: 10px; padding: 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <div style="font-size: 1.25rem; font-weight: bold; color: #fef08a;">
-                        ${titleObj.icon} ${titleObj.name}
+                        ${escapeHtml(titleObj.icon)} ${escapeHtml(titleObj.name)}
                     </div>
                     <div style="color: #cbd5e1; font-size: 0.85rem; margin-top: 3px;">
-                        Kategori: ${titleObj.category || 'Resmi Kaptanlık'} | Seviye ${user.licenseLevel} Şoför
+                        Kategori: ${escapeHtml(titleObj.category || 'Resmi Kaptanlık')} | Seviye ${user.licenseLevel || 1} Kaptan
                     </div>
                 </div>
                 <span style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem;">
-                    📍 ${user.currentCity}
+                    📍 ${escapeHtml(user.currentCity || 'Tekirdağ')}
                 </span>
             </div>
 
@@ -563,7 +618,7 @@
                 </div>
                 <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 12px;">
                     <div style="font-size: 0.8rem; color: #94a3b8;">Kazanılan Kaptan Brövesi</div>
-                    <div style="font-size: 1.25rem; font-weight: bold; color: #c084fc;">🎖️ ${user.badgesCount || 1} Bröve</div>
+                    <div style="font-size: 1.25rem; font-weight: bold; color: #c084fc;">🎖️ ${badgeCnt} Bröve</div>
                 </div>
             </div>
 
@@ -571,7 +626,7 @@
             <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 12px; margin-bottom: 10px;">
                 <div style="color: #38bdf8; font-weight: bold; font-size: 0.95rem; margin-bottom: 6px;">🚍 Tercih Ettiği Otobüs:</div>
                 <div style="color: #fff; font-size: 1rem;">
-                    ${busObj.icon} ${busObj.fullName || busObj.name}
+                    ${escapeHtml(busObj.icon)} ${escapeHtml(busObj.fullName || busObj.name)}
                 </div>
             </div>
 
@@ -579,7 +634,7 @@
                 <div style="color: #facc15; font-weight: bold; font-size: 0.95rem; margin-bottom: 6px;">🏢 Şirketi & Filo Gücü:</div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="color: #fff; font-size: 1rem;">
-                        <strong>${user.companyName}</strong> (Seviye ${user.companyLevel})
+                        <strong>${escapeHtml(user.companyName || 'Serbest Kaptan')}</strong> (Seviye ${user.companyLevel || 1})
                     </div>
                     <span style="color: #4ade80; font-weight: bold;">
                         ${Math.round(user.companyTreasury || 0).toLocaleString('tr-TR')} ₺ Kasa
@@ -620,6 +675,9 @@
             }
 
             modal.classList.remove('hidden');
+            if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+                KeyboardNav.initForScreen();
+            }
 
             // Sesli Teftiş Brifingi (Ekran Okuyucu Uyumlu)
             if (typeof audio !== 'undefined' && audio.speak) {
@@ -632,11 +690,15 @@
         closeInspector: function () {
             const modal = document.getElementById('captain-profile-inspector-modal');
             if (modal) modal.classList.add('hidden');
+            if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+                KeyboardNav.initForScreen();
+            }
         },
 
         // Ana Liderlik Modalını Aç
         open: function () {
             this.injectModals();
+            this.bindEvents();
             const modal = document.getElementById('leaderboard-modal');
             if (!modal) return;
 
@@ -645,7 +707,7 @@
 
             if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
             if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak("Canlı Kaptanlar Sıralaması açıldı. Ok tuşlarıyla listedeki şoförleri inceleyebilirsiniz.");
+                audio.speak("Canlı Kaptanlar Sıralaması açıldı. Ok tuşlarıyla listedeki kaptanları inceleyebilirsiniz.");
             }
         },
 
@@ -659,11 +721,14 @@
         }
     };
 
-    window.LeaderboardSystem = LeaderboardSystem;
+    const gObj = typeof window !== 'undefined' ? window : globalThis;
+    gObj.LeaderboardSystem = LeaderboardSystem;
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => LeaderboardSystem.init());
-    } else {
-        LeaderboardSystem.init();
+    if (typeof document !== 'undefined') {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => LeaderboardSystem.init());
+        } else {
+            LeaderboardSystem.init();
+        }
     }
 })();

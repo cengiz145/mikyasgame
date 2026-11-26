@@ -813,13 +813,31 @@ class AudioSystem {
     }
 
     playNav() {
+        if (this.isMuted) return;
+        const now = Date.now();
+        if (this._lastNavClickMs && (now - this._lastNavClickMs < 55)) return;
+        this._lastNavClickMs = now;
         this.init();
-        this.sounds.nav.play();
+        if (this.sounds && this.sounds.nav) {
+            try {
+                if (this.sounds.nav.playing()) this.sounds.nav.stop();
+                this.sounds.nav.play();
+            } catch (e) { }
+        }
     }
 
     playSelect() {
+        if (this.isMuted) return;
+        const now = Date.now();
+        if (this._lastSelectClickMs && (now - this._lastSelectClickMs < 65)) return;
+        this._lastSelectClickMs = now;
         this.init();
-        this.sounds.select.play();
+        if (this.sounds && this.sounds.select) {
+            try {
+                if (this.sounds.select.playing()) this.sounds.select.stop();
+                this.sounds.select.play();
+            } catch (e) { }
+        }
     }
 
     createSyntheticIdleBuffer() {
@@ -1724,9 +1742,9 @@ class AudioSystem {
         // 4. Howler üzerindeki tüm efektleri sustur
         if (this.sounds) {
             const effectKeys = [
-                'start', 'engine', 'airBrake', 'kneeling', 'doorOpen', 'doorClose',
+                'start', 'engine', 'airBrake', 'kneeling', 'doorOpen', 'doorClose', 'turnTick',
                 'akbilTam', 'akbilOgrenci', 'akbilAylik', 'akbilAktarma', 'akbilUcretsiz', 'akbilHata', 'busValidator', 'stopRequest', 'retarder', 'speedBump',
-                'horn', 'tireScreech', 'passengerShock', 'passengerBump', 'passengerDiscontent', 'passengerGroan', 'passengerMurmur',
+                'horn', 'airHorn', 'tireScreech', 'passengerShock', 'passengerBump', 'passengerDiscontent', 'passengerGroan', 'passengerMurmur',
                 'teaPour', 'teaStir', 'trolleyCart', 'snackWrapper', 'stationChime', 'luggageSuitcase', 'policeSiren', 'tachographPrint', 'thunderclap', 'distantFoghorn', 'radioSquelch',
                 'crowdWalla', 'dinerAmbience', 'reverseBeep', 'handbrakeAir',
                 'turboWhistle', 'turboWastegate', 'chassisCreak', 'ecasLeveling', 'radiatorFan', 'airDryerPurge'
@@ -1977,18 +1995,30 @@ class AudioSystem {
     }
 
     playSwitchClick() {
+        if (this.isMuted) return;
+        const nowMs = Date.now();
+        if (this._lastSwitchClickMs && (nowMs - this._lastSwitchClickMs < 140)) return;
+        this._lastSwitchClickMs = nowMs;
         this.init();
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(400, this.ctx.currentTime);
-        osc.frequency.setValueAtTime(300, this.ctx.currentTime + 0.05);
-        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
-        osc.connect(gain);
-        gain.connect(this.environmentMixer);
-        osc.start(this.ctx.currentTime);
-        osc.stop(this.ctx.currentTime + 0.1);
+        if (!this.ctx) return;
+        try {
+            const t = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(320, t);
+            osc.frequency.exponentialRampToValueAtTime(190, t + 0.045);
+            gain.gain.setValueAtTime(0.001, t);
+            gain.gain.linearRampToValueAtTime(0.14, t + 0.006);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
+            osc.connect(gain);
+            gain.connect(this.environmentMixer || this.ctx.destination);
+            osc.onended = () => {
+                try { osc.disconnect(); gain.disconnect(); } catch (e) { }
+            };
+            osc.start(t);
+            osc.stop(t + 0.06);
+        } catch (e) { }
     }
 
     // AKILLI KOKPİT AKUSTİK NAVİGASYON VE HEDEF BİP TONU
@@ -3305,8 +3335,16 @@ class AudioSystem {
     // --- PNÖMATİK (HAVALI FREN) SESLERİ ---
 
     playBrakeRelease() {
+        if (this.isMuted) return;
+        const nowMs = Date.now();
+        if (this._lastAirBrakeMs && (nowMs - this._lastAirBrakeMs < 420)) return;
+        this._lastAirBrakeMs = nowMs;
         if (this.sounds && this.sounds.airBrake) {
-            try { this.sounds.airBrake.play(); return; } catch (e) { }
+            try {
+                if (this.sounds.airBrake.playing()) this.sounds.airBrake.stop();
+                this.sounds.airBrake.play();
+                return;
+            } catch (e) { }
         }
         this.init();
         const bufferSize = this.ctx.sampleRate * 0.5; // 0.5 saniye
@@ -3419,17 +3457,27 @@ class AudioSystem {
     }
 
     playAirBrake() {
+        if (this.isMuted) return;
+        const nowMs = Date.now();
+        if (this._lastAirBrakeMs && (nowMs - this._lastAirBrakeMs < 420)) return;
+        this._lastAirBrakeMs = nowMs;
         if (this.sounds && this.sounds.airBrake) {
-            try { this.sounds.airBrake.play(); } catch (e) { }
+            try {
+                if (this.sounds.airBrake.playing()) this.sounds.airBrake.stop();
+                this.sounds.airBrake.play();
+            } catch (e) { }
         }
     }
 
     playHorn() {
+        if (this.isMuted) return;
         // Eğer seçili otobüs havalı korna kullanıyorsa (Travego, Tourismo, Setra, MAN, vb.)
         const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
         if (currentBus && currentBus.soundProfile && currentBus.soundProfile.hornSound === 'air') {
             if (this.sounds && this.sounds.airHorn) {
-                this.sounds.airHorn.play();
+                if (!this.sounds.airHorn.playing()) {
+                    this.sounds.airHorn.play();
+                }
                 return;
             }
         }
@@ -3555,11 +3603,58 @@ class AudioSystem {
     }
 
     playTurnTick(pan = 0) {
-        if (!this.sounds || !this.sounds.turnTick) return;
+        // 9 saniyelik freesound_turn_signal.mp3 şalter kaydının üst üste binip "tık tık tık" yapması tamamen iptal edildi!
+        // Viraj içinde yalnızca seyrek (en az 800ms arayla), yumuşak ve rahatsız etmeyen 35ms stereofonik yön nabzı verir.
+        if (this.isMuted) return;
+        const nowMs = Date.now();
+        if (this._lastTurnPulseMs && (nowMs - this._lastTurnPulseMs < 800)) return;
+        this._lastTurnPulseMs = nowMs;
+
         try {
-            const id = this.sounds.turnTick.play();
-            if (typeof this.sounds.turnTick.stereo === 'function' && typeof pan === 'number' && pan !== 0) {
-                this.sounds.turnTick.stereo(Math.max(-1, Math.min(1, pan)), id);
+            if (this.sounds && this.sounds.turnTick && this.sounds.turnTick.playing()) {
+                this.sounds.turnTick.stop();
+            }
+            this.init();
+            if (!this.ctx) return;
+            const t = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(pan >= 0 ? 460 : 390, t);
+
+            gain.gain.setValueAtTime(0.0001, t);
+            gain.gain.linearRampToValueAtTime(0.065, t + 0.010);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+
+            if (panner) {
+                panner.pan.setValueAtTime(Math.max(-1, Math.min(1, Number(pan) || 0)), t);
+                osc.connect(gain);
+                gain.connect(panner);
+                panner.connect(this.ctx.destination);
+            } else {
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+            }
+
+            osc.onended = () => {
+                try {
+                    osc.disconnect();
+                    gain.disconnect();
+                    if (panner) panner.disconnect();
+                } catch (e) { }
+            };
+
+            osc.start(t);
+            osc.stop(t + 0.05);
+        } catch (e) { }
+    }
+
+    stopTurnTick() {
+        try {
+            if (this.sounds && this.sounds.turnTick && this.sounds.turnTick.playing()) {
+                this.sounds.turnTick.stop();
             }
         } catch (e) { }
     }

@@ -8125,6 +8125,8 @@ window.TurkeyAdminData = {
   "Tekirdağ": {
     "plate": "59",
     "region": "Marmara",
+    "lat": 40.9833,
+    "lon": 27.5167,
     "districts": {
       "Süleymanpaşa": [
         "Hürriyet Mahallesi",
@@ -8176,6 +8178,14 @@ window.TurkeyAdminData = {
         "Sağlık Mahallesi",
         "Vakıflar Sanayi",
         "Misinli Beldesi"
+      ],
+      "Velimeşe": [
+        "Velimeşe Merkez Meydan",
+        "Velimeşe TOKİ Konutları",
+        "Velimeşe Tren İstasyonu",
+        "Velimeşe OSB Sanayi Bölgesi",
+        "Çetin Sokak & Dedebal Kavşağı",
+        "Mustafa Kemal Atatürk Stadyumu"
       ],
       "Saray": [
         "Ayaspaşa Mahallesi",

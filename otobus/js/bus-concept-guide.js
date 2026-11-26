@@ -1,7 +1,7 @@
 /* ========================================================================== 
 OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
 (BUS CONCEPT GUIDE & EDUCATIONAL ONBOARDING SYSTEM)
-- Hiç otobüs şoförlüğü tecrübesi olmayan herkes için her kavramı açıklar:
+- Hiç otobüs kaptanlığı tecrübesi olmayan herkes için her kavramı açıklar:
  * Ne işe yarar?
  * Neden var / Neden hayatidir?
  * Nasıl kullanılır?
@@ -38,9 +38,9 @@ OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
             title: "Mekanik Engelli Rampası & Interlock Güvenlik Kilidi",
             key: "U Tuşu (Aç / Kapat)",
             shortDesc: "Tekerlekli sandalyeli yolcuların kaldırımdan otobüse girmesini sağlayan ve açıkken aracı kilitleyen alüminyum rampa.",
-            whatIs: "Orta kapının zeminine gizlenmiş, menteşeli açılır-kapanır sağlam alüminyum bir köprüdür.",
+            whatIs: "Kapı eşiği zeminine gizlenmiş, menteşeli açılır-kapanır sağlam alüminyum bir erişim köprüsüdür.",
             whyExists: "Tekerlekli sandalyeli vatandaşların toplu taşımaya engelsiz ve güvenli şekilde erişebilmesi için uluslararası standarttır. En hayati özelliği 'Interlock Güvenlik Kilidi'dir: Rampa açıkken kaptan gaza bassa bile otobüs hareket edemez; yolcunun düşmesi kesin olarak engellenir.",
-            howToUse: "Durakta tekerlekli sandalyeli yolcu gördüğünüzde durun, orta kapıyı açın ve U tuşuna basarak rampayı açın. Yolcu bindikten sonra U tuşuna tekrar basarak rampayı kapatın ve seyre devam edin.",
+            howToUse: "Durakta tekerlekli sandalyeli yolcu gördüğünüzde tam durun, ön kapıyı (PageUp) açın ve U tuşuna basarak rampayı açın. Yolcu bindikten sonra U tuşuna tekrar basarak rampayı kapatın, kapıyı kapatıp seyre devam edin.",
             category: "erişilebilirlik"
         },
         {
@@ -98,7 +98,7 @@ OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
             title: "UKOME / TEKULAŞ Dispeçer Telsizi",
             key: "T Tuşu (Telsiz Dinle) | Shift + T (Hava & Saat)",
             shortDesc: "Belediye Ulaşım Koordinasyon Merkezi ile kaptan arasındaki canlı telsiz haberleşmesi.",
-            whatIs: "Otobüs filo takip merkezi ile sürücü arasındaki kurumsal analog/sayısal telsiz ağıdır.",
+            whatIs: "Otobüs filo takip merkezi ile kaptan arasındaki kurumsal analog/sayısal telsiz ağıdır.",
             whyExists: "Kaptana hatta oluşan kaza, yol yapımı, aşırı yolcu yoğunluğu veya sefer gecikmeleri hakkında anında bilgi vermek için kullanılır.",
             howToUse: "T tuşuna basarak telsiz mandal sesini açıp merkezin anonslarını dinleyebilirsiniz.",
             category: "haberleşme"
@@ -197,13 +197,20 @@ OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
                     }
                     break;
 
-                case "ac":
+                case "ac": {
+                    const isColdWeather = (typeof Game !== 'undefined') && (
+                        (typeof Game.temperature === 'number' && Game.temperature <= 16) ||
+                        (typeof Game.busTemperature === 'number' && Game.busTemperature < 20)
+                    );
                     if (isEngaged) {
-                        text = "Klima ve kabin havalandırması açıldı. Yolcu nefesinden camların buğulanmasını önler ve kabin havasını tazeler.";
+                        text = isColdWeather
+                            ? "Kalorifer ve kabin ısıtması açıldı. Soğuk havada kabini ideal 22 dereceye ısıtır ve camların buğulanmasını önler."
+                            : "Klima ve kabin havalandırması açıldı. Yolcu nefesinden camların buğulanmasını önler ve kabin havasını serinletir.";
                     } else {
-                        text = "Klima kapatıldı.";
+                        text = isColdWeather ? "Kalorifer ve kabin ısıtması kapatıldı." : "Klima kapatıldı.";
                     }
                     break;
+                }
 
                 case "wipers":
                     if (isEngaged) {
@@ -274,6 +281,9 @@ OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
                 if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
                     audio.speak("Kavramlar kılavuzu kapatıldı, kokpite dönüldü.");
                 }
+                if (typeof KeyboardNav !== 'undefined' && typeof KeyboardNav.initForScreen === 'function') {
+                    KeyboardNav.initForScreen();
+                }
             }
         },
 
@@ -291,7 +301,7 @@ OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
                         <button id="btn-concept-modal-close" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(239,68,68,0.2); border: 1.5px solid #ef4444; color: #ef4444; font-size: 1.1rem; cursor: pointer; border-radius: 6px;" aria-label="Kavramlar kılavuzunu kapat">✕ Kapat</button>
                     </div>
                     <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 16px; line-height: 1.5;">
-                        Hiç otobüs şoförlüğü tecrübesi olmayan herkes için otobüsteki her bir donanımın <strong>ne işe yaradığını, neden var olduğunu ve nasıl kullanılacağını</strong> sade bir dille anlatır.
+                        Hiç otobüs kaptanlığı tecrübesi olmayan herkes için otobüsteki her bir donanımın <strong>ne işe yaradığını, neden var olduğunu ve nasıl kullanılacağını</strong> sade bir dille anlatır.
                     </p>
 
                     <!-- Kategori Filtreleri -->
@@ -300,6 +310,7 @@ OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
                         <button class="modern-btn nav-item btn-concept-tab" data-filter="fren" style="padding: 8px 14px; background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid #475569; border-radius: 6px; cursor: pointer;">Frenler & Retarder</button>
                         <button class="modern-btn nav-item btn-concept-tab" data-filter="erişilebilirlik" style="padding: 8px 14px; background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid #475569; border-radius: 6px; cursor: pointer;">Rampa & Kneeling</button>
                         <button class="modern-btn nav-item btn-concept-tab" data-filter="güvenlik" style="padding: 8px 14px; background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid #475569; border-radius: 6px; cursor: pointer;">Kapı Kilidi & Motor</button>
+                        <button class="modern-btn nav-item btn-concept-tab" data-filter="trafik" style="padding: 8px 14px; background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid #475569; border-radius: 6px; cursor: pointer;">Zirve Saat & Telsiz</button>
                     </div>
 
                     <!-- Kavram Kartları Listesi -->
@@ -315,15 +326,16 @@ OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
             // Sekme filtreleri dinleyicisi
             document.querySelectorAll('.btn-concept-tab').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const filter = e.target.getAttribute('data-filter');
+                    const tabBtn = e.currentTarget;
+                    const filter = tabBtn.getAttribute('data-filter') || 'all';
                     document.querySelectorAll('.btn-concept-tab').forEach(b => {
                         b.style.background = 'rgba(255,255,255,0.08)';
                         b.style.color = '#cbd5e1';
                         b.style.border = '1px solid #475569';
                     });
-                    e.target.style.background = '#0284c7';
-                    e.target.style.color = '#fff';
-                    e.target.style.border = 'none';
+                    tabBtn.style.background = '#0284c7';
+                    tabBtn.style.color = '#fff';
+                    tabBtn.style.border = 'none';
                     this.renderConceptList(filter);
                 });
             });
@@ -344,12 +356,20 @@ OTOBÜS İÇİ KAVRAMLAR, BAŞUCU SÖZLÜĞÜ VE EĞİTİCİ KAPTAN REHBERİ
          * Kavram Listesini Ekrana Bas
          */
         renderConceptList: function (filter = 'all') {
+            this.activeFilter = filter;
             const container = document.getElementById('concept-cards-container');
             if (!container) return;
 
-            const filtered = (filter === 'all')
+            const categoryGroups = {
+                'fren': ['fren'],
+                'erişilebilirlik': ['erişilebilirlik', 'konfor'],
+                'güvenlik': ['güvenlik', 'motor'],
+                'trafik': ['trafik', 'haberleşme']
+            };
+            const allowedCats = categoryGroups[filter];
+            const filtered = (filter === 'all' || !allowedCats)
                 ? BUS_CONCEPTS
-                : BUS_CONCEPTS.filter(c => c.category === filter);
+                : BUS_CONCEPTS.filter(c => allowedCats.includes(c.category));
 
             container.innerHTML = filtered.map((c, idx) => `
                 <div class="glass-panel" style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 16px 20px;">

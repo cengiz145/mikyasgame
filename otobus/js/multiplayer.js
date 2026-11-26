@@ -7,8 +7,43 @@
 (function () {
     'use strict';
 
+    function escapeHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function normTr(str) {
+        return String(str ?? '')
+            .replace(/İ/g, 'i')
+            .replace(/I/g, 'ı')
+            .toLowerCase()
+            .trim();
+    }
+
+    function safeGetStorage(key) {
+        try {
+            if (typeof localStorage !== 'undefined' && localStorage) {
+                return localStorage.getItem(key);
+            }
+        } catch (e) {}
+        return null;
+    }
+
+    function safeSetStorage(key, val) {
+        try {
+            if (typeof localStorage !== 'undefined' && localStorage) {
+                localStorage.setItem(key, val);
+            }
+        } catch (e) {}
+    }
+
     const Multiplayer = {
         isOnline: false,
+        _initialized: false,
         driverId: null,
         profile: {
             name: "Kaptan",
@@ -23,33 +58,66 @@
         lastHornCooldown: 0,
         myRef: null,
 
+        refreshProfileFromState: function () {
+            if (typeof window !== 'undefined' && typeof window.getDriverPoliceIdentity === 'function') {
+                const id = window.getDriverPoliceIdentity();
+                if (id && id.driverName) this.profile.name = id.driverName;
+                if (id && id.plate) this.profile.plate = id.plate;
+            } else {
+                const savedUsername = (typeof Game !== 'undefined' && Game.username) ? Game.username : safeGetStorage('otobusUsername');
+                if (savedUsername && String(savedUsername).trim()) {
+                    this.profile.name = String(savedUsername).trim();
+                }
+                const savedPlate = safeGetStorage('otobusPlate');
+                if (savedPlate && String(savedPlate).trim()) {
+                    this.profile.plate = String(savedPlate).trim();
+                }
+            }
+            if (typeof CompanySystem !== 'undefined' && CompanySystem.data && CompanySystem.data.companyName) {
+                this.profile.company = CompanySystem.data.companyName;
+            } else {
+                const savedCompany = safeGetStorage('otobusCompany');
+                if (savedCompany && String(savedCompany).trim()) {
+                    this.profile.company = String(savedCompany).trim();
+                }
+            }
+        },
+
         init: function () {
+            if (this._initialized) return;
+            this._initialized = true;
             try {
                 // 1. Oyuncu Kimliği ve Profil Yükleme
-                this.driverId = localStorage.getItem('otobusDriverId');
+                this.driverId = safeGetStorage('otobusDriverId');
                 if (!this.driverId) {
-                    this.driverId = 'drv_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-                    localStorage.setItem('otobusDriverId', this.driverId);
+                    this.driverId = 'drv_' + Math.random().toString(36).slice(2, 11) + '_' + Date.now();
+                    safeSetStorage('otobusDriverId', this.driverId);
                 }
 
-                const savedUsername = localStorage.getItem('otobusUsername');
+                const savedUsername = safeGetStorage('otobusUsername');
                 if (savedUsername && savedUsername.trim()) {
                     this.profile.name = savedUsername.trim();
                 } else {
                     this.profile.name = "Kaptan " + (Math.floor(10 + Math.random() * 90));
                 }
 
-                const savedPlate = localStorage.getItem('otobusPlate');
+                const savedPlate = safeGetStorage('otobusPlate');
                 if (savedPlate && savedPlate.trim()) {
                     this.profile.plate = savedPlate.trim();
                 } else {
                     this.profile.plate = "59 TEK " + (Math.floor(100 + Math.random() * 900));
-                    localStorage.setItem('otobusPlate', this.profile.plate);
+                    safeSetStorage('otobusPlate', this.profile.plate);
                 }
 
-                const savedCompany = localStorage.getItem('otobusCompany');
+                const savedCompany = safeGetStorage('otobusCompany');
                 if (savedCompany && savedCompany.trim()) {
                     this.profile.company = savedCompany.trim();
+                }
+                this.refreshProfileFromState();
+
+                // Modal bileşenini her durumda (çevrimdışı da dahil) hazırla
+                if (typeof document !== 'undefined' && document.body) {
+                    this.injectModals();
                 }
 
                 // 2. Firebase Veritabanı Kontrolü
@@ -148,6 +216,7 @@
             if (!this.isOnline || !this.myRef) return;
 
             try {
+                this.refreshProfileFromState();
                 const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
                 const busName = currentBus ? currentBus.name : this.profile.bus;
                 const isDriving = typeof Game !== 'undefined' ? !!Game.isDriving : false;
@@ -182,7 +251,7 @@
 
                 // Yakınlık ve karşılaşma kontrollerini çalıştır
                 if (isDriving) {
-                    this.checkProximities(currentCity, activeRouteId, totalDist);
+                    this.checkProximities(currentCity, currentDistrict, activeRouteId, totalDist);
                 }
 
             } catch (e) {
@@ -191,17 +260,24 @@
         },
 
         // Yakındaki diğer gerçek oyuncuları kontrol et ve sesli ikaz ver
-        checkProximities: function (myCity, myRouteId, myDist) {
+        checkProximities: function (myCity, myDistrict, myRouteId, myDist) {
+            if (typeof myRouteId === 'number') {
+                // Geriye dönük 3 parametreli çağrı uyumluluğu: checkProximities(myCity, myRouteId, myDist)
+                myDist = myRouteId;
+                myRouteId = myDistrict;
+                myDistrict = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : '';
+            }
             const now = Date.now();
             Object.values(this.otherDrivers).forEach(driver => {
                 if (!driver || !driver.isDriving) return;
 
-                // Aynı şehirde veya aynı hatta mı?
-                const isSameCity = (driver.city && driver.city.toLowerCase() === myCity.toLowerCase());
-                const isSameRoute = (driver.routeId && driver.routeId === myRouteId);
+                const isSameRoute = !!(myRouteId && driver.routeId && driver.routeId === myRouteId);
+                const isSameCityAndDistrict = !myRouteId &&
+                    (driver.city && normTr(driver.city) === normTr(myCity)) &&
+                    (!myDistrict || !driver.district || normTr(driver.district) === normTr(myDistrict));
 
-                if (isSameCity || isSameRoute) {
-                    // İki otobüs arasındaki mesafe farkı (metre)
+                if (isSameRoute || isSameCityAndDistrict) {
+                    // İki otobüs arasındaki güzergâh mesafe farkı (metre)
                     const distDiff = Math.abs((driver.totalDist || 0) - myDist);
 
                     // 1200 metre altına girdiyse ve son 60 saniyede duyurulmadıysa
@@ -210,14 +286,14 @@
                         if (now - lastAnnounce > 60000) {
                             this.proximityAnnounceCooldown[driver.id] = now;
 
-                            const dirText = (driver.totalDist > myDist) ? "ilerinizde karşı şeritten geliyor" : "arkanızda konvoy takip mesafesinde";
+                            const dirText = (driver.totalDist > myDist) ? "ilerinizde aynı güzergâhta seyrediyor" : "arkanızda konvoy takip mesafesinde";
                             const msg = `Dikkat Kaptan: ${driver.name || 'Kaptan'} (${driver.plate || 'Plakasız'}), yaklaşık ${Math.round(distDiff)} metre ${dirText}!`;
 
                             if (typeof audio !== 'undefined' && audio.speak) {
                                 audio.speak(msg);
                             }
                             if (typeof UI !== 'undefined' && UI.showToast) {
-                                UI.showToast(`🚌 Kaptan ${driver.name} yaklaşıyor! (${Math.round(distDiff)} m)`, "info");
+                                UI.showToast(`🚌 Kaptan ${driver.name || 'Kaptan'} yaklaşıyor! (${Math.round(distDiff)} m)`, "info");
                             }
                         }
                     }
@@ -293,6 +369,7 @@
         // Uzaktan gelen kornayı 3D stereo olarak çal
         play3DRemoteHorn: function (pan, vol) {
             try {
+                if (typeof audio !== 'undefined' && audio.isMuted) return;
                 if (typeof audio !== 'undefined' && audio.ctx) {
                     const ctx = audio.ctx;
                     if (ctx.state === 'suspended') ctx.resume();
@@ -310,9 +387,10 @@
                     gainNode.gain.linearRampToValueAtTime(vol * 0.45, ctx.currentTime + 0.08);
                     gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.85);
 
+                    let panner = null;
                     // Panner (Stereo Konumlandırma)
                     if (ctx.createStereoPanner) {
-                        const panner = ctx.createStereoPanner();
+                        panner = ctx.createStereoPanner();
                         panner.pan.setValueAtTime(pan, ctx.currentTime);
                         osc1.connect(gainNode);
                         osc2.connect(gainNode);
@@ -323,6 +401,15 @@
                         osc2.connect(gainNode);
                         gainNode.connect(ctx.destination);
                     }
+
+                    osc1.onended = () => {
+                        try {
+                            osc1.disconnect();
+                            osc2.disconnect();
+                            gainNode.disconnect();
+                            if (panner) panner.disconnect();
+                        } catch (e) {}
+                    };
 
                     osc1.start(ctx.currentTime);
                     osc2.start(ctx.currentTime);
@@ -338,7 +425,7 @@
             } catch (err) {}
         },
 
-                _lastRadioSendTime: 0,
+        _lastRadioSendTime: 0,
         // Telsiz Mesajı Gönder (Kanal 19 - Hibrit Canlı & Çevrimdışı)
         sendRadioMessage: function (text) {
             if (!text || !text.trim()) return;
@@ -348,6 +435,7 @@
                 return;
             }
             this._lastRadioSendTime = now;
+            this.refreshProfileFromState();
             const cleanText = text.replace(/[<>{}`]/g, '').trim().substring(0, 100);
 
             this.playRadioChirp();
@@ -551,6 +639,7 @@
         // Telsiz Cızırtı ve Bip Sesi (CB Squelch Beep & Roger Beep)
         playRadioChirp: function () {
             try {
+                if (typeof audio !== 'undefined' && audio.isMuted) return;
                 if (typeof audio !== 'undefined' && typeof audio.playRadioSquelch === 'function') {
                     audio.playRadioSquelch(false);
                     return;
@@ -571,6 +660,9 @@
 
                     osc.connect(gain);
                     gain.connect(ctx.destination);
+                    osc.onended = () => {
+                        try { osc.disconnect(); gain.disconnect(); } catch (e) {}
+                    };
 
                     osc.start(ctx.currentTime);
                     osc.stop(ctx.currentTime + 0.15);
@@ -617,9 +709,61 @@
             }
         },
 
+        _radarEventsBound: false,
+
+        _bindRadarEvents: function () {
+            if (this._radarEventsBound) return;
+            const modal = document.getElementById('multiplayer-radar-modal');
+            if (!modal) return;
+            this._radarEventsBound = true;
+
+            const btnClose = document.getElementById('btn-close-mp-radar');
+            if (btnClose) {
+                btnClose.addEventListener('click', () => {
+                    this.closeRadarModal();
+                });
+            }
+
+            document.querySelectorAll('.mp-radio-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const msg = e.currentTarget.getAttribute('data-msg');
+                    this.sendRadioMessage(msg);
+                });
+            });
+
+            const customInput = document.getElementById('mp-custom-radio-input');
+            const btnSendCustom = document.getElementById('btn-send-mp-custom-radio');
+            const doSend = () => {
+                if (customInput && customInput.value.trim()) {
+                    this.sendRadioMessage(customInput.value.trim());
+                    customInput.value = '';
+                }
+            };
+            if (btnSendCustom) btnSendCustom.addEventListener('click', doSend);
+            if (customInput) {
+                customInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') doSend();
+                });
+            }
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const m = document.getElementById('multiplayer-radar-modal');
+                    if (m && !m.classList.contains('hidden')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.closeRadarModal();
+                    }
+                }
+            });
+        },
+
         // Radar ve Telsiz Modallarını Oluştur
         injectModals: function () {
-            if (document.getElementById('multiplayer-radar-modal')) return;
+            if (document.getElementById('multiplayer-radar-modal')) {
+                this._bindRadarEvents();
+                return;
+            }
 
             const modalHtml = `
             <div id="multiplayer-radar-modal" class="modal-overlay modal hidden" role="dialog" aria-modal="true" aria-labelledby="mp-radar-title" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.88); z-index: 8700; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
@@ -630,7 +774,7 @@
                                 📡 Canlı Kaptan Radarı & Telsiz (Kanal 19)
                             </h2>
                             <p style="color: #cbd5e1; font-size: 0.9rem; margin: 4px 0 0 0;">
-                                Türkiye yollarında aktif olan diğer gerçek otobüs şoförleri ve telsiz kanalı.
+                                Türkiye yollarında aktif olan diğer gerçek otobüs kaptanları ve telsiz kanalı.
                             </p>
                         </div>
                         <button id="btn-close-mp-radar" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-weight: bold; cursor: pointer;" aria-label="Radarı Kapat (Esc)">✕ Kapat</button>
@@ -640,7 +784,7 @@
                     <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
                         <div style="color: #6ee7b7; font-weight: bold; font-size: 0.95rem; margin-bottom: 4px;">👤 SİZİN KAPTAN BİLGİNİZ:</div>
                         <div id="mp-my-profile-desc" style="color: #fff; font-size: 1.05rem;">
-                            <strong>${this.profile.name || 'Kaptan'}</strong> (${this.profile.plate || '59 TK 001'}) - ${this.profile.company || 'Tekirdağ Birlik'}
+                            <strong>${escapeHtml(this.profile.name || 'Kaptan')}</strong> (${escapeHtml(this.profile.plate || '59 TK 001')}) - ${escapeHtml(this.profile.company || 'Tekirdağ Birlik')}
                         </div>
                     </div>
 
@@ -667,7 +811,7 @@
 
                     <!-- Özel Telsiz Mesajı Girişi -->
                     <div style="display: flex; gap: 8px; margin-bottom: 18px;">
-                        <input type="text" id="mp-custom-radio-input" placeholder="Telsizden bir şey söyleyin..." style="flex: 1; padding: 10px 14px; border-radius: 8px; border: 1px solid #334155; background: rgba(15,23,42,0.8); color: #fff; font-size: 0.95rem;">
+                        <input type="text" id="mp-custom-radio-input" aria-label="Özel telsiz mesajı yazın" placeholder="Telsizden bir şey söyleyin..." style="flex: 1; padding: 10px 14px; border-radius: 8px; border: 1px solid #334155; background: rgba(15,23,42,0.8); color: #fff; font-size: 0.95rem;">
                         <button id="btn-send-mp-custom-radio" class="modern-btn nav-item" style="padding: 10px 18px; background: #059669; border: 1px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">🎙️ Anons Et</button>
                     </div>
 
@@ -683,33 +827,7 @@
             `;
 
             document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-            // Modal Kapatma
-            document.getElementById('btn-close-mp-radar').addEventListener('click', () => {
-                this.closeRadarModal();
-            });
-
-            // Hızlı Butonlar
-            document.querySelectorAll('.mp-radio-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const msg = e.currentTarget.getAttribute('data-msg');
-                    this.sendRadioMessage(msg);
-                });
-            });
-
-            // Özel Mesaj Gönderme
-            const customInput = document.getElementById('mp-custom-radio-input');
-            const btnSendCustom = document.getElementById('btn-send-mp-custom-radio');
-            const doSend = () => {
-                if (customInput && customInput.value.trim()) {
-                    this.sendRadioMessage(customInput.value.trim());
-                    customInput.value = '';
-                }
-            };
-            btnSendCustom.addEventListener('click', doSend);
-            customInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') doSend();
-            });
+            this._bindRadarEvents();
         },
 
         // Radar Modalını Aç ve Listeyi Doldur
@@ -718,12 +836,13 @@
             const modal = document.getElementById('multiplayer-radar-modal');
             if (!modal) return;
 
+            this.refreshProfileFromState();
             // Kendi profil açıklamasını tazele
             const profEl = document.getElementById('mp-my-profile-desc');
             if (profEl) {
                 const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
                 const busName = currentBus ? currentBus.name : (this.profile.bus || 'Standart Otobüs');
-                profEl.innerHTML = `<strong>${this.profile.name || 'Kaptan'}</strong> (${this.profile.plate || '59 TK 001'}) - ${this.profile.company || 'Tekirdağ Birlik'} <br><small style="color: #94a3b8;">Araç: ${busName}</small>`;
+                profEl.innerHTML = `<strong>${escapeHtml(this.profile.name || 'Kaptan')}</strong> (${escapeHtml(this.profile.plate || '59 TK 001')}) - ${escapeHtml(this.profile.company || 'Tekirdağ Birlik')} <br><small style="color: #94a3b8;">Araç: ${escapeHtml(busName)}</small>`;
             }
 
             const listEl = document.getElementById('mp-drivers-list');
@@ -738,22 +857,27 @@
                 </li>`;
             } else {
                 others.forEach(d => {
-                    const statusText = d.isDriving ? `🛣️ Sürüşte (${d.speed || 0} km/s)` : `🅿️ Park / Mola Halinde`;
-                    const cityText = d.city ? `${d.city}` : "Bilinmiyor";
-                    const routeText = d.routeName ? `Hat: ${d.routeName}` : "";
+                    const spdNum = Number(d.speed) || 0;
+                    const statusText = d.isDriving ? `🛣️ Sürüşte (${spdNum} km/s)` : `🅿️ Park / Mola Halinde`;
+                    const cityText = escapeHtml(d.city ? `${d.city}` : "Bilinmiyor");
+                    const routeText = d.routeName ? `Hat: ${escapeHtml(d.routeName)}` : "";
+                    const safeName = escapeHtml(d.name || 'Kaptan');
+                    const safePlate = escapeHtml(d.plate || 'Plakasız');
+                    const safeComp = escapeHtml(d.company || 'Serbest Kaptan');
+                    const safeBus = escapeHtml(d.bus || 'Otobüs');
 
                     const li = document.createElement('li');
                     li.style.cssText = "padding: 12px 14px; margin-bottom: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;";
                     li.innerHTML = `
                     <div>
                         <div style="color: #38bdf8; font-weight: bold; font-size: 1.05rem;">
-                            🚌 ${d.name} <span style="font-size: 0.85rem; color: #cbd5e1;">(${d.plate || 'Plakasız'})</span>
+                            🚌 ${safeName} <span style="font-size: 0.85rem; color: #cbd5e1;">(${safePlate})</span>
                         </div>
                         <div style="color: #e2e8f0; font-size: 0.9rem; margin-top: 2px;">
                             📍 <strong>${cityText}</strong> ${routeText ? '— ' + routeText : ''}
                         </div>
                         <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 2px;">
-                            Firma: ${d.company || 'Serbest Kaptan'} | Araç: ${d.bus || 'Otobüs'}
+                            Firma: ${safeComp} | Araç: ${safeBus}
                         </div>
                     </div>
                     <div style="text-align: right;">
@@ -786,13 +910,16 @@
     };
 
     // Global nesneye bağla
-    window.Multiplayer = Multiplayer;
+    const gObj = typeof window !== 'undefined' ? window : globalThis;
+    gObj.Multiplayer = Multiplayer;
 
     // DOM yüklendiğinde başlat
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => Multiplayer.init());
-    } else {
-        Multiplayer.init();
+    if (typeof document !== 'undefined') {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => Multiplayer.init());
+        } else {
+            Multiplayer.init();
+        }
     }
 
 })();

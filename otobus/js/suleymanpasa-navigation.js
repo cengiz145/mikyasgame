@@ -1237,9 +1237,27 @@ const SuleymanpasaNavigasyon = {
     // Dünyanın ortalama yarıçapı (IUGG WGS-84 R1 standardı - km)
     R_DUNYA: 6371.0088,
 
+    get sokaklar() {
+        return (this.veritabani && Array.isArray(this.veritabani.sokaklar)) ? this.veritabani.sokaklar : [];
+    },
+
+    _otherLocationTokens: [
+        'corlu', 'cerkezkoy', 'kapakli', 'malkara', 'muratli', 'hayrabolu',
+        'sarkoy', 'marmaraereglisi', 'ergene', 'velimese', 'saray', 'buyukyoncali',
+        'istanbul', 'edirne', 'kirklareli', 'canakkale', 'ankara', 'izmir',
+        'bursa', 'antalya', 'adana', 'konya', 'trabzon', 'samsun', 'eskisehir',
+        'taksim', 'esenler', 'asti', 'konak', 'ulus', 'kizilay'
+    ],
+
+    _genericStopWords: new Set([
+        'cadde', 'caddesi', 'cd', 'sokak', 'sokagi', 'sk', 'bulvar', 'bulvari', 'blv',
+        'mahalle', 'mahallesi', 'park', 'parki', 'meydan', 'meydani',
+        'carsi', 'carsisi', 'yolu', 'durak', 'duragi', 'merkez', 'merkezi', 'ana', 'giris', 'girisi'
+    ]),
+
     normalizeText: function(text) {
-        if (!text) return '';
-        return text
+        if (text === null || text === undefined) return '';
+        return String(text)
             .replace(/İ/g, 'i')
             .replace(/I/g, 'i')
             .replace(/ı/g, 'i')
@@ -1252,6 +1270,11 @@ const SuleymanpasaNavigasyon = {
             .replace(/[^a-z0-9]/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
+    },
+
+    stemWord: function(w) {
+        if (!w || w.length < 5) return w;
+        return w.replace(/(lari|leri|sini|sine|sinda|ndan|nden|nin|nun|dan|den|si|su|yi|yu|i|u)$/, '');
     },
 
     /**
@@ -1311,47 +1334,90 @@ const SuleymanpasaNavigasyon = {
         const qNorm = this.normalizeText(query);
         if (qNorm.length === 0) return null;
 
+        // Başka bir ilçe veya şehir açıkça yazılmışsa ("Çorlu Otogar", "Saray Devlet Hastanesi", "İstanbul Otogarı" vb.) Süleymanpaşa'ya kaçırma!
+        if (!qNorm.includes('suleymanpasa')) {
+            const qTokens = qNorm.split(' ');
+            for (let i = 0; i < this._otherLocationTokens.length; i++) {
+                const locTok = this._otherLocationTokens[i];
+                if (locTok === 'muratli' && qNorm.includes('muratli caddesi')) continue; // Süleymanpaşa içindeki "Muratlı Caddesi" istisnası!
+                if (qTokens.includes(locTok) || (locTok.length >= 6 && qNorm.includes(locTok))) {
+                    return null;
+                }
+            }
+        }
+
         const havuz = this.veritabani.sokaklar.filter(s => {
             if (!mahalleFiltre || mahalleFiltre === 'TÜMÜ') return true;
             return s.mahalle === mahalleFiltre;
         });
 
-        // 1. Tam eşleşme
-        let match = havuz.find(s => this.normalizeText(s.name) === qNorm);
+        // ID veya tam isim eşleşmesi
+        const byId = havuz.find(s => s.id === query || this.normalizeText(s.id) === qNorm);
+        if (byId) return byId;
+
+        let match = havuz.find(s => this.normalizeText(s.name) === qNorm) ||
+                    havuz.find(s => this.normalizeText(s.name + ' ' + (s.mahalle || '')) === qNorm);
         if (match) return match;
 
-        // 2. Popüler takma adlar
+        if (qNorm === "meydan" || qNorm === "carsi") {
+            return havuz.find(s => s.name.includes("Köprübaşı Meydanı") || s.name.includes("Hükümet Caddesi")) || null;
+        }
+        if (qNorm.includes("spor salon") || qNorm.includes("ataturk spor") || qNorm.includes("stadyum")) {
+            return havuz.find(s => s.id === "spasa_sokak_66" || s.name.includes("Atatürk Bulvarı")) || null;
+        }
+
+        const qWords = qNorm.split(' ').filter(w => w.length > 1);
+        const significantWords = qWords.filter(w => !this._genericStopWords.has(w));
+        if (significantWords.length === 0) return null;
+
+        const wordMatchesTarget = (w, targetNorm) => {
+            if (targetNorm.includes(w)) return true;
+            const stem = this.stemWord(w);
+            return Boolean(stem && stem.length >= 4 && targetNorm.includes(stem));
+        };
+
+        // 2. Önce tüm kelimelerin (özel hastane/otogar/meydan ayrımları dahil: "Eski Otogar", "Tıp Fakültesi Hastanesi", "Diş Hastanesi", "İskele Meydanı") birebir eşleşmesi!
+        match = havuz.find(s => {
+            const sNorm = this.normalizeText(s.name + ' ' + (s.mahalle || ''));
+            return qWords.every(w => wordMatchesTarget(w, sNorm));
+        }) || havuz.find(s => {
+            const sNorm = this.normalizeText(s.name + ' ' + (s.mahalle || ''));
+            return significantWords.every(w => wordMatchesTarget(w, sNorm));
+        });
+        if (match) return match;
+
+        // 3. Popüler Süleymanpaşa takma adları (spesifik aramalardan SONRA çalışır, böylece "Eski Otogar" veya "Tıp Fakültesi" ezilmez!)
         if (qNorm.includes("kampus") || qNorm.includes("universite") || qNorm.includes("nku")) {
             match = havuz.find(s => s.name.includes("Kampüs") || s.name.includes("Üniversite"));
             if (match) return match;
         }
-        if (qNorm.includes("hastane") || qNorm.includes("sehir hastanesi")) {
-            match = havuz.find(s => s.name.includes("Şehir Hastanesi"));
+        if (qNorm.includes("sehir hastane") || qNorm === "hastane" || qNorm === "hastanesi") {
+            match = havuz.find(s => s.name.includes("Tekirdağ Şehir Hastanesi"));
             if (match) return match;
         }
         if (qNorm.includes("otogar") || qNorm.includes("terminal")) {
             match = havuz.find(s => s.name.includes("Yeni Otobüs Terminali") || s.name.includes("Terminal Yolu"));
             if (match) return match;
         }
-        if (qNorm.includes("meydan") || qNorm.includes("valilik")) {
-            match = havuz.find(s => s.name.includes("Valiliği") || s.name.includes("Meydanı"));
+        if (qNorm.includes("valilik") || qNorm.includes("hukumet")) {
+            match = havuz.find(s => s.name.includes("Valiliği") || s.name.includes("Hükümet Caddesi"));
             if (match) return match;
         }
-        if (qNorm.includes("kordon") || qNorm.includes("sahil")) {
+        if (qNorm === "meydan" || qNorm === "carsi" || qNorm.includes("cumhuriyet meydan") || qNorm.includes("koprubasi")) {
+            match = havuz.find(s => s.name.includes("Köprübaşı Meydanı") || s.name.includes("Hükümet Caddesi"));
+            if (match) return match;
+        }
+        if (qNorm.includes("kordon") || qNorm === "sahil") {
             match = havuz.find(s => s.name.includes("Kordon") || s.name.includes("Sahil Boyu"));
             if (match) return match;
         }
 
-        // 3. Kelime alt dize eşleşmesi
-        const qWords = qNorm.split(' ').filter(w => w.length > 1);
-        match = havuz.find(s => {
-            const sNorm = this.normalizeText(s.name);
-            return qWords.every(w => sNorm.includes(w));
-        });
-        if (match) return match;
-
-        // 4. İçerme
-        return havuz.find(s => this.normalizeText(s.name).includes(qNorm)) || null;
+        // 4. Güvenli kısmi içerme (en az 4 harfli anlamlı sorgularda)
+        const cleanSignificant = significantWords.join(' ');
+        if (cleanSignificant.length >= 4) {
+            return havuz.find(s => this.normalizeText(s.name).includes(cleanSignificant)) || null;
+        }
+        return null;
     },
 
     getMahalleler: function() {
@@ -1364,38 +1430,37 @@ const SuleymanpasaNavigasyon = {
     },
 
     /**
-     * Ara sokakları coğrafi vektör ve minimum sapma formülüyle seçer
-     */
-    /**
-     * Vektörel Projeksiyon Formülü ile Gerçekçi İlerleyen Ara Durak Seçimi:
-     * P noktasının A->B doğrusu üzerindeki t ilerleme parametresi (0 < t < 1)
-     * ve d_perp (doğruya olan dikey sapma) hesaplanır.
+     * Vektörel Projeksiyon Formülü ile Gerçekçi İlerleyen ve Dengeli Dağılan Ara Durak Seçimi:
+     * Enlem kosinüs düzeltmeli (cos(lat)) gerçek metrik projeksiyon + güzergâh dilimleme (yığılmayı önler).
      */
     araDuraklariSec: function(startSokak, endSokak, totalKm) {
-        const stopCount = Math.max(1, Math.min(5, Math.round(totalKm / 1.5)));
-        const dx = endSokak.lon - startSokak.lon;
+        const stopCount = Math.max(1, Math.min(5, Math.round(totalKm / 1.3)));
+        const midLatRad = ((startSokak.lat + endSokak.lat) / 2) * Math.PI / 180;
+        const cosLat = Math.cos(midLatRad);
+
+        const dx = (endSokak.lon - startSokak.lon) * cosLat;
         const dy = endSokak.lat - startSokak.lat;
         const lineLenSq = dx * dx + dy * dy;
 
-        if (lineLenSq === 0) return [];
+        if (lineLenSq < 1e-10) return [];
 
         const candidatesWithT = [];
         this.veritabani.sokaklar.forEach(s => {
             if (s.id === startSokak.id || s.id === endSokak.id) return;
-            // Projeksiyon faktörü t = ((P - A) . (B - A)) / |B - A|^2
-            const px = s.lon - startSokak.lon;
+            const px = (s.lon - startSokak.lon) * cosLat;
             const py = s.lat - startSokak.lat;
             const t = (px * dx + py * dy) / lineLenSq;
 
             // Sadece A ile B arasında olan noktalar (0.10 ile 0.90 arası)
             if (t > 0.10 && t < 0.90) {
-                // Doğruya olan dik mesafe sapması
-                const projX = startSokak.lon + t * dx;
-                const projY = startSokak.lat + t * dy;
-                const dPerpKm = this.hesaplaKusUcusuKm(s.lat, s.lon, projY, projX);
+                const projLon = startSokak.lon + t * (endSokak.lon - startSokak.lon);
+                const projLat = startSokak.lat + t * (endSokak.lat - startSokak.lat);
+                const dPerpKm = this.hesaplaKusUcusuKm(s.lat, s.lon, projLat, projLon);
 
-                // Ana arter veya cadde ise öncelik tanı
-                const isCadde = (s.cat && s.cat.includes("Cadde")) || (s.cat && s.cat.includes("Bulvar"));
+                // Koridordan çok uzak sapan sokakları ele
+                if (dPerpKm > Math.max(0.9, totalKm * 0.35)) return;
+
+                const isCadde = Boolean(s.cat && (s.cat.includes("Cadde") || s.cat.includes("Bulvar") || s.cat.includes("Arter")));
                 const adjustedPerp = isCadde ? dPerpKm * 0.7 : dPerpKm;
 
                 candidatesWithT.push({
@@ -1406,13 +1471,38 @@ const SuleymanpasaNavigasyon = {
             }
         });
 
-        // Minimum dikey sapmaya göre en uygunları seç
-        candidatesWithT.sort((a, b) => a.dPerp - b.dPerp);
-        const selected = candidatesWithT.slice(0, stopCount);
+        if (candidatesWithT.length === 0) return [];
 
-        // Seçilen durakları güzergâh boyunca t parametresine göre baştan sona sırala (ASLA GERİ DÖNÜŞ YOK)
+        // Güzergâhı stopCount adet eşit ilerleme dilimine bölüp her dilimde koridora en yakın ve bir önceki durağa >=180m mesafedeki durağı seç!
+        const selected = [];
+        for (let k = 0; k < stopCount; k++) {
+            const sliceMin = 0.10 + (0.80 * k) / stopCount;
+            const sliceMax = 0.10 + (0.80 * (k + 1)) / stopCount;
+            const sliceMid = (sliceMin + sliceMax) / 2;
+
+            let pool = candidatesWithT.filter(c => c.t >= sliceMin && c.t <= sliceMax);
+            if (pool.length === 0) pool = candidatesWithT;
+
+            let best = null;
+            let bestCost = Infinity;
+            for (let i = 0; i < pool.length; i++) {
+                const item = pool[i];
+                if (selected.some(sel => sel.sokak.id === item.sokak.id)) continue;
+                const prevT = selected.length > 0 ? selected[selected.length - 1].t : 0;
+                if (item.t <= prevT + 0.03) continue;
+                const prevStop = selected.length > 0 ? selected[selected.length - 1].sokak : startSokak;
+                if (this.hesaplaKusUcusuKm(prevStop.lat, prevStop.lon, item.sokak.lat, item.sokak.lon) < 0.18) continue;
+
+                const cost = item.dPerp + Math.abs(item.t - sliceMid) * 0.6;
+                if (cost < bestCost) {
+                    bestCost = cost;
+                    best = item;
+                }
+            }
+            if (best) selected.push(best);
+        }
+
         selected.sort((a, b) => a.t - b.t);
-
         return selected.map(item => item.sokak);
     },
 
@@ -1439,13 +1529,20 @@ const SuleymanpasaNavigasyon = {
             const nextStop = isLast ? null : stopSequence[i + 1];
             const segDist = nextStop ? this.hesaplaGercekYolKm(current, nextStop) : 0;
 
+            const catText = ((current.cat || '') + ' ' + (current.name || '')).toLowerCase();
+            const yolcuTipi = (catText.includes('kampüs') || catText.includes('üniversite') || catText.includes('öğrenci') || catText.includes('yurt') || catText.includes('okul') || catText.includes('eğitim'))
+                ? "Öğrenci"
+                : ((catText.includes('sağlık') || catText.includes('hastane') || catText.includes('acil') || catText.includes('huzurevi')) ? "Yaşlı" : "Sivil");
+
             routeStops.push({
-                name: current.name + (current.mahalle ? " (" + current.mahalle + ")" : ""),
+                name: current.name,
                 anons: isFirst 
-                    ? current.mahalle + ", " + current.name + " durağındayız. Süleymanpaşa şehir içi seferi başlıyor."
-                    : (isLast ? "Son durak: " + current.mahalle + ", " + current.name + ". Seferimiz tamamlanmıştır." : "Sonraki durak: " + current.name + "."),
+                    ? (current.mahalle ? current.mahalle + ", " : "") + current.name + " durağındayız. Süleymanpaşa şehir içi seferi başlıyor."
+                    : (isLast ? "Son durak: " + (current.mahalle ? current.mahalle + ", " : "") + current.name + ". Seferimiz tamamlanmıştır." : "Sonraki durak: " + current.name + "."),
                 bekleyenYolcu: isFirst ? 18 : (isLast ? 0 : (((i * 3 + 4) % 6) + 2)),
                 inenYolcu: isFirst ? 0 : (isLast ? 18 : (((i * 2 + 3) % 4) + 1)),
+                yolcuTipi: yolcuTipi,
+                garajMesafeKm: isFirst ? 0.85 : undefined,
                 gercekMesafeSonraki: segDist,
                 lat: current.lat,
                 lon: current.lon,
@@ -1466,6 +1563,7 @@ const SuleymanpasaNavigasyon = {
             name: "Süleymanpaşa: " + kalkis.name + " ➔ " + varis.name,
             rawName: "Süleymanpaşa İçi (" + (kalkis.mahalle || 'Merkez') + " - " + (varis.mahalle || 'Merkez') + ")",
             district: "Süleymanpaşa",
+            ilce: "Süleymanpaşa",
             originDistrict: "Süleymanpaşa",
             destDistrict: "Süleymanpaşa",
             isDistrict: false,
@@ -1477,6 +1575,7 @@ const SuleymanpasaNavigasyon = {
             endStop: varis.name,
             intermediateStops: routeStops.slice(1, -1).map(s => s.name),
             totalKm: finalKm,
+            totalDistanceKm: finalKm,
             seferSuresiDk: seferDk,
             biletFiyat: biletTL,
             biletFiyatMultiplier: 1.0,
@@ -1491,6 +1590,14 @@ const SuleymanpasaNavigasyon = {
 
         if (typeof routesData !== 'undefined') {
             routesData[routeId] = route;
+        }
+        if (typeof sehirRotalari !== 'undefined' && sehirRotalari["Tekirdağ"]) {
+            if (!Array.isArray(sehirRotalari["Tekirdağ"].routes)) {
+                sehirRotalari["Tekirdağ"].routes = [];
+            }
+            if (!sehirRotalari["Tekirdağ"].routes.includes(routeId)) {
+                sehirRotalari["Tekirdağ"].routes.push(routeId);
+            }
         }
 
         return {
@@ -1514,8 +1621,19 @@ const SuleymanpasaNavigasyon = {
         }
 
         if (typeof Game !== 'undefined' && typeof Game.startRoute === 'function') {
+            const prevCity = Game.currentCity;
+            const prevDistrict = Game.activeDistrict;
+            const prevLocked = Game.isSuleymanpasaLocked;
+            Game.currentCity = "Tekirdağ";
+            Game.activeDistrict = "Süleymanpaşa";
             Game.isSuleymanpasaLocked = true;
-            Game.startRoute(res.route.id);
+            const started = Game.startRoute(res.route.id);
+            if (started === false) {
+                Game.currentCity = prevCity;
+                Game.activeDistrict = prevDistrict;
+                Game.isSuleymanpasaLocked = prevLocked;
+                return false;
+            }
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast("🏙️ Süleymanpaşa Seferi: " + (res.kalkis ? res.kalkis.name : 'Kalkış') + " ➔ " + (res.varis ? res.varis.name : 'Varış') + " (" + (res.totalKm || 0) + " KM)", "info");
             }

@@ -38,7 +38,7 @@
                 desc: "Türkiye'nin en ünlü dağ tesisi. Karlı ve sisli gecelerde sıcak mercimek çorbası ve fındık helvasıyla kaptanların sığınağı.",
                 specialties: [
                     { id: "bolu_corba", name: "Bolu Dağı Sıcak Mercimek Çorbası", price: 65, effectDesc: "Uykuyu dağıtır, dikkati ve enerjiyi zirveye taşır (+40 Enerji)" },
-                    { id: "bolu_kofte", name: "Bolu Dağı Islama Köftesi", price: 145, effectDesc: "Şoförün karnını doyurur, sürüş odaklanması %100" },
+                    { id: "bolu_kofte", name: "Bolu Mengen Aşçı Kebabı & Izgara Köfte", price: 145, effectDesc: "Kaptanın karnını doyurur, sürüş odaklanması %100" },
                     { id: "bolu_helva", name: "Fındıklı Bolu Dağı Helvası", price: 55, effectDesc: "Geleneksel tatlı molası, moral artırır" }
                 ]
             },
@@ -250,6 +250,7 @@
 
         loadData: function () {
             try {
+                if (typeof localStorage === 'undefined') return;
                 const raw = localStorage.getItem(this.STORAGE_KEY);
                 if (raw) {
                     const parsed = JSON.parse(raw);
@@ -262,6 +263,7 @@
 
         saveData: function () {
             try {
+                if (typeof localStorage === 'undefined') return;
                 localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.data));
             } catch (e) {
                 console.warn("[HighwayFacilities] Veri kaydetme hatası:", e);

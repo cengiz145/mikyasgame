@@ -524,11 +524,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (descEl) descEl.innerText = `${distName} ilçesine ait mahalleler listeleniyor. Serbest seferinizi başlatmak istediğiniz mahalleyi seçin.`;
             if (searchInp) searchInp.placeholder = `🔍 Mahalle ara (örn: Merkez, Cumhuriyet, Atatürk)... `;
 
-            // TEKİRDAĞ GERÇEK BELEDİYE HATLARI (GTFS VERİTABANI)
+            // TEKİRDAĞ GERÇEK BELEDİYE HATLARI (GTFS VERİTABANI - Bozuk İLK DURAK şablonları hariç, Türkçe İ/I duyarlı)
+            const normTrApp = s => String(s || '').replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase().trim();
+            const isValidTekulas = r => r && Array.isArray(r.stops) && r.stops.length >= 2 && !/^(İLK DURAK|ILK DURAK|SON DURAK|1\.\s*DURAK)$/i.test(String(r.startStop || (r.stops[0] && r.stops[0].name) || '').trim());
             let tekulasLines = [];
             if (cityName === 'Tekirdağ' && typeof window !== 'undefined' && window.tekulasHatVeritabani) {
-                tekulasLines = window.tekulasHatVeritabani.filter(r => 
-                    r && (r.district === distName || r.originDistrict === distName || r.destDistrict === distName || (r.name && r.name.toLowerCase().includes(distName.toLowerCase())))
+                const dLow = normTrApp(distName);
+                tekulasLines = window.tekulasHatVeritabani.filter(r =>
+                    isValidTekulas(r) && (
+                        normTrApp(r.district) === dLow ||
+                        normTrApp(r.originDistrict) === dLow ||
+                        normTrApp(r.destDistrict) === dLow ||
+                        normTrApp(r.name).includes(dLow)
+                    )
                 );
             }
 
@@ -539,11 +547,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tekulasLines.length > 0) {
                 let linesToRender = tekulasLines;
                 if (q) {
-                    linesToRender = linesToRender.filter(r => 
-                        (r.name && r.name.toLowerCase().includes(q)) || 
-                        (r.hatNo && r.hatNo.toLowerCase().includes(q)) ||
-                        (r.startStop && r.startStop.toLowerCase().includes(q)) ||
-                        (r.endStop && r.endStop.toLowerCase().includes(q))
+                    const qTr = normTrApp(q);
+                    linesToRender = linesToRender.filter(r =>
+                        normTrApp(r.name).includes(qTr) ||
+                        normTrApp(r.hatNo).includes(qTr) ||
+                        normTrApp(r.startStop).includes(qTr) ||
+                        normTrApp(r.endStop).includes(qTr)
                     );
                 }
 
@@ -834,7 +843,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // TEKULAŞ KATEGORİLİ HAT SEÇİM MENÜSÜ
         const listEl = document.getElementById('district-dest-list');
         const descEl = document.getElementById('district-modal-desc');
-        const tekulasDb = (typeof window !== 'undefined' && window.tekulasHatVeritabani) ? window.tekulasHatVeritabani : (typeof ilceRotalari !== 'undefined' ? ilceRotalari["Tekirdağ"] : []);
+        const rawTekulasDb = (typeof window !== 'undefined' && window.tekulasHatVeritabani) ? window.tekulasHatVeritabani : (typeof ilceRotalari !== 'undefined' ? ilceRotalari["Tekirdağ"] : []);
+        const tekulasDb = (rawTekulasDb || []).filter(r => r && Array.isArray(r.stops) && r.stops.length >= 2 && !/^(İLK DURAK|ILK DURAK|SON DURAK|1\.\s*DURAK)$/i.test(String(r.startStop || (r.stops[0] && r.stops[0].name) || '').trim()));
+        const normTrCat = s => String(s || '').replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase();
 
         const renderCategories = () => {
             if (!listEl) return;
@@ -845,15 +856,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: "Süleymanpaşa", icon: "🏙️", title: "Süleymanpaşa Hatları (Merkez)", filter: r => r.district === 'Süleymanpaşa' || r.originDistrict === 'Süleymanpaşa' || r.destDistrict === 'Süleymanpaşa' },
                 { id: "Muratlı", icon: "🚆", title: "Muratlı Hatları (24 km)", filter: r => r.district === 'Muratlı' || r.originDistrict === 'Muratlı' || r.destDistrict === 'Muratlı' },
                 { id: "Çorlu", icon: "🏭", title: "Çorlu Hatları (36 km)", filter: r => r.district === 'Çorlu' || r.originDistrict === 'Çorlu' || r.destDistrict === 'Çorlu' },
-                { id: "Marmaraereğlisi", icon: "🏖️", title: "Marmaraereğlisi Sahil Hatları (38 km)", filter: r => r.district === 'Marmaraereğlisi' || r.originDistrict === 'Marmaraereğlisi' || r.destDistrict === 'Marmaraereğlisi' || (r.name && r.name.toLowerCase().includes('ereğli')) },
-                { id: "Ergene", icon: "⚙️", title: "Ergene & Velimeşe Hatları (45 km)", filter: r => r.district === 'Ergene' || r.district === 'Velimeşe' || r.originDistrict === 'Ergene' || r.destDistrict === 'Ergene' || (r.name && (r.name.toLowerCase().includes('ergene') || r.name.toLowerCase().includes('marmaracık') || r.name.toLowerCase().includes('velimeşe'))) },
+                { id: "Marmaraereğlisi", icon: "🏖️", title: "Marmaraereğlisi Sahil Hatları (38 km)", filter: r => r.district === 'Marmaraereğlisi' || r.originDistrict === 'Marmaraereğlisi' || r.destDistrict === 'Marmaraereğlisi' || normTrCat(r.name).includes('ereğli') || normTrCat(r.name).includes('yeniçiftlik') || normTrCat(r.name).includes('sultanköy') },
+                { id: "Ergene", icon: "⚙️", title: "Ergene & Velimeşe Hatları (45 km)", filter: r => r.district === 'Ergene' || r.district === 'Velimeşe' || r.originDistrict === 'Ergene' || r.destDistrict === 'Ergene' || normTrCat(r.name).includes('ergene') || normTrCat(r.name).includes('marmaracık') || normTrCat(r.name).includes('velimeşe') },
                 { id: "Hayrabolu", icon: "🌻", title: "Hayrabolu Hatları (52 km)", filter: r => r.district === 'Hayrabolu' || r.originDistrict === 'Hayrabolu' || r.destDistrict === 'Hayrabolu' },
                 { id: "Malkara", icon: "🌾", title: "Malkara Hatları (58 km)", filter: r => r.district === 'Malkara' || r.originDistrict === 'Malkara' || r.destDistrict === 'Malkara' },
                 { id: "Çerkezköy", icon: "🏭", title: "Çerkezköy Hatları (62 km)", filter: r => r.district === 'Çerkezköy' || r.originDistrict === 'Çerkezköy' || r.destDistrict === 'Çerkezköy' },
                 { id: "Kapaklı", icon: "🏢", title: "Kapaklı Hatları (67 km)", filter: r => r.district === 'Kapaklı' || r.originDistrict === 'Kapaklı' || r.destDistrict === 'Kapaklı' },
                 { id: "Saray", icon: "🌳", title: "Saray Hatları (78 km)", filter: r => r.district === 'Saray' || r.originDistrict === 'Saray' || r.destDistrict === 'Saray' },
                 { id: "Şarköy", icon: "🍇", title: "Şarköy Sahil Hatları (84 km)", filter: r => r.district === 'Şarköy' || r.originDistrict === 'Şarköy' || r.destDistrict === 'Şarköy' },
-                { id: "İlçeler Arası", icon: "🚌", title: "İlçeler Arası Ekspres Hatlar (11 İlçe Ağı)", filter: r => r.isDistrict || r.district === 'İlçeler Arası' || (r.originDistrict && r.destDistrict && r.originDistrict !== r.destDistrict) },
+                { id: "İlçeler Arası", icon: "🚌", title: "İlçeler Arası Ekspres Hatlar (11 İlçe Ağı)", filter: r => r.district === 'İlçeler Arası' || (r.originDistrict && r.destDistrict && r.originDistrict !== r.destDistrict) || r.isKomsuRoute },
                 { id: "TÜMÜ", icon: "📋", title: "Tüm TEKULAŞ Hatları (11 İlçe Ağı)", filter: () => true }
             ];
 

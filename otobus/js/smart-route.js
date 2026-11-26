@@ -612,15 +612,35 @@ const AkilliRotaSistemi = {
         match = this.mahallelerVeAnaDuraklar.find(item => item.keys && item.keys.some(k => qNorm.startsWith(k) || k.startsWith(qNorm)));
         if (match) return match;
 
-        // 3. Alt dize eşleşmesi
-        match = catalog.find(item => qWords.some(w => this.normalizeText(item.label).includes(w)));
-        if (match) return match;
+        // 3. Alt dize eşleşmesi (otogar, meydan, hastane, merkez gibi jenerik kelimelerin yanlış ilçeyle eşleşmesini önle!)
+        const genericStopWords = new Set([
+            "otogar", "otogari", "terminal", "terminali", "meydan", "meydani",
+            "hastane", "hastanesi", "devlet", "merkez", "merkezi", "mahalle",
+            "mahallesi", "cadde", "caddesi", "sokak", "sokagi", "bulvar", "bulvari",
+            "durak", "duragi", "tren", "gari", "gar", "istasyon", "istasyonu",
+            "iskele", "sahil", "sanayi", "belediye", "belediyesi", "ilce", "sehir", "yeni"
+        ]);
+        const distinctWords = qWords.filter(w => !genericStopWords.has(w));
+        if (distinctWords.length > 0) {
+            match = catalog.find(item => distinctWords.every(w => this.normalizeText(item.label).includes(w)));
+            if (match) return match;
 
-        match = this.mahallelerVeAnaDuraklar.find(item => {
-            const lNorm = this.normalizeText(item.label);
-            return qWords.some(w => lNorm.includes(w));
-        });
-        return match || null;
+            match = this.mahallelerVeAnaDuraklar.find(item => {
+                const lNorm = this.normalizeText(item.label);
+                return distinctWords.every(w => lNorm.includes(w));
+            });
+            if (match) return match;
+
+            match = catalog.find(item => distinctWords.some(w => this.normalizeText(item.label).includes(w) || (item.keys && item.keys.some(k => k.includes(w)))));
+            if (match) return match;
+
+            match = this.mahallelerVeAnaDuraklar.find(item => {
+                const lNorm = this.normalizeText(item.label);
+                return distinctWords.some(w => lNorm.includes(w) || (item.keys && item.keys.some(k => k.includes(w))));
+            });
+            if (match) return match;
+        }
+        return null;
     },
     allStopsCache: null,
 
@@ -738,8 +758,8 @@ const AkilliRotaSistemi = {
                 }
             }
         }
-        // SARAY İLÇE VE MAHALLELERİ İÇİ FORMÜLSEL NAVİGASYON
-        if (hasPassed10 && typeof SarayNavigasyon !== 'undefined' && SarayNavigasyon.findSokak) {
+        // SARAY İLÇE VE MAHALLELERİ İÇİ FORMÜLSEL NAVİGASYON (Yalnızca her iki uç da Saray içiyse!)
+        if (hasPassed10 && (!fromHub || fromHub.district === "Saray") && (!toHub || toHub.district === "Saray") && (fromHub || toHub) && typeof SarayNavigasyon !== 'undefined' && SarayNavigasyon.findSokak) {
             const sFrom = SarayNavigasyon.findSokak(neredenQuery);
             const sTo = SarayNavigasyon.findSokak(nereyeQuery);
             if (sFrom && sTo && sFrom.id !== sTo.id) {
@@ -757,41 +777,53 @@ const AkilliRotaSistemi = {
                 }
             }
         }
-        // SÜLEYMANPAŞA MAHALLELERİ İÇİ FORMÜLSEL NAVİGASYON
-        if (typeof SuleymanpasaNavigasyon !== 'undefined' && SuleymanpasaNavigasyon.findSokak) {
-            const sFrom = SuleymanpasaNavigasyon.findSokak(neredenQuery);
-            const sTo = SuleymanpasaNavigasyon.findSokak(nereyeQuery);
-            if (sFrom && sTo && sFrom.id !== sTo.id) {
-                const sRes = SuleymanpasaNavigasyon.rotaOlustur(neredenQuery, nereyeQuery);
-                if (sRes.success) {
-                    return {
-                        success: true,
-                        route: sRes.route,
-                        originalRoute: sRes.route,
-                        fromStop: sRes.kalkis.name,
-                        toStop: sRes.varis.name,
-                        stopsCount: sRes.stopsCount,
-                        dist: sRes.totalKm
-                    };
+        // SÜLEYMANPAŞA MAHALLELERİ İÇİ FORMÜLSEL NAVİGASYON (Yalnızca başka bir ilçe/il hedefi değilse!)
+        if ((!fromHub || fromHub.district === "Süleymanpaşa") && (!toHub || toHub.district === "Süleymanpaşa") && typeof SuleymanpasaNavigasyon !== 'undefined' && SuleymanpasaNavigasyon.findSokak) {
+            const otherTekDist = ["corlu", "cerkezkoy", "kapakli", "ergene", "velimese", "saray", "muratli", "marmaraereglisi", "hayrabolu", "malkara", "sarkoy"];
+            const fnLow = this.normalizeText(neredenQuery);
+            const tnLow = this.normalizeText(nereyeQuery);
+            const mentionsOtherDist = otherTekDist.some(d => fnLow.startsWith(d + " ") || fnLow === d || tnLow.startsWith(d + " ") || tnLow === d);
+            if (!mentionsOtherDist) {
+                const sFrom = SuleymanpasaNavigasyon.findSokak(neredenQuery);
+                const sTo = SuleymanpasaNavigasyon.findSokak(nereyeQuery);
+                if (sFrom && sTo && sFrom.id !== sTo.id) {
+                    const sRes = SuleymanpasaNavigasyon.rotaOlustur(neredenQuery, nereyeQuery);
+                    if (sRes.success) {
+                        return {
+                            success: true,
+                            route: sRes.route,
+                            originalRoute: sRes.route,
+                            fromStop: sRes.kalkis.name,
+                            toStop: sRes.varis.name,
+                            stopsCount: sRes.stopsCount,
+                            dist: sRes.totalKm
+                        };
+                    }
                 }
             }
         }
-        // VELİMEŞE 100 SOKAK İÇİ ÖNCELİKLİ KONTROL
-        if (typeof VelimeseNavigasyon !== 'undefined' && VelimeseNavigasyon.findSokak) {
-            const vFrom = VelimeseNavigasyon.findSokak(neredenQuery);
-            const vTo = VelimeseNavigasyon.findSokak(nereyeQuery);
-            if (vFrom && vTo && vFrom.id !== vTo.id) {
-                const vRes = VelimeseNavigasyon.rotaOlustur(neredenQuery, nereyeQuery);
-                if (vRes.success) {
-                    return {
-                        success: true,
-                        route: vRes.route,
-                        originalRoute: vRes.route,
-                        fromStop: vRes.kalkis.name,
-                        toStop: vRes.varis.name,
-                        stopsCount: vRes.stopsCount,
-                        dist: vRes.totalKm
-                    };
+        // VELİMEŞE 100 SOKAK İÇİ ÖNCELİKLİ KONTROL (Yalnızca başka bir ilçe/il hedefi değilse!)
+        if ((!fromHub || fromHub.district === "Velimeşe") && (!toHub || toHub.district === "Velimeşe") && typeof VelimeseNavigasyon !== 'undefined' && VelimeseNavigasyon.findSokak) {
+            const otherTekDistV = ["suleymanpasa", "corlu", "cerkezkoy", "kapakli", "saray", "muratli", "marmaraereglisi", "hayrabolu", "malkara", "sarkoy"];
+            const fnLowV = this.normalizeText(neredenQuery);
+            const tnLowV = this.normalizeText(nereyeQuery);
+            const mentionsOtherDistV = otherTekDistV.some(d => fnLowV.startsWith(d + " ") || fnLowV === d || tnLowV.startsWith(d + " ") || tnLowV === d);
+            if (!mentionsOtherDistV) {
+                const vFrom = VelimeseNavigasyon.findSokak(neredenQuery);
+                const vTo = VelimeseNavigasyon.findSokak(nereyeQuery);
+                if (vFrom && vTo && vFrom.id !== vTo.id) {
+                    const vRes = VelimeseNavigasyon.rotaOlustur(neredenQuery, nereyeQuery);
+                    if (vRes.success) {
+                        return {
+                            success: true,
+                            route: vRes.route,
+                            originalRoute: vRes.route,
+                            fromStop: vRes.kalkis.name,
+                            toStop: vRes.varis.name,
+                            stopsCount: vRes.stopsCount,
+                            dist: vRes.totalKm
+                        };
+                    }
                 }
             }
         }
@@ -836,43 +868,44 @@ const AkilliRotaSistemi = {
                 });
                 if (matched81) return matched81;
             }
-            // Caddelerle karışmaması için özel kontrol
+            // Caddelerle ve Tekirdağ mahalleleriyle (Altınova, Ereğli, Yenişehir, Tepebaşı, Gölbaşı, Yenice, Kemalpaşa, Danişment, Ortaköy) karışmaması için özel kontrol
             const words = norm.split(' ');
-                        if (words.some(w => ["artvin", "hopa", "borcka", "savsat", "yusufeli", "arhavi", "murgul", "kemalpasa", "danisment", "karagol", "kafkasor", "sarp"].includes(w)) || norm === "artvin") return "Artvin";
-                                                                                                            if (words.some(w => ["sinop", "boyabat", "gerze", "ayancik", "turkeli", "duragan", "erfelek", "dikmen", "sarayduzu", "inceburun", "hamsilos"].includes(w)) || norm === "sinop") return "Sinop";
-                                                                                                                        if (words.some(w => ["yalova", "termal", "cinarcik", "çınarcık", "armutlu", "altinova", "altınova", "ciftlikkoy", "çiftlikköy", "osmangazi"].includes(w)) || norm === "yalova") return "Yalova";
-                        if (words.some(w => ["gumushane", "gümüşhane", "torul", "kurtun", "kürtün", "kelkit", "siran", "şiran", "kose", "köse", "zigana", "karaca magarasi", "karaca mağarası", "pestil", "kome", "köme"].includes(w)) || norm === "gumushane" || norm === "gümüşhane") return "Gümüşhane";
-                        if (words.some(w => ["giresun", "bulancak", "piraziz", "kesap", "keşap", "espiye", "tirebolu", "gorele", "görele", "eynesil", "dereli", "kumbet", "kümbet", "sebinkarahisar", "şebinkarahisar", "alucra", "camoluk", "çamoluk", "findik", "fındık"].includes(w)) || norm === "giresun") return "Giresun";
-                        if (words.some(w => ["gaziantep", "antep", "sahinbey", "şahinbey", "sehitkamil", "şehitkamil", "nizip", "zeugma", "baklava", "fistik", "fıstık", "rumkale", "nurdagi", "nurdağı", "islahiye", "islâhiye", "araban", "yavuzeli", "karkamis", "karkamış"].includes(w)) || norm === "gaziantep" || norm === "antep") return "Gaziantep";
-                        if (words.some(w => ["eskisehir", "eskişehir", "odunpazari", "odunpazarı", "tepebasi", "tepebaşı", "sazova", "sivrihisar", "seyitgazi", "porsuk", "ciborek", "çibörek", "luletasi", "lületaşı"].includes(w)) || norm === "eskisehir" || norm === "eskişehir") return "Eskişehir";
-                        if (words.some(w => ["erzurum", "palandoken", "palandöken", "cifte minareli", "çifte minareli", "yakutiye", "askale", "aşkale", "pasinler", "horasan", "oltu", "ispir", "tortum", "ovit", "cag kebabi", "cağ kebabı"].includes(w)) || norm === "erzurum") return "Erzurum";
-            if (words.some(w => ["konya", "mevlana", "catalhoyuk", "çatalhöyük", "aksehir", "akşehir", "beysehir", "beyşehir", "seydisehir", "seydişehir", "eregli", "ereğli", "cihanbeyli", "kulu", "karapinar", "karapınar", "cumra", "çumra", "ilgin", "ılgın", "meram", "selcuklu", "selçuklu", "karatay"].includes(w)) || norm === "konya") return "Konya";
+            const isTekCtx = (currentCity === "Tekirdağ");
+            if (words.some(w => ["artvin", "hopa", "borcka", "savsat", "yusufeli", "arhavi", "murgul", "karagol", "kafkasor", "sarp"].includes(w)) || norm === "artvin") return "Artvin";
+            if (words.some(w => ["sinop", "boyabat", "gerze", "ayancik", "turkeli", "duragan", "erfelek", "dikmen", "sarayduzu", "inceburun", "hamsilos"].includes(w)) || norm === "sinop") return "Sinop";
+            if (words.some(w => (isTekCtx ? ["yalova", "termal", "cinarcik", "çınarcık", "armutlu", "osmangazi"] : ["yalova", "termal", "cinarcik", "çınarcık", "armutlu", "altinova", "altınova", "ciftlikkoy", "çiftlikköy", "osmangazi"]).includes(w)) || norm === "yalova") return "Yalova";
+            if (words.some(w => ["gumushane", "gümüşhane", "torul", "kurtun", "kürtün", "kelkit", "siran", "şiran", "kose", "köse", "zigana", "karaca magarasi", "karaca mağarası", "pestil", "kome", "köme"].includes(w)) || norm === "gumushane" || norm === "gümüşhane") return "Gümüşhane";
+            if (words.some(w => ["giresun", "bulancak", "piraziz", "kesap", "keşap", "espiye", "tirebolu", "gorele", "görele", "eynesil", "dereli", "kumbet", "kümbet", "sebinkarahisar", "şebinkarahisar", "alucra", "camoluk", "çamoluk", "findik", "fındık"].includes(w)) || norm === "giresun") return "Giresun";
+            if (words.some(w => ["gaziantep", "antep", "sahinbey", "şahinbey", "sehitkamil", "şehitkamil", "nizip", "zeugma", "baklava", "fistik", "fıstık", "rumkale", "nurdagi", "nurdağı", "islahiye", "islâhiye", "araban", "yavuzeli", "karkamis", "karkamış"].includes(w)) || norm === "gaziantep" || norm === "antep") return "Gaziantep";
+            if (words.some(w => (isTekCtx ? ["eskisehir", "eskişehir", "odunpazari", "odunpazarı", "sazova", "sivrihisar", "seyitgazi", "porsuk", "ciborek", "çibörek", "luletasi", "lületaşı"] : ["eskisehir", "eskişehir", "odunpazari", "odunpazarı", "tepebasi", "tepebaşı", "sazova", "sivrihisar", "seyitgazi", "porsuk", "ciborek", "çibörek", "luletasi", "lületaşı"]).includes(w)) || norm === "eskisehir" || norm === "eskişehir") return "Eskişehir";
+            if (words.some(w => ["erzurum", "palandoken", "palandöken", "cifte minareli", "çifte minareli", "yakutiye", "askale", "aşkale", "pasinler", "horasan", "oltu", "ispir", "tortum", "ovit", "cag kebabi", "cağ kebabı"].includes(w)) || norm === "erzurum") return "Erzurum";
+            if (words.some(w => (isTekCtx ? ["konya", "mevlana", "catalhoyuk", "çatalhöyük", "aksehir", "akşehir", "beysehir", "beyşehir", "seydisehir", "seydişehir", "cihanbeyli", "kulu", "karapinar", "karapınar", "cumra", "çumra", "ilgin", "ılgın", "meram", "selcuklu", "selçuklu", "karatay"] : ["konya", "mevlana", "catalhoyuk", "çatalhöyük", "aksehir", "akşehir", "beysehir", "beyşehir", "seydisehir", "seydişehir", "eregli", "ereğli", "cihanbeyli", "kulu", "karapinar", "karapınar", "cumra", "çumra", "ilgin", "ılgın", "meram", "selcuklu", "selçuklu", "karatay"]).includes(w)) || norm === "konya") return "Konya";
             if (words.some(w => ["erzincan", "refahiye", "tercan", "uzumlu", "üzümlü", "kemaliye", "kemah", "cayinli", "çayırlı", "ilic", "iliç", "otlukbeli", "girlevik", "ergan"].includes(w)) || norm === "erzincan") return "Erzincan";
             if (words.some(w => ["elazig", "elazığ", "harput", "keban", "sivrice", "maden", "kovancilar", "kovancılar", "karakocan", "karakoçan", "palu", "baskil", "agin", "ağın", "aricak", "arıcak", "alacakaya"].includes(w)) || norm === "elazig" || norm === "elazığ") return "Elazığ";
             if (words.some(w => ["bayburt", "aydintepe", "aydıntepe", "demirozu", "demirözü", "kop", "baksi", "baksı"].includes(w)) || norm === "bayburt") return "Bayburt";
-            if (words.some(w => ["diyarbakir", "diyarbakır", "disti", "dişti", "ergani", "silvan", "bismil", "cinar", "çınar", "cermik", "çermik", "dicle", "kulp", "hani", "lice", "egil", "eğil", "hazro", "kocakoy", "kocaköy", "cungus", "çüngüş", "sur", "baglar", "bağlar", "kayapinar", "kayapınar", "yenisehir", "yenişehir"].includes(w)) || norm === "diyarbakir" || norm === "diyarbakır") return "Diyarbakır";
-            if (words.some(w => ["corum", "çorum", "sungurlu", "osmancik", "osmancık", "iskilip", "alaca", "bogazkale", "boğazkale", "kargi", "kargı", "mecitozu", "mecitözü", "ortakoy", "ortaköy", "ugurludag", "uğurludağ", "bayat", "dodurga", "oguzlar", "oğuzlar", "lacin", "laçin"].includes(w)) || norm === "corum" || norm === "çorum") return "Çorum";
-            if (words.some(w => ["cankiri", "çankırı", "cerkes", "çerkeş", "ilgaz", "kursunlu", "kurşunlu", "sabanozu", "şabanözü", "orta", "eldivan", "yaprakli", "kizilirmak", "kızılırmak", "atakaracalar", "bayramoren", "korgun"].includes(w)) || norm === "cankiri" || norm === "çankırı") return "Çankırı";
-            if (words.some(w => ["bursa", "inegol", "gemlik", "mudanya", "orhangazi", "iznik", "karacabey", "mustafakemalpasa", "uludag", "nilufer", "osmangazi", "yildirim", "gursu", "kestel"].includes(w)) || norm === "bursa") return "Bursa";
+            if (words.some(w => (isTekCtx ? ["diyarbakir", "diyarbakır", "ergani", "silvan", "bismil", "cermik", "çermik", "dicle", "kulp", "hani", "lice", "egil", "eğil", "hazro", "kocakoy", "kocaköy", "cungus", "çüngüş", "kayapinar", "kayapınar"] : ["diyarbakir", "diyarbakır", "disti", "dişti", "ergani", "silvan", "bismil", "cinar", "çınar", "cermik", "çermik", "dicle", "kulp", "hani", "lice", "egil", "eğil", "hazro", "kocakoy", "kocaköy", "cungus", "çüngüş", "sur", "baglar", "bağlar", "kayapinar", "kayapınar", "yenisehir", "yenişehir"]).includes(w)) || norm === "diyarbakir" || norm === "diyarbakır") return "Diyarbakır";
+            if (words.some(w => ["corum", "çorum", "sungurlu", "osmancik", "osmancık", "iskilip", "alaca", "bogazkale", "boğazkale", "kargi", "kargı", "mecitozu", "mecitözü", "ugurludag", "uğurludağ", "dodurga", "oguzlar", "oğuzlar", "lacin", "laçin"].includes(w)) || norm === "corum" || norm === "çorum") return "Çorum";
+            if (words.some(w => ["cankiri", "çankırı", "cerkes", "çerkeş", "ilgaz", "kursunlu", "kurşunlu", "sabanozu", "şabanözü", "eldivan", "yaprakli", "kizilirmak", "kızılırmak", "atakaracalar", "bayramoren", "korgun"].includes(w)) || norm === "cankiri" || norm === "çankırı") return "Çankırı";
+            if (words.some(w => ["bursa", "inegol", "gemlik", "mudanya", "orhangazi", "iznik", "karacabey", "mustafakemalpasa", "uludag", "nilufer", "osmangazi", "gursu", "kestel"].includes(w)) || norm === "bursa") return "Bursa";
             if (words.some(w => ["burdur", "bucak", "yesilova", "salda", "golhisar", "celtikci", "aglasun", "sagalasos", "tefenni", "karamanli", "cavdir", "altinyayla"].includes(w)) || norm === "burdur") return "Burdur";
             if (words.some(w => ["bolu", "gerede", "mengen", "mudurnu", "goynuk", "seben", "kibriscik", "yenicaga", "dortdivan", "abant", "yedigoller", "kartalkaya", "boludagi"].includes(w)) || norm === "bolu") return "Bolu";
-            if (words.some(w => ["bitlis", "tatvan", "ahlat", "adilcevaz", "guroymak", "mutki", "hizan", "nemrut", "suphan", "rahva", "besminare"].includes(w)) || norm === "bitlis") return "Bitlis";
+            if (words.some(w => ["bitlis", "tatvan", "ahlat", "adilcevaz", "guroymak", "mutki", "hizan", "suphan", "rahva", "besminare"].includes(w)) || norm === "bitlis") return "Bitlis";
             if (words.some(w => ["bingol", "solhan", "karliova", "genc", "kigi", "yedisu", "yayladere", "adakli", "yuzenadalar", "capakcur", "haserek"].includes(w)) || norm === "bingol") return "Bingöl";
-            if (words.some(w => ["bilecik", "bozuyuk", "sogut", "osmaneli", "pazaryeri", "golpazari", "yenipazar", "inhisar", "edebali", "ertugrul"].includes(w)) || norm === "bilecik") return "Bilecik";
+            if (words.some(w => ["bilecik", "bozuyuk", "sogut", "osmaneli", "pazaryeri", "golpazari", "inhisar", "edebali", "ertugrul"].includes(w)) || norm === "bilecik") return "Bilecik";
             if (words.some(w => ["balikesir", "bandirma", "edremit", "ayvalik", "gonen", "susurluk", "burhaniye", "erdek", "dursunbey", "bigadic", "sindirgi", "ivrindi", "havran", "savastepe", "manyas", "gomec", "akcay", "altinoluk", "cunda", "kazdaglari"].includes(w)) || norm === "balikesir") return "Balıkesir";
-            if (words.some(w => ["aydin", "efeler", "kusadasi", "nazilli", "soke", "didim", "germencik", "incirliova", "cine", "buharkent", "kuyucak", "sultanhisar", "yenipazar", "karacasu", "bozdogan", "kocarli", "bafa"].includes(w)) || norm === "aydin") return "Aydın";
+            if (words.some(w => ["aydin", "efeler", "kusadasi", "nazilli", "soke", "didim", "germencik", "incirliova", "cine", "buharkent", "kuyucak", "sultanhisar", "karacasu", "bozdogan", "kocarli", "bafa"].includes(w)) || norm === "aydin") return "Aydın";
             if (words.some(w => ["denizli", "pamukkale", "hierapolis", "saraykoy", "honaz", "tavas", "acipayam", "buldan", "civril"].includes(w)) || norm === "denizli") return "Denizli";
             if (words.some(w => ["antalya", "kepez", "konyaalti", "lara", "alanya", "manavgat", "kemer", "kas"].includes(w)) || norm === "antalya") return "Antalya";
             if (words.some(w => ["ankara", "asti", "kizilay", "anitkabir", "polatli", "cankaya", "kecioren"].includes(w)) || norm === "ankara" || norm === "asti") return "Ankara";
             if (words.some(w => ["amasya", "merzifon", "suluova", "tasova", "gumushacikoy", "goynucek", "hamamozu"].includes(w)) || norm === "amasya") return "Amasya";
             if (words.some(w => ["agri", "dogubayazit", "patnos", "eleskirt", "diyadin", "ishakpasa"].includes(w)) || norm === "agri") return "Ağrı";
             if (words.some(w => ["afyon", "afyonkarahisar", "aftas", "sandikli", "dinar", "bolvadin", "emirdag"].includes(w)) || norm === "afyon" || norm === "afyonkarahisar") return "Afyonkarahisar";
-            if (words.some(w => ["adiyaman", "nemrut", "kahta", "golbasi", "besni"].includes(w)) || norm === "adiyaman") return "Adıyaman";
+            if (words.some(w => (isTekCtx ? ["adiyaman", "nemrut", "kahta", "besni"] : ["adiyaman", "nemrut", "kahta", "golbasi", "besni"]).includes(w)) || norm === "adiyaman") return "Adıyaman";
             if (words.some(w => ["adana", "cukurova", "seyhan", "yuregir", "saricam", "karaisali", "ceyhan", "karatas", "yumurtalik", "imamoglu", "kozan", "aladag", "pozanti", "feke", "saimbeyli", "tufanbeyli"].includes(w)) || norm === "adana") return "Adana";
             if (words.some(w => ["istanbul", "esenler", "silivri", "catalca"].includes(w))) return "İstanbul";
             if (words.some(w => ["edirne", "kesan", "uzunkopru", "ipsala", "kapikule"].includes(w))) return "Edirne";
             if (words.some(w => ["kirklareli", "luleburgaz", "babaeski", "vize", "pinarhisar"].includes(w))) return "Kırklareli";
-            if (words.some(w => ["canakkale", "gelibolu", "eceabat", "lapseki", "biga", "can", "ayvacik", "ezine", "bayramic", "yenice", "bozcaada", "gokceada", "assos", "truva"].includes(w))) return "Çanakkale";
+            if (words.some(w => (isTekCtx ? ["canakkale", "gelibolu", "eceabat", "lapseki", "biga", "ayvacik", "ezine", "bayramic", "bozcaada", "gokceada", "assos", "truva"] : ["canakkale", "gelibolu", "eceabat", "lapseki", "biga", "can", "ayvacik", "ezine", "bayramic", "yenice", "bozcaada", "gokceada", "assos", "truva"]).includes(w))) return "Çanakkale";
             if (norm === "edirne" || norm.startsWith("edirne ")) return "Edirne";
             if (norm === "istanbul" || norm.startsWith("istanbul ")) return "İstanbul";
             if (norm === "kirklareli" || norm.startsWith("kirklareli ")) return "Kırklareli";
@@ -915,16 +948,55 @@ const AkilliRotaSistemi = {
             const cityProv1 = resolveCityProv(originProvince);
             const cityProv2 = resolveCityProv(targetProvince);
 
+            // Tekirdağ ilçe koordinatları ve sınır ilçeleri (Silivri, Vize, Lüleburgaz, Keşan, Uzunköprü, Gelibolu) için hassas GPS & KM
+            const getPrecisePlaceCoords = (placeName, rawQuery, hubObj) => {
+                const subTownCoords = {
+                    "silivri": [41.0735, 28.2465],
+                    "catalca": [41.1435, 28.4610],
+                    "vize": [41.5725, 27.7660],
+                    "luleburgaz": [41.4055, 27.3570],
+                    "babaeski": [41.4325, 27.0930],
+                    "uzunkopru": [41.2670, 26.6870],
+                    "kesan": [40.8555, 26.6305],
+                    "gelibolu": [40.4105, 26.6705]
+                };
+                const rqNorm = this.normalizeText(rawQuery || (hubObj && hubObj.label) || placeName);
+                for (const [k, coords] of Object.entries(subTownCoords)) {
+                    if (rqNorm.includes(k)) return { coords, subKey: k };
+                }
+                if (typeof sehirRotalari !== 'undefined' && sehirRotalari["Tekirdağ"] && sehirRotalari["Tekirdağ"].ilcelerBilgisi && Array.isArray(sehirRotalari["Tekirdağ"].ilcelerBilgisi.liste)) {
+                    const tdFound = sehirRotalari["Tekirdağ"].ilcelerBilgisi.liste.find(x => x.ad === placeName || x.id === placeName);
+                    if (tdFound && tdFound.lat && tdFound.lon) {
+                        return { coords: [tdFound.lat, tdFound.lon], subKey: this.normalizeText(placeName) };
+                    }
+                }
+                const c = (typeof CompassSystem !== 'undefined' && CompassSystem.getCityCoordinates) ? CompassSystem.getCityCoordinates(resolveCityProv(placeName)) : null;
+                return { coords: c, subKey: this.normalizeText(placeName) };
+            };
+
+            const pInfo1 = getPrecisePlaceCoords(originProvince, neredenQuery, fromHub);
+            const pInfo2 = getPrecisePlaceCoords(targetProvince, nereyeQuery, toHub);
+
             let exactKm = 0;
+            // Eğer bir uç Tekirdağ ilçesi / sınır ilçesi ise önce Trakya hassas ilçe mesafe matrisine bak!
+            if ((cityProv1 === "Tekirdağ" || cityProv2 === "Tekirdağ") && typeof sehirRotalari !== 'undefined' && sehirRotalari["Tekirdağ"] && sehirRotalari["Tekirdağ"].ilcelerBilgisi && typeof sehirRotalari["Tekirdağ"].ilcelerBilgisi.hesaplaIlceMesafe === 'function') {
+                const lookupA = pInfo1.subKey || originProvince;
+                const lookupB = pInfo2.subKey || targetProvince;
+                const distFromTekMatrix = sehirRotalari["Tekirdağ"].ilcelerBilgisi.hesaplaIlceMesafe(lookupA, lookupB);
+                if (distFromTekMatrix && distFromTekMatrix > 0) {
+                    exactKm = distFromTekMatrix;
+                }
+            }
+
             const pairKey1 = cityProv1 + "-" + cityProv2;
             const pairKey2 = cityProv2 + "-" + cityProv1;
-            if (typeof sehirlerarasiMesafeler !== 'undefined') {
+            if (!exactKm && typeof sehirlerarasiMesafeler !== 'undefined') {
                 exactKm = sehirlerarasiMesafeler[pairKey1] || sehirlerarasiMesafeler[pairKey2] || 0;
             }
 
-            // Koordinatlar (CompassSystem 81 İl GPS)
-            const c1 = (typeof CompassSystem !== 'undefined' && CompassSystem.getCityCoordinates) ? CompassSystem.getCityCoordinates(cityProv1) : null;
-            const c2 = (typeof CompassSystem !== 'undefined' && CompassSystem.getCityCoordinates) ? CompassSystem.getCityCoordinates(cityProv2) : null;
+            // Koordinatlar (İlçe / Sınır Kasabası hassasiyetli)
+            const c1 = pInfo1.coords;
+            const c2 = pInfo2.coords;
 
             if (!exactKm && c1 && c2 && typeof CompassSystem !== 'undefined' && CompassSystem.calculateDistanceKm) {
                 exactKm = Math.round(CompassSystem.calculateDistanceKm(c1[0], c1[1], c2[0], c2[1]) * 1.28);
@@ -1096,9 +1168,10 @@ const AkilliRotaSistemi = {
                         ? sehirRotalari["Tekirdağ"].ilcelerBilgisi.komsuIlceler
                         : {
                         "Süleymanpaşa": ["Muratlı", "Çorlu", "Marmaraereğlisi", "Hayrabolu", "Malkara", "Şarköy"],
-                        "Çorlu": ["Süleymanpaşa", "Marmaraereğlisi", "Ergene", "Çerkezköy", "Muratlı"],
-                        "Ergene": ["Çorlu", "Muratlı", "Çerkezköy", "Kapaklı", "Saray"],
-                        "Çerkezköy": ["Kapaklı", "Çorlu", "Ergene"],
+                        "Çorlu": ["Süleymanpaşa", "Marmaraereğlisi", "Ergene", "Velimeşe", "Çerkezköy", "Muratlı"],
+                        "Ergene": ["Çorlu", "Velimeşe", "Muratlı", "Çerkezköy", "Kapaklı", "Saray"],
+                        "Velimeşe": ["Ergene", "Çorlu", "Çerkezköy"],
+                        "Çerkezköy": ["Kapaklı", "Çorlu", "Ergene", "Velimeşe"],
                         "Kapaklı": ["Çerkezköy", "Saray", "Ergene"],
                         "Saray": ["Kapaklı", "Ergene"],
                         "Muratlı": ["Süleymanpaşa", "Çorlu", "Ergene", "Hayrabolu"],
@@ -1108,16 +1181,27 @@ const AkilliRotaSistemi = {
                         "Şarköy": ["Süleymanpaşa", "Malkara"]
                     });
 
-                // Sınır illerinin ilçe kapıları (Örn: Silivri -> Marmaraereğlisi/Çerkezköy, Keşan -> Malkara, Gelibolu -> Şarköy vb.)
-                const gatewayMap = {
-                    "İstanbul": "Marmaraereğlisi",
-                    "Edirne": "Malkara",
-                    "Kırklareli": "Muratlı",
-                    "Çanakkale": "Şarköy"
+                // Kalkış ilçesine duyarlı sınır kapısı eşleşmesi (Saray -> Kırklareli Vize kapısını, Çerkezköy -> İstanbul Silivri/Çatalca kapısını, Hayrabolu -> Edirne Uzunköprü kapısını kullanır!)
+                const resolveGateway = (provOrDist, otherSide) => {
+                    if (provOrDist === "İstanbul") {
+                        return ["Çerkezköy", "Kapaklı", "Saray", "Velimeşe"].includes(otherSide) ? "Çerkezköy" : "Marmaraereğlisi";
+                    }
+                    if (provOrDist === "Kırklareli") {
+                        if (["Saray", "Kapaklı", "Çerkezköy"].includes(otherSide)) return "Saray";
+                        if (["Hayrabolu", "Malkara"].includes(otherSide)) return "Hayrabolu";
+                        return "Muratlı";
+                    }
+                    if (provOrDist === "Edirne") {
+                        return ["Hayrabolu", "Muratlı"].includes(otherSide) ? "Hayrabolu" : "Malkara";
+                    }
+                    if (provOrDist === "Çanakkale") {
+                        return "Şarköy";
+                    }
+                    return provOrDist;
                 };
 
-                const startDist = gatewayMap[d1] || d1;
-                const endDist = gatewayMap[d2] || d2;
+                const startDist = resolveGateway(d1, d2);
+                const endDist = resolveGateway(d2, d1);
 
                 if (kGraph[startDist] && kGraph[endDist]) {
                     const queue = [[startDist]];
@@ -1149,26 +1233,50 @@ const AkilliRotaSistemi = {
                         for (let p = 0; p < foundPath.length - 1; p++) {
                             const u = foundPath[p];
                             const v = foundPath[p + 1];
-                            const legRoute = db.find(r => 
+                            let legRoute = db.find(r => 
                                 (r.originDistrict === u && r.destDistrict === v) ||
                                 (r.originDistrict === v && r.destDistrict === u)
                             );
+                            // Velimeşe <-> Ergene veya Velimeşe <-> Çerkezköy bacakları için gerçek durak köprüsü
+                            if (!legRoute && (u === "Velimeşe" || v === "Velimeşe")) {
+                                const otherEnd = u === "Velimeşe" ? v : u;
+                                const vStopsForward = otherEnd === "Ergene"
+                                    ? [
+                                        { name: "Velimeşe Merkez Meydan", lat: 41.2530, lon: 27.8990, gercekMesafeSonraki: 4.5 },
+                                        { name: "Ulaş Belde Meydanı", lat: 41.2510, lon: 27.7780, gercekMesafeSonraki: 7.5 },
+                                        { name: "Ergene Hükümet Konağı & Marmaracık Meydan", lat: 41.2281, lon: 27.7028, gercekMesafeSonraki: 0 }
+                                    ]
+                                    : [
+                                        { name: "Velimeşe Merkez Meydan", lat: 41.2530, lon: 27.8990, gercekMesafeSonraki: 4.2 },
+                                        { name: "Veliköy Merkez", lat: 41.2650, lon: 27.9250, gercekMesafeSonraki: 3.8 },
+                                        { name: "Kızılpınar Merkez", lat: 41.2780, lon: 27.9750, gercekMesafeSonraki: 4.0 },
+                                        { name: "Çerkezköy Otogarı", lat: 41.2850, lon: 27.9950, gercekMesafeSonraki: 0 }
+                                    ];
+                                legRoute = {
+                                    originDistrict: "Velimeşe",
+                                    destDistrict: otherEnd,
+                                    stops: vStopsForward
+                                };
+                            }
                             if (legRoute && legRoute.stops && legRoute.stops.length > 0) {
                                 const isRev = (legRoute.originDistrict === v && legRoute.destDistrict === u);
-                                const legStops = isRev ? [...legRoute.stops].reverse() : legRoute.stops;
+                                const legStops = isRev
+                                    ? legRoute.stops.slice().reverse().map((st, idx, arr) => Object.assign({}, st, {
+                                        gercekMesafeSonraki: idx === arr.length - 1 ? 0 : (arr[idx + 1].gercekMesafeSonraki || 3.5)
+                                    }))
+                                    : legRoute.stops;
                                 legStops.forEach((st, sIdx) => {
                                     if (p > 0 && sIdx === 0) return;
                                     if (!seenStopNames.has(st.name)) {
                                         seenStopNames.add(st.name);
-                                        combinedStops.push(st);
-                                        totalCalculatedKm += (st.gercekMesafeSonraki || 0);
+                                        combinedStops.push(Object.assign({}, st));
                                     }
                                 });
                             }
                         }
 
                         // Eğer dış sınır ili hedefiyse (örn: Silivri, Keşan, Lüleburgaz, Vize, Gelibolu), sınır rotasını ekle
-                        if (d2 in gatewayMap || d2 === "İstanbul" || d2 === "Edirne" || d2 === "Kırklareli" || d2 === "Çanakkale") {
+                        if (d2 === "İstanbul" || d2 === "Edirne" || d2 === "Kırklareli" || d2 === "Çanakkale") {
                             const borderRoute = db.find(r => 
                                 r.isBorderRoute && r.originDistrict === endDist && (r.destDistrict.includes(d2) || (toHub && r.destDistrict.includes(toHub.label)))
                             );
@@ -1176,11 +1284,25 @@ const AkilliRotaSistemi = {
                                 borderRoute.stops.forEach((st, sIdx) => {
                                     if (sIdx > 0 && !seenStopNames.has(st.name)) {
                                         seenStopNames.add(st.name);
-                                        combinedStops.push(st);
-                                        totalCalculatedKm += (st.gercekMesafeSonraki || 0);
+                                        combinedStops.push(Object.assign({}, st));
                                     }
                                 });
                             }
+                        }
+
+                        // Birleştirilen koridor durakları arasındaki son/ara durak mesafelerini gerçek koordinatlarla doğrula
+                        totalCalculatedKm = 0;
+                        for (let cs = 0; cs < combinedStops.length; cs++) {
+                            if (cs === combinedStops.length - 1) {
+                                combinedStops[cs].gercekMesafeSonraki = 0;
+                            } else if (!combinedStops[cs].gercekMesafeSonraki || combinedStops[cs].gercekMesafeSonraki <= 0) {
+                                const a = combinedStops[cs], b = combinedStops[cs + 1];
+                                const air = (a.lat && b.lat && typeof calculateDistance === 'function')
+                                    ? calculateDistance(a.lat, a.lon, b.lat, b.lon)
+                                    : 4.0;
+                                combinedStops[cs].gercekMesafeSonraki = Math.max(1.0, Math.round(air * 1.25 * 10) / 10);
+                            }
+                            totalCalculatedKm += (combinedStops[cs].gercekMesafeSonraki || 0);
                         }
 
                         if (combinedStops.length >= 2) {
@@ -1635,9 +1757,15 @@ const AkilliRotaSistemi = {
 
 if (typeof window !== 'undefined') {
     window.AkilliRotaSistemi = AkilliRotaSistemi;
-    document.addEventListener('DOMContentLoaded', () => {
+}
+if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            AkilliRotaSistemi.init();
+        });
+    } else {
         AkilliRotaSistemi.init();
-    });
+    }
 }
 
 

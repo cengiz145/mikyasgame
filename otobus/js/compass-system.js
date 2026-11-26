@@ -673,11 +673,11 @@ const CompassSystem = {
         },
         "Tekirdağ": {
             "Koordinatlar": "40°59′N 27°31′E (Enlem: 40.9833° Kuzey, Boylam: 27.5167° Doğu, Rakım: 15 m)",
-            "Konum": "Marmara Bölgesi Trakya yakası, TEKULAŞ ulaşım ağı ve Marmara Denizi sahili. Doğuda İstanbul, batıda Edirne ve Çanakkale, kuzeyde Kırklareli, güneyde Marmara Denizi.",
-            "Kuzey": "Muratlı Caddesi, Şehir Hastanesi, Saray, Kapaklı ve Kırklareli istikameti",
-            "Doğu": "Değirmenaltı, Namık Kemal Üniversitesi, Çorlu, Velimeşe, Çerkezköy ve İstanbul otoyolu",
-            "Güney": "Marmara Denizi, Sahil Dolgu Parkı, Ceyport Limanı, Şarköy ve Çanakkale istikameti",
-            "Batı": "Hükümet Caddesi, Valilik Meydanı, Malkara, Hayrabolu ve Edirne istikameti"
+            "Konum": "Marmara Bölgesi Trakya yakası, TEKULAŞ ulaşım ağı ve Marmara Denizi kuzey kıyısı. Doğuda İstanbul, batıda Edirne, güneybatıda Çanakkale, kuzeyde Kırklareli, güneyde Marmara Denizi.",
+            "Kuzey": "Muratlı Caddesi, Şehir Hastanesi, Muratlı, Kırklareli (Lüleburgaz) istikameti ve Kuzeydoğuda Saray (Istranca etekleri)",
+            "Doğu": "Değirmenaltı, Namık Kemal Üniversitesi, Marmaraereğlisi, Çorlu, Ergene, Velimeşe, Çerkezköy, Kapaklı ve İstanbul (D-110 / E-84) karayolu",
+            "Güney": "Marmara Denizi açıkları, Sahil Dolgu Parkı ve Ceyport Tekirdağ Limanı (Doğrudan güneyde kara yolu yoktur; Güneybatı sahil hattında Kumbağ, Uçmakdere, Mürefte, Şarköy ve Gelibolu/Çanakkale yer alır)",
+            "Batı": "Altınova, Barbaros, Kumbağ kavşağı, Malkara, İpsala/Keşan (Edirne) D-110 karayolu ve Kuzeybatıda Hayrabolu"
         },
         "Tokat": {
             "Koordinatlar": "40°19′N 36°33′E (Enlem: 40.3167° Kuzey, Boylam: 36.5500° Doğu, Rakım: 623 m)",
@@ -1004,18 +1004,91 @@ const CompassSystem = {
 
         // 3. Rota adı ve açıklama metin analizi
         const name = ((route.name || "") + " " + (route.desc || "")).toLowerCase();
-        if (name.includes("kuzey") || name.includes("saray") || name.includes("muratlı") || name.includes("hastane") || name.includes("otogar")) return "Kuzey";
-        if (name.includes("doğu") || name.includes("çorlu") || name.includes("velimeşe") || name.includes("değirmenaltı") || name.includes("üniversite") || name.includes("istanbul")) return "Doğu";
-        if (name.includes("güney") || name.includes("şarköy") || name.includes("ereğli") || name.includes("sahil") || name.includes("liman") || name.includes("çanakkale")) return "Güney";
-        if (name.includes("batı") || name.includes("malkara") || name.includes("hayrabolu") || name.includes("valilik") || name.includes("keşan") || name.includes("edirne")) return "Batı";
+        if (name.includes("kuzey") || name.includes("saray") || name.includes("muratlı") || name.includes("hastane") || name.includes("kırklareli")) return "Kuzey";
+        if (name.includes("doğu") || name.includes("çorlu") || name.includes("velimeşe") || name.includes("çerkezköy") || name.includes("kapaklı") || name.includes("ereğli") || name.includes("yeniçiftlik") || name.includes("değirmenaltı") || name.includes("üniversite") || name.includes("istanbul")) return "Doğu";
+        if (name.includes("güney") || name.includes("şarköy") || name.includes("mürefte") || name.includes("uçmakdere") || name.includes("sahil") || name.includes("liman") || name.includes("çanakkale")) return "Güney";
+        if (name.includes("batı") || name.includes("malkara") || name.includes("hayrabolu") || name.includes("altınova") || name.includes("barbaros") || name.includes("kumbağ") || name.includes("keşan") || name.includes("edirne")) return "Batı";
 
         return null;
+    },
+
+    tekirdagDistrictCompass: {
+        "Çorlu": {
+            "Kuzey": "Ergene (Marmaracık, Ulaş), Velimeşe OSB ve Lüleburgaz/Edirne TEM bağlantısı",
+            "Doğu": "Velimeşe, Çerkezköy, Çorlu Atatürk Havalimanı, Silivri ve İstanbul yönü",
+            "Güney": "Yenice, Yeniçiftlik, Marmaraereğlisi sahili ve Marmara Denizi",
+            "Batı": "Muratlı ve Süleymanpaşa (Tekirdağ Merkez) istikameti"
+        },
+        "Çerkezköy": {
+            "Kuzey": "Kapaklı, Pınarça, Büyükyoncalı ve Saray orman koridoru",
+            "Doğu": "Çatalca, Silivri ve İstanbul TEM / Kuzey Marmara bağlantısı",
+            "Güney": "Veliköy, Kınalı/Silivri bağlantı yolu",
+            "Batı": "Kızılpınar, Velimeşe OSB, Ergene ve Çorlu istikameti"
+        },
+        "Kapaklı": {
+            "Kuzey": "Büyükyoncalı, Saray ve Istranca Ormanları (Vize/Kıyıköy) istikameti",
+            "Doğu": "Karaağaç, Pınarça ve İstanbul Çatalca sınırı",
+            "Güney": "Çerkezköy Merkez ve Çerkezköy OSB sanayi bölgesi",
+            "Batı": "Yanıkağıl, Ergene ve Velimeşe sanayi koridoru"
+        },
+        "Ergene": {
+            "Kuzey": "Ulaş, Vakıflar, Misinli ve Lüleburgaz (Kırklareli) D-565 yolu",
+            "Doğu": "Velimeşe OSB, Kızılpınar ve Çerkezköy sanayi hattı",
+            "Güney": "Sağlık/Yeşiltepe mahalleleri ve Çorlu Merkez",
+            "Batı": "Muratlı ve Hayrabolu istikameti"
+        },
+        "Velimeşe": {
+            "Kuzey": "TEM Otoyolu Çorlu/Ergene gişeleri, Misinli ve Saray bağlantısı",
+            "Doğu": "Veliköy, Kızılpınar ve Çerkezköy OSB koridoru",
+            "Güney": "Çorlu Çevre Yolu ve Çorlu Şehir Merkezi (Hat 48)",
+            "Batı": "Ulaş, Marmaracık (Ergene Merkez) ve Muratlı istikameti"
+        },
+        "Saray": {
+            "Kuzey": "Güngörmez, Bahçeköy, Istranca Ormanları ve Vize/Kıyıköy (Karadeniz) istikameti",
+            "Doğu": "Safaalan, Çatalca orman yolu ve İstanbul kuzey sınırı",
+            "Güney": "Büyükyoncalı, Kapaklı ve Çerkezköy istikameti",
+            "Batı": "Çukuryurt, Beyazköy, Vakıflar ve Lüleburgaz/Ergene istikameti"
+        },
+        "Muratlı": {
+            "Kuzey": "Aşağısevindik, Büyükkarıştıran ve Lüleburgaz (Kırklareli) D-565 karayolu",
+            "Doğu": "Ergene (Marmaracık) ve Çorlu sanayi koridoru",
+            "Güney": "Süleymanpaşa (Tekirdağ Merkez) D-565 karayolu",
+            "Batı": "İnanlı ve Hayrabolu ova istikameti"
+        },
+        "Marmaraereğlisi": {
+            "Kuzey": "Çorlu ve TEM Otoyolu bağlantı yolu",
+            "Doğu": "Sultanköy, Gümüşyaka, Silivri ve İstanbul D-110 sahil karayolu",
+            "Güney": "Perinthos Antik Limanı ve Marmara Denizi açıkları (kara yolu yoktur)",
+            "Batı": "Yeniçiftlik, Yenice ve Süleymanpaşa sahil yolu"
+        },
+        "Hayrabolu": {
+            "Kuzey": "Alpullu, Babaeski ve Kırklareli D-555 karayolu",
+            "Doğu": "Muratlı ve Çorlu/Ergene iç Trakya bağlantısı",
+            "Güney": "Dambaslar, Banarlı ve Süleymanpaşa / Malkara ayrımı",
+            "Batı": "Çerkezmüsellim ve Edirne Uzunköprü sınır hattı"
+        },
+        "Malkara": {
+            "Kuzey": "Kozyörük, Sağlamtaş ve Hayrabolu iç Trakya karayolu",
+            "Doğu": "İnecik ve Süleymanpaşa (Tekirdağ Merkez) D-110 karayolu",
+            "Güney": "Ganos Dağları geçidi, Şarköy ve 1915 Çanakkale Köprüsü otoyolu",
+            "Batı": "Keşan, İpsala Sınır Kapısı ve Edirne karayolu"
+        },
+        "Şarköy": {
+            "Kuzey": "Gölcük, Ganos Dağları ve Malkara dağ geçidi",
+            "Doğu": "Eriklice, Mürefte, Hoşköy, Gaziköy, Uçmakdere ve Süleymanpaşa sahil yolu",
+            "Güney": "Şarköy İskelesi, Marmara Denizi ve Marmara Adası açıkları (kara yolu yoktur)",
+            "Batı": "Kızılcaterzi, Kavakköy ve Çanakkale Gelibolu yarımadası"
+        }
     },
 
     getLandmarkDesc: function(city, dirName) {
         if (!city) city = "Tekirdağ";
         const cleanCity = city.trim();
         const altCity = cleanCity.includes('â') ? cleanCity.replace(/â/g, 'a') : (cleanCity === 'Hakkari' ? 'Hakkâri' : cleanCity);
+
+        if (cleanCity === "Tekirdağ" && typeof Game !== 'undefined' && Game.activeDistrict && this.tekirdagDistrictCompass[Game.activeDistrict] && this.tekirdagDistrictCompass[Game.activeDistrict][dirName]) {
+            return `${Game.activeDistrict} (${dirName}): ${this.tekirdagDistrictCompass[Game.activeDistrict][dirName]}`;
+        }
 
         if (this.cityLandmarks) {
             if (this.cityLandmarks[cleanCity] && this.cityLandmarks[cleanCity][dirName]) {
@@ -1241,7 +1314,7 @@ const CompassSystem = {
         // Süleymanpaşa merkezli coğrafi yönler
         const keywords = {
             "Kuzey": ["saray", "muratlı"],
-            "Doğu": ["çorlu", "velimeşe", "çerkezköy"],
+            "Doğu": ["çorlu", "ergene", "velimeşe", "çerkezköy", "kapaklı", "marmaraereğlisi"],
             "Güney": ["şarköy"],
             "Batı": ["malkara", "hayrabolu"]
         };

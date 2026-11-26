@@ -1954,7 +1954,7 @@ const sehirRotalari = {
         komsular: {
             kuzey: "Kırklareli (Lüleburgaz - Babaeski - Vize)",
             dogu: "İstanbul (Silivri - Çatalca)",
-            guney: "Marmara Denizi ve Çanakkale (Gelibolu / Şarköy)",
+            guney: "Marmara Denizi (Güneybatıda Şarköy üzerinden Çanakkale / Gelibolu)",
             bati: "Edirne (Uzunköprü - Keşan - Meriç)"
         },
         komsuIller: ["İstanbul", "Kırklareli", "Edirne", "Çanakkale"],
@@ -1973,9 +1973,10 @@ const sehirRotalari = {
             aciklama: "Eski merkez ilçe Süleymanpaşa adını aldı. Çorlu'ya bağlı beldelerin birleşmesiyle Ergene yeni bir ilçe oldu. Çerkezköy'e bağlı bir belde olan Kapaklı müstakil bir ilçeye dönüştürüldü. Diğer 8 ilçe (Çorlu, Çerkezköy, Malkara, Şarköy, Hayrabolu, Saray, Muratlı ve Marmaraereğlisi) ile birlikte güncel ilçe sayısı 11 olarak sabitlendi.",
             komsuIlceler: {
                 "Süleymanpaşa": ["Muratlı", "Çorlu", "Marmaraereğlisi", "Hayrabolu", "Malkara", "Şarköy"],
-                "Çorlu": ["Süleymanpaşa", "Marmaraereğlisi", "Ergene", "Çerkezköy", "Muratlı"],
-                "Ergene": ["Çorlu", "Muratlı", "Çerkezköy", "Kapaklı", "Saray"],
-                "Çerkezköy": ["Kapaklı", "Çorlu", "Ergene"],
+                "Çorlu": ["Süleymanpaşa", "Marmaraereğlisi", "Ergene", "Velimeşe", "Çerkezköy", "Muratlı"],
+                "Ergene": ["Çorlu", "Velimeşe", "Muratlı", "Çerkezköy", "Kapaklı", "Saray"],
+                "Velimeşe": ["Ergene", "Çorlu", "Çerkezköy"],
+                "Çerkezköy": ["Kapaklı", "Çorlu", "Ergene", "Velimeşe"],
                 "Kapaklı": ["Çerkezköy", "Saray", "Ergene"],
                 "Saray": ["Kapaklı", "Ergene"],
                 "Muratlı": ["Süleymanpaşa", "Çorlu", "Ergene", "Hayrabolu"],
@@ -1994,22 +1995,13 @@ const sehirRotalari = {
                 "Malkara": [{ komsuIl: "Edirne", ilceAks: "Keşan / İpsala", yol: "D-110 / E84", mesafeKm: 28 }],
                 "Şarköy": [{ komsuIl: "Çanakkale", ilceAks: "Gelibolu / Evreşe", yol: "D-120", mesafeKm: 35 }]
             },
-            ilSinirKapilari: {
-                "Marmaraereğlisi": [{ komsuIl: "İstanbul", ilceAks: "Silivri / Gümüşyaka", yol: "D-110 / E84", mesafeKm: 15 }],
-                "Çerkezköy": [{ komsuIl: "İstanbul", ilceAks: "Silivri / Çatalca", yol: "D-567 / O-3", mesafeKm: 25 }],
-                "Kapaklı": [{ komsuIl: "İstanbul", ilceAks: "Çatalca", yol: "D-020", mesafeKm: 30 }],
-                "Muratlı": [{ komsuIl: "Kırklareli", ilceAks: "Lüleburgaz / Büyükkarıştıran", yol: "D-565", mesafeKm: 22 }],
-                "Saray": [{ komsuIl: "Kırklareli", ilceAks: "Vize / Kıyıköy", yol: "D-020", mesafeKm: 20 }],
-                "Hayrabolu": [{ komsuIl: "Edirne", ilceAks: "Uzunköprü", yol: "D-555", mesafeKm: 42 }],
-                "Malkara": [{ komsuIl: "Edirne", ilceAks: "Keşan / İpsala", yol: "D-110 / E84", mesafeKm: 28 }],
-                "Şarköy": [{ komsuIl: "Çanakkale", ilceAks: "Gelibolu / Evreşe", yol: "D-120", mesafeKm: 35 }]
-            },
             liste: [
                 { id: "Süleymanpaşa", ad: "Süleymanpaşa", rol: "İl Merkezi (Eski Merkez İlçe)", lat: 40.9833, lon: 27.5167, merkezeMesafeKm: 0, aciklama: "Eski merkez ilçe Süleymanpaşa adını aldı." },
                 { id: "Muratlı", ad: "Muratlı", rol: "Demiryolu & Sanayi", lat: 41.1717, lon: 27.5028, merkezeMesafeKm: 24, aciklama: "Tren Garı aksı ve merkez hatları." },
                 { id: "Çorlu", ad: "Çorlu", rol: "Sanayi & Ticaret Metropolü", lat: 41.1592, lon: 27.8000, merkezeMesafeKm: 36, aciklama: "Büyük sanayi metropolü ve en kalabalık ilçe." },
                 { id: "Marmaraereğlisi", ad: "Marmaraereğlisi", rol: "Sahil, Liman & Turizm", lat: 40.9686, lon: 27.9553, merkezeMesafeKm: 38, aciklama: "Perinthos antik kenti, Yeniçiftlik ve sahil hatları." },
-                { id: "Ergene", ad: "Ergene", rol: "Müstakil İlçe (Marmaracık & Velimeşe)", lat: 41.2281, lon: 27.7028, merkezeMesafeKm: 45, aciklama: "Çorlu'ya bağlı beldelerin birleşmesiyle Ergene yeni bir ilçe oldu." },
+                { id: "Ergene", ad: "Ergene", rol: "Müstakil İlçe (Marmaracık & Ulaş)", lat: 41.2281, lon: 27.7028, merkezeMesafeKm: 45, aciklama: "Çorlu'ya bağlı beldelerin birleşmesiyle Ergene yeni bir ilçe oldu." },
+                { id: "Velimeşe", ad: "Velimeşe", rol: "OSB Sanayi & Tren Garı Bölgesi", lat: 41.2530, lon: 27.8990, merkezeMesafeKm: 49, aciklama: "Ergene-Çorlu-Çerkezköy kavşağında ağır sanayi ve mahalle merkezi." },
                 { id: "Hayrabolu", ad: "Hayrabolu", rol: "Trakya Tarım & Ayçiçeği", lat: 41.2153, lon: 27.1111, merkezeMesafeKm: 52, aciklama: "Ayçiçeği tarlaları ve ova çarşı hatları." },
                 { id: "Malkara", ad: "Malkara", rol: "Tarım & Hayvancılık Merkezi", lat: 40.8900, lon: 26.9011, merkezeMesafeKm: 58, aciklama: "Geniş ova, tepe mahalleler ve köy hatları." },
                 { id: "Çerkezköy", ad: "Çerkezköy", rol: "Sanayi & OSB Merkezi", lat: 41.2858, lon: 28.0019, merkezeMesafeKm: 62, aciklama: "Yoğun sanayi ve fabrika merkezleri." },
@@ -2017,19 +2009,20 @@ const sehirRotalari = {
                 { id: "Saray", ad: "Saray", rol: "Kuzey Trakya Orman Hattı", lat: 41.4439, lon: 27.9219, merkezeMesafeKm: 78, aciklama: "Istranca etekleri ve orman hatları." },
                 { id: "Şarköy", ad: "Şarköy", rol: "Marmara Sahil & Bağcılık", lat: 40.6139, lon: 27.1128, merkezeMesafeKm: 84, aciklama: "Marmara denizi kıyısı ve bağ hatları." }
             ],
-            // 11x11 Gerçek Karayolu Kilometre Matrisi (Karayolu Mesafeleri)
+            // 12x12 Gerçek Karayolu Kilometre Matrisi (Velimeşe dahil)
             mesafeMatrisiKm: {
-                "Süleymanpaşa":   { "Süleymanpaşa": 0,  "Muratlı": 24, "Çorlu": 36, "Marmaraereğlisi": 38, "Ergene": 45, "Hayrabolu": 52, "Malkara": 58, "Çerkezköy": 62, "Kapaklı": 67, "Saray": 78, "Şarköy": 84 },
-                "Muratlı":        { "Süleymanpaşa": 24, "Muratlı": 0,  "Çorlu": 24, "Marmaraereğlisi": 46, "Ergene": 18, "Hayrabolu": 44, "Malkara": 70, "Çerkezköy": 48, "Kapaklı": 53, "Saray": 68, "Şarköy": 98 },
-                "Çorlu":          { "Süleymanpaşa": 36, "Muratlı": 24, "Çorlu": 0,  "Marmaraereğlisi": 22, "Ergene": 9,  "Hayrabolu": 64, "Malkara": 82, "Çerkezköy": 26, "Kapaklı": 31, "Saray": 46, "Şarköy": 110 },
-                "Marmaraereğlisi":{ "Süleymanpaşa": 38, "Muratlı": 46, "Çorlu": 22, "Marmaraereğlisi": 0,  "Ergene": 31, "Hayrabolu": 90, "Malkara": 96, "Çerkezköy": 48, "Kapaklı": 53, "Saray": 68, "Şarköy": 122 },
-                "Ergene":         { "Süleymanpaşa": 45, "Muratlı": 18, "Çorlu": 9,  "Marmaraereğlisi": 31, "Ergene": 0,  "Hayrabolu": 58, "Malkara": 91, "Çerkezköy": 23, "Kapaklı": 28, "Saray": 43, "Şarköy": 119 },
-                "Hayrabolu":      { "Süleymanpaşa": 52, "Muratlı": 44, "Çorlu": 64, "Marmaraereğlisi": 90, "Ergene": 58, "Hayrabolu": 0,  "Malkara": 46, "Çerkezköy": 88, "Kapaklı": 93, "Saray": 85, "Şarköy": 95 },
-                "Malkara":        { "Süleymanpaşa": 58, "Muratlı": 70, "Çorlu": 82, "Marmaraereğlisi": 96, "Ergene": 91, "Hayrabolu": 46, "Malkara": 0,  "Çerkezköy": 108,"Kapaklı": 113,"Saray": 128,"Şarköy": 48 },
-                "Çerkezköy":      { "Süleymanpaşa": 62, "Muratlı": 48, "Çorlu": 26, "Marmaraereğlisi": 48, "Ergene": 23, "Hayrabolu": 88, "Malkara": 108,"Çerkezköy": 0,  "Kapaklı": 5,  "Saray": 20, "Şarköy": 136 },
-                "Kapaklı":        { "Süleymanpaşa": 67, "Muratlı": 53, "Çorlu": 31, "Marmaraereğlisi": 53, "Ergene": 28, "Hayrabolu": 93, "Malkara": 113,"Çerkezköy": 5,   "Kapaklı": 0,  "Saray": 15, "Şarköy": 141 },
-                "Saray":          { "Süleymanpaşa": 78, "Muratlı": 68, "Çorlu": 46, "Marmaraereğlisi": 68, "Ergene": 43, "Hayrabolu": 85, "Malkara": 128,"Çerkezköy": 20, "Kapaklı": 15, "Saray": 0,  "Şarköy": 152 },
-                "Şarköy":         { "Süleymanpaşa": 84, "Muratlı": 98, "Çorlu": 110,"Marmaraereğlisi": 122,"Ergene": 119,"Hayrabolu": 95, "Malkara": 48, "Çerkezköy": 136,"Kapaklı": 141,"Saray": 152,"Şarköy": 0 }
+                "Süleymanpaşa":   { "Süleymanpaşa": 0,  "Muratlı": 24, "Çorlu": 36, "Marmaraereğlisi": 38, "Ergene": 45, "Velimeşe": 49, "Hayrabolu": 52, "Malkara": 58, "Çerkezköy": 62, "Kapaklı": 67, "Saray": 78, "Şarköy": 84 },
+                "Muratlı":        { "Süleymanpaşa": 24, "Muratlı": 0,  "Çorlu": 24, "Marmaraereğlisi": 46, "Ergene": 18, "Velimeşe": 30, "Hayrabolu": 44, "Malkara": 70, "Çerkezköy": 48, "Kapaklı": 53, "Saray": 68, "Şarköy": 98 },
+                "Çorlu":          { "Süleymanpaşa": 36, "Muratlı": 24, "Çorlu": 0,  "Marmaraereğlisi": 22, "Ergene": 9,  "Velimeşe": 13, "Hayrabolu": 64, "Malkara": 82, "Çerkezköy": 26, "Kapaklı": 31, "Saray": 46, "Şarköy": 110 },
+                "Marmaraereğlisi":{ "Süleymanpaşa": 38, "Muratlı": 46, "Çorlu": 22, "Marmaraereğlisi": 0,  "Ergene": 31, "Velimeşe": 35, "Hayrabolu": 90, "Malkara": 96, "Çerkezköy": 48, "Kapaklı": 53, "Saray": 68, "Şarköy": 122 },
+                "Ergene":         { "Süleymanpaşa": 45, "Muratlı": 18, "Çorlu": 9,  "Marmaraereğlisi": 31, "Ergene": 0,  "Velimeşe": 12, "Hayrabolu": 58, "Malkara": 91, "Çerkezköy": 23, "Kapaklı": 28, "Saray": 43, "Şarköy": 119 },
+                "Velimeşe":       { "Süleymanpaşa": 49, "Muratlı": 30, "Çorlu": 13, "Marmaraereğlisi": 35, "Ergene": 12, "Velimeşe": 0,  "Hayrabolu": 70, "Malkara": 95, "Çerkezköy": 12, "Kapaklı": 17, "Saray": 32, "Şarköy": 123 },
+                "Hayrabolu":      { "Süleymanpaşa": 52, "Muratlı": 44, "Çorlu": 64, "Marmaraereğlisi": 90, "Ergene": 58, "Velimeşe": 70, "Hayrabolu": 0,  "Malkara": 46, "Çerkezköy": 88, "Kapaklı": 93, "Saray": 85, "Şarköy": 95 },
+                "Malkara":        { "Süleymanpaşa": 58, "Muratlı": 70, "Çorlu": 82, "Marmaraereğlisi": 96, "Ergene": 91, "Velimeşe": 95, "Hayrabolu": 46, "Malkara": 0,  "Çerkezköy": 108,"Kapaklı": 113,"Saray": 128,"Şarköy": 48 },
+                "Çerkezköy":      { "Süleymanpaşa": 62, "Muratlı": 48, "Çorlu": 26, "Marmaraereğlisi": 48, "Ergene": 23, "Velimeşe": 12, "Hayrabolu": 88, "Malkara": 108,"Çerkezköy": 0,  "Kapaklı": 5,  "Saray": 20, "Şarköy": 136 },
+                "Kapaklı":        { "Süleymanpaşa": 67, "Muratlı": 53, "Çorlu": 31, "Marmaraereğlisi": 53, "Ergene": 28, "Velimeşe": 17, "Hayrabolu": 93, "Malkara": 113,"Çerkezköy": 5,   "Kapaklı": 0,  "Saray": 15, "Şarköy": 141 },
+                "Saray":          { "Süleymanpaşa": 78, "Muratlı": 68, "Çorlu": 46, "Marmaraereğlisi": 68, "Ergene": 43, "Velimeşe": 32, "Hayrabolu": 85, "Malkara": 128,"Çerkezköy": 20, "Kapaklı": 15, "Saray": 0,  "Şarköy": 152 },
+                "Şarköy":         { "Süleymanpaşa": 84, "Muratlı": 98, "Çorlu": 110,"Marmaraereğlisi": 122,"Ergene": 119,"Velimeşe": 123,"Hayrabolu": 95, "Malkara": 48, "Çerkezköy": 136,"Kapaklı": 141,"Saray": 152,"Şarköy": 0 }
             },
             hesaplaIlceMesafe: function(ilce1, ilce2) {
                 if (!ilce1 || !ilce2) return 0;
@@ -2109,13 +2102,6 @@ const sehirRotalari = {
                 sogukDonemEnDusuk: 2.1
             }
         },
-        komsular: {
-            bati: "Edirne",
-            kuzey: "Kırklareli",
-            dogu: "İstanbul",
-            guney: "Çanakkale"
-        },
-        komsuIller: ["Edirne", "Kırklareli", "İstanbul", "Çanakkale"],
         terrain: "sahil",
         ucretler: { tam: 33, ogrenci: 17, yasli: 0 }
     },
@@ -12678,6 +12664,28 @@ if (typeof window !== 'undefined' && window.tekulasHatVeritabani && Array.isArra
     }
 }
 
+// Tekirdağ el yapımı ilçe ve mahalle hatlarında eksik district / totalKm / isCity alanlarını yükleme sırasından bağımsız olarak tamamla
+if (typeof ilceRotalari !== 'undefined' && Array.isArray(ilceRotalari["Tekirdağ"])) {
+    ilceRotalari["Tekirdağ"].forEach(r => {
+        if (!r) return;
+        r.sehir = r.sehir || "Tekirdağ";
+        if (!r.totalKm && Array.isArray(r.stops)) {
+            const sumKm = r.stops.reduce((acc, st) => acc + (Number(st && st.gercekMesafeSonraki) || 0), 0);
+            r.totalKm = Math.round(sumKm * 10) / 10;
+        }
+        if (!r.district) {
+            if (r.originDistrict && r.destDistrict && r.originDistrict === r.destDistrict) {
+                r.district = r.originDistrict;
+                r.isCity = true;
+                r.isDistrict = false;
+            } else {
+                r.district = "İlçeler Arası";
+                r.isDistrict = true;
+            }
+        }
+    });
+}
+
 /* MAP_ENGINE_HIERARCHICAL_ROUTES */
 // Yalova ve Bayburt Hiyerarşik Hafif Rota Entegrasyonu
 if (typeof MapEngine !== 'undefined') {
@@ -13096,7 +13104,7 @@ const hatVelimeseMahalleRing = {
     hatNo: "VM-RING",
     name: "VELİMEŞE MAHALLESİ TAM RİNG (30 DURAK)",
     sehir: "Tekirdağ",
-    destDistrict: "Ergene",
+    destDistrict: "Velimeşe",
     originDistrict: "Velimeşe",
     district: "Velimeşe",
     startStop: "Velimeşe Merkez Meydanı (Atatürk Parkı)",
@@ -13325,7 +13333,7 @@ if (typeof masterCitiesList !== 'undefined' && typeof sehirRotalari !== 'undefin
 
     masterCitiesList.forEach(cityA => {
         if (sehirRotalari[cityA]) {
-            // 1. Resmi fiziki sınır komşularını güvenle sakla
+            // 1. Resmi fiziki sınır komşularını güvenle sakla ve komsuIller alanında yalnızca gerçek sınır komşularını koru!
             if (!sehirRotalari[cityA].fizikiSinirKomsulari) {
                 if (Array.isArray(sehirRotalari[cityA].komsuIller)) {
                     sehirRotalari[cityA].fizikiSinirKomsulari = [...sehirRotalari[cityA].komsuIller];
@@ -13335,9 +13343,11 @@ if (typeof masterCitiesList !== 'undefined' && typeof sehirRotalari !== 'undefin
                     sehirRotalari[cityA].fizikiSinirKomsulari = [];
                 }
             }
-            // 2. Bütün illeri komşu olarak bağla (kendisi hariç)
-            sehirRotalari[cityA].komsuIller = masterCitiesList.filter(c => c !== cityA);
-            // 3. Ulaşım ağı bağlantısı listesi
+            if (cityA === "Erzurum") {
+                sehirRotalari[cityA].fizikiSinirKomsulari = sehirRotalari[cityA].fizikiSinirKomsulari.filter(x => x !== "Eskişehir");
+            }
+            sehirRotalari[cityA].komsuIller = [...sehirRotalari[cityA].fizikiSinirKomsulari];
+            // 2. Tüm Türkiye 81 il şehirlerarası ulaşım ağı bağlantısı listesi
             sehirRotalari[cityA].ulasimAgi = masterCitiesList.filter(c => c !== cityA);
         }
     });

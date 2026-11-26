@@ -111,6 +111,26 @@
         "Hatay": { x: 7, y: 7, plate: "31", region: "Akdeniz", alt: 85, neighbors: ["Adana", "Osmaniye", "Gaziantep"], desc: "Medeniyetler beşiği, Saint Pierre Kilisesi, Harbiye Şelaleleri ve zengin gastronomi." }
     };
 
+    function normTr(str) {
+        return String(str || '')
+            .replace(/İ/g, 'i')
+            .replace(/I/g, 'ı')
+            .replace(/Â/g, 'a')
+            .replace(/â/g, 'a')
+            .toLowerCase()
+            .trim();
+    }
+
+    function normAscii(str) {
+        return normTr(str)
+            .replace(/ı/g, 'i')
+            .replace(/ğ/g, 'g')
+            .replace(/ü/g, 'u')
+            .replace(/ş/g, 's')
+            .replace(/ö/g, 'o')
+            .replace(/ç/g, 'c');
+    }
+
     const TurkeyAtlas = {
         provinces: PROVINCES_MAP,
         currentCity: "Tekirdağ",
@@ -118,9 +138,23 @@
         selectedDistrictIndex: 0,
         districtsList: [],
         audioCtx: null,
+        _initialized: false,
+
+        _resolveProvinceKey: function(name) {
+            if (!name) return null;
+            if (this.provinces[name]) return name;
+            const nNorm = normTr(name);
+            const nAscii = normAscii(name);
+            for (const key of Object.keys(this.provinces)) {
+                if (normTr(key) === nNorm || normAscii(key) === nAscii) return key;
+            }
+            return null;
+        },
 
         // Haritayı Başlat
         init: function() {
+            if (this._initialized) return;
+            this._initialized = true;
             this.bindEvents();
             console.log("[TurkeyAtlas] 81 İl Coğrafya Atlası ve Izgara Motoru hazır.");
         },
@@ -128,6 +162,7 @@
         // Web Audio Synthesizer (3D Stereo Panning & Yön Geri Bildirimi)
         playSpatialTone: function(x, y, isBorder) {
             try {
+                if (typeof audio !== 'undefined' && audio.isMuted) return;
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (!AudioContext) return;
                 if (!this.audioCtx) this.audioCtx = new AudioContext();
@@ -173,6 +208,14 @@
                     gain.connect(ctx.destination);
                 }
 
+                osc.onended = () => {
+                    try {
+                        osc.disconnect();
+                        gain.disconnect();
+                        if (panner) panner.disconnect();
+                    } catch (e) {}
+                };
+
                 osc.start();
                 osc.stop(ctx.currentTime + (isBorder ? 0.25 : 0.22));
             } catch(e) {
@@ -182,10 +225,11 @@
 
         // Atlas Ekranını Aç
         open: function(initialCity) {
-            if (initialCity && this.provinces[initialCity]) {
-                this.currentCity = initialCity;
-            } else if (typeof Game !== 'undefined' && Game.currentCity && this.provinces[Game.currentCity]) {
-                this.currentCity = Game.currentCity;
+            this.init();
+            const resolvedInit = this._resolveProvinceKey(initialCity)
+                || (typeof Game !== 'undefined' && Game.currentCity ? this._resolveProvinceKey(Game.currentCity) : null);
+            if (resolvedInit) {
+                this.currentCity = resolvedInit;
             }
             this.currentMode = "provinces";
 
@@ -207,6 +251,9 @@
             } else {
                 const scr = document.getElementById("atlas-screen");
                 if (scr) scr.classList.add("hidden");
+            }
+            if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+                KeyboardNav.initForScreen();
             }
             if (typeof audio !== 'undefined' && audio.speak) {
                 audio.speak("Türkiye Coğrafya Atlasından çıkıldı. Ana menüdesiniz.");
@@ -258,44 +305,53 @@
             }
         },
 
-        // Belirtilen yöndeki en mantıklı komşuyu veya en yakın şehri bul
+        // Belirtilen yöndeki en mantıklı komşuyu veya aynı koridordaki en yakın şehri bul
+        // (Antalya'dan Güneye basınca Akdeniz sınırı yerine Hatay'a ışınlanma hatası önlendi!)
         findCityInDirection: function(fromCity, targetX, targetY, direction) {
-            // 1. Önce tam hedef koordinatta il var mı bak
+            // 1. Önce tam bitişik hedef koordinatta il var mı bak
             for (const [name, p] of Object.entries(this.provinces)) {
                 if (p.x === targetX && p.y === targetY) {
                     return name;
                 }
             }
 
-            // 2. Tam koordinatta yoksa, o yöndeki en yakın geçerli ili seç
-            let closestCity = null;
-            let minDistance = Infinity;
+            const neighborSet = new Set(Array.isArray(fromCity.neighbors) ? fromCity.neighbors : []);
+
+            // 2. O yöndeki koni içinde kalan gerçek komşu veya yakın ili seç (yanal kayma sınırı: <= 2 sütun/satır)
+            let bestCity = null;
+            let bestScore = Infinity;
 
             for (const [name, p] of Object.entries(this.provinces)) {
                 if (name === this.currentCity) continue;
 
-                let isEligible = false;
-                if (direction === 'up' && p.y < fromCity.y) isEligible = true;
-                if (direction === 'down' && p.y > fromCity.y) isEligible = true;
-                if (direction === 'left' && p.x < fromCity.x) isEligible = true;
-                if (direction === 'right' && p.x > fromCity.x) isEligible = true;
+                const dx = p.x - fromCity.x;
+                const dy = p.y - fromCity.y;
+                let primary = 0;
+                let cross = 0;
 
-                if (isEligible) {
-                    const dx = p.x - fromCity.x;
-                    const dy = p.y - fromCity.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        closestCity = name;
-                    }
+                if (direction === 'up' && dy < 0) { primary = -dy; cross = Math.abs(dx); }
+                else if (direction === 'down' && dy > 0) { primary = dy; cross = Math.abs(dx); }
+                else if (direction === 'left' && dx < 0) { primary = -dx; cross = Math.abs(dy); }
+                else if (direction === 'right' && dx > 0) { primary = dx; cross = Math.abs(dy); }
+                else continue;
+
+                const isNeighbor = neighborSet.has(name);
+                // Kuzey/Güney basıldığında en fazla 2 sütun, Doğu/Batı basıldığında en fazla 2 satır yanal sapmaya izin ver
+                const maxCross = isNeighbor ? 3 : ((direction === 'left' || direction === 'right') ? 2 : 1);
+                if (cross > maxCross) continue;
+
+                const score = primary + (cross * 1.45) - (isNeighbor ? 0.65 : 0);
+                if (score < bestScore) {
+                    bestScore = score;
+                    bestCity = name;
                 }
             }
 
-            return closestCity;
+            return bestCity;
         },
 
         // Ekran Okuyucu ve Sesli Bildirim
-        speakCurrentCity: function() {
+        speakCurrentCity: function(prefixText = "") {
             const c = this.provinces[this.currentCity];
             if (!c) return;
 
@@ -303,9 +359,10 @@
             const distCount = adminInfo && adminInfo.districts ? Object.keys(adminInfo.districts).length : (c.districts ? c.districts.length : 1);
             const neighborsStr = c.neighbors && c.neighbors.length ? c.neighbors.join(", ") : "Bölgesel komşular";
 
-            const speechText = `${this.currentCity}, Plaka ${c.plate}. ${c.region} Bölgesi. Rakım: ${c.alt} metre. ${distCount} ilçe. Komşuları: ${neighborsStr}. İlçeleri gezmek için Enter, komşuları detaylı dinlemek için K, arama yapmak için F tuşuna basınız.`;
+            const coreSpeech = `${this.currentCity}, Plaka ${c.plate}. ${c.region} Bölgesi. Rakım: ${c.alt} metre. ${distCount} ilçe. Komşuları: ${neighborsStr}. İlçeleri gezmek için Enter, komşuları detaylı dinlemek için K, arama yapmak için F tuşuna basınız.`;
+            const speechText = prefixText ? `${prefixText} ${coreSpeech}` : coreSpeech;
 
-            this.announceText(speechText, "polite");
+            this.announceText(speechText, prefixText ? "assertive" : "polite");
         },
 
         // Komşuları Detaylı Seslendir (K Tuşu)
@@ -400,35 +457,38 @@
             this.announceText(speech, "assertive");
         },
 
-        // Hızlı İl veya İlçe Arama (F Tuşu)
+        // Hızlı İl veya İlçe Arama (F Tuşu - Türkçe İ/I ve şapkasız harf duyarlı)
         openSearch: function() {
             const query = prompt("🗺️ TÜRKİYE COĞRAFYA ATLASI ARAMA\n\nGitmek istediğiniz il, ilçe veya plaka kodunu yazınız (Örn: Bolu, Çorlu, Çankaya, 59):");
             if (!query || !query.trim()) return;
 
-            const q = query.trim().toLowerCase();
+            const qRaw = query.trim();
+            const qNorm = normTr(qRaw);
+            const qAscii = normAscii(qRaw);
 
             // 1. Plaka eşleşmesi
-            for (const [name, p] of Object.entries(this.provinces)) {
-                if (p.plate === q || p.plate === q.padStart(2, '0')) {
-                    this.currentCity = name;
-                    this.currentMode = "provinces";
-                    this.render();
-                    this.announceText(`Plaka ${p.plate} eşleşti: ${name} iline gidildi.`, "assertive");
-                    this.speakCurrentCity();
-                    return;
+            if (/^\d{1,2}$/.test(qRaw)) {
+                const padded = qRaw.padStart(2, '0');
+                for (const [name, p] of Object.entries(this.provinces)) {
+                    if (p.plate === padded) {
+                        this.currentCity = name;
+                        this.currentMode = "provinces";
+                        this.render();
+                        this.speakCurrentCity(`Plaka ${p.plate} eşleşti: ${name} iline gidildi.`);
+                        return;
+                    }
                 }
             }
 
-            // 2. İl adı eşleşmesi
-            for (const name of Object.keys(this.provinces)) {
-                if (name.toLowerCase().includes(q)) {
-                    this.currentCity = name;
-                    this.currentMode = "provinces";
-                    this.render();
-                    this.announceText(`${name} ili bulundu ve haritada konumlanıldı.`, "assertive");
-                    this.speakCurrentCity();
-                    return;
-                }
+            // 2. İl adı eşleşmesi (Önce tam eşleşme, sonra alt dize)
+            const exactProv = Object.keys(this.provinces).find(name => normTr(name) === qNorm || normAscii(name) === qAscii);
+            const partialProv = exactProv || Object.keys(this.provinces).find(name => normTr(name).includes(qNorm) || normAscii(name).includes(qAscii));
+            if (partialProv) {
+                this.currentCity = partialProv;
+                this.currentMode = "provinces";
+                this.render();
+                this.speakCurrentCity(`${partialProv} ili bulundu ve haritada konumlanıldı.`);
+                return;
             }
 
             // 3. İlçe adı eşleşmesi
@@ -436,14 +496,14 @@
                 for (const [cName, cData] of Object.entries(window.TurkeyAdminData)) {
                     if (cData && cData.districts) {
                         for (const dName of Object.keys(cData.districts)) {
-                            if (dName.toLowerCase().includes(q)) {
-                                this.currentCity = cName;
+                            if (normTr(dName).includes(qNorm) || normAscii(dName).includes(qAscii)) {
+                                this.currentCity = this._resolveProvinceKey(cName) || cName;
                                 this.currentMode = "districts";
                                 this.districtsList = Object.keys(cData.districts);
                                 this.selectedDistrictIndex = this.districtsList.indexOf(dName);
                                 if (this.selectedDistrictIndex === -1) this.selectedDistrictIndex = 0;
                                 this.render();
-                                this.announceText(`${dName} ilçesi bulundu! ${cName} ili ilçeler atlasına gidildi.`, "assertive");
+                                this.announceText(`${dName} ilçesi bulundu! ${this.currentCity} ili ilçeler atlasına gidildi.`, "assertive");
                                 return;
                             }
                         }
@@ -451,7 +511,7 @@
                 }
             }
 
-            this.announceText(`'${query}' aramasına uygun il veya ilçe bulunamadı.`, "assertive");
+            this.announceText(`'${qRaw}' aramasına uygun il veya ilçe bulunamadı.`, "assertive");
         },
 
         // Canlı Bölge ve NVDA Bildirimi
@@ -576,7 +636,11 @@
                 const scr = document.getElementById("atlas-screen");
                 if (!scr || scr.classList.contains("hidden")) return;
 
-                const k = e.key;
+                const targetTag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : "";
+                if (targetTag === "INPUT" || targetTag === "TEXTAREA" || targetTag === "SELECT") return;
+                if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+                const k = e.key || "";
 
                 if (k === "ArrowUp") {
                     e.preventDefault();
@@ -619,10 +683,14 @@
     if (typeof module !== 'undefined' && module.exports) {
         module.exports = TurkeyAtlas;
     }
-    if (typeof window !== 'undefined') {
-        window.TurkeyAtlas = TurkeyAtlas;
-        document.addEventListener("DOMContentLoaded", () => {
+    window.TurkeyAtlas = TurkeyAtlas;
+    if (typeof document !== 'undefined') {
+        if (document.readyState === 'loading') {
+            document.addEventListener("DOMContentLoaded", () => {
+                TurkeyAtlas.init();
+            });
+        } else {
             TurkeyAtlas.init();
-        });
+        }
     }
-})(typeof window !== 'undefined' ? window : global);
+})(typeof window !== 'undefined' ? window : globalThis);

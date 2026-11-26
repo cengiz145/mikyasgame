@@ -826,47 +826,126 @@ const VelimeseNavigasyon = {
             .trim();
     },
 
+    _otherPlaces: [
+        'suleymanpasa', 'corlu', 'cerkezkoy', 'kapakli', 'saray', 'malkara',
+        'sarkoy', 'hayrabolu', 'muratli', 'marmaraereglisi', 'istanbul',
+        'edirne', 'kirklareli', 'ankara', 'izmir', 'bursa', 'kumbag', 'degirmenalti'
+    ],
+
+    _genericWords: new Set([
+        'sokak', 'sokagi', 'sk', 'cadde', 'caddesi', 'cd', 'mahalle', 'mahallesi',
+        'meydan', 'meydani', 'park', 'parki', 'yolu', 'giris', 'girisi', 'kapisi', 'duragi', 'durak',
+        'bolge', 'bolgesi', 'sitesi', 'konutlari', 'konut'
+    ]),
+
+    _stemWord: function(w) {
+        if (!w || w.length <= 4) return w;
+        return w.replace(/(lari|leri|nin|nun|dan|den|tan|ten|nda|nde|na|ne|ya|ye|yi|yu|si|su|i|u)$/, '');
+    },
+
     findSokak: function(query) {
         if (!query) return null;
         const qNorm = this.normalizeText(query);
         if (qNorm.length === 0) return null;
 
-        // 1. Tam eşleşme
-        let match = this.sokaklar.find(s => this.normalizeText(s.name) === qNorm);
-        if (match) return match;
-
-        // 2. Özel takma adlar (TOKİ, Sanayi, İstasyon, Çetin)
-        if (qNorm.includes("cetin")) {
-            match = this.sokaklar.find(s => s.name.includes("Çetin"));
-            if (match) return match;
-        }
-        if (qNorm.includes("meydan") || qNorm.includes("merkez")) {
-            match = this.sokaklar.find(s => s.name.includes("Meydanı"));
-            if (match) return match;
-        }
-        if (qNorm.includes("istasyon") || qNorm.includes("tren") || qNorm.includes("gar")) {
-            match = this.sokaklar.find(s => s.name.includes("Tren İstasyonu"));
-            if (match) return match;
-        }
-        if (qNorm.includes("saglik") || qNorm.includes("ocak") || qNorm.includes("doktor")) {
-            match = this.sokaklar.find(s => s.name.includes("Sağlığı Merkezi"));
-            if (match) return match;
-        }
-        if (qNorm.includes("pazar")) {
-            match = this.sokaklar.find(s => s.name.includes("Pazar Yeri"));
-            if (match) return match;
+        const hasVelimese = qNorm.includes('velimese');
+        if (!hasVelimese) {
+            if (this._otherPlaces.some(p => new RegExp('(?:^|\\s)' + p + '(?:\\s|$)').test(qNorm))) {
+                return null;
+            }
+            if (qNorm.includes('namik kemal universite') || qNorm.includes('otogar')) {
+                return null;
+            }
         }
 
-        // 3. Kelime bazlı alt dize eşleşmesi
-        const qWords = qNorm.split(' ').filter(w => w.length > 1);
-        match = this.sokaklar.find(s => {
+        // "Velimeşe Dedebal Caddesi" gibi sorgular için mahalle ön ekini soyulmuş varyant
+        const qStripped = qNorm.replace(/\bvelimese\b/g, '').replace(/\bmahallesi\b/g, '').replace(/\s+/g, ' ').trim();
+
+        // 1. Tam eşleşme (hem ham hem Velimeşe soyulmuş hali)
+        let match = this.sokaklar.find(s => {
             const sNorm = this.normalizeText(s.name);
-            return qWords.every(w => sNorm.includes(w));
+            return sNorm === qNorm || (qStripped && sNorm === qStripped);
         });
         if (match) return match;
 
-        // 4. Kısmi eşleşme
-        return this.sokaklar.find(s => this.normalizeText(s.name).includes(qNorm)) || null;
+        // 2. Çok kelimeli spesifik eşleşme (Özel takma adlardan ÖNCE çalışır: "Tarihi Bozacılar Meydanı" veya "İstasyon Caddesi" gölgelenmez!)
+        const effectiveQ = qStripped || qNorm;
+        const qWords = effectiveQ.split(' ').filter(w => w.length > 0);
+        const meaningfulWords = qWords.filter(w => (w.length > 1 || /^\d+$/.test(w)) && !this._genericWords.has(w));
+
+        if (meaningfulWords.length > 0) {
+            // 2a. Numaralı sokak tam eşleşmesi ("25. Sokak" vs "125" karışmasını önler)
+            const numWord = meaningfulWords.find(w => /^\d+$/.test(w));
+            if (numWord) {
+                const numRegex = new RegExp('(?:^|\\s)' + numWord + '(?:\\s|$)');
+                const numMatches = this.sokaklar.filter(s => numRegex.test(this.normalizeText(s.name)));
+                if (numMatches.length === 1) return numMatches[0];
+                if (numMatches.length > 1) {
+                    const refined = numMatches.find(s => {
+                        const sNorm = this.normalizeText(s.name);
+                        return meaningfulWords.every(w => sNorm.includes(w) || sNorm.includes(this._stemWord(w)));
+                    });
+                    if (refined) return refined;
+                }
+            }
+
+            // 2b. Tüm anlamlı kelimelerin (veya köklerinin) eşleşmesi (kategori metni dahil: "TOKİ Konutları", "Sanayi")
+            match = this.sokaklar.find(s => {
+                const sNorm = this.normalizeText(s.name + ' ' + (s.cat || ''));
+                return qWords.every(w => sNorm.includes(w) || (w.length > 4 && sNorm.includes(this._stemWord(w))));
+            });
+            if (match) return match;
+
+            match = this.sokaklar.find(s => {
+                const sNorm = this.normalizeText(s.name + ' ' + (s.cat || ''));
+                return meaningfulWords.every(w => sNorm.includes(w) || (w.length > 4 && sNorm.includes(this._stemWord(w))));
+            });
+            if (match) return match;
+        }
+
+        // 3. Özel takma adlar (Genel tek kelimeli aramalar için: "TOKİ", "Sanayi", "Meydan", "Tren", "Gar", "Sağlık Ocağı", "Pazar", "OSB")
+        if (/\btoki\b/.test(qNorm)) {
+            match = this.sokaklar.find(s => s.id === "velimese_sokak_63" || (s.cat && s.cat.includes("TOKİ")) || s.name.includes("TOKİ"));
+            if (match) return match;
+        }
+        if (/\bsanayi\b/.test(qNorm)) {
+            match = this.sokaklar.find(s => s.id === "velimese_sokak_99" || s.name.includes("Küçük Sanayi") || s.name.includes("Sanayi Caddesi"));
+            if (match) return match;
+        }
+        if (/\bcetin\b/.test(qNorm)) {
+            match = this.sokaklar.find(s => s.name.includes("Çetin"));
+            if (match) return match;
+        }
+        if (/\bbozaci/.test(qNorm)) {
+            match = this.sokaklar.find(s => s.id === "velimese_sokak_98" || s.name.includes("Bozacılar"));
+            if (match) return match;
+        }
+        if (/\b(meydan|meydani|merkez|heykel)\b/.test(qNorm)) {
+            match = this.sokaklar.find(s => s.id === "velimese_sokak_91" || s.name.includes("Merkez Meydanı"));
+            if (match) return match;
+        }
+        if (/\b(istasyon|istasyonu|tren|gar|gari)\b/.test(qNorm) && !qNorm.includes("otogar")) {
+            match = this.sokaklar.find(s => s.id === "velimese_sokak_93" || s.name.includes("Tren Garı"));
+            if (match) return match;
+        }
+        if (/\b(saglik|ocak|ocagi|doktor|asm|hastane)\b/.test(qNorm)) {
+            match = this.sokaklar.find(s => s.id === "velimese_sokak_92" || s.name.includes("Sağlığı Merkezi"));
+            if (match) return match;
+        }
+        if (/\bpazar\b/.test(qNorm)) {
+            match = this.sokaklar.find(s => s.id === "velimese_sokak_96" || s.name.includes("Pazar Yeri"));
+            if (match) return match;
+        }
+        if (/\b(osb|organize)\b/.test(qNorm)) {
+            match = this.sokaklar.find(s => s.id === "velimese_sokak_100" || s.name.includes("OSB"));
+            if (match) return match;
+        }
+
+        // 4. Anlamlı kelime bazlı kısmi eşleşme (jenerik "sokak/cadde" tek başına eşleşmez)
+        if (meaningfulWords.length > 0 && effectiveQ.length >= 3) {
+            return this.sokaklar.find(s => this.normalizeText(s.name).includes(effectiveQ)) || null;
+        }
+        return null;
     },
 
     hesaplaMesafe: function(s1, s2) {
@@ -885,19 +964,73 @@ const VelimeseNavigasyon = {
     },
 
     araDuraklariSec: function(startSokak, endSokak, totalKm) {
-        // Hedefe göre ara sokak sayısı (2 ile 6 arası)
+        // Hedefe göre ara sokak sayısı (1 ile 5 arası), zikzak yapmadan koridor ilerleyiş sırasına göre seçilir
         const stopCount = Math.max(1, Math.min(5, Math.round(totalKm / 0.5)));
-        const candidates = this.sokaklar.filter(s => s.id !== startSokak.id && s.id !== endSokak.id);
+        const cosLat = Math.cos(((startSokak.lat + endSokak.lat) * 0.5) * Math.PI / 180);
+        const ax = startSokak.lon * cosLat * 111.32;
+        const ay = startSokak.lat * 111.32;
+        const bx = endSokak.lon * cosLat * 111.32;
+        const by = endSokak.lat * 111.32;
+        const vx = bx - ax;
+        const vy = by - ay;
+        const segLenSq = vx * vx + vy * vy;
+        const segLenKm = Math.sqrt(segLenSq);
 
-        // Başlangıç ile bitiş arasındaki vektöre göre sırala
-        candidates.sort((a, b) => {
-            const distA = this.hesaplaMesafe(startSokak, a) + this.hesaplaMesafe(a, endSokak);
-            const distB = this.hesaplaMesafe(startSokak, b) + this.hesaplaMesafe(b, endSokak);
-            return distA - distB;
-        });
+        if (segLenSq < 1e-6) return [];
 
-        // En mantıklı ara sokakları al
-        return candidates.slice(0, stopCount);
+        const maxCorridorKm = Math.max(0.35, segLenKm * 0.35);
+        const projected = [];
+
+        for (const s of this.sokaklar) {
+            if (s.id === startSokak.id || s.id === endSokak.id) continue;
+            const px = s.lon * cosLat * 111.32;
+            const py = s.lat * 111.32;
+            const t = ((px - ax) * vx + (py - ay) * vy) / segLenSq;
+            if (t <= 0.08 || t >= 0.92) continue;
+            const projX = ax + t * vx;
+            const projY = ay + t * vy;
+            const perpKm = Math.hypot(px - projX, py - projY);
+            if (perpKm <= maxCorridorKm) {
+                projected.push({ stop: s, t: t, perpKm: perpKm });
+            }
+        }
+
+        if (projected.length === 0) {
+            // Çok yakın iki sokak arasındaysa en az sapmalı tek ara sokağı al
+            const fallback = this.sokaklar
+                .filter(s => s.id !== startSokak.id && s.id !== endSokak.id)
+                .map(s => ({
+                    stop: s,
+                    detour: this.hesaplaMesafe(startSokak, s) + this.hesaplaMesafe(s, endSokak)
+                }))
+                .sort((a, b) => a.detour - b.detour);
+            return fallback.length > 0 ? [fallback[0].stop] : [];
+        }
+
+        const selected = [];
+        for (let k = 1; k <= stopCount; k++) {
+            const targetT = k / (stopCount + 1);
+            let best = null;
+            let bestScore = Infinity;
+            for (const cand of projected) {
+                if (selected.some(sel => sel.stop.id === cand.stop.id)) continue;
+                const tooClose = selected.some(sel => {
+                    const dx = (sel.stop.lon - cand.stop.lon) * cosLat * 111.32;
+                    const dy = (sel.stop.lat - cand.stop.lat) * 111.32;
+                    return Math.hypot(dx, dy) < 0.14;
+                });
+                if (tooClose) continue;
+                const score = Math.abs(cand.t - targetT) * segLenKm + cand.perpKm * 0.85;
+                if (score < bestScore) {
+                    bestScore = score;
+                    best = cand;
+                }
+            }
+            if (best) selected.push(best);
+        }
+
+        selected.sort((a, b) => a.t - b.t);
+        return selected.map(item => item.stop);
     },
 
     rotaOlustur: function(kalkisSorgu, varisSorgu) {
@@ -926,8 +1059,10 @@ const VelimeseNavigasyon = {
             const isLast = (i === stopSequence.length - 1);
             const nextStop = isLast ? null : stopSequence[i + 1];
             const segDist = nextStop ? this.hesaplaMesafe(current, nextStop) : 0;
+            const catStr = String(current.cat || '');
+            const yolcuTipi = catStr.includes('Eğitim') ? 'Öğrenci' : (catStr.includes('Sağlık') ? 'Yaşlı' : 'Sivil');
 
-            routeStops.push({
+            const stopObj = {
                 name: current.name,
                 anons: isFirst 
                     ? current.name + " durağındayız. Velimeşe mahalle içi seferi başlıyor."
@@ -935,14 +1070,20 @@ const VelimeseNavigasyon = {
                 bekleyenYolcu: isFirst ? 12 : (isLast ? 0 : (((i * 3 + 2) % 4) + 1)),
                 inenYolcu: isFirst ? 0 : (isLast ? 12 : (((i * 2 + 1) % 3) + 1)),
                 gercekMesafeSonraki: segDist,
+                yolcuTipi: yolcuTipi,
                 lat: current.lat,
                 lon: current.lon,
                 cat: current.cat
-            });
+            };
+            if (isFirst) {
+                stopObj.garajMesafeKm = 0.85;
+            }
+            routeStops.push(stopObj);
         }
 
         const calculatedKm = routeStops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0);
         const finalKm = Math.round(calculatedKm * 10) / 10;
+        const seferSuresiDk = Math.max(6, Math.round(finalKm * 3.2 + routeStops.length * 1.1));
         const routeId = "velimese_mahalle_" + kalkis.id + "_" + varis.id;
 
         const route = {
@@ -950,6 +1091,7 @@ const VelimeseNavigasyon = {
             hatNo: "VM-R",
             name: "Velimeşe Mahalle İçi: " + kalkis.name + " ➔ " + varis.name,
             rawName: "Velimeşe 100 Sokak Seferi (" + (kalkis ? kalkis.name : 'Kalkış') + " - " + (varis ? varis.name : 'Varış') + ")",
+            ilce: "Velimeşe",
             district: "Velimeşe",
             originDistrict: "Velimeşe",
             destDistrict: "Velimeşe",
@@ -962,6 +1104,8 @@ const VelimeseNavigasyon = {
             endStop: varis.name,
             intermediateStops: routeStops.slice(1, -1).map(s => s.name),
             totalKm: finalKm,
+            totalDistanceKm: finalKm,
+            seferSuresiDk: seferSuresiDk,
             biletFiyat: 15,
             biletFiyatMultiplier: 1.0,
             otobusKapasitesi: 28,
@@ -975,6 +1119,14 @@ const VelimeseNavigasyon = {
 
         if (typeof routesData !== 'undefined') {
             routesData[routeId] = route;
+        }
+        if (typeof sehirRotalari !== 'undefined' && sehirRotalari["Tekirdağ"] && Array.isArray(sehirRotalari["Tekirdağ"].routes)) {
+            const existingIdx = sehirRotalari["Tekirdağ"].routes.findIndex(r => r && r.id === routeId);
+            if (existingIdx >= 0) {
+                sehirRotalari["Tekirdağ"].routes[existingIdx] = route;
+            } else {
+                sehirRotalari["Tekirdağ"].routes.push(route);
+            }
         }
 
         return {
@@ -996,8 +1148,16 @@ const VelimeseNavigasyon = {
         }
 
         if (typeof Game !== 'undefined' && typeof Game.startRoute === 'function') {
+            const prevDistrict = Game.activeDistrict;
+            const prevLocked = Game.isVelimeseLocked;
+            Game.activeDistrict = "Velimeşe";
             Game.isVelimeseLocked = true;
-            Game.startRoute(res.route.id);
+            const started = Game.startRoute(res.route.id);
+            if (started === false) {
+                Game.activeDistrict = prevDistrict;
+                Game.isVelimeseLocked = prevLocked;
+                return false;
+            }
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast("🏘️ Velimeşe 100 Sokak Modu: " + res.kalkis.name + " ➔ " + res.varis.name, "success");
             }
@@ -1010,4 +1170,7 @@ const VelimeseNavigasyon = {
 // Global erişim
 if (typeof window !== 'undefined') {
     window.VelimeseNavigasyon = VelimeseNavigasyon;
+}
+if (typeof globalThis !== 'undefined') {
+    globalThis.VelimeseNavigasyon = VelimeseNavigasyon;
 }

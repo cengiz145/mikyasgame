@@ -454,6 +454,16 @@
         return delta;
     }
 
+    function normTr(str) {
+        return String(str || '')
+            .replace(/İ/g, 'i')
+            .replace(/I/g, 'ı')
+            .replace(/Â/g, 'a')
+            .replace(/â/g, 'a')
+            .toLowerCase()
+            .trim();
+    }
+
     // ANA MOTOR (TURKEY CURVES ENGINE)
     const TurkeyCurvesEngine = {
         highwayCurves: TURKEY_HIGHWAY_CURVES,
@@ -574,6 +584,7 @@
             if (!cluster || cluster.length === 0) return null;
 
             let totalAngle = 0;
+            let sumAbsDelta = 0;
             let peakDelta = 0;
             let centerLat = 0;
             let centerLon = 0;
@@ -582,6 +593,7 @@
 
             cluster.forEach(pt => {
                 totalAngle += pt.delta;
+                sumAbsDelta += pt.absDelta;
                 centerLat += pt.lat;
                 centerLon += pt.lon;
                 if (pt.absDelta > Math.abs(peakDelta)) peakDelta = pt.delta;
@@ -591,8 +603,12 @@
             centerLon /= cluster.length;
 
             const curveLength = Math.max(45, endDist - startDist);
-            const isRight = totalAngle > 0;
-            const absAngle = Math.abs(totalAngle);
+            // Ardışık sağ-sol S-virajlarında net açı (totalAngle) birbirini sıfırlasa bile gerçek viraj keskinliği korunur!
+            const isSCurve = (sumAbsDelta >= 36 && Math.abs(totalAngle) < sumAbsDelta * 0.45);
+            const isRight = isSCurve ? (cluster[0].delta >= 0) : (totalAngle >= 0);
+            const absAngle = isSCurve
+                ? Math.max(Math.abs(totalAngle), Math.abs(peakDelta) * 1.4, sumAbsDelta * 0.55)
+                : Math.abs(totalAngle);
 
             // Viraj yarıçapı tahmini R = L / theta (radyan)
             const thetaRad = Math.max(0.15, (absAngle * Math.PI / 180));
@@ -612,7 +628,13 @@
             let curveType = "orta_viraj";
             let reqProgress = 100;
 
-            if (absAngle >= 75) {
+            if (isSCurve) {
+                dirText = isRight ? "önce sağa sonra sola S-virajı" : "önce sola sonra sağa S-virajı";
+                curveType = "s_viraj";
+                curveIntensity = Math.max(30, curveIntensity);
+                advisorySpeed = Math.min(50, advisorySpeed);
+                reqProgress = 115;
+            } else if (absAngle >= 75) {
                 dirText = isRight ? "keskin saç tokası sağa" : "keskin saç tokası sola";
                 curveType = "sac_tokasi";
                 curveIntensity = Math.max(38, curveIntensity);
@@ -675,40 +697,73 @@
 
         _findMatchingPass: function(lat, lon, context) {
             // Ünlü dağ geçitleri ve uçurum virajları YALNIZCA gerçekten o koridordan geçiliyorsa tetiklenir!
-            // Şehir içi cadde ve mahalle hatlarında "Uçmakdere Uçurum Virajları" vb. yanlış eşleşmeleri kesinlikle engeller.
+            // Şehir içi cadde ve mahalle hatlarında veya "Sakarya" -> "Sakar", "Karadeniz Mah." -> "Cide-İnebolu" yanlış eşleşmeleri engellenir.
             const routeData = (context && context.routeData) ? context.routeData : null;
-            const routeName = routeData && routeData.name ? String(routeData.name).toLowerCase() : "";
-            const curStopName = (context && context.currentStop && context.currentStop.name) ? String(context.currentStop.name).toLowerCase() : "";
-            const prevStopName = (context && context.prevStop && context.prevStop.name) ? String(context.prevStop.name).toLowerCase() : "";
-            const combined = (routeName + " " + curStopName + " " + prevStopName);
+            const cityNorm = normTr((context && context.city) || (routeData && routeData.sehir) || "");
+            const routeName = routeData && routeData.name ? normTr(routeData.name) : "";
+            const curStopName = (context && context.currentStop && context.currentStop.name) ? normTr(context.currentStop.name) : "";
+            const prevStopName = (context && context.prevStop && context.prevStop.name) ? normTr(context.prevStop.name) : "";
+            const combined = (routeName + " " + curStopName + " " + prevStopName).trim();
+            if (!combined) return null;
+
+            const hasWord = (text, phrase) => {
+                const pNorm = normTr(phrase);
+                if (!pNorm) return false;
+                return new RegExp('(?:^|[^a-zçğıöşü0-9])' + pNorm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:$|[^a-zçğıöşü0-9])').test(text);
+            };
+
+            const isStreetOnly = hasWord(combined, 'sokak') || hasWord(combined, 'sokağı') || hasWord(combined, 'caddesi') || hasWord(combined, 'mahallesi');
 
             const passKeywords = {
-                'bolu_dagi_s': ['bolu dağı', 'bolu tüneli', 'kaynaşlı', 'abant'],
+                'bolu_dagi_s': ['bolu dağı', 'bolu tüneli', 'karanlıkdere', 'kaynaşlı', 'abant'],
                 'ganos_ucmakdere': ['uçmakdere', 'ganos', 'yeniköy yamaç'],
                 'istranca_orman': ['istranca', 'kıyıköy', 'vize', 'demirköy', 'yıldız dağları'],
                 'hereke_korfez': ['hereke', 'dilovası'],
                 'geyve_bogazi': ['geyve', 'pamukova', 'bilecik boğazı'],
                 'supurgelik_gecidi': ['süpürgelik', 'orhangazi'],
                 'derebasi_virajlari': ['derebaşı', 'soğanlı geçidi', 'd-915'],
-                'zigana_gecidi': ['zigana', 'torul', 'maçka']
+                'zigana_gecidi': ['zigana', 'torul', 'hamsiköy'],
+                'cankurtaran_gecidi': ['cankurtaran geçidi', 'borçka', 'hopa'],
+                'ovit_dagi': ['ovit', 'ovit dağı'],
+                'ilgaz_dagi': ['ilgaz', 'ilgaz dağı'],
+                'ahmetusta_gecidi': ['ahmetusta'],
+                'karadeniz_eski_sahil': ['cide', 'inebolu'],
+                'guzeldere_32_virajlar': ['güzeldere', '32 virajlar', 'başkale'],
+                'kop_dagi': ['kop dağı', 'kop geçidi'],
+                'kizildag_gecidi': ['kızıldağ geçidi', 'kızıldağ'],
+                'kuskunkiran_gecidi': ['kuskunkıran'],
+                'zap_vadisi': ['zap vadisi', 'zap suyu'],
+                'kemaliye_karanlik_kanyon': ['kemaliye', 'karanlık kanyon', 'taş yolu'],
+                'kas_kalkan_d400': ['kalkan', 'kaputaş', 'kaş - kalkan'],
+                'gulek_bogazi': ['gülek', 'gülek boğazı'],
+                'sertavul_gecidi': ['sertavul'],
+                'alacabel_gecidi': ['alacabel', 'akseki'],
+                'belen_gecidi': ['belen geçidi', 'iskenderun'],
+                'sabuncubeli_gecidi': ['sabuncubeli'],
+                'sakar_gecidi': ['sakar geçidi', 'gökova'],
+                'elmadag_rampasi': ['elmadağ', 'yahşihan'],
+                'camlibel_gecidi': ['çamlıbel geçidi', 'yıldızeli'],
+                'erciyes_tekir': ['erciyes', 'tekir yaylası']
             };
 
-            for (let pass of TURKEY_HIGHWAY_CURVES) {
+            for (const pass of TURKEY_HIGHWAY_CURVES) {
                 const pId = pass.id || '';
-                const pNameLow = String(pass.name || '').toLowerCase();
-                if (combined.includes(pId.replace(/_/g, ' ')) || combined.includes(pNameLow)) {
+                const pNameNorm = normTr(pass.name || '');
+                const inPassProvince = Array.isArray(pass.provinces) && pass.provinces.some(pr => {
+                    const prNorm = normTr(pr);
+                    return prNorm === cityNorm || hasWord(combined, prNorm);
+                });
+
+                if (pNameNorm && combined.includes(pNameNorm)) {
                     return pass;
                 }
                 const kwList = passKeywords[pId];
-                if (kwList && kwList.some(kw => combined.includes(kw))) {
-                    return pass;
-                }
-                // Diğer dağ geçitleri yalnızca şehirlerarası/dağ görevlerinde kendi özel geçit adı geçiyorsa eşleşir
-                if (!kwList && routeData && (routeData.isIntercity || (routeData.licenseLevel && routeData.licenseLevel >= 7))) {
-                    const firstWord = pNameLow.split(/\s+/)[0];
-                    if (firstWord && firstWord.length >= 5 && combined.includes(firstWord)) {
-                        return pass;
+                if (kwList && kwList.some(kw => hasWord(combined, kw))) {
+                    // Şehir içi sokak adı ("Güzeldere Sokak" vb.) başka ildeyse dağ geçidi tetiklemesin
+                    if (isStreetOnly && !inPassProvince && !hasWord(combined, 'geçidi') && !hasWord(combined, 'dağı')) {
+                        continue;
                     }
+                    return pass;
                 }
             }
             return null;
@@ -881,14 +936,16 @@
             const sCur = stops[targetIdx];
             const sNext = stops[targetIdx + 1];
 
-            const lat0 = sPrev && (sPrev.lat || sPrev.stop_lat);
-            const lon0 = sPrev && (sPrev.lon || sPrev.stop_lon);
-            const lat1 = sCur && (sCur.lat || sCur.stop_lat);
-            const lon1 = sCur && (sCur.lon || sCur.stop_lon);
-            const lat2 = sNext && (sNext.lat || sNext.stop_lat);
-            const lon2 = sNext && (sNext.lon || sNext.stop_lon);
+            const lat0 = sPrev ? (sPrev.lat ?? sPrev.stop_lat) : null;
+            const lon0 = sPrev ? (sPrev.lon ?? sPrev.stop_lon) : null;
+            const lat1 = sCur ? (sCur.lat ?? sCur.stop_lat) : null;
+            const lon1 = sCur ? (sCur.lon ?? sCur.stop_lon) : null;
+            const lat2 = sNext ? (sNext.lat ?? sNext.stop_lat) : null;
+            const lon2 = sNext ? (sNext.lon ?? sNext.stop_lon) : null;
 
-            if (!lat0 || !lon0 || !lat1 || !lon1 || !lat2 || !lon2) {
+            if (typeof lat0 !== 'number' || typeof lon0 !== 'number' ||
+                typeof lat1 !== 'number' || typeof lon1 !== 'number' ||
+                typeof lat2 !== 'number' || typeof lon2 !== 'number') {
                 return this.getCurvatureForCorridor(context.city || "Tekirdağ", context.routeData, safeDist, context);
             }
 
@@ -973,14 +1030,19 @@
                 const curveName = upcoming.name || upcoming.direction || "kavis";
                 const dir = upcoming.isRight ? "sağa" : (upcoming.isRight === false ? "sola" : upcoming.direction);
                 const rem = Math.max(0, Math.round((game.currentDistanceToNext || 0) - (upcoming.distance || 0)));
-                speech = `${rem} metre sonra ${curveName}, ${dir}.`;
+                const nameNorm = normTr(curveName);
+                const alreadyHasDir = nameNorm.includes("sağa") || nameNorm.includes("sola") || nameNorm.includes("sağ ") || nameNorm.includes("sol ");
+                speech = alreadyHasDir ? `${rem} metre sonra ${curveName}.` : `${rem} metre sonra ${curveName}, ${dir}.`;
             } else {
                 speech = "Yol düz devam ediyor.";
             }
 
             if (typeof audio !== 'undefined' && typeof audio.speakNavigation === 'function') {
                 audio.speakNavigation(speech);
-            } else if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+            } else if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
+                audio.speak(speech);
+            }
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
                 audio.updateNvdaLiveRegion(speech);
             }
             if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {

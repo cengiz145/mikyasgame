@@ -12,6 +12,9 @@
         murmurAudio: null,
         soundBuffers: {},
         audioCtx: null,
+        _initialized: false,
+        _inspectionInProgress: false,
+        _lastCologneTime: 0,
 
         sounds: {
             whistle: 'sounds/freesound_police_whistle.mp3',
@@ -29,6 +32,8 @@
         },
 
         init: function () {
+            if (this._initialized) return;
+            this._initialized = true;
             this.injectHudButton();
             this.setupKeyBindings();
             console.log("[RoleplaySystem] Rol Yapma & Freesound Ses Motoru hazır.");
@@ -46,6 +51,7 @@
 
         // Ses Çalma Fonksiyonu (HTML5 Audio veya Web Audio fallback)
         playSound: function (soundKey, volume = 0.8) {
+            if (typeof audio !== 'undefined' && audio.isMuted) return;
             const url = this.sounds[soundKey];
             if (!url) return;
 
@@ -69,6 +75,13 @@
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(noPassMsg);
                 return;
             }
+            const now = Date.now();
+            if (now - this._lastCologneTime < 8000) {
+                const waitMsg = "Kolonya ikramı az önce yapıldı, lütfen birkaç saniye bekleyin.";
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🧴 " + waitMsg, "info");
+                return;
+            }
+            this._lastCologneTime = now;
 
             this.playSound('spray', 0.85);
 
@@ -149,8 +162,9 @@
                     }
                 }
 
+                const chimeLabel = (chimeType === 'gong') ? "Tekli gong çaldı (Dıııın)" : "3'lü zil çaldı (Dı-dı-dııın)";
                 const msg = earnedNow
-                    ? "🎟️ [Otogar Anonsu] 3'lü zil çaldı (Dı-dı-dııın), bagaj kuponları zımbalandı (+45 ₺ Bagaj Geliri)."
+                    ? `🎟️ [Otogar Anonsu] ${chimeLabel}, bagaj kuponları zımbalandı (+45 ₺ Bagaj Geliri).`
                     : "🎟️ [Otogar Anonsu] Peron zili ve bagaj zımbası çaldı (Bu durak için bagaj geliri zaten işlendi).";
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, earnedNow ? "success" : "info");
                 if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.playLuggageStapled())) {
@@ -188,6 +202,11 @@
 
         // Rol 3: 👮 Bölge Trafik Polisi, PTS Plaka Tanıma & Takograf Denetimi
         triggerPoliceInspection: function () {
+            if (this._inspectionInProgress) {
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("👮 Takograf denetimi zaten devam ediyor, lütfen bekleyin...", "info");
+                return;
+            }
+            this._inspectionInProgress = true;
             this.playSound('whistle', 0.9);
             const id = (typeof window.getDriverPoliceIdentity === 'function')
                 ? window.getDriverPoliceIdentity()
@@ -204,10 +223,14 @@
             setTimeout(() => {
                 this.playSound('tachograph', 0.85);
 
-                const currentSpeed = (typeof Game !== 'undefined' && Game.speed) ? Math.floor(Game.speed) : 80;
+                // Duran araçta (speed === 0) yanlışlıkla 80 km/s yazılması engellendi!
+                const currentSpeed = (typeof Game !== 'undefined' && typeof Game.speed === 'number' && !isNaN(Game.speed))
+                    ? (Game.isDriving ? Math.max(0, Math.round(Game.speed)) : 72)
+                    : 72;
                 const isOverSpeed = currentSpeed > 100;
 
                 setTimeout(() => {
+                    this._inspectionInProgress = false;
                     if (!isOverSpeed) {
                         if (typeof Game !== 'undefined') Game.addXP(30);
                         const msg = `👮 [Bölge Trafik Polisi] "${id.plate} — Ehliyet ve takograf tertemiz ${id.politeAddress}, hızın ${currentSpeed} km/s. Hayırlı yolculuklar!" (+30 XP)`;
@@ -282,12 +305,17 @@
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`👥 ${msg}`, "info");
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             } else {
+                if (typeof audio !== 'undefined' && audio.isMuted) {
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔇 Ses kapalıyken kabin mırıltısı başlatılamaz (M tuşuyla sesi açın).", "info");
+                    return;
+                }
                 try {
                     this.murmurAudio = new Audio(this.sounds.passengerMurmur);
                     this.murmurAudio.loop = true;
                     this.murmurAudio.volume = 0.18;
                     this.murmurAudio.play().then(() => {
                         this.isMurmurPlaying = true;
+                        this.renderModalContent();
                         const msg = "Kabin içi yaşayan yolcu fısıltısı ve mırıltısı aktif edildi.";
                         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`👥 ${msg}`, "success");
                         if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
@@ -396,7 +424,21 @@
 
         setupKeyBindings: function () {
             window.addEventListener('keydown', (e) => {
-                if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
+                const modal = document.getElementById('roleplay-modal');
+                if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.closeModal();
+                    return;
+                }
+
+                const activeTag = (document.activeElement && document.activeElement.tagName)
+                    ? document.activeElement.tagName.toLowerCase()
+                    : '';
+                const targetTag = (e.target && e.target.tagName)
+                    ? e.target.tagName.toLowerCase()
+                    : '';
+                if (['input', 'textarea', 'select'].includes(activeTag) || ['input', 'textarea', 'select'].includes(targetTag)) return;
 
                 // F3: Rol Yapma Panelini Aç / Kapat (F2 Kaptan Rehberi ile çakışmaması için)
                 if (e.key === 'F3') {
@@ -406,8 +448,8 @@
                 }
 
                 // Hızlı Kısayollar (Alt kombinasyonları ile Shift+V/P/Z telemetri raporlarıyla sıfır çakışma!)
-                if (e.altKey && !e.shiftKey && !e.ctrlKey) {
-                    const k = e.key.toLowerCase();
+                if (e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+                    const k = (e.key || '').toLowerCase();
                     if (k === 'v' || e.code === 'KeyV') {
                         e.preventDefault();
                         this.triggerCologneService();
@@ -443,6 +485,9 @@
             if (!modal) return;
             modal.classList.remove('hidden');
             this.renderModalContent();
+            if (typeof KeyboardNav !== 'undefined' && typeof KeyboardNav.initForScreen === 'function') {
+                KeyboardNav.initForScreen();
+            }
 
             const msg = "Rol Yapma ve Freesound ses efektleri paneli açıldı. Kolonya servisi, otogar bagaj zımbası, polis denetimi veya yolcu mırıltısını başlatabilirsiniz.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
@@ -450,7 +495,12 @@
 
         closeModal: function () {
             const modal = document.getElementById('roleplay-modal');
-            if (modal) modal.classList.add('hidden');
+            if (modal && !modal.classList.contains('hidden')) {
+                modal.classList.add('hidden');
+                if (typeof KeyboardNav !== 'undefined' && typeof KeyboardNav.initForScreen === 'function') {
+                    KeyboardNav.initForScreen();
+                }
+            }
         },
 
         injectModal: function () {
@@ -469,7 +519,7 @@
                                 Freesound API ile güçlendirilmiş gerçekçi polis düdüğü, takograf yazıcısı, kolonya fısfısı, bagaj zımbası ve yaşayan yolcular.
                             </p>
                         </div>
-                        <button id="btn-close-roleplay-modal" class="modern-btn" style="padding: 6px 14px; background: rgba(255,255,255,0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 1.1rem; cursor: pointer;" aria-label="Rol yapma penceresini kapat (Esc veya F2)">✕ Kapat</button>
+                        <button id="btn-close-roleplay-modal" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(255,255,255,0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 1.1rem; cursor: pointer;" aria-label="Rol yapma penceresini kapat (Esc veya F3)">✕ Kapat</button>
                     </div>
 
                     <div id="roleplay-modal-content"></div>
@@ -486,7 +536,7 @@
 
             const id = (typeof window.getDriverPoliceIdentity === 'function')
                 ? window.getDriverPoliceIdentity()
-                : { driverName: 'Kaptan', plate: '59 TKL 059', busName: 'Yolcu Otobüsü', licenseTitle: 'Kaptan Şoför' };
+                : { driverName: 'Kaptan', plate: '59 TKL 059', busName: 'Yolcu Otobüsü', licenseTitle: 'Başkaptan' };
             const safeAttr = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
             let html = `
@@ -637,7 +687,13 @@
 
             </div>`;
 
-            container.innerHTML = html;
+            container.innerHTML = html.replace(/class="modern-btn"/g, 'class="modern-btn nav-item"');
+            if (typeof KeyboardNav !== 'undefined' && typeof KeyboardNav.initForScreen === 'function') {
+                const modal = document.getElementById('roleplay-modal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    KeyboardNav.initForScreen();
+                }
+            }
 
             const btnPtsQuery = document.getElementById('rp-btn-pts-query');
             if (btnPtsQuery) btnPtsQuery.addEventListener('click', () => this.triggerPtsPlateQuery());
@@ -692,12 +748,15 @@
     };
 
     // Global nesneye bağla
-    window.RoleplaySystem = RoleplaySystem;
+    const gObj = typeof window !== 'undefined' ? window : globalThis;
+    gObj.RoleplaySystem = RoleplaySystem;
 
     // DOM hazır olduğunda başlat
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => RoleplaySystem.init());
-    } else {
-        RoleplaySystem.init();
+    if (typeof document !== 'undefined') {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => RoleplaySystem.init());
+        } else {
+            RoleplaySystem.init();
+        }
     }
 })();

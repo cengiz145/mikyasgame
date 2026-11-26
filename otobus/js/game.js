@@ -292,6 +292,7 @@ const Game = {
     activeDistrict: localStorage.getItem('activeDistrict') || "Süleymanpaşa",
     setActiveDistrict: function (dist) {
         this.activeDistrict = dist || "Süleymanpaşa";
+        this.isVelimeseLocked = (this.activeDistrict === "Velimeşe");
         try { localStorage.setItem('activeDistrict', this.activeDistrict); } catch (e) { }
         this.saveData();
         if (typeof generateRoutesFromAPI === 'function') {
@@ -726,8 +727,9 @@ const Game = {
         }
         const start = r.startStop || (r.stops[0] ? r.stops[0].name : "Başlangıç");
         const end = r.endStop || (r.stops[r.stops.length - 1] ? r.stops[r.stops.length - 1].name : "Son Durak");
-        const lineCode = (r.hatNo || "26").toUpperCase();
-        const msg = `Hat Tabelası: TEKULAŞ Hat ${lineCode}. Güzergah: ${start} kalkışlı, ${end} varışlı.`;
+        const lineCode = (r.hatNo || "1").toUpperCase();
+        const agencyPrefix = ((r.sehir || this.currentCity || "Tekirdağ") === "Tekirdağ") ? "TEKULAŞ " : "";
+        const msg = `Hat Tabelası: ${agencyPrefix}Hat ${lineCode}. Güzergah: ${start} kalkışlı, ${end} varışlı.`;
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
         if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
     },
@@ -2278,14 +2280,18 @@ const Game = {
             return false;
         }
 
-        // VELİMEŞE İLÇE SINIR KORUMASI: Velimeşe modundaysa dışarı çıkış kapalıdır!
+        // VELİMEŞE İLÇE SINIR KORUMASI: Yalnızca aktif bölge hala Velimeşe Sokak Modu ise dışarı çıkış kapalıdır; başka il/ilçe seçilmişse kilit otomatik açılır!
         if (this.isVelimeseLocked) {
-            const nextRoute = (typeof routesData !== 'undefined' && routesData[routeId]) || null;
-            if (nextRoute && !nextRoute.isVelimeseLocked && nextRoute.district !== 'Velimeşe' && !nextRoute.id.includes('velimese')) {
-                const lockMsg = "Velimeşe Mahalle İçi Modundasınız. İlçe dışına çıkış kapalıdır. Velimeşe'deki 100 sokak arasında serbestçe seyahat edebilirsiniz.";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, 'warning');
-                return false;
+            if (this.currentCity !== 'Tekirdağ' || (this.activeDistrict && this.activeDistrict !== 'Velimeşe')) {
+                this.isVelimeseLocked = false;
+            } else {
+                const nextRoute = (typeof routesData !== 'undefined' && routesData[routeId]) || null;
+                if (nextRoute && !nextRoute.isVelimeseLocked && nextRoute.district !== 'Velimeşe' && !String(nextRoute.id || '').includes('velimese')) {
+                    const lockMsg = "Velimeşe Mahalle İçi Modundasınız. İlçe dışına çıkmak için önce Bölge Seçiminden başka bir ilçe seçiniz.";
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, 'warning');
+                    return false;
+                }
             }
         }
         this.activeRouteId = routeId;
@@ -2900,7 +2906,8 @@ const Game = {
 
         // ŞEHİR ÖNEMLİ SİMGE NOKTA HAZIRLIĞI (Henüz seslendirmez, durağa varınca okunur)
         if (typeof CityLandmarksEngine !== 'undefined' && nextStop) {
-            CityLandmarksEngine.prepareStop(this.currentCity, this.activeDistrict, nextStop.name);
+            const effDist = nextStop.district || (this.activeRouteData && (this.activeRouteData.ilce || this.activeRouteData.district)) || this.activeDistrict;
+            CityLandmarksEngine.prepareStop(this.currentCity, effDist, nextStop.name);
         }
 
         // Zemin Akustiğini Ayarla (Dinamik İlçe/Durak Bazlı)
@@ -3745,9 +3752,9 @@ const Game = {
                                 navFeedbackEl.innerHTML = `<span style="color: ${speedColor};">${curveSign} [${currentTurn.advisorySpeed || 50} km/s] | ${evalRes.gForce.toFixed(2)}G (%${pct})</span>`;
                             }
 
-                            // SESLİ GERİBİLDİRİM: Kör oyuncular için stereofonik tık sesi (virajın yönüne göre sağ/sol kulaklıkta çalar)
-                            if (!currentTurn.lastTickTime || currentTime > currentTurn.lastTickTime + 300) {
-                                if (this.speed > 5 && typeof audio.playTurnTick === 'function') {
+                            // SESLİ GERİBİLDİRİM: Kör oyuncular için yumuşak, üst üste binmeyen stereofonik yön nabzı (900ms aralıkla)
+                            if (!currentTurn.lastTickTime || currentTime > currentTurn.lastTickTime + 900) {
+                                if (this.speed > 12 && typeof audio.playTurnTick === 'function') {
                                     const panVal = currentTurn.pan !== undefined ? currentTurn.pan : (isTurnRight ? 0.70 : -0.70);
                                     audio.playTurnTick(panVal);
                                 }
@@ -4538,8 +4545,9 @@ const Game = {
                         // MOTORU SUSTUR VE PARK ET
                         if (typeof audio.stopEngine === 'function') audio.stopEngine();
 
-                        if (typeof audio.speak === 'function') audio.speak("Sanayiye yavaşça park ettik. Motor kapatıldı. Geçmiş olsun usta.");
-                        document.getElementById('nav-feedback').innerText = "TEKİRDAĞ SANAYİ - VARIŞ";
+                        const sanayiTitle = (typeof this.getActiveSanayiName === 'function') ? this.getActiveSanayiName() : "Tekirdağ Sanayi Sitesi";
+                        if (typeof audio.speak === 'function') audio.speak(`${sanayiTitle} kademesine yavaşça park ettik. Motor kapatıldı. Geçmiş olsun kaptan.`);
+                        document.getElementById('nav-feedback').innerText = `${sanayiTitle.toLocaleUpperCase('tr-TR')} - VARIŞ`;
                         document.getElementById('hud-speed').innerText = `0`;
 
                         // Sanayi moduna geç
@@ -5295,6 +5303,29 @@ const Game = {
         }
     },
 
+    getActiveSanayiName: function () {
+        const city = this.currentCity || "Tekirdağ";
+        if (city !== "Tekirdağ") {
+            return `${city} Oto Sanayi Sitesi`;
+        }
+        const dist = (this.activeRouteData && (this.activeRouteData.ilce || (this.activeRouteData.district && this.activeRouteData.district !== 'İlçeler Arası' ? this.activeRouteData.district : null))) || this.activeDistrict || "Süleymanpaşa";
+        const tekSanayiMap = {
+            "Süleymanpaşa": "Tekirdağ 100. Yıl Sanayi Sitesi",
+            "Çorlu": "Çorlu Yeni Sanayi Sitesi",
+            "Çerkezköy": "Çerkezköy OSB Sanayi Sitesi",
+            "Kapaklı": "Kapaklı Sanayi Sitesi",
+            "Ergene": "Velimeşe OSB Sanayi Sitesi",
+            "Velimeşe": "Velimeşe OSB Sanayi Sitesi",
+            "Saray": "Saray Sanayi Sitesi",
+            "Muratlı": "Muratlı Sanayi Sitesi",
+            "Marmaraereğlisi": "Marmaraereğlisi Sanayi Sitesi",
+            "Hayrabolu": "Hayrabolu Sanayi Sitesi",
+            "Malkara": "Malkara Sanayi Sitesi",
+            "Şarköy": "Şarköy Sanayi Sitesi"
+        };
+        return tekSanayiMap[dist] || "Tekirdağ 100. Yıl Sanayi Sitesi";
+    },
+
     triggerTowTruck: function () {
         if (!this.isDriving && !this.animationFrameId) return; // BUG FIX: Aynı saniyede birden fazla kaza olursa (çift NPC'ye çarpma vs.) paralel evren (çift gameLoop) oluşmasını engeller
         this.isDriving = false; // Oyunu geçici durdur
@@ -5355,11 +5386,12 @@ const Game = {
         // 5 Saniye sonra çekici ile yola çık
         // 5 Saniye sonra çekici ile yola çık
         setTimeout(() => {
+            const sanayiName = this.getActiveSanayiName();
             this.activeRouteData = {
                 hatNo: "ÇEKİCİ",
-                guzergah: "Kaza Yeri -> Tekirdağ Sanayi",
+                guzergah: `Kaza Yeri -> ${sanayiName}`,
                 stops: [
-                    { name: "Tekirdağ Sanayi", ad: "Tekirdağ Sanayi", id: "sanayi", anons: "Tekirdağ Sanayisine hoşgeldiniz.", gercekMesafeSonraki: 5 }
+                    { name: sanayiName, ad: sanayiName, id: "sanayi", anons: `${sanayiName} kademesine hoş geldiniz.`, gercekMesafeSonraki: 5 }
                 ]
             };
             this.currentStopIndex = 0;
@@ -5373,7 +5405,7 @@ const Game = {
             this.lanePosition = 50;
             this.steeringAngle = 0;
 
-            audio.speak("Aracınız çekiciye yüklendi. Tekirdağ Sanayi'ye doğru otomatik olarak yola çıkıldı.");
+            audio.speak(`Aracınız çekiciye yüklendi. ${sanayiName} istikametine doğru otomatik olarak yola çıkıldı.`);
             audio.startEngine(); // BUG FIX: Çekiciye bindiğimizde de motor sesini aç
 
             // Otomatik sürüşü başlat
@@ -5416,14 +5448,19 @@ const Game = {
 
         // stopData ve isFinalStop fonksiyon başında güvenle tanımlandı
 
+        const stopEffDist = (stopData && stopData.district)
+            || (this.activeRouteData && (this.activeRouteData.ilce || (this.activeRouteData.district !== 'İlçeler Arası' ? this.activeRouteData.district : null)))
+            || this.activeDistrict
+            || "Süleymanpaşa";
+
         // DURAK KEŞİF VE KOLEKSİYON SİSTEMİ TETİKLEYİCİSİ
         if (typeof StopDiscovery !== 'undefined' && stopData && stopData.name) {
-            StopDiscovery.onReachStop(stopData.name, this.activeDistrict || "Süleymanpaşa");
+            StopDiscovery.onReachStop(stopData.name, stopEffDist);
         }
 
         // ŞEHİR ÖNEMLİ SİMGE NOKTASI (Sadece durağa tam varılınca ekran okuyucu sesli okur, bilgi vermez)
         if (typeof CityLandmarksEngine !== 'undefined' && stopData && stopData.name) {
-            CityLandmarksEngine.onArriveAtStop(this.currentCity, this.activeDistrict, stopData.name);
+            CityLandmarksEngine.onArriveAtStop(this.currentCity, stopEffDist, stopData.name);
         }
 
         if (this.slammedDoorDepartTimer) {
@@ -6583,6 +6620,7 @@ const Game = {
         // İKRAM VE MUAVİN SERVİSİ (I Tuşu) & HAT TABELASI (Shift + I)
         if (k === 'i' || k === 'ı' || e.code === 'KeyI') {
             e.preventDefault();
+            if (e.repeat) return;
             if (e.shiftKey) {
                 this.reportIBISStatus();
             } else {
@@ -6594,6 +6632,7 @@ const Game = {
         const isCommaKey = (e.key === ',' || e.key === ';' || e.key === '<' || e.code === 'Comma');
         if (e.shiftKey && isCommaKey) {
             e.preventDefault();
+            if (e.repeat) return;
             if (typeof Multiplayer !== 'undefined' && typeof Multiplayer.playRandomRadioChatter === 'function') {
                 Multiplayer.playRandomRadioChatter();
             }
@@ -7504,7 +7543,7 @@ const SanayiMechanic = {
             const cost = Math.floor(part.damage * 15);
             totalCost += cost;
 
-            const msg = "Su an " + part.name + " parcasini onariyorum.";
+            const msg = "Şu an " + part.name + " parçasını onarıyorum.";
             document.getElementById('sanayi-dialog').innerText = msg;
             if (typeof window.HumanNpcVoices !== 'undefined') window.HumanNpcVoices.playSanayiWrench();
             if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
