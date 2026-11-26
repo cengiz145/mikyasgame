@@ -16,8 +16,10 @@ window.addXP = function(amount) {
     localStorage.setItem('hafizaGuvenXP', currentXP);
     let newRank = window.getRankInfo(currentXP).name;
     if (oldRank !== newRank) {
-        let timerFunction = window.hgfzZamanlayici ? window.hgfzZamanlayici.setTimeout : setTimeout;
-        timerFunction(() => {
+        const scheduleFn = (window.hgfzZamanlayici && window.hgfzZamanlayici.setTimeout)
+            ? window.hgfzZamanlayici.setTimeout.bind(window.hgfzZamanlayici)
+            : setTimeout;
+        scheduleFn(() => {
             if (window.buySound) window.buySound.play();
             if (window.announceToScreenReader) window.announceToScreenReader(`Tebrikler! Seviye atladınız! Yeni Rütbeniz: ${newRank}`);
         }, 1500);
@@ -4314,13 +4316,19 @@ if (!window.orijinalAnnounce) {
     window.orijinalAnnounce = window.announceToScreenReader;
     window.srMesajKuyrugu = [];
     window.srOkuyorMu = false;
+    window._srQueueTimerId = null;
     
     window.announceToScreenReader = function(text, forceFocus = false, interrupt = false) {
-        if (interrupt) {
+        if (!text) return;
+        if (interrupt || forceFocus) {
+            if (window._srQueueTimerId) {
+                clearTimeout(window._srQueueTimerId);
+                window._srQueueTimerId = null;
+            }
             window.srMesajKuyrugu = [];
             window.srOkuyorMu = false;
         }
-        window.srMesajKuyrugu.push({ text: text, forceFocus: forceFocus });
+        window.srMesajKuyrugu.push({ text: String(text), forceFocus: forceFocus });
         window.srKuyruguIslet();
     };
     
@@ -4331,14 +4339,18 @@ if (!window.orijinalAnnounce) {
         window.srOkuyorMu = true;
         const siradaki = window.srMesajKuyrugu.shift(); // Kuyruktan ilk mesajı al
         
-        // Orijinal okuma fonksiyonunu çağır
-        window.orijinalAnnounce(siradaki.text, siradaki.forceFocus);
+        try {
+            window.orijinalAnnounce(siradaki.text, siradaki.forceFocus);
+        } catch (e) {
+            console.error('[SR Queue Error]', e);
+        }
         
-        // Okuma süresi tahmini: Harf başına ortalama 70ms + 1 saniye bekleme payı
-        const okumaSuresi = Math.max(1500, (siradaki.text.length * 70) + 1000);
+        // Okuma süresi tahmini (oyun içi seri bildirimlerin kilitlenmemesi için üst sınır korumalı)
+        const okumaSuresi = Math.min(5000, Math.max(1200, (siradaki.text.length * 55) + 600));
         
-        // Aşama 1'de kurduğumuz ajan zamanlayıcısını kullanarak sıradaki mesaja geç
-        (window.hgfzZamanlayici && window.hgfzZamanlayici.setTimeout ? window.hgfzZamanlayici.setTimeout : setTimeout)(() => {
+        if (window._srQueueTimerId) clearTimeout(window._srQueueTimerId);
+        window._srQueueTimerId = setTimeout(() => {
+            window._srQueueTimerId = null;
             window.srOkuyorMu = false;
             window.srKuyruguIslet(); // Kuyrukta bekleyen varsa devam et
         }, okumaSuresi);

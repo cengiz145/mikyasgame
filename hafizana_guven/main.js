@@ -14,7 +14,7 @@ let loadedFallback = false;
 function loadLocalFallback() {
     if (!mainWindow || loadedFallback) return;
     loadedFallback = true;
-    mainWindow.loadFile(path.join(__dirname, 'index.html')).catch(() => {});
+    mainWindow.loadFile(path.join(__dirname, 'index.html')).catch(() => { });
 }
 
 function createWindow() {
@@ -47,7 +47,7 @@ function createWindow() {
     // Telegram, WhatsApp gibi dış bağlantıları varsayılan tarayıcıda aç
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
         if (url && /^https?:\/\//i.test(url)) {
-            shell.openExternal(url).catch(() => {});
+            shell.openExternal(url).catch(() => { });
         }
         return { action: 'deny' };
     });
@@ -60,7 +60,7 @@ function createWindow() {
             url.includes('cengiz145.github.io/mikyasgame/hafizana_guven');
         if (!isAllowedAppUrl && /^https?:\/\//i.test(url)) {
             event.preventDefault();
-            shell.openExternal(url).catch(() => {});
+            shell.openExternal(url).catch(() => { });
         }
     });
 
@@ -94,7 +94,7 @@ app.whenReady().then(() => {
     // NVDA ve JAWS ekran okuyucular için tam erişilebilirlik ağacını zorunlu aç
     try {
         app.setAccessibilitySupportEnabled(true);
-    } catch (e) {}
+    } catch (e) { }
 
     createWindow();
 

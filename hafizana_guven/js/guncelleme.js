@@ -10,7 +10,7 @@ window.globalChangelogMessage = null;
 
 window.guncellemeKontrolEt = function (isManual = false) {
     if (window.location && window.location.protocol === 'file:') {
-        const localVer = window.UYGULAMA_SURUMU || window.mevcutSurum || '0.98.1.6';
+        const localVer = window.UYGULAMA_SURUMU || window.mevcutSurum || '0.98.1.7';
         window.mevcutSurum = localVer;
         const visualVersion = document.getElementById("intro-version-display");
         if (visualVersion) visualVersion.textContent = "Sürüm: " + localVer;
@@ -87,8 +87,14 @@ window.guncellemeKontrolEt = function (isManual = false) {
                     });
                 }
 
-                // KULLANICI İSTEĞİ: Güncelleme bulunduğunda anında önbelleği temizleyip sayfayı yenile (Force Reload)
-                if (typeof window.announceToScreenReader === 'function') {
+                // Aktif oyun ortasında oyuncuyu bölme; oyun bitince ana menüde yenile
+                if (window.gameIsActive || window.inStoryMode) {
+                    window.pendingUpdate = true;
+                    window.mevcutSurum = null;
+                    return;
+                }
+
+                if (!data.silent && typeof window.announceToScreenReader === 'function') {
                     window.announceToScreenReader("Oyun güncellendi! Yeni sürüm uygulanıyor, sayfa yenilenecek, lütfen bekleyin...", true);
                 }
                 
@@ -96,11 +102,9 @@ window.guncellemeKontrolEt = function (isManual = false) {
                 const allAudios = document.querySelectorAll('audio');
                 allAudios.forEach(audio => { audio.pause(); });
 
-                // 2 saniye sonra sayfayı tam yenile
                 setTimeout(() => {
-                    // Sayfayı serverdan zorla yenileme kodu
                     window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
-                }, 2500);
+                }, data.silent ? 400 : 2500);
 
             } else {
                 // Sessizce güncelleme durumunu UI'da tuttuk.

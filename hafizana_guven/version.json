@@ -1,5 +1,6 @@
 {
-    "version": "0.98.1.6",
-    "buildId": 1794945577,
-    "changelog": "Google Play Store uyumluluğu eklendi: Gizlilik Politikası (gizlilik.html), Sunucu Verilerini Silme (veri-silme.html + Profil menüsü düğmesi), Android arka plan ses duraklatma ve geri tuşu desteği."
+    "version": "0.98.1.7",
+    "buildId": 1795692550,
+    "silent": true,
+    "changelog": ""
 }

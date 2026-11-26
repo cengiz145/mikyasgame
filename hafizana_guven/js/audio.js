@@ -393,7 +393,7 @@ window.playPianoNoteSingle = function (key) {
     if (currentMap[key]) {
         let soundId = currentMap[key].play();
         if (window.activeInstrument === 'piano') {
-            currentMap[key].seek(0.045, soundId);
+            try { currentMap[key].seek(0.045, soundId); } catch (e) {}
         }
     }
 };

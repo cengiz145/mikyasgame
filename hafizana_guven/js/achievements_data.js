@@ -953,14 +953,16 @@ window.checkAllAchievements = function() {
                     if (window.addXP) window.addXP(ach.reward);
                 }
 
-                let timerFunction = window.hgfzZamanlayici ? window.hgfzZamanlayici.setTimeout : setTimeout;
+                const timerFunction = setTimeout;
                 
                 timerFunction(() => {
                     if (window.achievementSound) window.achievementSound.play();
                     let rewardTxt = ach.reward ? " (" + ach.reward + " Jeton Kazandırdı)" : "";
                     if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir Başarım Kazandınız: " + ach.title + rewardTxt);
                     setTimeout(() => {
-                        if (window.showAchievementModal) window.showAchievementModal(ach.title, ach.reward);
+                        if (!window.gameIsActive && !window.inStoryMode && window.showAchievementModal) {
+                            window.showAchievementModal(ach.title, ach.reward);
+                        }
                     }, 3000);
                 }, delayAcc);
                 delayAcc += 4500;
@@ -972,9 +974,11 @@ window.checkAllAchievements = function() {
         
         milestones.forEach(m => {
             if (countBefore < m && countAfter >= m) {
-                let timerFunction = window.hgfzZamanlayici ? window.hgfzZamanlayici.setTimeout : setTimeout;
+                const timerFunction = setTimeout;
                 timerFunction(() => {
-                    alert(`Tebrikler! Hafızana Güven'de toplam ${m} başarı seviyesine ulaştınız!`);
+                    if (!window.gameIsActive && !window.inStoryMode) {
+                        alert(`Tebrikler! Hafızana Güven'de toplam ${m} başarı seviyesine ulaştınız!`);
+                    }
                     if (window.announceToScreenReader) window.announceToScreenReader(`Tebrikler! Hafızana Güven'de toplam ${m} başarı seviyesine ulaştınız!`);
                 }, delayAcc + 1000);
                 delayAcc += 2000;
