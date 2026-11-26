@@ -24,7 +24,7 @@ window.guncellemeKontrolEt = function (isManual = false) {
     if (isManual && typeof window.announceToScreenReader === 'function') {
         window.announceToScreenReader('Güncellemeler denetleniyor...');
     }
-    fetch('version.json?t=' + new Date().getTime())
+    fetch('version.json?t=' + new Date().getTime(), { cache: 'no-store' })
         .then(response => { if (!response.ok) throw new Error('Network response bad'); return response.json(); })
         .then(data => {
             const visualVersion = document.getElementById("intro-version-display");
@@ -103,8 +103,9 @@ window.guncellemeKontrolEt = function (isManual = false) {
                 allAudios.forEach(audio => { audio.pause(); });
 
                 setTimeout(() => {
-                    window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
-                }, data.silent ? 400 : 2500);
+                    const baseUrl = window.location.href.split('?')[0].split('#')[0];
+                    window.location.replace(baseUrl + '?v=' + encodeURIComponent(data.version) + '_' + Date.now());
+                }, data.silent ? 50 : 2500);
 
             } else {
                 // Sessizce güncelleme durumunu UI'da tuttuk.
@@ -122,3 +123,6 @@ window.guncellemeKontrolEt = function (isManual = false) {
             }
         });
 };
+
+// Sayfa açılır açılmaz beklemeden sürüm kontrolü başlat (eski önbellekte kalmayı önler)
+try { window.guncellemeKontrolEt(false); } catch (e) { }

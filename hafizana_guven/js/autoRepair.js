@@ -76,7 +76,11 @@ window.HafizanaGuvenAutoRepair = {
 
             if (btnReload) {
                 btnReload.addEventListener('click', () => {
-                    window.location.reload();
+                    if ('caches' in window) {
+                        caches.keys().then(names => names.forEach(n => caches.delete(n))).catch(() => {});
+                    }
+                    const baseUrl = window.location.href.split('?')[0].split('#')[0];
+                    window.location.replace(baseUrl + '?v=' + Date.now());
                 });
             }
         });
@@ -85,6 +89,23 @@ window.HafizanaGuvenAutoRepair = {
     showErrorReporter: function(errorLog) {
         if (this.isRepairing) return;
         this.isRepairing = true;
+
+        // Eğer tarayıcı eski bir önbellek sürümünü çalıştırıyorsa hata ekranı göstermek yerine sessizce güncel sürüme geçir
+        if (window.location && window.location.protocol !== 'file:' && typeof fetch === 'function') {
+            fetch('version.json?t=' + Date.now(), { cache: 'no-store' })
+                .then(r => r.ok ? r.json() : null)
+                .then(d => {
+                    const cur = window.UYGULAMA_SURUMU || window.mevcutSurum;
+                    if (d && d.version && cur && d.version !== cur) {
+                        if ('caches' in window) {
+                            caches.keys().then(names => names.forEach(n => caches.delete(n))).catch(() => {});
+                        }
+                        const baseUrl = window.location.href.split('?')[0].split('#')[0];
+                        window.location.replace(baseUrl + '?v=' + encodeURIComponent(d.version) + '_' + Date.now());
+                    }
+                })
+                .catch(() => {});
+        }
 
         // Kullanıcı gizliliğini korumak için bilgisayar dosya yollarını maskele (C:\Users\... veya file:///)
         let sanitizedLog = errorLog;

@@ -69,14 +69,14 @@ function createWindow() {
         if (!isMainFrame) return;
         if (!triedBackup) {
             triedBackup = true;
-            mainWindow.loadURL(BACKUP_URL).catch(() => loadLocalFallback());
+            mainWindow.loadURL(BACKUP_URL + '?v=' + Date.now()).catch(() => loadLocalFallback());
         } else {
             loadLocalFallback();
         }
     });
 
     // Önce canlı HTTPS sürümünü dene (böylece portatif uygulama her zaman güncel kalır), hata varsa yerel dosyayı aç
-    mainWindow.loadURL(LIVE_URL).catch(() => {
+    mainWindow.loadURL(LIVE_URL + '?v=' + Date.now()).catch(() => {
         triedBackup = true;
         loadLocalFallback();
     });

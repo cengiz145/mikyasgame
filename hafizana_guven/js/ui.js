@@ -1155,7 +1155,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             setTimeout(() => {
-                window.location.reload(true);
+                const baseUrl = window.location.href.split('?')[0].split('#')[0];
+                window.location.replace(baseUrl + '?v=' + Date.now());
             }, 500);
         });
     }
