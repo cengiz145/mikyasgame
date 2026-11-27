@@ -3013,17 +3013,33 @@
             let dispatchedCount = 0;
             const dispatchReports = [];
 
-            // Şoförleri rütbelerine ve uzmanlıklarına göre sırala (en tecrübeli şoför en karlı uzun hatta)
-            const driversSorted = [...this.data.hiredDrivers].sort((a, b) => (b.rankLevel || 1) - (a.rankLevel || 1));
+            // Yalnızca şu an seferde veya dinlenmede OLMAYAN müsait NPC şoförleri filtrele
+            const idleDrivers = this.data.hiredDrivers.filter(d => d && d.status !== 'on_trip' && d.status !== 'resting');
+            if (idleDrivers.length === 0) {
+                const busyMsg = "Tüm şoförleriniz şu an aktif seferde veya istirahatte!";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(busyMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`ℹ️ ${busyMsg}`, "info");
+                return;
+            }
 
-            driversSorted.forEach((driver, idx) => {
+            // Şu an aktif seferde kullanılan otobüsleri belirle ki boşta otobüs varsa aynı otobüs çakışmasın
+            const busyBusIds = new Set(
+                this.data.hiredDrivers
+                    .filter(d => d && d.status === 'on_trip' && d.assignedBusId)
+                    .map(d => d.assignedBusId)
+            );
+
+            // Şoförleri rütbelerine ve uzmanlıklarına göre sırala (en tecrübeli şoför en karlı uzun hatta)
+            const driversSorted = [...idleDrivers].sort((a, b) => (b.rankLevel || 1) - (a.rankLevel || 1));
+
+            driversSorted.forEach((driver) => {
                 // Şoförün ehliyetinin yettiği en karlı rotayı bul
                 const eligibleRoutes = this.availableRoutes.filter(r => (driver.rankLevel || 1) >= (r.minRankLevel || 1));
                 if (eligibleRoutes.length === 0) return;
 
                 // Karlılık skorunu hesapla
                 let bestRoute = eligibleRoutes[0];
-                let maxProfitScore = -1;
+                let maxProfitScore = -Infinity;
 
                 eligibleRoutes.forEach(r => {
                     const trend = trends[r.id];
@@ -3045,18 +3061,18 @@
                     }
                 });
 
-                // Bu rota için en uygun otobüsü seç
-                let chosenBusId = availableBusIds[0];
+                // Bu rota için öncelikle boşta olan en uygun otobüsü seç
+                const freePool = availableBusIds.filter(id => !busyBusIds.has(id));
+                const candidatePool = freePool.length > 0 ? freePool : availableBusIds;
+                let chosenBusId = candidatePool[0];
                 if (bestRoute.routeType === "buyuk") {
-                    // Tercihen Tier 3 VIP otobüs
-                    const vipBus = availableBusIds.find(id => {
+                    const vipBus = candidatePool.find(id => {
                         const b = this.getBusInfo(id);
                         return b.sizeTier === 3 || b.sizeClass === "buyuk";
                     });
                     if (vipBus) chosenBusId = vipBus;
                 } else if (bestRoute.routeType === "kucuk") {
-                    // Tercihen Tier 1 Midibüs
-                    const midiBus = availableBusIds.find(id => {
+                    const midiBus = candidatePool.find(id => {
                         const b = this.getBusInfo(id);
                         return b.sizeTier === 1 || b.sizeClass === "kucuk";
                     });
@@ -3076,12 +3092,18 @@
                     Game.playerBudget -= 300;
                 }
 
-                // Sefere çıkart
-                this.dispatchDriver(driver.id, bestRoute.id, chosenBusId);
-                dispatchedCount++;
-                const bInfo = this.getBusInfo(chosenBusId);
-                dispatchReports.push(`${driver.name} ➔ ${bInfo.fullName} ile ${bestRoute.name}`);
+                // Sefere çıkart ve yalnızca gerçekten sefere çıktıysa say
+                if (this.dispatchDriver(driver.id, bestRoute.id, chosenBusId)) {
+                    busyBusIds.add(chosenBusId);
+                    dispatchedCount++;
+                    const bInfo = this.getBusInfo(chosenBusId);
+                    dispatchReports.push(`${driver.name} ➔ ${bInfo.fullName} ile ${bestRoute.name}`);
+                }
             });
+
+            if (dispatchedCount === 0) {
+                return;
+            }
 
             this.playAiDispatchSound();
 
@@ -3589,6 +3611,7 @@
 
         // Web Audio Synthesizer Ses Efektleri
         getAudioCtx: function () {
+            if (typeof audio !== 'undefined' && (audio.isMuted || (typeof audio.gameSoundVolume === 'number' && audio.gameSoundVolume <= 0.01))) return null;
             if (typeof audio !== 'undefined' && audio.ctx) return audio.ctx;
             if (!this._internalAudioCtx && typeof window !== 'undefined') {
                 const AudioCtxClass = window.AudioContext || window.webkitAudioContext;

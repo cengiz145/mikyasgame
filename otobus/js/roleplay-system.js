@@ -52,12 +52,14 @@
         // Ses Çalma Fonksiyonu (HTML5 Audio veya Web Audio fallback)
         playSound: function (soundKey, volume = 0.8) {
             if (typeof audio !== 'undefined' && audio.isMuted) return;
+            const gameVol = (typeof audio !== 'undefined' && typeof audio.gameSoundVolume === 'number') ? audio.gameSoundVolume : 1.0;
+            if (gameVol <= 0.01) return;
             const url = this.sounds[soundKey];
             if (!url) return;
 
             try {
                 const a = new Audio(url);
-                a.volume = volume;
+                a.volume = Math.max(0, Math.min(1, volume * gameVol));
                 a.play().catch(e => {
                     console.log("[RoleplaySystem] Ses çalma uyarısı:", e.message);
                 });
@@ -305,14 +307,15 @@
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`👥 ${msg}`, "info");
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             } else {
-                if (typeof audio !== 'undefined' && audio.isMuted) {
-                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔇 Ses kapalıyken kabin mırıltısı başlatılamaz (M tuşuyla sesi açın).", "info");
+                const gameVol = (typeof audio !== 'undefined' && typeof audio.gameSoundVolume === 'number') ? audio.gameSoundVolume : 1.0;
+                if ((typeof audio !== 'undefined' && audio.isMuted) || gameVol <= 0.01) {
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔇 Ses kapalıyken kabin mırıltısı başlatılamaz.", "info");
                     return;
                 }
                 try {
                     this.murmurAudio = new Audio(this.sounds.passengerMurmur);
                     this.murmurAudio.loop = true;
-                    this.murmurAudio.volume = 0.18;
+                    this.murmurAudio.volume = Math.max(0, Math.min(1, 0.16 * gameVol));
                     this.murmurAudio.play().then(() => {
                         this.isMurmurPlaying = true;
                         this.renderModalContent();

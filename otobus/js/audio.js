@@ -1380,7 +1380,9 @@ class AudioSystem {
 
     // --- FREESOUND GERÇEK YOLCU AKUSTİK TEPKİLERİ ---
     playPassengerShock() {
-        if (!this.sounds || !this.sounds.passengerShock) return;
+        if (!this.sounds || !this.sounds.passengerShock || this.isMuted) return;
+        const volScale = (typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : 1.0;
+        if (volScale <= 0.01) return;
         const now = performance.now();
         if (this.lastPassengerShockTime && (now - this.lastPassengerShockTime < 6000)) return;
         this.lastPassengerShockTime = now;
@@ -1389,12 +1391,14 @@ class AudioSystem {
             if (typeof this.sounds.passengerShock.stereo === 'function') {
                 this.sounds.passengerShock.stereo((Math.random() - 0.5) * 0.5, id);
             }
-            this.sounds.passengerShock.volume(0.85, id);
+            this.sounds.passengerShock.volume(0.85 * volScale, id);
         } catch (e) { }
     }
 
     playPassengerBump() {
-        if (!this.sounds || !this.sounds.passengerBump) return;
+        if (!this.sounds || !this.sounds.passengerBump || this.isMuted) return;
+        const volScale = (typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : 1.0;
+        if (volScale <= 0.01) return;
         const now = performance.now();
         if (this.lastPassengerBumpTime && (now - this.lastPassengerBumpTime < 5000)) return;
         this.lastPassengerBumpTime = now;
@@ -1403,12 +1407,14 @@ class AudioSystem {
             if (typeof this.sounds.passengerBump.stereo === 'function') {
                 this.sounds.passengerBump.stereo((Math.random() - 0.5) * 0.5, id);
             }
-            this.sounds.passengerBump.volume(0.85, id);
+            this.sounds.passengerBump.volume(0.85 * volScale, id);
         } catch (e) { }
     }
 
     playPassengerDiscontent() {
-        if (!this.sounds || !this.sounds.passengerDiscontent) return;
+        if (!this.sounds || !this.sounds.passengerDiscontent || this.isMuted) return;
+        const volScale = (typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : 1.0;
+        if (volScale <= 0.01) return;
         const now = performance.now();
         if (this.lastPassengerDiscontentTime && (now - this.lastPassengerDiscontentTime < 14000)) return;
         this.lastPassengerDiscontentTime = now;
@@ -1417,12 +1423,14 @@ class AudioSystem {
             if (typeof this.sounds.passengerDiscontent.stereo === 'function') {
                 this.sounds.passengerDiscontent.stereo((Math.random() - 0.5) * 0.5, id);
             }
-            this.sounds.passengerDiscontent.volume(0.80, id);
+            this.sounds.passengerDiscontent.volume(0.80 * volScale, id);
         } catch (e) { }
     }
 
     playPassengerGroan() {
-        if (!this.sounds || !this.sounds.passengerGroan) return;
+        if (!this.sounds || !this.sounds.passengerGroan || this.isMuted) return;
+        const volScale = (typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : 1.0;
+        if (volScale <= 0.01) return;
         const now = performance.now();
         if (this.lastPassengerGroanTime && (now - this.lastPassengerGroanTime < 22000)) return;
         this.lastPassengerGroanTime = now;
@@ -1431,29 +1439,48 @@ class AudioSystem {
             if (typeof this.sounds.passengerGroan.stereo === 'function') {
                 this.sounds.passengerGroan.stereo((Math.random() - 0.5) * 0.5, id);
             }
-            this.sounds.passengerGroan.volume(0.80, id);
+            this.sounds.passengerGroan.volume(0.80 * volScale, id);
         } catch (e) { }
     }
 
     updatePassengerCabinMurmur(passengerCount = 0, isDriving = false) {
         if (!this.sounds || !this.sounds.passengerMurmur) return;
-        if (!isDriving || passengerCount <= 0) {
-            if (this.sounds.passengerMurmur.playing()) {
-                this.sounds.passengerMurmur.fade(this.sounds.passengerMurmur.volume(), 0, 600);
-                setTimeout(() => {
-                    try { if (this.sounds.passengerMurmur) this.sounds.passengerMurmur.pause(); } catch (e) { }
-                }, 600);
+        const volScale = (!this.isMuted && typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : (this.isMuted ? 0 : 1.0);
+        const manualRpMurmur = (typeof RoleplaySystem !== 'undefined' && RoleplaySystem.isMurmurPlaying);
+        if (!isDriving || passengerCount < 3 || volScale <= 0.01 || manualRpMurmur) {
+            this._lastMurmurTargetVol = 0;
+            if (this.sounds.passengerMurmur.playing() && !this._murmurFadingOut) {
+                this._murmurFadingOut = true;
+                this.sounds.passengerMurmur.fade(this.sounds.passengerMurmur.volume(), 0, 500);
+                if (this._murmurPauseTimer) clearTimeout(this._murmurPauseTimer);
+                this._murmurPauseTimer = setTimeout(() => {
+                    this._murmurFadingOut = false;
+                    this._murmurPauseTimer = null;
+                    try {
+                        if (this.sounds && this.sounds.passengerMurmur && (this._lastMurmurTargetVol || 0) <= 0.005) {
+                            this.sounds.passengerMurmur.pause();
+                        }
+                    } catch (e) { }
+                }, 520);
             }
             return;
         }
 
-        // Yolcu sayısına göre tatlı bir kabin içi yaşam mırıltısı
-        const targetVol = Math.min(0.12, 0.03 + (passengerCount / 60) * 0.09);
+        if (this._murmurPauseTimer) {
+            clearTimeout(this._murmurPauseTimer);
+            this._murmurPauseTimer = null;
+        }
+        this._murmurFadingOut = false;
+
+        // En az 3 yolcu varken tatlı kabin mırıltısı (her karede fade sıfırlanmasını önlemek için eşikli güncelleme)
+        const targetVol = Math.min(0.11, 0.025 + (passengerCount / 60) * 0.085) * volScale;
         if (!this.sounds.passengerMurmur.playing()) {
+            this._lastMurmurTargetVol = targetVol;
             this.sounds.passengerMurmur.volume(0);
             this.sounds.passengerMurmur.play();
-            this.sounds.passengerMurmur.fade(0, targetVol, 1200);
-        } else {
+            this.sounds.passengerMurmur.fade(0, targetVol, 900);
+        } else if (typeof this._lastMurmurTargetVol !== 'number' || Math.abs(this._lastMurmurTargetVol - targetVol) > 0.008) {
+            this._lastMurmurTargetVol = targetVol;
             this.sounds.passengerMurmur.fade(this.sounds.passengerMurmur.volume(), targetVol, 400);
         }
     }
@@ -1647,21 +1674,55 @@ class AudioSystem {
 
     updateCrowdAmbience(passengerCount = 0, isDoorOpen = false, isStation = false) {
         if (!this.sounds || !this.sounds.crowdWalla) return;
-        let targetVol = 0;
-        if (passengerCount > 0) {
-            // 1 yolcudan 50 yolcuya kadar yumuşak artış
-            targetVol = Math.min(0.70, 0.15 + (passengerCount / 40) * 0.45);
+        const volScale = (!this.isMuted && typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : (this.isMuted ? 0 : 1.0);
+        let rawVol = 0;
+        if (passengerCount >= 6) {
+            // Gerçekçi kabin kalabalık uğultusu: en az 6 yolcuda başlar, NVDA ve diyalogları asla bastırmaz
+            rawVol = Math.min(0.14, 0.03 + ((passengerCount - 5) / 45) * 0.11);
         }
         if (isStation && isDoorOpen) {
-            // Durakta kapı açılınca durak kalabalığı içeri dolar
-            targetVol = Math.max(targetVol, 0.45);
+            const waitEl = (typeof document !== 'undefined') ? document.getElementById('stop-waiting-count') : null;
+            const waitingCount = waitEl ? (parseInt(waitEl.innerText, 10) || 0) : 0;
+            if (waitingCount >= 3 || passengerCount >= 6) {
+                rawVol = Math.max(rawVol, Math.min(0.22, 0.07 + (waitingCount / 25) * 0.15));
+            }
+        }
+        const targetVol = rawVol * volScale;
+
+        if (targetVol <= 0.005) {
+            this._lastCrowdTargetVol = 0;
+            if (this.sounds.crowdWalla.playing() && !this._crowdFadingOut) {
+                this._crowdFadingOut = true;
+                this.sounds.crowdWalla.fade(this.sounds.crowdWalla.volume(), 0, 450);
+                if (this._crowdPauseTimer) clearTimeout(this._crowdPauseTimer);
+                this._crowdPauseTimer = setTimeout(() => {
+                    this._crowdFadingOut = false;
+                    this._crowdPauseTimer = null;
+                    try {
+                        if (this.sounds && this.sounds.crowdWalla && (this._lastCrowdTargetVol || 0) <= 0.005) {
+                            this.sounds.crowdWalla.pause();
+                        }
+                    } catch (e) { }
+                }, 470);
+            }
+            return;
         }
 
-        if (targetVol > 0.02 && !this.sounds.crowdWalla.playing()) {
+        if (this._crowdPauseTimer) {
+            clearTimeout(this._crowdPauseTimer);
+            this._crowdPauseTimer = null;
+        }
+        this._crowdFadingOut = false;
+
+        if (!this.sounds.crowdWalla.playing()) {
+            this._lastCrowdTargetVol = targetVol;
             this.sounds.crowdWalla.volume(0.01);
             this.sounds.crowdWalla.play();
+            this.sounds.crowdWalla.fade(0.01, targetVol, 500);
+        } else if (typeof this._lastCrowdTargetVol !== 'number' || Math.abs(this._lastCrowdTargetVol - targetVol) > 0.01) {
+            this._lastCrowdTargetVol = targetVol;
+            this.sounds.crowdWalla.fade(this.sounds.crowdWalla.volume(), targetVol, 500);
         }
-        this.sounds.crowdWalla.fade(this.sounds.crowdWalla.volume(), targetVol, 500);
     }
 
     toggleCrowdDemo() {
@@ -1782,6 +1843,13 @@ class AudioSystem {
                 setTimeout(() => { if (snd) snd.pause(); }, 200);
             }
         });
+        if (typeof Game !== 'undefined' && Array.isArray(Game.activeNPCs) && Game.activeNPCs.length > 0) {
+            Game.activeNPCs.forEach(n => {
+                if (n && n.audioObj && typeof n.audioObj.stop === 'function') {
+                    try { n.audioObj.stop(); } catch (e) {}
+                }
+            });
+        }
     }
 
     updateEngineSound(speed, rpm = null, gear = null, isThrottle = false) {
@@ -3448,10 +3516,14 @@ class AudioSystem {
     }
 
     playNPCHorn(pan = 0) {
+        if (this.isMuted) return;
+        const gVol = (typeof this.gameSoundVolume === 'number') ? this.gameSoundVolume : 1.0;
+        if (gVol <= 0.01) return;
         if (this.sounds && this.sounds.npcHorn) {
             const id = this.sounds.npcHorn.play();
+            this.sounds.npcHorn.volume(Math.min(1.0, 0.80 * gVol), id);
             if (typeof this.sounds.npcHorn.stereo === 'function') {
-                this.sounds.npcHorn.stereo(pan, id);
+                this.sounds.npcHorn.stereo(Math.max(-1, Math.min(1, pan)), id);
             }
         }
     }

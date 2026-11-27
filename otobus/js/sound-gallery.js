@@ -1609,6 +1609,7 @@ const SoundGallery = {
         this.currentlyPlayingId = s.id;
         const statusBanner = document.getElementById('sound-gallery-current-status');
         const statusText = document.getElementById('sound-gallery-status-text');
+        const countdownEl = document.getElementById('sound-gallery-countdown-num');
 
         if (s.category === 'engine') {
             this.playEngineFor10Seconds(s);
@@ -1619,18 +1620,37 @@ const SoundGallery = {
                 statusBanner.style.display = 'flex';
                 statusText.innerText = '▶️ Çalıyor: ' + s.title;
             }
+            if (countdownEl) countdownEl.innerText = '🔊';
             if (s.category !== 'human' && typeof audio !== 'undefined' && audio.speak) {
                 audio.speak(s.title + ' çalınıyor.');
             }
             if (typeof s.playFn === 'function') {
                 s.playFn();
             }
-            this.renderModal(this.currentTab);
-            setTimeout(() => {
-                this.currentlyPlayingId = null;
-                if (statusBanner) statusBanner.style.display = 'none';
-                this.renderModal(this.currentTab);
-            }, 3000);
+            // NVDA odak korunumu: listEl.innerHTML sıfırlayan renderModal yerine yalnızca aktif rozeti ve aria-label'ı yerinde güncelle!
+            this.updatePlayingUI(s.id);
+            const activeItemId = s.id;
+            let elapsedTicks = 0;
+            this.effectWatchTimer = setInterval(() => {
+                elapsedTicks++;
+                if (this.currentlyPlayingId !== activeItemId) {
+                    clearInterval(this.effectWatchTimer);
+                    this.effectWatchTimer = null;
+                    return;
+                }
+                const humanStillPlaying = (s.category === 'human' && typeof window.HumanNpcVoices !== 'undefined')
+                    && (window.HumanNpcVoices.isPlayingNow()
+                        || !!(window.HumanNpcVoices.activePoliceChase && window.HumanNpcVoices.activePoliceChase.active)
+                        || !!(window.HumanNpcVoices.activeStreetFight && window.HumanNpcVoices.activeStreetFight.active && !window.HumanNpcVoices.activeStreetFight.brawlFinished));
+                const minTicks = (s.category === 'human') ? 6 : 5; // en az ~3 sn, uzun NPC sahnelerinde ise bitene kadar (azami 24 sn)
+                if ((!humanStillPlaying && elapsedTicks >= minTicks) || elapsedTicks >= 48) {
+                    clearInterval(this.effectWatchTimer);
+                    this.effectWatchTimer = null;
+                    this.currentlyPlayingId = null;
+                    if (statusBanner) statusBanner.style.display = 'none';
+                    this.updatePlayingUI(null);
+                }
+            }, 500);
         }
     },
 
@@ -1792,6 +1812,10 @@ const SoundGallery = {
         if (this.countdownInterval) {
             clearInterval(this.countdownInterval);
             this.countdownInterval = null;
+        }
+        if (this.effectWatchTimer) {
+            clearInterval(this.effectWatchTimer);
+            this.effectWatchTimer = null;
         }
 
         if (this.currentAudioNode) {

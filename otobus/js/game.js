@@ -527,6 +527,20 @@ const Game = {
     runningPassengerBonusCount: 0,
     timingDeviations: [],
 
+    stopAndClearActiveNPCs: function() {
+        if (Array.isArray(this.activeNPCs) && this.activeNPCs.length > 0) {
+            this.activeNPCs.forEach(n => {
+                if (n && n.audioObj && typeof n.audioObj.stop === 'function') {
+                    try { n.audioObj.stop(); } catch (e) {}
+                }
+                if (n && n.el && typeof n.el.remove === 'function') {
+                    try { n.el.remove(); } catch (e) {}
+                }
+            });
+        }
+        this.activeNPCs = [];
+    },
+
     cleanupPassengerTimersAndState: function() {
         if (this.boardingTimer) { clearInterval(this.boardingTimer); this.boardingTimer = null; }
         if (this.rearDoorRemindTimer) { clearTimeout(this.rearDoorRemindTimer); this.rearDoorRemindTimer = null; }
@@ -541,6 +555,10 @@ const Game = {
         this.activeRunningPassenger = false;
         this.lostAndFoundCheckingInProgress = false;
         this.pendingFinishAfterLostCheck = false;
+        this.stopAndClearActiveNPCs();
+        if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.stopTimersOnly === 'function') {
+            window.HumanNpcVoices.stopTimersOnly();
+        }
     },
 
     isCoachVehicle: function() {
@@ -617,6 +635,44 @@ const Game = {
         }
     },
 
+    boardWheelchairPassengerNow: function () {
+        if (this.isDriving || !this.frontDoorOpen || !this.isRampDeployed || !this.hasWheelchairPassengerAtStop || this.wheelchairPassengerBoardedAtStop) {
+            return false;
+        }
+        const stopData = (this.activeRouteData && Array.isArray(this.activeRouteData.stops)) ? this.activeRouteData.stops[this.currentStopIndex] : null;
+        const { seatCapacity, totalCapacity } = this.getSeatAndTotalCapacity();
+        if (this.passengersOnBoard >= totalCapacity) {
+            if ((this.pendingAlightingAtStop || 0) > 0 && !this.rearDoorOpen) {
+                const waitAlightWc = "Araç dolu! Tekerlekli sandalyeli yolcuya yer açmak için önce PageDown ile arka kapıyı açıp inecek yolcuları indiriniz.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(waitAlightWc);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("♿ " + waitAlightWc, "warning");
+            }
+            return false;
+        }
+        this.wheelchairPassengerBoardedAtStop = true;
+        if (stopData && stopData.bekleyenYolcu > 0) {
+            const isStandingWc = this.passengersOnBoard >= seatCapacity;
+            this.automatedTicketProcess(isStandingWc, { forceWheelchairFree: true, silentGreeting: true });
+            stopData.bekleyenYolcu = Math.max(0, stopData.bekleyenYolcu - 1);
+            const waitEl = document.getElementById('stop-waiting-count');
+            if (waitEl) waitEl.innerText = stopData.bekleyenYolcu;
+            const pInter = document.getElementById('passenger-interaction');
+            if (pInter) pInter.classList.remove('hidden');
+            const dEl = document.getElementById('passenger-dialog');
+            if (dEl) dEl.innerText = '"Allah razı olsun kaptanım, tekerlekli sandalyeyle güvenle bindim."';
+        }
+        this.updateHudPassengersDisplay();
+        this.syncRampButtonUI();
+        if (stopData && stopData.bekleyenYolcu > 0 && !this.boardingTimer) {
+            setTimeout(() => {
+                if (!this.isDriving && this.frontDoorOpen && !this.boardingTimer) {
+                    this.startBoardingLoop();
+                }
+            }, 900);
+        }
+        return true;
+    },
+
     toggleWheelchairRamp: function () {
         if (this.isDriving && this.speed > 3) {
             if (typeof audio !== 'undefined' && audio.speak) audio.speak("Güvenlik: Araç hareket halindeyken rampa açılamaz.");
@@ -648,17 +704,22 @@ const Game = {
                 this.addXP(30, "Tekerlekli Sandalye Rampası Hizmeti");
                 xpGained = true;
             }
+            let boardedRightNow = false;
             if (this.hasWheelchairPassengerAtStop && !this.wheelchairPassengerBoardedAtStop) {
-                this.wheelchairPassengerBoardedAtStop = true;
                 if (!this.isDriving && this.frontDoorOpen) {
-                    setTimeout(() => {
-                        if (!this.isDriving && this.frontDoorOpen) this.startBoardingLoop();
-                    }, 900);
+                    boardedRightNow = this.boardWheelchairPassengerNow();
+                } else if (!this.isDriving && !this.frontDoorOpen) {
+                    this.syncRampButtonUI();
+                    const openFrontMsg = "Engelli rampası indirildi. Tekerlekli sandalyeli yolcunun içeri girebilmesi için şimdi PageUp (Sayfa Yukarı) tuşuyla ön kapıyı açınız.";
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(openFrontMsg);
+                    if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(openFrontMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(xpGained ? "♿ Rampa Açıldı (+30 XP) — Ön Kapıyı Açın (PageUp)" : "♿ Rampa Açıldı — Ön Kapıyı Açın (PageUp)", "info");
+                    return;
                 }
             }
             this.syncRampButtonUI();
-            if (xpGained) {
-                const msg = "Tekerlekli sandalye rampası açıldı. Yolcu güvenle biniyor: Çok teşekkür ederim kaptanım, iyi görevler. Kapatmak için tekrar U tuşuna basınız.";
+            if (xpGained || boardedRightNow) {
+                const msg = "Tekerlekli sandalye rampası açıldı ve yolcu güvenle bindi: Çok teşekkür ederim kaptanım, iyi görevler. Kapatmak için tekrar U tuşuna basınız.";
                 if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onRampThank())) {
                     if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
                     if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
@@ -2647,15 +2708,20 @@ const Game = {
     resumeFromSave: function () {
         if (!this.savedState) return;
 
+        if (this.savedState.routeId) this.activeRouteId = this.savedState.routeId;
         this.activeRouteData = this.savedState.routeData;
         this.currentStopIndex = this.savedState.stopIndex;
         this.currentDistanceToNext = this.savedState.distance;
         this.currentRoadType = this.savedState.roadType;
         this.passengersOnBoard = (typeof this.savedState.passengersOnBoard === 'number') ? this.savedState.passengersOnBoard : 0;
+        if (typeof this.savedState.totalPassengersBoardedInRoute === 'number') {
+            this.totalPassengersBoardedInRoute = this.savedState.totalPassengersBoardedInRoute;
+        }
         if (typeof window.HumanNpcVoices !== 'undefined') {
             if (this.savedState.npcRoster) window.HumanNpcVoices.roster = JSON.parse(JSON.stringify(this.savedState.npcRoster));
             if (Array.isArray(this.savedState.simulatedPassengers)) window.HumanNpcVoices.simulatedPassengers = JSON.parse(JSON.stringify(this.savedState.simulatedPassengers));
         }
+        this.updateHudPassengersDisplay();
 
         // Temizle
         this.savedState = null;
@@ -2674,7 +2740,7 @@ const Game = {
         this.driftVelocity = 0;
         this.targetDriftVelocity = 0;
         this.obstacles = [];
-        this.activeNPCs = [];
+        this.stopAndClearActiveNPCs();
         this.frontDoorOpen = false;
         this.rearDoorOpen = false;
         this.airPressure = 120; // BUG FIX: Sanayiden çıkınca hava tankları fullenir
@@ -2826,7 +2892,7 @@ const Game = {
         }
 
         this.obstacles = [];
-        this.activeNPCs = [];
+        this.stopAndClearActiveNPCs();
         this.frontDoorOpen = false;
         this.rearDoorOpen = false;
         this.departCountdownTimer = null;
@@ -5123,7 +5189,7 @@ const Game = {
             // 2. Kademeli Ses Seviyesi Formülü (Uzaklaşırken YAVAŞ YAVAŞ sönümlenir)
             let vol = 0;
             if (npc.y >= 0) {
-                vol = 1 - (npc.y / 650);
+                vol = 1 - (npc.y / 700);
             } else {
                 vol = 1 - (Math.abs(npc.y) / 500);
             }
@@ -5132,9 +5198,14 @@ const Game = {
             // 3. Doppler Pitch Formülü: Hız ve yöne bağlı frekans kayması
             let dopplerRate = (npc.y >= 0) ? (1.04 + Math.min(0.08, this.speed / 200)) : (0.92 - Math.min(0.06, this.speed / 200));
 
-            if (npc.audioObj && npc.audioObj.howlObj) {
+            const masterNpcVol = (typeof audio !== 'undefined')
+                ? (audio.isMuted ? 0 : (typeof audio.gameSoundVolume === 'number' ? audio.gameSoundVolume : 1.0))
+                : 1.0;
+            const effectiveNpcVol = Math.max(0, Math.min(1, vol * masterNpcVol));
+
+            if (npc.audioObj && npc.audioObj.howlObj && !npc.hasCollided) {
                 npc.audioObj.howlObj.stereo(currentPan, npc.audioObj.soundId);
-                npc.audioObj.howlObj.volume(vol, npc.audioObj.soundId);
+                npc.audioObj.howlObj.volume(effectiveNpcVol, npc.audioObj.soundId);
                 npc.audioObj.howlObj.rate(dopplerRate, npc.audioObj.soundId);
             }
 
@@ -5149,19 +5220,25 @@ const Game = {
 
             // --- ÇARPIŞMA VE FİZİKSEL HASAR (KİNETİK ENERJİ FORMÜLÜ) ---
             if (!npc.hasCollided && Math.abs(npc.y) <= 12) {
-                if (!this.isBeingTowed && this.speed >= 15 && Math.abs(npc.x - this.lanePosition) < 20) {
+                const isRearEndImpact = (npc.type === 'overtaking' && !npc.merged && npc.speed > this.speed);
+                if (!this.isBeingTowed && (this.speed >= 15 || isRearEndImpact) && Math.abs(npc.x - this.lanePosition) < 20) {
                     npc.hasCollided = true;
+                    if (npc.audioObj && typeof npc.audioObj.stop === 'function') {
+                        npc.audioObj.stop();
+                        npc.audioObj = null;
+                    }
 
                     npc.baseSpeed = 0;
                     npc.slideX = (this.lanePosition > 50) ? -80 : 80;
-                    npc.slideY = this.speed * 1.5;
+                    npc.slideY = isRearEndImpact ? -Math.max(25, (npc.speed - this.speed) * 1.2) : (this.speed * 1.5);
                     if (typeof audio !== 'undefined' && typeof audio.playTireScreech === 'function') {
-                        audio.playTireScreech(1.0);
+                        audio.playTireScreech(isRearEndImpact ? 0.75 : 1.0);
                         setTimeout(() => audio.stopTireScreech(), 1500);
                     }
 
-                    // KİNETİK ENERJİ HASAR FORMÜLÜ: Hasar = v^2 / 110 (Rastgelelik sıfırlandı)
-                    let damageAmount = Math.max(5, Math.min(100, Math.round(Math.pow(this.speed, 2) / 110)));
+                    // KİNETİK ENERJİ HASAR FORMÜLÜ: Arkadan darbede bağıl hız farkı, diğer çarpışmalarda v^2 / 110
+                    const impactVel = isRearEndImpact ? Math.max(18, npc.speed - this.speed) : this.speed;
+                    let damageAmount = Math.max(5, Math.min(100, Math.round(Math.pow(impactVel, 2) / (isRearEndImpact ? 145 : 110))));
 
                     // Garaj ve Filo Sahası Koruması (Kapalı Hangar, Güvenlik Kameraları ve Çevre Aydınlatması)
                     if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
@@ -5182,7 +5259,17 @@ const Game = {
                     const useHumanCrash = (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.canSpeakInCabin());
                     let crashSummaryText = "";
                     let crashSide = "front";
-                    if (relCrashX < -8) {
+                    if (isRearEndImpact && Math.abs(relCrashX) <= 12) {
+                        crashSide = "rear";
+                        this.lastRearHitTime = performance.now();
+                        const exhDmg = Math.max(6, Math.round(damageAmount / 1.4));
+                        this.busDamage.exhaust = Math.min(100, (this.busDamage.exhaust || 0) + exhDmg);
+                        if (this.calculateCrashOutcome(damageAmount, 2) >= 1) {
+                            this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + Math.round(damageAmount / 2.0));
+                        }
+                        crashSummaryText = `Arkadan çarptılar! Egzoz ve arka tampon yüzde ${exhDmg} hasar aldı.`;
+                        if (!useHumanCrash) audio.speak(crashSummaryText);
+                    } else if (relCrashX < -8) {
                         crashSide = "left";
                         // Hassas dış donanım (Sol Cam - 1.0x)
                         let outcome = this.calculateCrashOutcome(damageAmount, 1);
@@ -5281,22 +5368,29 @@ const Game = {
                     }
 
                     audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
-                    this.speed = 0;
+                    this.speed = (crashSide === "rear") ? Math.max(0, this.speed - 12) : 0;
                     audio.playCrash();
                     if (useHumanCrash) {
-                        window.HumanNpcVoices.onCollision(crashSide, damageAmount, this.passengersOnBoard, crashSummaryText);
+                        if (crashSide === "rear" && typeof window.HumanNpcVoices.onRearEndHit === 'function') {
+                            window.HumanNpcVoices.onRearEndHit();
+                        } else {
+                            window.HumanNpcVoices.onCollision(crashSide, damageAmount, this.passengersOnBoard, crashSummaryText);
+                        }
                     }
 
                     if (this.busDamage.health < 20) {
                         this.triggerTowTruck();
                     } else {
-                        this.showWarning("KAZA YAPTINIZ! Araç hasar aldı.");
+                        this.showWarning(crashSide === "rear" ? "ARKADAN ÇARPTILAR! Egzoz hasar aldı." : "KAZA YAPTINIZ! Araç hasar aldı.");
                     }
                 }
             }
 
-            // Araç arkamızda tamamen uzaklaşıp sesi sönümlendiğinde (veya önde çok uzaklaştığında) sil
-            if (npc.y < -520 || npc.y > 850 || (Math.abs(npc.y) > 150 && vol <= 0.01)) {
+            // Çarpışmış ve savrulması bitmiş aracı veya arkamızda/önde menzilden çıkmış aracı temizle (Karşıdan 650-680m uzaktan yaklaşan oncoming/hazard araçları ilk karede silmemek için yön kontrolü şart!)
+            const isRecedingAhead = (npc.type === 'ahead' || npc.type === 'overtaking') && npc.y > 680 && vol <= 0.01;
+            const isRecedingBehind = npc.y < -520 || (npc.y < -490 && vol <= 0.01);
+            const isSettledWreck = npc.hasCollided && Math.abs(npc.slideX || 0) < 2 && Math.abs(npc.slideY || 0) < 2;
+            if (isRecedingBehind || npc.y > 850 || isRecedingAhead || isSettledWreck) {
                 if (npc.audioObj) npc.audioObj.stop();
                 this.activeNPCs.splice(i, 1);
             }
@@ -5344,8 +5438,10 @@ const Game = {
             document.getElementById('obstacles-container').innerHTML = '';
         }
         this.obstacles = [];
-        (this.activeNPCs || []).forEach(n => { if (n.audioObj) n.audioObj.stop(); if (n.el) n.el.remove(); });
-        this.activeNPCs = [];
+        this.stopAndClearActiveNPCs();
+        if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.stopTimersOnly === 'function') {
+            window.HumanNpcVoices.stopTimersOnly();
+        }
 
         document.getElementById('nav-feedback').innerText = "ARAÇ PERT OLDU! ÇEKİCİ BEKLENİYOR...";
         document.getElementById('nav-feedback').style.color = '#ef4444';
@@ -5358,11 +5454,13 @@ const Game = {
         // Kaza anını ve yolcu manifestosunu kaydet (Sanayi sonrası kaldığımız yerden devam etmek için)
         const evacuatedCount = this.passengersOnBoard || 0;
         this.savedState = {
+            routeId: this.activeRouteId,
             routeData: JSON.parse(JSON.stringify(this.activeRouteData)),
             stopIndex: this.currentStopIndex,
             distance: this.currentDistanceToNext,
             roadType: this.currentRoadType,
             passengersOnBoard: evacuatedCount,
+            totalPassengersBoardedInRoute: this.totalPassengersBoardedInRoute || 0,
             npcRoster: (typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.roster) ? JSON.parse(JSON.stringify(window.HumanNpcVoices.roster)) : null,
             simulatedPassengers: (typeof window.HumanNpcVoices !== 'undefined' && Array.isArray(window.HumanNpcVoices.simulatedPassengers)) ? JSON.parse(JSON.stringify(window.HumanNpcVoices.simulatedPassengers)) : []
         };
@@ -5486,9 +5584,11 @@ const Game = {
             stopData._baseBekleyen = (typeof stopData.bekleyenYolcu === 'number') ? stopData.bekleyenYolcu : 5;
         }
         let rawWaiting = stopData ? stopData._baseBekleyen : 5;
+        const { seatCapacity: stopSeatCap, totalCapacity: stopTotalCap } = this.getSeatAndTotalCapacity();
+        const isCoachOrIntercityStop = this.isCoachVehicle();
         if (!isTrainingEmpty && rawWaiting > 0) {
             let demandMult = 1.0;
-            if (typeof PowertrainDynamicsEngine !== 'undefined') {
+            if (!isCoachOrIntercityStop && typeof PowertrainDynamicsEngine !== 'undefined') {
                 demandMult *= PowertrainDynamicsEngine.getDemandMultiplier(this.clockMinutes);
             }
             if (typeof CompanySystem !== 'undefined' && CompanySystem.data) {
@@ -5498,10 +5598,13 @@ const Game = {
                 else if (pMult >= 1.55) demandMult *= 0.65;
                 else if (pMult >= 1.25) demandMult *= 0.90;
                 if (CompanySystem.data.hqUpgrades && CompanySystem.data.hqUpgrades.terminalPlatform && (this.currentStopIndex === 0 || (this.activeRouteData && this.activeRouteData.isIntercity))) {
-                    demandMult *= 1.25;
+                    demandMult *= 1.15;
                 }
             }
-            rawWaiting = Math.max(0, Math.round(rawWaiting * demandMult));
+            const maxStopQueue = isCoachOrIntercityStop
+                ? Math.max(1, stopSeatCap - (this.passengersOnBoard - alighting))
+                : Math.min(24, stopTotalCap);
+            rawWaiting = Math.max(0, Math.min(maxStopQueue, Math.round(rawWaiting * demandMult)));
             if (stopData) stopData.bekleyenYolcu = rawWaiting;
         }
         if (this.hasWheelchairPassengerAtStop && !isTrainingEmpty && !isFinalStop && rawWaiting < 1) {
@@ -5571,6 +5674,9 @@ const Game = {
             }
         }
         this.lastStopArrivalDelta = arrivalDelta;
+        if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onArriveAtStopCheck === 'function') {
+            window.HumanNpcVoices.onArriveAtStopCheck(this.currentStopIndex, stopData ? stopData.name : '');
+        }
         if (alighting === 0 && typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.syncStopArrival === 'function') {
             window.HumanNpcVoices.syncStopArrival(0, this.passengersOnBoard, arrivalDelta, this.currentStopIndex, stopData ? stopData.name : '');
         }
@@ -5607,6 +5713,8 @@ const Game = {
         this.currentGear = 1;
         audio.updateEngineSound(0, 800, 1);
         audio.updateTireNoise(0, null);
+        if (typeof audio.updatePassengerCabinMurmur === 'function') audio.updatePassengerCabinMurmur(this.passengersOnBoard, false);
+        if (typeof audio.updateCrowdAmbience === 'function') audio.updateCrowdAmbience(this.passengersOnBoard, false, true);
         if (typeof audio.stopLowAirAlarm === 'function') audio.stopLowAirAlarm();
         if (typeof audio.stopTireScreech === 'function') audio.stopTireScreech();
         if (typeof audio.stopReverseBeep === 'function') audio.stopReverseBeep();
@@ -5620,9 +5728,16 @@ const Game = {
         }
         this.obstacles = [];
 
-        // BUG FIX: Kalan NPC'leri ve seslerini temizle (Sonsuz motor sesi hatasını engeller)
-        (this.activeNPCs || []).forEach(n => { if (n.audioObj) n.audioObj.stop(); if (n.el) n.el.remove(); });
-        this.activeNPCs = [];
+        // BUG FIX: Kalan NPC'leri, aktif polis kovalamacası sirenini ve sokak kavgası döngülerini temizle (Durakta sonsuz siren/motor sesi hatasını engeller)
+        this.stopAndClearActiveNPCs();
+        if (typeof window.HumanNpcVoices !== 'undefined') {
+            if (window.HumanNpcVoices.activePoliceChase && window.HumanNpcVoices.activePoliceChase.active && typeof window.HumanNpcVoices.stopPolicePursuit === 'function') {
+                window.HumanNpcVoices.stopPolicePursuit();
+            }
+            if (window.HumanNpcVoices.activeStreetFight && typeof window.HumanNpcVoices.stopStreetFight === 'function') {
+                window.HumanNpcVoices.stopStreetFight();
+            }
+        }
 
         document.getElementById('stop-title').innerText = stopData.name;
 
@@ -5840,7 +5955,8 @@ const Game = {
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🚍 Otobüs Tamamen Dolu!", "warning");
                 if (this.stopIdleTimer) clearTimeout(this.stopIdleTimer);
                 this.stopIdleTimer = setTimeout(() => {
-                    if (!this.isDriving && this.passengersOnBoard > 0 && (this.lastStopArrivalDelta || 0) >= -1.2 && !this.activePassengerEvent && !this.activeRunningPassenger && (this.frontDoorOpen || this.rearDoorOpen || !audio.isEngineRunning)) {
+                    const isFinalIdle = !!(this.activeRouteData && Array.isArray(this.activeRouteData.stops) && (this.currentStopIndex >= this.activeRouteData.stops.length - 1));
+                    if (!this.isDriving && !isFinalIdle && (this.pendingAlightingAtStop || 0) <= 0 && this.passengersOnBoard > 0 && (this.lastStopArrivalDelta || 0) >= -1.2 && !this.activePassengerEvent && !this.activeRunningPassenger && (this.frontDoorOpen || this.rearDoorOpen || !audio.isEngineRunning)) {
                         if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onStopIdleScold === 'function') {
                             window.HumanNpcVoices.onStopIdleScold();
                         }
@@ -5881,7 +5997,8 @@ const Game = {
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🏃 Yetişen Yolcu Bonusu (+60 ₺ / +30 XP)", "success");
             if (this.stopIdleTimer) clearTimeout(this.stopIdleTimer);
             this.stopIdleTimer = setTimeout(() => {
-                if (!this.isDriving && this.passengersOnBoard > 0 && (this.lastStopArrivalDelta || 0) >= -1.2 && !this.activePassengerEvent && !this.activeRunningPassenger && (this.frontDoorOpen || this.rearDoorOpen || !audio.isEngineRunning)) {
+                const isFinalIdle = !!(this.activeRouteData && Array.isArray(this.activeRouteData.stops) && (this.currentStopIndex >= this.activeRouteData.stops.length - 1));
+                if (!this.isDriving && !isFinalIdle && (this.pendingAlightingAtStop || 0) <= 0 && this.passengersOnBoard > 0 && (this.lastStopArrivalDelta || 0) >= -1.2 && !this.activePassengerEvent && !this.activeRunningPassenger && (this.frontDoorOpen || this.rearDoorOpen || !audio.isEngineRunning)) {
                     if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onStopIdleScold === 'function') {
                         window.HumanNpcVoices.onStopIdleScold();
                     }
@@ -5897,6 +6014,9 @@ const Game = {
         this.frontDoorOpen = !this.frontDoorOpen;
         if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.updateExteriorOcclusion === 'function') {
             window.HumanNpcVoices.updateExteriorOcclusion();
+        }
+        if (typeof audio !== 'undefined' && typeof audio.updateCrowdAmbience === 'function') {
+            audio.updateCrowdAmbience(this.passengersOnBoard, this.frontDoorOpen || this.rearDoorOpen, !this.isDriving);
         }
         if (typeof BusConceptGuide !== 'undefined') {
             BusConceptGuide.announceAction('front_door', this.frontDoorOpen);
@@ -5931,7 +6051,21 @@ const Game = {
             }
 
             if (!this.isDriving) {
-                this.startBoardingLoop();
+                if (this.isRampDeployed && this.hasWheelchairPassengerAtStop && !this.wheelchairPassengerBoardedAtStop) {
+                    const boardedWc = this.boardWheelchairPassengerNow();
+                    if (boardedWc) {
+                        const thankWcMsg = "Ön kapı açıldı ve tekerlekli sandalyeli yolcu rampadan güvenle bindi! Kapatmak için U tuşuna basınız.";
+                        if (!(typeof window.HumanNpcVoices !== 'undefined' && window.HumanNpcVoices.onRampThank())) {
+                            if (typeof audio !== 'undefined' && audio.speak) audio.speak(thankWcMsg);
+                            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(thankWcMsg);
+                        }
+                    }
+                }
+                if (!this.boardingTimer && curStopGreet && curStopGreet.bekleyenYolcu > 0) {
+                    this.startBoardingLoop();
+                } else if (curStopGreet && curStopGreet.bekleyenYolcu <= 0 && !this.hasWheelchairPassengerAtStop) {
+                    this.startBoardingLoop();
+                }
                 if (!this.isTrainingRoute && !this.isCoachVehicle() && typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.triggerStopHawker === 'function') {
                     setTimeout(() => {
                         if (this.frontDoorOpen && !this.isDriving && this.passengersOnBoard >= 2) {
@@ -6000,6 +6134,7 @@ const Game = {
         document.getElementById('passenger-feedback').innerText = "";
         document.getElementById('stop-waiting-count').innerText = currentWaiting;
 
+        const boardingIntervalMs = (this.isCoachVehicle() || currentWaiting > 12) ? 650 : 1150;
         this.boardingTimer = setInterval(() => {
             if (!this.frontDoorOpen) {
                 clearInterval(this.boardingTimer);
@@ -6021,8 +6156,9 @@ const Game = {
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak("Binişler tamamlandı. Tüm yolcular bindi.");
                 if (this.stopIdleTimer) clearTimeout(this.stopIdleTimer);
                 this.stopIdleTimer = setTimeout(() => {
-                    // Erken varışta kalkış saati bekleniyorsa (lastStopArrivalDelta < -1.2) yolcular şoförü azarlamaz!
-                    if (!this.isDriving && this.passengersOnBoard > 0 && (this.lastStopArrivalDelta || 0) >= -1.2 && !this.activePassengerEvent && !this.activeRunningPassenger && (this.frontDoorOpen || this.rearDoorOpen || !audio.isEngineRunning)) {
+                    // Erken varışta kalkış saati bekleniyorsa (lastStopArrivalDelta < -1.2) veya inecek yolcu varsa yolcular şoförü azarlamaz!
+                    const isFinalIdle = !!(this.activeRouteData && Array.isArray(this.activeRouteData.stops) && (this.currentStopIndex >= this.activeRouteData.stops.length - 1));
+                    if (!this.isDriving && !isFinalIdle && (this.pendingAlightingAtStop || 0) <= 0 && (stopData.bekleyenYolcu || 0) <= 0 && this.passengersOnBoard > 0 && (this.lastStopArrivalDelta || 0) >= -1.2 && !this.activePassengerEvent && !this.activeRunningPassenger && (this.frontDoorOpen || this.rearDoorOpen || !audio.isEngineRunning)) {
                         if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.onStopIdleScold === 'function') {
                             window.HumanNpcVoices.onStopIdleScold();
                         }
@@ -6033,21 +6169,41 @@ const Game = {
 
             const { seatCapacity, maxStanding, totalCapacity } = this.getSeatAndTotalCapacity();
 
-            // Tekerlekli sandalyeli yolcu rampa (U) açılmadan otobüse binemez!
-            if (this.hasWheelchairPassengerAtStop && !this.wheelchairPassengerBoardedAtStop && !this.isRampDeployed && stopData.bekleyenYolcu <= 1 && this.passengersOnBoard < totalCapacity) {
+            // Araç doluysa ama içeride arka kapının açılmasını bekleyen inecek yolcular varsa, dışarıdaki yolcuları kovma — önce inenlere yol ver!
+            if (this.passengersOnBoard >= totalCapacity && (this.pendingAlightingAtStop || 0) > 0 && !this.rearDoorOpen) {
                 clearInterval(this.boardingTimer);
                 this.boardingTimer = null;
-                const wcWaitText = '"Tekerlekli sandalyeli yolcu biniş için engelli rampasının açılmasını bekliyor (U tuşu veya Rampayı Aç düğmesi)."';
-                document.getElementById('passenger-dialog').innerText = wcWaitText;
-                document.getElementById('passenger-feedback').innerText = "♿ Engelli rampasını açınız (Kısayol: U)";
-                document.getElementById('passenger-feedback').style.color = '#38bdf8';
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("Diğer yolcular bindi. Tekerlekli sandalyeli yolcunun binebilmesi için U tuşuyla engelli rampasını açınız.");
-                }
-                if (typeof UI !== 'undefined' && UI.showToast) {
-                    UI.showToast("♿ Tekerlekli sandalyeli yolcu rampayı bekliyor! (U tuşu)", "info");
-                }
+                document.getElementById('passenger-dialog').innerText = '"Önce inecek yolculara yol verelim; lütfen arka kapıyı açınız (PageDown)."';
+                document.getElementById('passenger-feedback').innerText = "🚪 Önce inecek yolcular için arka kapıyı açınız (PageDown)";
+                document.getElementById('passenger-feedback').style.color = '#facc15';
+                const waitRearMsg = "Araç şu an dolu; bekleyen yolcuların binebilmesi için önce PageDown (Sayfa Aşağı) tuşuyla arka kapıyı açıp inecek yolcuları indiriniz.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(waitRearMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🚪 " + waitRearMsg, "warning");
                 return;
+            }
+
+            // Tekerlekli sandalyeli yolcu rampa (U) açılmadan otobüse binemez!
+            if (this.hasWheelchairPassengerAtStop && !this.wheelchairPassengerBoardedAtStop && stopData.bekleyenYolcu <= 1 && this.passengersOnBoard < totalCapacity) {
+                if (!this.isRampDeployed) {
+                    clearInterval(this.boardingTimer);
+                    this.boardingTimer = null;
+                    const wcWaitText = '"Tekerlekli sandalyeli yolcu biniş için engelli rampasının açılmasını bekliyor (U tuşu veya Rampayı Aç düğmesi)."';
+                    document.getElementById('passenger-dialog').innerText = wcWaitText;
+                    document.getElementById('passenger-feedback').innerText = "♿ Engelli rampasını açınız (Kısayol: U)";
+                    document.getElementById('passenger-feedback').style.color = '#38bdf8';
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Diğer yolcular bindi. Tekerlekli sandalyeli yolcunun binebilmesi için U tuşuyla engelli rampasını açınız.");
+                    }
+                    if (typeof UI !== 'undefined' && UI.showToast) {
+                        UI.showToast("♿ Tekerlekli sandalyeli yolcu rampayı bekliyor! (U tuşu)", "info");
+                    }
+                    return;
+                } else {
+                    clearInterval(this.boardingTimer);
+                    this.boardingTimer = null;
+                    this.boardWheelchairPassengerNow();
+                    return;
+                }
             }
 
             if (this.passengersOnBoard < seatCapacity) {
@@ -6075,7 +6231,10 @@ const Game = {
             }
 
             this.updateHudPassengersDisplay();
-        }, 1500);
+            if (typeof audio !== 'undefined' && typeof audio.updateCrowdAmbience === 'function') {
+                audio.updateCrowdAmbience(this.passengersOnBoard, this.frontDoorOpen || this.rearDoorOpen, !this.isDriving);
+            }
+        }, boardingIntervalMs);
     },
 
     triggerRunningPassenger: function () {
@@ -6235,6 +6394,10 @@ const Game = {
                     if (this.passengersOnBoard <= 0 && typeof RoleplaySystem !== 'undefined' && typeof RoleplaySystem.stopPassengerMurmurIfNeeded === 'function') {
                         RoleplaySystem.stopPassengerMurmurIfNeeded();
                     }
+                    if (typeof audio !== 'undefined') {
+                        if (typeof audio.updatePassengerCabinMurmur === 'function') audio.updatePassengerCabinMurmur(this.passengersOnBoard, false);
+                        if (typeof audio.updateCrowdAmbience === 'function') audio.updateCrowdAmbience(this.passengersOnBoard, this.frontDoorOpen || this.rearDoorOpen, !this.isDriving);
+                    }
                     if (isFinalStopNow) {
                         if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.evaluateInspectorAtFinalStop === 'function') {
                             window.HumanNpcVoices.evaluateInspectorAtFinalStop(this);
@@ -6246,29 +6409,45 @@ const Game = {
                             }
                             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("👋 " + goodbyeMsg, "info");
                         }, 600);
-                    } else if (typeof window.HumanNpcVoices !== 'undefined') {
-                        window.HumanNpcVoices.onRearDoorAlight(prevAlight);
+                    } else {
+                        if (typeof window.HumanNpcVoices !== 'undefined') {
+                            window.HumanNpcVoices.onRearDoorAlight(prevAlight);
+                        }
+                        // İnenler yer açtıysa ve ön kapı halihazırda açıksa bekleyen yolcuların binişini otomatik devam ettir!
+                        if (this.frontDoorOpen && !this.isDriving && !this.boardingTimer && stopDataNow && stopDataNow.bekleyenYolcu > 0) {
+                            setTimeout(() => {
+                                if (this.frontDoorOpen && !this.isDriving && !this.boardingTimer) {
+                                    this.startBoardingLoop();
+                                }
+                            }, 650);
+                        }
                     }
                 }
             }
         } else {
             if (typeof audio !== 'undefined' && typeof audio.playPneumaticDoorClose === 'function') audio.playPneumaticDoorClose();
             else audio.playDoorClose();
+            if (typeof audio !== 'undefined' && typeof audio.updateCrowdAmbience === 'function') {
+                audio.updateCrowdAmbience(this.passengersOnBoard, this.frontDoorOpen || this.rearDoorOpen, !this.isDriving);
+            }
             if (btn) btn.innerText = "Arka Kapıyı Aç";
             if (!this.isDriving) this.checkAutoDepart();
         }
     },
 
-    automatedTicketProcess: function (isStanding = false) {
+    automatedTicketProcess: function (isStanding = false, opts = null) {
         const stopObj = (this.activeRouteData && Array.isArray(this.activeRouteData.stops)) ? this.activeRouteData.stops[this.currentStopIndex] : null;
         const currentStopName = ((stopObj && stopObj.name) || "").toLowerCase();
         const isIntercityTrip = !!(this.activeRouteData && this.activeRouteData.isIntercity) || this.isCoachVehicle();
         const validatorActive = !isIntercityTrip && this.isCareerFeatureUnlocked('validator');
+        const isWheelchairPass = !!(opts && opts.forceWheelchairFree);
 
-        // FORMÜLE VE DURAK VERİSİNE BAĞLI BİLET TÜRÜ (1. yolcu her zaman ücretsiz yaşlı olmaz!)
+        // FORMÜLE VE DURAK VERİSİNE BAĞLI BİLET TÜRÜ (1. yolcu her zaman ücretsiz yaşlı olmaz; engelli yolcu her zaman ücretsiz serbest kartlıdır!)
         let pType = "tam";
         const nextSeq = ((this.totalPassengersBoardedInRoute || 0) + 1) % 5;
-        if (isIntercityTrip) {
+        if (isWheelchairPass) {
+            pType = "yasli";
+        } else if (isIntercityTrip) {
             pType = (nextSeq === 3) ? "ogrenci" : "tam";
         } else if (stopObj && typeof stopObj.yolcuTipi === 'string') {
             const yt = stopObj.yolcuTipi.toLowerCase();
@@ -6284,9 +6463,9 @@ const Game = {
             pType = (nextSeq === 4) ? "yasli" : ((nextSeq === 2) ? "ogrenci" : "tam");
         }
 
-        // YETERSİZ BAKİYE AKILLI YOLCU OLAYI (Yalnızca validatörü açık şehir içi hatlarda, şehirlerarası biletli seferde olmaz!)
+        // YETERSİZ BAKİYE AKILLI YOLCU OLAYI (Yalnızca validatörü açık şehir içi hatlarda, şehirlerarası ve engelli binişinde olmaz!)
         const choiceBox = document.getElementById('passenger-choice-box');
-        if (validatorActive && pType === "ogrenci" && choiceBox && !this.insufficientBalanceTriggeredAtStop && !this.isTrainingRoute && Math.random() < 0.18) {
+        if (!isWheelchairPass && validatorActive && pType === "ogrenci" && choiceBox && !this.insufficientBalanceTriggeredAtStop && !this.isTrainingRoute && Math.random() < 0.18) {
             this.insufficientBalanceTriggeredAtStop = true;
             this.activePassengerEvent = { type: 'insufficient_balance' };
             choiceBox.classList.remove('hidden');
@@ -6377,9 +6556,11 @@ const Game = {
             setTimeout(() => { try { audio.playUmbrellaShake(); } catch (e) { } }, 320);
         }
 
-        let label = isIntercityTrip
-            ? (pType === "ogrenci" ? "İndirimli Peron Bileti" : "Tam Peron Bileti")
-            : (pType === "tam" ? "Tam" : (pType === "ogrenci" ? "Öğrenci" : "Serbest"));
+        let label = isWheelchairPass
+            ? "Ücretsiz Engelli Kartı"
+            : (isIntercityTrip
+                ? (pType === "ogrenci" ? "İndirimli Peron Bileti" : "Tam Peron Bileti")
+                : (pType === "tam" ? "Tam" : (pType === "ogrenci" ? "Öğrenci" : "Serbest")));
         const actionVerb = isIntercityTrip ? "kontrol edildi" : (validatorActive ? "basıldı" : "biniş yaptı");
         const agencySuffix = agencyCut > 0 ? ` [-${agencyCut} ₺ F1 Acente Payı]` : '';
         if (fare > 0 && splitRes && splitRes.companyShare > 0) {
@@ -6391,11 +6572,11 @@ const Game = {
         }
         document.getElementById('passenger-feedback').style.color = 'var(--secondary)';
 
-        if (!isStanding) {
+        if (!isStanding && !isWheelchairPass) {
             document.getElementById('passenger-dialog').innerText = '"Kolay gelsin."';
         }
         if (typeof window.HumanNpcVoices !== 'undefined') {
-            window.HumanNpcVoices.onPassengerBoarded(pType, this.currentStopIndex, isStanding, this.clockMinutes);
+            window.HumanNpcVoices.onPassengerBoarded(pType, this.currentStopIndex, isStanding, this.clockMinutes, opts || undefined);
         }
     },
 
@@ -6419,8 +6600,10 @@ const Game = {
             document.getElementById('obstacles-container').innerHTML = '';
         }
         this.obstacles = [];
-        (this.activeNPCs || []).forEach(n => { if (n.audioObj) n.audioObj.stop(); if (n.el) n.el.remove(); });
-        this.activeNPCs = [];
+        this.stopAndClearActiveNPCs();
+        if (typeof window.HumanNpcVoices !== 'undefined' && typeof window.HumanNpcVoices.stopAll === 'function') {
+            window.HumanNpcVoices.stopAll();
+        }
 
         if (isSuccess) {
             const isEmptyOrTrainingTrip = !!(this.isTrainingRoute || (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)));
@@ -6712,13 +6895,13 @@ const Game = {
         }
 
         // Y ve N tuşları: Eğer yetersiz bakiye olayı aktifse kaptan kararı
-        if (this.activePassengerEvent && this.activePassengerEvent.type === 'insufficient_balance') {
-            if (k === 'y') {
+        if (this.activePassengerEvent && this.activePassengerEvent.type === 'insufficient_balance' && !e.shiftKey) {
+            if (k === 'y' || e.code === 'KeyY') {
                 e.preventDefault();
                 this.resolveInsufficientBalance(true);
                 return;
             }
-            if (k === 'n') {
+            if (k === 'n' || e.code === 'KeyN') {
                 e.preventDefault();
                 this.resolveInsufficientBalance(false);
                 return;
@@ -7182,7 +7365,7 @@ const Game = {
                     window.HumanNpcVoices.onHornPressed(this.passengersOnBoard, hasAheadHazard);
                 }
             }
-            // Öndeki aracı uyar: Korna çalınca öndeki araç panikle fiziksel olarak sağa kırar ve gaza basar
+            // Öndeki yavaş aracı veya şeridimize taşmış hatalı sollayan (hazard) aracı korna ile uyar!
             if (this.activeNPCs && this.activeNPCs.length > 0) {
                 (this.activeNPCs || []).forEach(npc => {
                     if (!npc.hasCollided && npc.type === 'ahead' && npc.y > 0 && npc.y < 220) {
@@ -7191,6 +7374,17 @@ const Game = {
                         if (!npc.horned && audio.playNPCHorn) {
                             npc.horned = true;
                             setTimeout(() => audio.playNPCHorn((npc.x - this.lanePosition) / 30), 350);
+                        }
+                    } else if (!npc.hasCollided && npc.type === 'hazard' && npc.y > 30 && npc.y < 420) {
+                        npc.targetX = 21;    // Hatalı sollayan karşı araç panikle kendi sol şeridine kaçar!
+                        if (!npc.horned) {
+                            npc.horned = true;
+                            if (audio.playNPCHorn) {
+                                setTimeout(() => audio.playNPCHorn((npc.x - this.lanePosition) / 30), 280);
+                            }
+                            if (typeof UI !== 'undefined' && UI.showToast) {
+                                UI.showToast("📯 Kornanızla uyardınız; karşıdaki araç kendi şeridine kaçtı!", "success");
+                            }
                         }
                     }
                 });

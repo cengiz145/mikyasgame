@@ -262,6 +262,8 @@
         isPlayingNow: function () {
             try {
                 if (this._ptsPlayingUntil && performance.now() < this._ptsPlayingUntil) return true;
+                if (this.activePoliceChase && this.activePoliceChase.active && !this.activePoliceChase.resolved) return true;
+                if (this.activeStreetFight && this.activeStreetFight.active && !this.activeStreetFight.brawlFinished) return true;
                 return !!(this.activeHowl && typeof this.activeHowl.playing === 'function' && this.activeHowl.playing());
             } catch (e) {
                 return false;
@@ -383,11 +385,37 @@
             return topAgent ? topAgent.seatPan : -0.48;
         },
 
+        onArriveAtStopCheck: function (stopIndex, stopName) {
+            if (!this._centralStopWaiter || !stopName) return false;
+            const nm = String(stopName).toLowerCase();
+            if (nm.includes('merkez') || nm.includes('meydan') || nm.includes('çarşı') || nm.includes('otogar') || nm.includes('köprübaşı') || nm.includes('valilik') || nm.includes('hastane')) {
+                const waiterPan = this._centralStopWaiter.seatPan || 0.30;
+                this._centralStopWaiter = null;
+                const t = setTimeout(() => {
+                    const gNow = this.getGameObj();
+                    if (!gNow || gNow.isDriving || gNow.rearDoorOpen) return;
+                    this.playClip('smart_central_arrived.mp3', {
+                        pan: waiterPan,
+                        volume: 0.94,
+                        priority: 2,
+                        nvdaText: 'Az önce merkez durağını soran yolcu: Hah tamam geldik merkez durağına! Az önce sormuştum ya çok sağ olun, müsait olunca arka kapıyı açar mısınız?',
+                        toastText: '📍 Durağı Soran Yolcu: "Hah tamam geldik merkez durağına! Çok sağ olun, arka kapıyı açar mısınız?" (PageDown)',
+                        toastType: 'success'
+                    });
+                }, 2200);
+                if (!this._stuntTimers) this._stuntTimers = [];
+                this._stuntTimers.push(t);
+                return true;
+            }
+            return false;
+        },
+
         syncStopArrival: function (alightingCount, remainingPassengers, deltaMinutes, stopIndex, stopName) {
             if (typeof deltaMinutes === 'number') {
                 this.lastLateMinutes = deltaMinutes;
             }
             const rem = Math.max(0, remainingPassengers || 0);
+            const seatCap = this.getGameContext({ passengersOnBoard: rem }).seatCap || 40;
 
             // Bireysel Simüle Yolcu Ajanları İniş & Stres Hesabı
             let maxAlightStress = 0;
@@ -411,27 +439,6 @@
             this._lastAlightedMaxStress = maxAlightStress;
             this._lastAlightedSeatPan = alightPan;
 
-            // Merkez / Meydan / Otogar / Hastane Durağını Soran Yolcunun Çok Duraklı Hafıza Takibi!
-            if (this._centralStopWaiter && stopName) {
-                const nm = String(stopName).toLowerCase();
-                if (nm.includes('merkez') || nm.includes('meydan') || nm.includes('çarşı') || nm.includes('otogar') || nm.includes('köprübaşı') || nm.includes('valilik') || nm.includes('hastane')) {
-                    const waiterPan = this._centralStopWaiter.seatPan || 0.30;
-                    this._centralStopWaiter = null;
-                    setTimeout(() => {
-                        const gNow = this.getGameObj();
-                        if (gNow && gNow.isDriving) return;
-                        this.playClip('smart_central_arrived.mp3', {
-                            pan: waiterPan,
-                            volume: 0.94,
-                            priority: 2,
-                            nvdaText: 'Az önce merkez durağını soran yolcu: Hah tamam geldik merkez durağına! Az önce sormuştum ya çok sağ olun, müsait olunca arka kapıyı açar mısınız?',
-                            toastText: '📍 Durağı Soran Yolcu: "Hah tamam geldik merkez durağına! Çok sağ olun, arka kapıyı açar mısınız?" (PageDown)',
-                            toastType: 'success'
-                        });
-                    }, 2200);
-                }
-            }
-
             if (rem === 0) {
                 this.roster = { yasli: 0, ogrenci: 0, tam: 0, standing: 0, hasKid: false };
                 this.simulatedPassengers = [];
@@ -439,8 +446,21 @@
                 return;
             }
 
-            // Kalan gerçek yolcu ajanlarından demografi ve kabin öfkesini yeniden hesapla
+            // Boşalan koltuklara önce yaşlılar olmak üzere ayaktaki yolcular otursun!
             if (Array.isArray(this.simulatedPassengers) && this.simulatedPassengers.length > 0) {
+                let seatedNow = this.simulatedPassengers.filter(ag => !ag.isStanding).length;
+                if (seatedNow < seatCap) {
+                    const standers = this.simulatedPassengers
+                        .filter(ag => ag.isStanding)
+                        .sort((a, b) => (a.role === 'yasli' ? 0 : 1) - (b.role === 'yasli' ? 0 : 1));
+                    for (let i = 0; i < standers.length && seatedNow < seatCap; i++) {
+                        standers[i].isStanding = false;
+                        standers[i].seatPan = Number(((Math.random() < 0.5 ? -1 : 1) * (0.25 + Math.random() * 0.35)).toFixed(2));
+                        seatedNow++;
+                    }
+                }
+
+                // Kalan gerçek yolcu ajanlarından demografi ve kabin öfkesini yeniden hesapla
                 const rNext = { yasli: 0, ogrenci: 0, tam: 0, standing: 0, hasKid: this.roster && this.roster.hasKid };
                 let maxRemStress = 0;
                 this.simulatedPassengers.forEach(ag => {
@@ -464,7 +484,7 @@
                 this.roster.yasli = Math.max(0, Math.round((this.roster.yasli || 0) * ratio));
                 this.roster.ogrenci = Math.max(0, Math.round((this.roster.ogrenci || 0) * ratio));
                 this.roster.tam = Math.max(0, rem - this.roster.yasli - this.roster.ogrenci);
-                this.roster.standing = Math.max(0, Math.min(this.roster.standing || 0, rem - 20));
+                this.roster.standing = Math.max(0, Math.min(this.roster.standing || 0, rem - seatCap));
                 if (rem < 3) this.roster.hasKid = false;
                 if (alightingCount >= Math.ceil(prevTotal * 0.45) && this.angerLevel > 0) {
                     this.angerLevel = Math.max(0, this.angerLevel - 1);
@@ -494,6 +514,7 @@
         },
 
         getVolume: function (mult = 1.0) {
+            if (typeof audio !== 'undefined' && audio.isMuted) return 0;
             const base = (typeof audio !== 'undefined' && typeof audio.gameSoundVolume === 'number')
                 ? audio.gameSoundVolume
                 : 1.0;
@@ -519,23 +540,30 @@
             return this.howlCache[filename] || null;
         },
 
-        stopTimersOnly: function () {
-            this._demoForceOcclusion = null;
+        stopStreetFight: function () {
             if (this._demoFightInterval) {
                 clearInterval(this._demoFightInterval);
                 this._demoFightInterval = null;
             }
+            if (this.activeStreetFight) {
+                this.activeStreetFight.active = false;
+                if (Array.isArray(this.activeStreetFight.entries)) {
+                    this.activeStreetFight.entries.forEach(en => {
+                        try { if (en.howl) en.howl.stop(en.sid); } catch (e) {}
+                    });
+                }
+                this.activeStreetFight = null;
+            }
+        },
+
+        stopTimersOnly: function () {
+            this._demoForceOcclusion = null;
+            this.stopStreetFight();
             if (typeof this._stopPtsVoiceSequence === 'function') {
                 this._stopPtsVoiceSequence();
             }
             if (typeof this.stopPolicePursuit === 'function') {
                 this.stopPolicePursuit();
-            }
-            if (this.activeStreetFight && Array.isArray(this.activeStreetFight.entries)) {
-                this.activeStreetFight.entries.forEach(en => {
-                    try { if (en.howl) en.howl.stop(en.sid); } catch (e) {}
-                });
-                this.activeStreetFight = null;
             }
             if (this._footstepTimers && Array.isArray(this._footstepTimers)) {
                 this._footstepTimers.forEach(t => clearTimeout(t));
@@ -840,11 +868,22 @@
             this._brokenWindowWarned = false;
             this._brokenExhaustWarned = false;
             this._loudPhoneTriggeredInRoute = false;
+            this._phoneEventSecs = 0;
             this.loudPhoneActiveUntil = 0;
             this.wheezeLaughActiveUntil = 0;
+            this.pendingRiotWalkout = false;
+            this.fullStopWarnedIndex = -1;
             this._walkAngryDoneInRoute = false;
             this._wrongBusDoneInRoute = false;
             this._wrongBusDriveSecs = 0;
+            this._gossipDoneInRoute = false;
+            this._gossipDriveSecs = 0;
+            this._smoothDriveSecs = 0;
+            this._bickerSecs = 0;
+            this._overspeedSecs = 0;
+            this._calmDownSecs = 0;
+            this._darkDriveSecs = 0;
+            this._wetDriveSecs = 0;
             this._goalShoutDoneInRoute = false;
             this._hawkerTriggeredInRoute = false;
             this.hawkerActiveUntil = 0;
@@ -2180,7 +2219,10 @@
                 })
                 .catch(() => {
                     if (opts.fallbackClip) {
-                        this.playClip(opts.fallbackClip, opts);
+                        this.playClip(opts.fallbackClip, Object.assign({}, opts, {
+                            nvdaText: opts.nvdaText || opts.fallbackNvdaText,
+                            toastText: null
+                        }));
                     } else {
                         if (opts.fallbackNvdaText && typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
                             audio.updateNvdaLiveRegion(opts.fallbackNvdaText);
@@ -2734,6 +2776,24 @@
                             if (slice) {
                                 if (slice.file === 'ambient_route_ask.mp3') {
                                     this._centralStopWaiter = { seatPan: slice.pan || 0.30 };
+                                    if (gameObj.activeRouteData && Array.isArray(gameObj.activeRouteData.stops) && Array.isArray(this.simulatedPassengers) && this.simulatedPassengers.length > 0) {
+                                        const curIdx = gameObj.currentStopIndex || 0;
+                                        let centralIdx = -1;
+                                        for (let sIdx = curIdx; sIdx < gameObj.activeRouteData.stops.length; sIdx++) {
+                                            const stNm = ((gameObj.activeRouteData.stops[sIdx] && gameObj.activeRouteData.stops[sIdx].name) || '').toLowerCase();
+                                            if (stNm.includes('merkez') || stNm.includes('meydan') || stNm.includes('çarşı') || stNm.includes('otogar') || stNm.includes('köprübaşı') || stNm.includes('valilik') || stNm.includes('hastane')) {
+                                                centralIdx = sIdx;
+                                                break;
+                                            }
+                                        }
+                                        if (centralIdx >= curIdx) {
+                                            const waiterAg = this.simulatedPassengers.find(ag => ag.targetStopIndex > centralIdx) || this.simulatedPassengers[0];
+                                            if (waiterAg) {
+                                                waiterAg.targetStopIndex = centralIdx;
+                                                waiterAg.seatPan = slice.pan || 0.30;
+                                            }
+                                        }
+                                    }
                                 }
                                 this.playClip(slice.file, {
                                     pan: slice.pan,
@@ -3105,8 +3165,8 @@
                         if (wasWheezeLaugh) {
                             this.allyPoints = (this.allyPoints || 0) + 1;
                             this.adjustCityReputation(7);
-                            if (gameObj && typeof gameObj.addMoney === 'function') gameObj.addMoney(35);
-                            if (gameObj && typeof gameObj.addXP === 'function') gameObj.addXP(20);
+                            if (gChk && typeof gChk.addMoney === 'function') gChk.addMoney(35);
+                            if (gChk && typeof gChk.addXP === 'function') gChk.addXP(20);
                             const wasDeniz = !!this._wheezeWasDeniz;
                             this._wheezeWasDeniz = false;
                             setTimeout(() => {
@@ -3126,8 +3186,8 @@
                         } else if (wasHawker) {
                             this.allyPoints = (this.allyPoints || 0) + 1;
                             this.adjustCityReputation(7);
-                            if (gameObj && typeof gameObj.addMoney === 'function') gameObj.addMoney(35);
-                            if (gameObj && typeof gameObj.addXP === 'function') gameObj.addXP(20);
+                            if (gChk && typeof gChk.addMoney === 'function') gChk.addMoney(35);
+                            if (gChk && typeof gChk.addXP === 'function') gChk.addXP(20);
                             setTimeout(() => {
                                 this.playClip('story_hawker_kick.mp3', {
                                     pan: 0.42,
@@ -3141,8 +3201,8 @@
                         } else if (wasLoudPhone) {
                             this.allyPoints = (this.allyPoints || 0) + 1;
                             this.adjustCityReputation(6);
-                            if (gameObj && typeof gameObj.addMoney === 'function') gameObj.addMoney(30);
-                            if (gameObj && typeof gameObj.addXP === 'function') gameObj.addXP(20);
+                            if (gChk && typeof gChk.addMoney === 'function') gChk.addMoney(30);
+                            if (gChk && typeof gChk.addXP === 'function') gChk.addXP(20);
                             setTimeout(() => {
                                 this.playClip('annoy_phone_shutup.mp3', {
                                     pan: -0.35,
@@ -3153,7 +3213,7 @@
                                     toastType: 'success'
                                 });
                             }, 350);
-                        } else if (gameObj && (gameObj.passengersOnBoard || 0) > 0 && (this.angerLevel || 0) >= 4) {
+                        } else if (gChk && (gChk.passengersOnBoard || 0) > 0 && (this.angerLevel || 0) >= 4) {
                             // Şoför çok kötü sürüp üstüne yolculara "sessiz olun" anonsu açarsa ters cevap alır!
                             setTimeout(() => {
                                 this.playClip('rude_mock_anons.mp3', {
@@ -3327,6 +3387,17 @@
 
         playWalkingWrongBusDrama: function (force = false) {
             if (!this.canSpeakInCabin(force)) return false;
+            if (!force) {
+                const g = this.getGameObj();
+                const nextIdx = g ? (g.currentStopIndex || 0) : 0;
+                if (Array.isArray(this.simulatedPassengers) && this.simulatedPassengers.length > 0) {
+                    const wrongAg = this.simulatedPassengers.find(ag => ag.targetStopIndex > nextIdx) || this.simulatedPassengers[0];
+                    if (wrongAg) {
+                        wrongAg.targetStopIndex = nextIdx;
+                        wrongAg.temperament = 'impatient';
+                    }
+                }
+            }
             this.playClip('walk_start_wrongbus.mp3', {
                 pan: 0.65,
                 volume: 0.72,
@@ -3738,8 +3809,9 @@
         updateRoadsideFight: function (gameObj, deltaTime) {
             const sf = this.activeStreetFight;
             if (!sf || !sf.active) return;
-            const speedKmh = sf.isDemo ? 40 : ((gameObj && typeof gameObj.speed === 'number') ? gameObj.speed : 36);
-            sf.distMeters -= (speedKmh / 3.6) * deltaTime;
+            const rawSpeed = sf.isDemo ? 40 : ((gameObj && typeof gameObj.speed === 'number') ? Math.max(14, gameObj.speed) : 36);
+            const scale = sf.isDemo ? 1.35 : 2.1;
+            sf.distMeters -= (rawSpeed / 3.6) * deltaTime * scale;
 
             const sp = this.computeStreetFightSpatial(sf.distMeters, sf.sideSign);
             sf.entries.forEach(en => {
@@ -3754,11 +3826,7 @@
             });
 
             if (sf.distMeters < -95 && sf.brawlFinished) {
-                sf.active = false;
-                if (this._demoFightInterval) {
-                    clearInterval(this._demoFightInterval);
-                    this._demoFightInterval = null;
-                }
+                this.stopStreetFight();
             }
         },
 
